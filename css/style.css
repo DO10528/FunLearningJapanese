@@ -44,11 +44,11 @@ h1 {
 .menu-card-button {
     border: 2px solid #ffcc5c; /* 明るい黄色の枠線 */
     padding: 20px;
-    margin: 0; /* gridで制御するためmarginは0 */
+    margin: 0; 
     border-radius: 15px;
     font-size: 1.3em; 
     font-weight: bold;
-    text-decoration: none; /* リンクの下線を消す */
+    text-decoration: none; 
     text-align: center;
     
     /* サイズを固定し、中身を中央に配置 */
@@ -99,4 +99,17 @@ a.menu-card-button {
 
 .choice-button:hover:not(:disabled) {
     background-color: #4a6de1;
+}
+
+/* ★ 追加/修正: 画像がロードされない時にレイアウトが崩れないようにするCSS */
+/* main.jsで img タグに設定しているスタイルをここで再確認 */
+#game-area img {
+    /* js/main.js ですでに設定済みですが、念のため視認性を高めます */
+    width: 150px; 
+    height: 150px; 
+    object-fit: cover; /* 画像の比率を保ちつつ、指定サイズに収める */
+    display: block; /* 中央揃えのためにブロック要素に */
+    margin: 0 auto 15px; /* 中央揃えと下部の余白 */
+    line-height: 150px; /* 画像がないときもテキストを中央に配置 */
+    text-align: center;
 }
