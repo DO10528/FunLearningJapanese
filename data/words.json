@@ -41,7 +41,7 @@
     {"id": 68, "word": "さる", "reading": "さる", "image": "saru.png", "type": "animal", "level": 1, "english": "monkey"},
     {"id": 71, "word": "しか", "reading": "しか", "image": "shika.png", "type": "animal", "level": 1, "english": "deer"},
     {"id": 72, "word": "しまうま", "reading": "しまうま", "image": "shimauma.png", "type": "animal", "level": 1, "english": "zebra"},
-    {"id": 73, "word": "しんごう", "reading": "しんごう", "image": "shingou.jpg", "type": "object", "level": 1, "english": "traffic light"},
+    {"id": 73, "word": "しんごう", "reading": "しんごう", "image": "shingou.png", "type": "object", "level": 1, "english": "traffic light"},
     {"id": 77, "word": "すいか", "reading": "すいか", "image": "suika.png", "type": "food", "level": 1, "english": "watermelon"},
     {"id": 78, "word": "すなはま", "reading": "すなはま", "image": "sunahama.png", "type": "nature", "level": 1, "english": "sandy beach"},
     {"id": 76, "word": "すべりだい", "reading": "すべりだい", "image": "suberidai.png", "type": "object", "level": 1, "english": "slide"},
