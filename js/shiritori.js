@@ -5,9 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const START_BUTTON = document.getElementById('shiritoriStartButton');
     const TURN_MESSAGE = document.getElementById('turn-message');
     const CURRENT_WORD_TEXT = document.getElementById('current-word-text');
-    const CURRENT_WORD_DISPLAY = document.getElementById('current-word-display');
     const IMAGE_AREA = document.getElementById('image-area');
-    const WORD_HISTORY_DISPLAY = document.getElementById('wordHistory'); // 履歴表示要素（今回は空にする）
     const BACK_BUTTON = document.getElementById('shiritoriBackToMenu');
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const FEEDBACK = document.getElementById('feedback');
@@ -16,20 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let allWords = [];
     let usedWords = new Set();
     let lastChar = ''; 
-    let score = 0;             // プレイヤーの正解数
+    let score = 0;             // プレイヤーの正解数 (1問1点)
     let incorrectCount = 0;    // プレイヤーの不正解数
     
-    // 履歴表示を削除する（HTML要素は残すが、中身は空にする）
-    if (WORD_HISTORY_DISPLAY) {
-        WORD_HISTORY_DISPLAY.style.display = 'none';
-    }
-
-
-    // 1. JSONデータを読み込む関数 (変更なし)
+    // 1. JSONデータを読み込む関数
     async function loadWords() {
         try {
             const response = await fetch('data/words.json');
             const data = await response.json();
+            // 読み仮名が「ん」で終わらない単語のみを使用
             allWords = data.filter(word => !word.reading.endsWith('ん'));
             return allWords;
         } catch (error) {
@@ -38,9 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. スコア表示を更新する関数
+    // 2. スコア表示を更新する関数 (例: 14/2)
     function updateScoreDisplay(message) {
         const scoreDisplay = `${score}/${incorrectCount}`;
+        // ★ 改善点2: スコア表記を追加 ★
         TURN_MESSAGE.innerHTML = `${message} (${scoreDisplay})`;
     }
 
@@ -54,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lastChar = '';
         score = 0;
         incorrectCount = 0;
-        CURRENT_WORD_DISPLAY.textContent = '';
+        CURRENT_WORD_TEXT.textContent = '';
         FEEDBACK.textContent = '単語を選んでね！';
         CHOICE_BUTTONS_AREA.innerHTML = '';
         if (BACK_BUTTON) BACK_BUTTON.style.display = 'none';
@@ -100,38 +94,45 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (availableWords.length === 0) {
-            endGame('あなたの勝ちです！コンピューターは単語が見つかりませんでした。', true); // 勝ち
+            endGame('あなたの勝ちです！コンピューターは単語が見つかりませんでした。', true); 
             return;
         }
         
-        // 正解の単語を選ぶ (ランダム)
         const correctWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-        let choices = [correctWord]; // 正解をリストに格納
+        let choices = [correctWord]; 
 
-        // 2. 不正解の選択肢を2つ選ぶ
+        // 2. 不正解の選択肢を2つ選ぶ（lastChar を基準にする）
         let wrongWords = [];
-        while (wrongWords.length < 2) {
-            const randomIndex = Math.floor(Math.random() * allWords.length);
-            const randomWord = allWords[randomIndex];
-            
-            // 選択済みの単語、重複、正解と一致する単語は避ける
-            const isUsed = usedWords.has(randomWord.reading);
-            const isDuplicate = wrongWords.some(w => w.id === randomWord.id);
-            const isCorrect = correctWord.id === randomWord.id;
 
-            if (!isUsed && !isDuplicate && !isCorrect) {
-                // 不正解の単語は、**しりとりルールを満たさない**単語から選ぶ（ゲーム性を維持）
-                // ただし、最後の文字が「ん」の単語は避ける
-                if (randomWord.reading.charAt(0) !== correctWord.reading.charAt(0)) {
-                    wrongWords.push(randomWord);
-                }
+        // 候補プールを作る: 未使用・正解でない・かつ lastChar と異なる先頭文字を持つ単語
+        let wrongCandidates = allWords.filter(w =>
+            !usedWords.has(w.reading) &&
+            w.reading !== correctWord.reading &&
+            (lastChar === '' ? true : w.reading.charAt(0) !== lastChar)
+        );
+
+        // 候補プールからランダムに最大2つ選ぶ（spliceで重複防止）
+        while (wrongWords.length < 2 && wrongCandidates.length > 0) {
+            const idx = Math.floor(Math.random() * wrongCandidates.length);
+            wrongWords.push(wrongCandidates.splice(idx, 1)[0]);
+        }
+
+        // フォールバック: 候補が足りない場合は、未使用で正解でない別の単語で埋める
+        if (wrongWords.length < 2) {
+            const fallback = allWords.filter(w =>
+                !usedWords.has(w.reading) &&
+                w.reading !== correctWord.reading &&
+                !wrongWords.some(x => x.reading === w.reading)
+            );
+            while (wrongWords.length < 2 && fallback.length > 0) {
+                const idx = Math.floor(Math.random() * fallback.length);
+                wrongWords.push(fallback.splice(idx, 1)[0]);
             }
         }
-        
-        // 3. 選択肢をシャッフルして表示
+
         let finalChoices = shuffleArray([...choices, ...wrongWords]);
         
-        // 4. 画面を更新
+        // 画面を更新
         updateScoreDisplay(`次はあなたの番です。「${lastChar}」から始まる単語を選んでください。`);
         QUESTION_TEXT.textContent = 'さあ、次はどのイラストを選ぶ？';
         renderChoices(finalChoices);
@@ -147,14 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.choice-card').forEach(btn => btn.style.pointerEvents = 'none');
         
-        let isCorrect = true; // クイズの正解・不正解ではなく、しりとりルールを満たすかのフラグ
-
         // 1. 「ん」チェック (プレイヤー負け)
         if (selectedReading.slice(-1) === 'ん') {
             FEEDBACK.textContent = `「${selectedWordData.word}」は「ん」で終わります！あなたの負けです。`;
             FEEDBACK.style.color = '#ff6f61';
             card.style.backgroundColor = '#ff6f61';
-            incorrectCount++; // 不正解カウント
+            incorrectCount++; 
             endGame('敗北: 「ん」で終了', false);
             return;
         }
@@ -164,12 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
             FEEDBACK.textContent = `ざんねん！「${lastChar}」から始まっていません。`;
             FEEDBACK.style.color = '#ff6f61';
             card.style.backgroundColor = '#ff6f61';
-            incorrectCount++; // 不正解カウント
+            incorrectCount++; 
             endGame('敗北: ルール違反', false);
             return;
         }
         
-        // 3. 使用済みチェック (ロジック上は発生しないが念のため)
+        // 3. 使用済みチェック 
         if (usedWords.has(selectedReading)) {
              FEEDBACK.textContent = `既に使用されています。`;
              FEEDBACK.style.color = '#ff6f61';
@@ -202,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (availableWords.length === 0) {
-            endGame('あなたの勝ちです！コンピューターは単語が見つかりませんでした。', true); // 勝ち
+            endGame('あなたの勝ちです！コンピューターは単語が見つかりませんでした。', true); 
             return;
         }
 
@@ -214,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // コンピュータが「ん」で終わったらプレイヤーの勝ち
         if (lastChar === 'ん') {
-            endGame(`コンピューターの負けです！「${chosenWord.word}」が「ん」で終わってしまいました。`, true); // 勝ち
+            endGame(`コンピューターの負けです！「${chosenWord.word}」が「ん」で終わってしまいました。`, true); 
             return;
         }
 
@@ -227,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
-    // 8. 単語の使用と画面表示の更新 (履歴のHTML表示はしない)
+    // 8. 単語の使用と画面表示の更新 (履歴のHTML表示を削除)
     function useWord(wordData, user) {
         const reading = wordData.reading;
         usedWords.add(reading);
@@ -237,19 +236,20 @@ document.addEventListener('DOMContentLoaded', () => {
         IMAGE_AREA.innerHTML = `
             <img src="${imagePath}" 
                  alt="${wordData.word}" 
-                 onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${wordData.image})';" 
+                 onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${wordData.image})'; console.error('画像読み込み失敗:', '${imagePath}');" 
                  style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover; margin: 15px auto;">
         `;
         
         // 現在の単語表示を更新
-        CURRENT_WORD_TEXT.innerHTML = `直前の単語: <span id="current-word-display" style="font-weight: bold; color: #ff6f61;">${wordData.word} (${reading})</span>`;
+        // ★ 改善点1: 履歴を削除し、直前の単語のみを表示 ★
+        CURRENT_WORD_TEXT.innerHTML = `直前の単語: <span style="font-weight: bold; color: #ff6f61;">${wordData.word} (${reading})</span>`;
     }
 
     // 9. ゲーム終了処理
     function endGame(message, isWin) {
         const finalMessage = isWin ? 
-            `🎉 勝利！${message} スコア: ${score}/${incorrectCount}` : 
-            `😭 敗北。${message} スコア: ${score}/${incorrectCount}`;
+            `🎉 勝利！${message}` : 
+            `😭 敗北。${message}`;
             
         updateScoreDisplay('ゲーム終了');
         FEEDBACK.innerHTML = `<span style="font-size: 1.2em;">${finalMessage}</span>`;
@@ -267,3 +267,28 @@ document.addEventListener('DOMContentLoaded', () => {
             // カード型のボタンでイラストのみ表示
             return `
                 <div class="menu-card-button menu-card-reset choice-card" data-word-reading="${word.reading}" data-index="${index}">
+                    <img src="${imagePath}" 
+                         alt="${word.word}" 
+                         onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません';" 
+                         style="object-fit: cover; border-radius: 5px;">
+                </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.choice-card').forEach(button => {
+            button.addEventListener('click', handleAnswer);
+        });
+    }
+
+    // 11. 配列をランダムにシャッフルするユーティリティ関数
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    
+    // 起動
+    loadWords().then(renderMenu);
+});
