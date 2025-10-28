@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>しりとりゲーム</title> 
+    <link rel="stylesheet" href="css/style.css"> 
+</head>
+<body>
+    
+    <h1>しりとりゲーム</h1>
+    
+    <div id="shiritori-menu" class="container">
+        <h2>しりとりであそぼう！</h2>
+        
+        <div id="shiritori-start-message" style="margin-bottom: 20px;">
+            <p>ルール: プレイヤーとコンピューターで交互に単語を言います。</p>
+            <p>「ん」で終わる単語を言ったら負けです。</p>
+        </div> 
+        
+        <button id="shiritoriStartButton" class="menu-card-button menu-card-reset">
+            🎮<br>ゲームスタート！
+        </button>
+
+        <a href="index.html" class="menu-card-button menu-card-reset">
+            🏠<br>ホームに戻る
+        </a>
+    </div>
+    
+    <div id="shiritori-game-area" class="container" style="display:none;">
+        
+        <div id="currentWordDisplay" style="margin-bottom: 20px;">
+            <p id="turn-message" style="font-size: 1.5em; font-weight: bold; color: #5c7aff;">ゲーム開始</p>
+            <div id="wordHistory" style="font-size: 1.1em; margin-bottom: 10px;"></div>
+            
+            <p id="current-word-display" style="font-size: 1.5em; font-weight: bold; color: #ff6f61;"></p>
+            
+            <div id="image-area">
+                </div>
+        </div>
+
+        <div id="player-input-area" style="margin-top: 20px;">
+            <input type="text" id="playerInput" placeholder="ひらがなで単語を入力" style="padding: 10px; font-size: 1.1em; border: 2px solid #ccc; border-radius: 5px;">
+            <button id="submitButton" class="choice-button" style="margin-left: 10px;">送信</button>
+            <p id="error-message" style="color: red; margin-top: 10px; font-weight: bold;"></p>
+        </div>
+        
+        <button id="shiritoriBackToMenu" class="menu-card-button menu-card-reset" style="margin-top: 30px; display: none;">メニューに戻る</button>
+    </div>
+    
+    <script src="js/shiritori.js"></script>
+</body>
+</html>
