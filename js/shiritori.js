@@ -91,15 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
         playerTurn(); 
     }
     
+    // js/shiritori.js 内の function playerTurn() をこのコードに置き換えてください
+
     // 5. プレイヤーのターン (3択クイズとして表示)
     function playerTurn() {
         
         // しりとりルールを満たす単語（正解候補）を見つける
         let availableWords = allWords.filter(word => 
-            !usedWords.has(word.reading) && word.reading.charAt(0) === lastChar
+            !usedWords.has(word.reading) && (lastChar === '' || word.reading.charAt(0) === lastChar)
         );
 
-        // ルールを満たす単語が辞書にない場合、ゲームオーバー
         if (availableWords.length === 0) {
             endGame('おめでとう！辞書のすべての単語を使い切りました。', true); 
             return;
@@ -109,12 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const correctWord = availableWords[Math.floor(Math.random() * availableWords.length)];
         let choices = [correctWord]; 
 
-        // 2. 不正解の選択肢を2つ選ぶ（ルールを満たさない、または使用済み）
+        // 2. ★ 修正: 不正解の選択肢を2つ選ぶ ★
         let wrongWords = [];
         let attempts = 0;
         const MAX_ATTEMPTS = allWords.length * 2; 
 
-        while (wrongWords.length < 3 && attempts < MAX_ATTEMPTS) { // 3つ選ぶように修正
+        // ★ 修正: 2つ見つかるまでループする (wrongWords.length < 2) ★
+        while (wrongWords.length < 2 && attempts < MAX_ATTEMPTS) { 
             const randomIndex = Math.floor(Math.random() * allWords.length);
             const randomWord = allWords[randomIndex];
             
@@ -126,27 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 不正解の条件: 正解の単語と、読みの最初の文字が異なる単語を選ぶ
                 if (randomWord.reading.charAt(0) !== correctWord.reading.charAt(0)) {
                     wrongWords.push(randomWord);
-                } else if(wrongWords.length < 2) {
-                    // ルールは満たすが、既に使った単語を不正解として追加する（選択肢が足りない場合の補充ロジック）
-                    // ここは一人用なので、単純に「正しい文字から始まらない」単語を優先する。
-                    // 選択肢を4つに固定するため、不正解は3つ必要。
                 }
             }
             attempts++;
         }
         
-        // 選択肢が4つになるよう調整 (choices[1] + wrongWords[0..2] or choices[0] + wrongWords[0..3])
-        while (wrongWords.length < 3) {
-             // 選択肢が足りない場合、適当な単語を追加（めったに発生しないはず）
-             wrongWords.push({
-                 id: Date.now() + Math.random(),
-                 word: "???",
-                 reading: "ふせいかい",
-                 image: "default.png" // 存在しない画像名でエラー表示を期待
-             });
-        }
-        
-        let finalChoices = shuffleArray([...choices, ...wrongWords.slice(0, 3)]); // 選択肢は計4つ
+        // 選択肢を3つに固定する (正解1つ + 不正解2つ)
+        let finalChoices = shuffleArray([...choices, ...wrongWords.slice(0, 2)]);
         
         // 画面を更新
         updateScoreDisplay(`チャレンジ中！`);
