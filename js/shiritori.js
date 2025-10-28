@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 5. プレイヤーのターン (3択クイズとして表示)
-    function playerTurn(wordData) {
+    function playerTurn() { 
         
         let availableWords = allWords.filter(word => 
             !usedWords.has(word.reading) && (lastChar === '' || word.reading.charAt(0) === lastChar)
