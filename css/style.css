@@ -1,0 +1,102 @@
+/* サイト全体の基本的なデザイン設定 */
+body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: #f7f9fc;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+/* タイトル（h1）の設定 */
+h1 {
+    color: #ff6f61;
+    font-size: 2.5em;
+    border-bottom: 4px solid #ffcc5c;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* ゲームやコンテンツのコンテナ（枠）の基本設定 */
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+/* ------------------------------------ */
+/* 統一ボタンデザイン */
+/* ------------------------------------ */
+
+/* メニューボタンの配置を制御 */
+.menu-buttons-grid {
+    display: flex; 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    gap: 30px; /* ボタン間のスペースを広げる */
+    margin-top: 20px;
+}
+
+/* カード型ボタンの共通デザインとサイズ設定 */
+.menu-card-button {
+    border: 2px solid #ffcc5c; /* 明るい黄色の枠線 */
+    padding: 20px;
+    margin: 0; /* gridで制御するためmarginは0 */
+    border-radius: 15px;
+    font-size: 1.3em; 
+    font-weight: bold;
+    text-decoration: none; /* リンクの下線を消す */
+    text-align: center;
+    
+    /* サイズを固定し、中身を中央に配置 */
+    width: 200px;
+    height: 150px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* 青いボタンのスタイルを上書きし、デザインをリセットする */
+button.menu-card-reset,
+a.menu-card-reset {
+    background-color: white !important; /* 背景色を白で固定 */
+    color: #333 !important;            /* 文字色を黒で固定 */
+    border: 2px solid #ffcc5c !important; /* 枠線を固定 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* リンク要素の色とカーソルを調整 */
+a.menu-card-button {
+    color: #333;
+}
+
+.menu-card-button:hover {
+    transform: translateY(-5px); /* 少し上に浮き上がる */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    background-color: #fff8e1; /* 薄い黄色に変化 */
+}
+
+/* ゲーム中の選択肢ボタン (標準ボタンのスタイルを保持) */
+.choice-button {
+    background-color: #5c7aff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.choice-button:hover:not(:disabled) {
+    background-color: #4a6de1;
+}
