@@ -113,3 +113,33 @@ a.menu-card-button {
     line-height: 150px; /* 画像がないときもテキストを中央に配置 */
     text-align: center;
 }
+
+/* --- ★ 新規追加: しりとりゲームの選択肢を横並びにするスタイル ★ --- */
+#choice-buttons-area {
+    display: flex;
+    justify-content: center; /* 横方向の中央揃え */
+    flex-wrap: wrap; /* 画面幅が狭くなったら折り返す */
+    gap: 20px; /* カード間のスペース */
+    margin-top: 30px;
+}
+
+/* 選択肢のカードのサイズを調整 */
+.choice-card {
+    /* 3つ並ぶように幅を調整 */
+    width: 150px !important; 
+    height: 150px !important;
+    padding: 10px !important;
+    margin: 0 !important; /* 親要素のgapでスペースを調整 */
+    
+    /* カード内の画像とテキストを調整 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-around !important; /* 上下に均等に配置 */
+}
+
+/* 画像がカードの空間を占有しすぎないように微調整 */
+.choice-card img {
+    width: 60px !important;
+    height: 60px !important;
+    margin: 0 auto !important;
+}

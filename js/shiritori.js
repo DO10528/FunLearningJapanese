@@ -114,27 +114,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 5. 選択肢を画面に描画
-    function renderChoices(choices) {
-        currentChoices = choices;
-        CHOICE_BUTTONS_AREA.innerHTML = choices.map((word, index) => {
-            const imagePath = `assets/images/${word.image}`;
-            
-            // 各選択肢をカード型のボタンで表示
-            return `
-                <div class="menu-card-button menu-card-reset choice-card" data-word-reading="${word.reading}" data-index="${index}" style="width: 200px; height: 180px; margin: 10px;">
-                    <img src="${imagePath}" 
-                         alt="${word.word}" 
-                         onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません';" 
-                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
-                    <span style="font-size: 1.1em; margin-top: 5px;">${word.word} (${word.reading})</span>
+function renderChoices(choices) {
+    currentChoices = choices;
+    CHOICE_BUTTONS_AREA.innerHTML = choices.map((word, index) => {
+        const imagePath = `assets/images/${word.image}`;
+        
+        // 各選択肢をカード型のボタンで表示
+        return `
+            <div class="menu-card-button menu-card-reset choice-card" data-word-reading="${word.reading}" data-index="${index}">
+                <img src="${imagePath}" 
+                     alt="${word.word}" 
+                     onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません';" 
+                     style="object-fit: cover; border-radius: 5px;">
                 </div>
-            `;
-        }).join('');
+        `;
+    }).join('');
 
-        document.querySelectorAll('.choice-card').forEach(button => {
-            button.addEventListener('click', handleAnswer);
-        });
-    }
+    document.querySelectorAll('.choice-card').forEach(button => {
+        button.addEventListener('click', handleAnswer);
+    });
+}
 
     // 6. ユーザーの回答を処理
     function handleAnswer(event) {
