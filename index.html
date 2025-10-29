@@ -15,33 +15,8 @@
         
         <div id="score-message" style="margin-bottom: 20px;">
             <p>ようこそ！ゲームを選んでね。</p>
-        </div> 
-        
-        <div class="menu-buttons-grid">
-            
-        <button id="startButton1" 
-            class="menu-card-button menu-card-reset" 
-            type="button"
-            onclick="loadGameScript('./js/main.js')">
-                🎮<br>ひらがな単語ゲーム
-            </button>
-            
-        <button id="startButton2" 
-            class="menu-card-button menu-card-reset" 
-            type="button"
-            onclick="loadGameScript('./js/main2.js')">
-                ⭐<br>ひらがなゲーム2 (並び替え)
-            </button>
-            
-            <a href="hiragana.html" class="menu-card-button menu-card-reset">
-                📝<br>ひらがな・カタカナ学習
-            </a>
-            
-            <a href="shiritori.html" class="menu-card-button menu-card-reset">
-                🗣️<br>しりとりゲーム
-            </a>
-            
         </div>
+        
     </div>
     
     <div id="game-area" class="container" style="display:none;">
@@ -68,39 +43,25 @@
         // 既存のゲームを破棄する関数
         function disposeCurrentGame() {
             if (window.gameState.currentGame === 'hiragana2' && typeof window.disposeHiragana2 === 'function') {
-                try {
-                    window.disposeHiragana2();
-                } catch (e) {
-                    console.warn('Error disposing Hiragana2:', e);
-                }
+                try { window.disposeHiragana2(); } catch (e) { console.warn('Error disposing Hiragana2:', e); }
             } else if (window.gameState.currentGame === 'hiragana' && typeof window.disposeHiragana === 'function') {
-                try {
-                    window.disposeHiragana();
-                } catch (e) {
-                    console.warn('Error disposing Hiragana:', e);
-                }
+                try { window.disposeHiragana(); } catch (e) { console.warn('Error disposing Hiragana:', e); }
             }
-            
+
             // 古いスクリプトを削除
             document.querySelectorAll('script[data-game-script]').forEach(s => {
-                s.parentNode.removeChild(s);
+                try { s.parentNode.removeChild(s); } catch (e) {}
             });
-            
+
             window.gameState.currentGame = null;
         }
 
-        // ゲームスクリプトを読み込んで初期化する関数
+        // ゲームスクリプトを読み込んで初期化する関数（重複ロード防止付き）
         function loadGameScript(scriptPath) {
             console.log('[Loader] loadGameScript called:', scriptPath);
-            // 既に同じ src のスクリプトが存在しないかチェック
-            const existing = document.querySelector(`script[src="${scriptPath}"]`);
-            if (existing) {
-                console.log('[Loader] script already present in DOM for', scriptPath);
-            }
             // メインメニューを一旦非表示にし、ゲームエリアに切り替え
             const menu = document.getElementById('main-menu');
             const gameArea = document.getElementById('game-area');
-            
             if (menu) menu.style.display = 'none';
             if (gameArea) {
                 gameArea.style.display = 'block';
@@ -110,44 +71,39 @@
             // 既存のゲームを破棄
             disposeCurrentGame();
 
+            const normalized = scriptPath.replace(/^\.\//, '');
+
+            // 既に同じスクリプトが DOM に存在するか確認
+            const existing = Array.from(document.querySelectorAll('script[data-game-script]')).find(s => {
+                const src = s.getAttribute('src') || s.src || '';
+                return src.endsWith(normalized) || src.endsWith(scriptPath.replace(/^\.\//, ''));
+            });
+
+            if (existing) {
+                console.log('[Loader] script already present in DOM for -', scriptPath);
+                const alreadyLoaded = existing.dataset && existing.dataset.loaded === 'true';
+                if (alreadyLoaded) {
+                    console.log('[Loader] script previously loaded - calling init for', normalized);
+                    callInitForNormalized(normalized);
+                    return;
+                }
+                existing.addEventListener('load', function onExistingLoad() {
+                    try { existing.dataset.loaded = 'true'; } catch (e) {}
+                    existing.removeEventListener('load', onExistingLoad);
+                    callInitForNormalized(normalized);
+                });
+                return;
+            }
+
             // 新しいスクリプトを読み込む
             const script = document.createElement('script');
             script.src = scriptPath;
             script.setAttribute('data-game-script', 'true');
 
             script.onload = function() {
+                try { script.dataset.loaded = 'true'; } catch (e) {}
                 console.log('[Loader] script loaded:', scriptPath);
-                // 正規化（先頭の ./ を取り除く）
-                const normalized = scriptPath.replace(/^\.\//, '');
-
-                // スクリプトの読み込み完了後、適切な初期化関数を呼び出す
-                if (normalized === 'js/main.js') {
-                    window.gameState.currentGame = 'hiragana';
-                    if (typeof window.initHiragana === 'function') {
-                        try {
-                            window.initHiragana();
-                        } catch (e) {
-                            console.error('Failed to initialize Hiragana game:', e);
-                            showGameError();
-                        }
-                    } else {
-                        console.warn('initHiragana not found after loading', scriptPath);
-                        showGameError();
-                    }
-                } else if (normalized === 'js/main2.js') {
-                    window.gameState.currentGame = 'hiragana2';
-                    if (typeof window.initHiragana2 === 'function') {
-                        try {
-                            window.initHiragana2();
-                        } catch (e) {
-                            console.error('Failed to initialize Hiragana2 game:', e);
-                            showGameError();
-                        }
-                    } else {
-                        console.warn('initHiragana2 not found after loading', scriptPath);
-                        showGameError();
-                    }
-                }
+                callInitForNormalized(normalized);
             };
 
             script.onerror = function() {
@@ -158,6 +114,21 @@
             document.body.appendChild(script);
         }
 
+        // normalized に応じて該当 init を呼ぶヘルパ
+        function callInitForNormalized(normalized) {
+            if (normalized === 'js/main.js') {
+                window.gameState.currentGame = 'hiragana';
+                if (typeof window.initHiragana === 'function') {
+                    try { window.initHiragana(); } catch (e) { console.error('Failed to initialize Hiragana game:', e); showGameError(); }
+                } else { console.warn('initHiragana not found after loading', normalized); showGameError(); }
+            } else if (normalized === 'js/main2.js') {
+                window.gameState.currentGame = 'hiragana2';
+                if (typeof window.initHiragana2 === 'function') {
+                    try { window.initHiragana2(); } catch (e) { console.error('Failed to initialize Hiragana2 game:', e); showGameError(); }
+                } else { console.warn('initHiragana2 not found after loading', normalized); showGameError(); }
+            }
+        }
+
         // エラー表示関数
         function showGameError() {
             const gameArea = document.getElementById('game-area');
@@ -165,16 +136,11 @@
                 gameArea.innerHTML = `
                     <div style="color: red; padding: 20px;">
                         <p>ゲームの読み込みに失敗しました。</p>
-                        <button class="menu-card-button menu-card-reset" 
-                                onclick="location.reload()" 
-                                style="width: auto; height: auto; padding: 10px 20px;">
-                            再試行
-                        </button>
+                        <button class="menu-card-button menu-card-reset" onclick="location.reload()" style="width: auto; height: auto; padding: 10px 20px;">再試行</button>
                     </div>`;
             }
         }
 
-                
     </script>
     
     </body>
