@@ -19,11 +19,17 @@
         
         <div class="menu-buttons-grid">
             
-            <button id="startButton1" class="menu-card-button menu-card-reset" onclick="loadGameScript('js/main.js')">
+            <button id="startButton1" 
+                    class="menu-card-button menu-card-reset" 
+                    type="button"
+                    onclick="loadGameScript('js/main.js')">
                 🎮<br>ひらがな単語ゲーム
             </button>
             
-            <button id="startButton2" class="menu-card-button menu-card-reset" onclick="loadGameScript('js/main2.js')">
+            <button id="startButton2" 
+                    class="menu-card-button menu-card-reset" 
+                    type="button"
+                    onclick="loadGameScript('js/main2.js')">
                 ⭐<br>ひらがなゲーム2 (並び替え)
             </button>
             
@@ -43,26 +49,44 @@
     </div>
     
     <script>
+        // ゲーム管理用の状態オブジェクト
+        window.gameState = {
+            currentGame: null,
+            initialized: false
+        };
+
+        // DOMContentLoaded イベントで初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // ボタンにtype属性を追加
+            document.querySelectorAll('.menu-buttons-grid button').forEach(button => {
+                if (!button.hasAttribute('type')) {
+                    button.setAttribute('type', 'button');
+                }
+            });
+        });
+
         // 既存のゲームを破棄する関数
         function disposeCurrentGame() {
-            // ひらがなゲーム2の破棄
-            if (typeof window.disposeHiragana2 === 'function') {
+            if (window.gameState.currentGame === 'hiragana2' && typeof window.disposeHiragana2 === 'function') {
                 try {
                     window.disposeHiragana2();
                 } catch (e) {
                     console.warn('Error disposing Hiragana2:', e);
                 }
-            }
-            // ひらがな単語ゲームの破棄
-            if (typeof window.disposeHiragana === 'function') {
+            } else if (window.gameState.currentGame === 'hiragana' && typeof window.disposeHiragana === 'function') {
                 try {
                     window.disposeHiragana();
                 } catch (e) {
                     console.warn('Error disposing Hiragana:', e);
                 }
             }
+            
             // 古いスクリプトを削除
-            document.querySelectorAll('script[data-game-script]').forEach(s => s.remove());
+            document.querySelectorAll('script[data-game-script]').forEach(s => {
+                s.parentNode.removeChild(s);
+            });
+            
+            window.gameState.currentGame = null;
         }
 
         // ゲームスクリプトを読み込んで初期化する関数
@@ -70,6 +94,7 @@
             // メインメニューを一旦非表示にし、ゲームエリアに切り替え
             const menu = document.getElementById('main-menu');
             const gameArea = document.getElementById('game-area');
+            
             if (menu) menu.style.display = 'none';
             if (gameArea) {
                 gameArea.style.display = 'block';
@@ -84,22 +109,53 @@
             script.src = scriptPath;
             script.setAttribute('data-game-script', 'true');
 
-            script.onload = () => {
-                if (scriptPath === 'js/main.js' && typeof window.initHiragana === 'function') {
-                    window.initHiragana();
-                } else if (scriptPath === 'js/main2.js' && typeof window.initHiragana2 === 'function') {
-                    window.initHiragana2();
+            script.onload = function() {
+                // スクリプトの読み込み完了後、適切な初期化関数を呼び出す
+                if (scriptPath === 'js/main.js') {
+                    window.gameState.currentGame = 'hiragana';
+                    if (typeof window.initHiragana === 'function') {
+                        try {
+                            window.initHiragana();
+                        } catch (e) {
+                            console.error('Failed to initialize Hiragana game:', e);
+                            showGameError();
+                        }
+                    }
+                } else if (scriptPath === 'js/main2.js') {
+                    window.gameState.currentGame = 'hiragana2';
+                    if (typeof window.initHiragana2 === 'function') {
+                        try {
+                            window.initHiragana2();
+                        } catch (e) {
+                            console.error('Failed to initialize Hiragana2 game:', e);
+                            showGameError();
+                        }
+                    }
                 }
             };
 
-            script.onerror = () => {
-                if (gameArea) {
-                    gameArea.innerHTML = '<p style="color: red;">ゲームの読み込みに失敗しました。</p>' +
-                                       '<button onclick="location.reload()">再試行</button>';
-                }
+            script.onerror = function() {
+                console.error('Failed to load game script:', scriptPath);
+                showGameError();
             };
 
             document.body.appendChild(script);
+        }
+
+        // エラー表示関数
+        function showGameError() {
+            const gameArea = document.getElementById('game-area');
+            if (gameArea) {
+                gameArea.innerHTML = `
+                    <div style="color: red; padding: 20px;">
+                        <p>ゲームの読み込みに失敗しました。</p>
+                        <button class="menu-card-button menu-card-reset" 
+                                onclick="location.reload()" 
+                                style="width: auto; height: auto; padding: 10px 20px;">
+                            再試行
+                        </button>
+                    </div>`;
+            }
         }
 
                 const script = document.createElement('script');
