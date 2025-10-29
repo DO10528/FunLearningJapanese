@@ -1,18 +1,21 @@
 (function(){
-    // HTML要素のIDを正確に取得
-    const MAIN_MENU = document.getElementById('main-menu'); 
-    const GAME_AREA = document.getElementById('game-area');
-    const START_BUTTON = document.getElementById('startButton'); 
-    const SCORE_MESSAGE = document.getElementById('score-message'); 
-    
+    // DOM 要素は init 時に取得（スクリプトを動的に読み込むため）
+    let MAIN_MENU = null;
+    let GAME_AREA = null;
+    let START_BUTTON = null;
+    let SCORE_MESSAGE = null;
+
     let allWords = [];
     let currentWord = null;
     let score = 0;
     
-    // --- 【改善点2, 3のために追加】 ---
+    // --- 状態 ---
     let correctCount = 0;      // 正解数
     let incorrectCount = 0;    // 不正解数
     let askedWordIds = new Set(); // 出題済みの単語IDを記録
+    // 追跡用: 動的に追加したリスナやタイマーを保持して dispose 時に解除する
+    let attachedListeners = [];
+    let activeTimeouts = [];
     // ---------------------------------
 
     // 1. JSONデータを読み込む関数 (変更なし)
@@ -127,9 +130,14 @@
 
         document.querySelectorAll('.choice-button').forEach(button => {
             button.addEventListener('click', handleAnswer);
+            attachedListeners.push({ el: button, type: 'click', fn: handleAnswer });
         });
         
-        document.getElementById('backToMenu').addEventListener('click', renderMenu);
+        const backBtn = document.getElementById('backToMenu');
+        if (backBtn) {
+            backBtn.addEventListener('click', renderMenu);
+            attachedListeners.push({ el: backBtn, type: 'click', fn: renderMenu });
+        }
     }
 
     // 6. ユーザーの回答を処理する 
@@ -147,9 +155,10 @@
             correctCount += 1; // 正解数をカウントアップ
             
             // 改善点1: 正解の場合、自動で次の問題へ (1.5秒後)
-            setTimeout(() => {
+            const tCorrect = setTimeout(() => {
                 showNextQuestion();
             }, 1500);
+            activeTimeouts.push(tCorrect);
 
         } else {
             feedbackElement.textContent = `ざんねん...。正解は「${currentWord.word}」だよ。`;
@@ -157,7 +166,7 @@
             incorrectCount += 1; // 不正解数をカウントアップ
             
             // 不正解の場合、手動で次の問題へ進むボタンを表示
-            setTimeout(() => {
+            const tIncorrect = setTimeout(() => {
                 const nextButton = document.createElement('button');
                 nextButton.id = 'nextButton';
                 nextButton.textContent = 'つぎのもんだいへ';
@@ -167,11 +176,16 @@
                 const backButton = document.getElementById('backToMenu');
                 backButton.parentNode.insertBefore(nextButton, backButton);
 
-                document.getElementById('nextButton').addEventListener('click', showNextQuestion);
+                const nextBtn = document.getElementById('nextButton');
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', showNextQuestion);
+                    attachedListeners.push({ el: nextBtn, type: 'click', fn: showNextQuestion });
+                }
                 
                 // 改善点3の表示を更新するため、タイトルを再描画
                 renderScoreTitleUpdate();
-            }, 1500); 
+            }, 1500);
+            activeTimeouts.push(tIncorrect);
         }
     }
 
