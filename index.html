@@ -17,10 +17,29 @@
             <p>ようこそ！ゲームを選んでね。</p>
         </div>
         
+        <div class="menu-buttons-grid">
+            <button class="menu-card-button" onclick="loadGameScript('./js/main.js')">
+                ひらがな
+                <small>基本のひらがな学習</small>
+            </button>
+            <button class="menu-card-button" onclick="loadGameScript('./js/main2.js')">
+                ひらがな2
+                <small>応用のひらがな学習</small>
+            </button>
+            <button class="menu-card-button" onclick="loadGameScript('./js/shiritori.js')">
+                しりとり
+                <small>言葉をつなげよう</small>
+            </button>
+        </div>
     </div>
     
     <div id="game-area" class="container" style="display:none;">
-        <p>ゲームを読み込んでいます...</p>
+        <h3>ゲームを読み込んでいます...</h3>
+        <div id="loading-area">
+            <div class="loading-spinner"></div>
+        </div>
+        <div id="game-content"></div>
+        <button id="startButton1" class="menu-card-button menu-card-reset" style="display: none;">はじめる</button>
     </div>
     
     <script>
@@ -38,6 +57,19 @@
                     button.setAttribute('type', 'button');
                 }
             });
+
+            // ゲームエリアの初期状態を設定
+            const gameArea = document.getElementById('game-area');
+            if (gameArea) {
+                gameArea.innerHTML = `
+                    <h3>ゲームを読み込んでいます...</h3>
+                    <div id="loading-area">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div id="game-content"></div>
+                    <button id="startButton1" class="menu-card-button menu-card-reset" style="display: none;">はじめる</button>
+                `;
+            }
         });
 
         // 既存のゲームを破棄する関数
