@@ -31,13 +31,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (SCORE_MESSAGE) {
             SCORE_MESSAGE.innerHTML = `<p id="current-score">前回のスコア: ${score}点 (正解: ${correctCount}問, 失敗: ${incorrectCount}回)</p>`;
         }
+        
+        // メニューのボタンにイベントリスナーを再設定（index.htmlの動的読み込みに対応）
+        const startButton2 = document.getElementById('startButton2');
+        if (startButton2) {
+            startButton2.addEventListener('click', startNewGame);
+        }
     }
 
     // 3. ゲーム開始と新しい問題の生成
     function startNewGame() {
         if (allWords.length === 0) {
-            alert('単語データがありません。');
-            renderMenu();
+            alert('ゲームを開始するには最低限の単語データが必要です。');
+            // データが読み込まれていない場合はここで終了し、メニューに戻るための処理を行う
+            loadWords().then(() => {
+                if(allWords.length > 0) startNewGame();
+                else renderMenu();
+            });
             return;
         }
         
@@ -78,16 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuestion(currentWord, shuffledChars);
     }
 
-    // 5. 画面に問題とブロックを表示する (要件2, 4, 5に対応)
+    // 5. 画面に問題とブロックを表示する
     function renderQuestion(word, shuffledChars) {
-        // 画像は既存の assets/images フォルダを参照 (要件1)
+        // 画像は既存の assets/images フォルダを参照
         const imagePath = `assets/images/${word.image}`; 
         
         const scoreDisplay = `${correctCount}/${incorrectCount}`; 
 
         // 文字ブロックを生成
         let blocksHtml = shuffledChars.map((char, index) => 
-            // data-indexは元の位置を保持 (並び替えに必要)、data-charは文字
             `<div class="char-block" data-char="${char}" data-original-index="${index}">${char}</div>`
         ).join('');
 
@@ -110,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <p id="feedback" style="font-weight: bold; margin-top: 15px; min-height: 25px;">クリックで文字を入れ替え！</p>
             
-            <button id="backToMenu" class="menu-card-button menu-card-reset" style="margin-top: 20px;">メニューに戻る</button>
+            <button id="backToMenu2" class="menu-card-button menu-card-reset" style="margin-top: 20px;">メニューに戻る</button>
         `;
 
         // イベントリスナーを設定
@@ -119,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         document.getElementById('checkButton').addEventListener('click', checkAnswer);
-        document.getElementById('backToMenu').addEventListener('click', renderMenu);
+        document.getElementById('backToMenu2').addEventListener('click', renderMenu);
     }
 
     // 6. ブロックをクリックしたときの処理（並び替えロジック）
@@ -165,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         FEEDBACK.style.color = '#333';
     }
 
-    // 7. 答え合わせの処理 (要件3に対応)
+    // 7. 答え合わせの処理
     function checkAnswer() {
         const blocks = Array.from(document.querySelectorAll('.char-block'));
         const attemptedReading = blocks.map(block => block.dataset.char).join('');
@@ -178,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             score += 10;
             correctCount += 1; 
 
-            // 次へ自動で進む (要件3)
+            // 次へ自動で進む
             setTimeout(() => {
                 showNextQuestion();
             }, 1500);
@@ -189,8 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             FEEDBACK.style.color = '#ff6f61';
             incorrectCount += 1; // 失敗数をカウントアップ
 
-            // 失敗したらやり直し（画面はそのままで、ボタンだけリセット）(要件3)
-            // 特に何もしなくても、ユーザーはブロックを操作し直すだけで良い
+            // 失敗したらやり直し（画面はそのままで、ボタンだけリセット）
             document.querySelectorAll('.char-block').forEach(block => {
                 block.classList.remove('selected'); // 選択状態を解除
             });
@@ -219,9 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // 全ての処理を開始（ゲーム開始はindex.htmlのボタンで動的に行われるため、ここではメニュー表示のみ）
-    // loadWords().then(renderMenu); // 起動ロジックはindex.htmlの動的ロードに任せる
-
-    // ページがロードされたらデータを準備
+    // 全ての処理を開始（index.htmlのボタンが押されるのを待つ）
     loadWords();
 });
