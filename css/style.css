@@ -102,7 +102,8 @@ a.menu-card-button {
 }
 
 /* 画像がロードされない時にレイアウトが崩れないようにするCSS */
-/* カード（メニュー・選択肢）内の画像：カードのコンテンツ領域にフィットさせる */
+
+/* カード（メニュー・選択肢）内の画像 */
 .menu-card-button img,
 .choice-card img {
     width: 100%;
@@ -113,19 +114,20 @@ a.menu-card-button {
     box-sizing: border-box;
 }
 
-/* メイン表示用の画像（問題画像など）は固定サイズで中央に配置）*/
+/* メイン表示用の画像（問題画像など） */
 #image-area img,
 #game-area img,
 #shiritori-game-area img {
-    width: 150px;
-    height: 150px;
+    width: 150px; 
+    height: 150px; 
     object-fit: cover;
     display: block;
     margin: 0 auto 15px;
     border-radius: 10px;
 }
 
-/* --- ★ 新規追加: ひらがなゲーム2 の文字ブロック スタイル ★ --- */
+
+/* --- ★ ひらがなゲーム2 の文字ブロック スタイル ★ --- */
 .char-block {
     /* 要件5: 同じ大きさのブロック */
     width: 50px;
