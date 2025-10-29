@@ -197,7 +197,7 @@
     window.initHiragana = function() {
         MAIN_MENU = document.getElementById('main-menu');
         GAME_AREA = document.getElementById('game-area');
-        START_BUTTON = document.getElementById('startButton');
+        START_BUTTON = document.getElementById('startButton1');
         SCORE_MESSAGE = document.getElementById('score-message');
 
         // 初期化前に古い状態が残っている場合は dispose

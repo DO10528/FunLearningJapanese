@@ -71,7 +71,15 @@
 
             function loadScript(src) {
                 // 既に同じスクリプトが読み込まれている場合は無視
-                if (document.querySelector('script[src="' + src + '"]')) return;
+                if (document.querySelector('script[src="' + src + '"]')) {
+                    // スクリプトが既に存在する場合は、対応する初期化関数を直接呼び出す
+                    if (src === 'js/main.js' && typeof window.initHiragana === 'function') {
+                        window.initHiragana();
+                    } else if (src === 'js/main2.js' && typeof window.initHiragana2 === 'function') {
+                        window.initHiragana2();
+                    }
+                    return;
+                }
 
                 // 古いゲームスクリプトを削除（簡易アンロード）
                 document.querySelectorAll('script[data-game-script]').forEach(s => s.remove());
