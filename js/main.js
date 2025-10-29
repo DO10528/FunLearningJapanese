@@ -209,6 +209,7 @@
 
     // 公開 API: init / dispose
     window.initHiragana = function() {
+        console.log('[Hiragana] initHiragana called');
         MAIN_MENU = document.getElementById('main-menu');
         GAME_AREA = document.getElementById('game-area');
         START_BUTTON = document.getElementById('startButton1');

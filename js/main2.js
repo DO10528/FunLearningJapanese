@@ -271,6 +271,7 @@
 
     // 公開 API: init / dispose
     window.initHiragana2 = function() {
+        console.log('[Hiragana2] initHiragana2 called');
         MAIN_MENU = document.getElementById('main-menu');
         GAME_AREA = document.getElementById('game-area');
         SCORE_MESSAGE = document.getElementById('score-message');

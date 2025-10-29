@@ -110,6 +110,7 @@
             script.setAttribute('data-game-script', 'true');
 
             script.onload = function() {
+                console.log('[Loader] script loaded:', scriptPath);
                 // スクリプトの読み込み完了後、適切な初期化関数を呼び出す
                 if (scriptPath === 'js/main.js') {
                     window.gameState.currentGame = 'hiragana';
