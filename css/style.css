@@ -124,3 +124,35 @@ a.menu-card-button {
     margin: 0 auto 15px;
     border-radius: 10px;
 }
+
+/* --- ★ 新規追加: ひらがなゲーム2 の文字ブロック スタイル ★ --- */
+.char-block {
+    /* 要件5: 同じ大きさのブロック */
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 1.5em; 
+    font-weight: bold;
+    
+    /* ブロックのデザイン */
+    background-color: #ffcc5c; /* 明るい黄色 */
+    color: #333;
+    border: 2px solid #ff6f61; /* 赤系の枠線 */
+    border-radius: 8px;
+    margin: 0 5px; /* ブロック間のスペース */
+    cursor: pointer;
+    user-select: none; /* 文字選択を禁止 */
+    transition: background-color 0.1s, transform 0.1s;
+}
+
+.char-block:hover {
+    background-color: #ffd880; 
+}
+
+/* 選択中のブロック */
+.char-block.selected {
+    border: 3px solid #5c7aff; /* 青い枠線でハイライト */
+    background-color: #cce0ff; /* 薄い青に変化 */
+    transform: translateY(-2px);
+}
