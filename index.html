@@ -19,17 +19,17 @@
         
         <div class="menu-buttons-grid">
             
-            <button id="startButton1" 
-                    class="menu-card-button menu-card-reset" 
-                    type="button"
-                    onclick="loadGameScript('js/main.js')">
+        <button id="startButton1" 
+            class="menu-card-button menu-card-reset" 
+            type="button"
+            onclick="loadGameScript('./js/main.js')">
                 🎮<br>ひらがな単語ゲーム
             </button>
             
-            <button id="startButton2" 
-                    class="menu-card-button menu-card-reset" 
-                    type="button"
-                    onclick="loadGameScript('js/main2.js')">
+        <button id="startButton2" 
+            class="menu-card-button menu-card-reset" 
+            type="button"
+            onclick="loadGameScript('./js/main2.js')">
                 ⭐<br>ひらがなゲーム2 (並び替え)
             </button>
             
@@ -91,6 +91,12 @@
 
         // ゲームスクリプトを読み込んで初期化する関数
         function loadGameScript(scriptPath) {
+            console.log('[Loader] loadGameScript called:', scriptPath);
+            // 既に同じ src のスクリプトが存在しないかチェック
+            const existing = document.querySelector(`script[src="${scriptPath}"]`);
+            if (existing) {
+                console.log('[Loader] script already present in DOM for', scriptPath);
+            }
             // メインメニューを一旦非表示にし、ゲームエリアに切り替え
             const menu = document.getElementById('main-menu');
             const gameArea = document.getElementById('game-area');
@@ -111,8 +117,11 @@
 
             script.onload = function() {
                 console.log('[Loader] script loaded:', scriptPath);
+                // 正規化（先頭の ./ を取り除く）
+                const normalized = scriptPath.replace(/^\.\//, '');
+
                 // スクリプトの読み込み完了後、適切な初期化関数を呼び出す
-                if (scriptPath === 'js/main.js') {
+                if (normalized === 'js/main.js') {
                     window.gameState.currentGame = 'hiragana';
                     if (typeof window.initHiragana === 'function') {
                         try {
@@ -121,8 +130,11 @@
                             console.error('Failed to initialize Hiragana game:', e);
                             showGameError();
                         }
+                    } else {
+                        console.warn('initHiragana not found after loading', scriptPath);
+                        showGameError();
                     }
-                } else if (scriptPath === 'js/main2.js') {
+                } else if (normalized === 'js/main2.js') {
                     window.gameState.currentGame = 'hiragana2';
                     if (typeof window.initHiragana2 === 'function') {
                         try {
@@ -131,6 +143,9 @@
                             console.error('Failed to initialize Hiragana2 game:', e);
                             showGameError();
                         }
+                    } else {
+                        console.warn('initHiragana2 not found after loading', scriptPath);
+                        showGameError();
                     }
                 }
             };

@@ -20,13 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. JSONデータを読み込む関数
     async function loadWords() {
         try {
-            const response = await fetch('data/words.json');
+            const url = './data/words.json';
+            console.log('[Shiritori] fetching words from', url);
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error('[Shiritori] fetch failed, status:', response.status, response.statusText);
+                allWords = [];
+                return allWords;
+            }
             const data = await response.json();
+            console.log(`[Shiritori] loaded ${Array.isArray(data) ? data.length : 0} raw entries from words.json`);
             // 読み（reading）の最後が「ん」または「ン」で終わる単語のみを除外
-            allWords = data.filter(word => !word.reading.endsWith('ん') && !word.reading.endsWith('ン'));
+            allWords = (Array.isArray(data) ? data : []).filter(word => {
+                const r = (word.reading || '').toString();
+                return !r.endsWith('ん') && !r.endsWith('ン');
+            });
+            console.log(`[Shiritori] after filtering (exclude ending ん/ン): ${allWords.length} entries available`);
             return allWords;
         } catch (error) {
-            console.error('単語データの読み込みに失敗しました:', error);
+            console.error('[Shiritori] 単語データの読み込みに失敗しました:', error);
             return [];
         }
     }
@@ -61,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (START_BUTTON) {
             START_BUTTON.removeEventListener('click', startNewGame);
             START_BUTTON.addEventListener('click', startNewGame);
+            // 単語が十分に読み込まれるまでボタンを無効化
+            const startDisabled = !(Array.isArray(allWords) && allWords.length >= 3);
+            START_BUTTON.disabled = startDisabled;
+            START_BUTTON.title = startDisabled ? '単語データを読み込んでください（少なくとも3件）' : '';
+            console.log('[Shiritori] renderMenu: start button disabled =', startDisabled);
         }
     }
 

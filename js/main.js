@@ -21,16 +21,25 @@
     // 1. JSONデータを読み込む関数 (変更なし)
     async function loadWords() {
         try {
-            const response = await fetch('data/words.json');
+            const url = './data/words.json';
+            console.log('[Hiragana] fetching words from', url);
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.error('[Hiragana] fetch failed, status:', response.status, response.statusText);
+                allWords = [];
+                return allWords;
+            }
             const data = await response.json();
+            console.log(`[Hiragana] loaded ${Array.isArray(data) ? data.length : 0} raw entries from words.json`);
             // 読み（reading）の最後が「ん」または「ン」で終わる単語のみを除外
-            allWords = data.filter(w => {
-                const reading = w.reading || '';
+            allWords = (Array.isArray(data) ? data : []).filter(w => {
+                const reading = (w.reading || '').toString();
                 return !reading.endsWith('ん') && !reading.endsWith('ン');
             });
+            console.log(`[Hiragana] after filtering (exclude ending ん/ン): ${allWords.length} entries available`);
             return allWords;
         } catch (error) {
-            console.error('単語データの読み込みに失敗しました:', error);
+            console.error('[Hiragana] 単語データの読み込みに失敗しました:', error);
             return [];
         }
     }
@@ -50,6 +59,11 @@
         if (START_BUTTON) {
             START_BUTTON.removeEventListener('click', startNewGame);
             START_BUTTON.addEventListener('click', startNewGame);
+            // 読み込みが完了していない場合はスタートを無効化
+            const startDisabled = !(Array.isArray(allWords) && allWords.length >= 3);
+            START_BUTTON.disabled = startDisabled;
+            START_BUTTON.title = startDisabled ? '単語データを読み込んでください（少なくとも3件）' : '';
+            console.log('[Hiragana] renderMenu: start button disabled =', startDisabled);
         }
     }
 
