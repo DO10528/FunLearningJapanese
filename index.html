@@ -19,11 +19,11 @@
         
         <div class="menu-buttons-grid">
             
-            <button id="startButton1" class="menu-card-button menu-card-reset" data-script="js/main.js">
+            <button id="startButton1" class="menu-card-button menu-card-reset" onclick="loadGameScript('js/main.js')">
                 🎮<br>ひらがな単語ゲーム
             </button>
             
-            <button id="startButton2" class="menu-card-button menu-card-reset" data-script="js/main2.js">
+            <button id="startButton2" class="menu-card-button menu-card-reset" onclick="loadGameScript('js/main2.js')">
                 ⭐<br>ひらがなゲーム2 (並び替え)
             </button>
             
@@ -43,81 +43,67 @@
     </div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuButtons = document.querySelectorAll('.menu-buttons-grid button');
-            const menu = document.getElementById('main-menu');
-
-            // 既にロジックがロードされていないかチェックし、重複ロードを防ぐ
-            if (window.gameLoaderInitialized) return;
-            window.gameLoaderInitialized = true;
-            
-            menuButtons.forEach(button => {
-                // 明示的に type="button" を付与しておく（将来フォーム内に置かれた場合の誤送信防止）
-                if (!button.hasAttribute('type')) button.setAttribute('type', 'button');
-
-                button.addEventListener('click', () => {
-                    const scriptPath = button.getAttribute('data-script');
-                    if (scriptPath) {
-                        // メインメニューを一旦非表示にし、ゲームエリアに切り替え
-                        if (menu) menu.style.display = 'none';
-                        const gameArea = document.getElementById('game-area');
-                        if (gameArea) gameArea.style.display = 'block';
-
-                        // 動的に該当のスクリプトを読み込む
-                        loadScript(scriptPath);
-                    }
-                });
-            });
-
-            function loadScript(src) {
-                // 既に同じスクリプトが読み込まれている場合は無視
-                if (document.querySelector('script[src="' + src + '"]')) {
-                    // スクリプトが既に存在する場合は、対応する初期化関数を直接呼び出す
-                    if (src === 'js/main.js' && typeof window.initHiragana === 'function') {
-                        window.initHiragana();
-                    } else if (src === 'js/main2.js' && typeof window.initHiragana2 === 'function') {
-                        window.initHiragana2();
-                    }
-                    return;
+        // 既存のゲームを破棄する関数
+        function disposeCurrentGame() {
+            // ひらがなゲーム2の破棄
+            if (typeof window.disposeHiragana2 === 'function') {
+                try {
+                    window.disposeHiragana2();
+                } catch (e) {
+                    console.warn('Error disposing Hiragana2:', e);
                 }
+            }
+            // ひらがな単語ゲームの破棄
+            if (typeof window.disposeHiragana === 'function') {
+                try {
+                    window.disposeHiragana();
+                } catch (e) {
+                    console.warn('Error disposing Hiragana:', e);
+                }
+            }
+            // 古いスクリプトを削除
+            document.querySelectorAll('script[data-game-script]').forEach(s => s.remove());
+        }
 
-                // 古いゲームスクリプトを削除（簡易アンロード）
-                document.querySelectorAll('script[data-game-script]').forEach(s => s.remove());
+        // ゲームスクリプトを読み込んで初期化する関数
+        function loadGameScript(scriptPath) {
+            // メインメニューを一旦非表示にし、ゲームエリアに切り替え
+            const menu = document.getElementById('main-menu');
+            const gameArea = document.getElementById('game-area');
+            if (menu) menu.style.display = 'none';
+            if (gameArea) {
+                gameArea.style.display = 'block';
+                gameArea.innerHTML = '<p>ゲームを読み込んでいます...</p>';
+            }
+
+            // 既存のゲームを破棄
+            disposeCurrentGame();
+
+            // 新しいスクリプトを読み込む
+            const script = document.createElement('script');
+            script.src = scriptPath;
+            script.setAttribute('data-game-script', 'true');
+
+            script.onload = () => {
+                if (scriptPath === 'js/main.js' && typeof window.initHiragana === 'function') {
+                    window.initHiragana();
+                } else if (scriptPath === 'js/main2.js' && typeof window.initHiragana2 === 'function') {
+                    window.initHiragana2();
+                }
+            };
+
+            script.onerror = () => {
+                if (gameArea) {
+                    gameArea.innerHTML = '<p style="color: red;">ゲームの読み込みに失敗しました。</p>' +
+                                       '<button onclick="location.reload()">再試行</button>';
+                }
+            };
+
+            document.body.appendChild(script);
+        }
 
                 const script = document.createElement('script');
                 script.src = src;
-                // マークをつけて後で削除できるようにする
-                script.setAttribute('data-game-script', 'true');
-
-                script.onload = () => {
-                    // 優先: スクリプトが公開する初期化関数があれば呼び出す
-                    if (typeof window.initHiragana2 === 'function') {
-                        try {
-                            window.initHiragana2();
-                        } catch (e) {
-                            console.warn('initHiragana2 threw:', e);
-                        }
-                        return;
-                    }
-                    if (typeof window.initHiragana === 'function') {
-                        try {
-                            window.initHiragana();
-                        } catch (e) {
-                            console.warn('initHiragana threw:', e);
-                        }
-                        return;
-                    }
-
-                    // フォールバック: 既に DOMContentLoaded が発生している場合は再発火して互換性を保つ
-                    if (document.readyState !== 'loading') {
-                        try { document.dispatchEvent(new Event('DOMContentLoaded')); }
-                        catch (e) { console.warn('Could not dispatch DOMContentLoaded to dynamic script:', e); }
-                    }
-                };
-
-                document.body.appendChild(script);
-            }
-        });
     </script>
     
     </body>
