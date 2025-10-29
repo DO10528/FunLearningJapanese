@@ -14,12 +14,17 @@
         <h2>何をして遊ぶ？</h2>
         
         <div id="score-message" style="margin-bottom: 20px;">
-            </div> 
+            <p>ようこそ！ゲームを選んでね。</p>
+        </div> 
         
         <div class="menu-buttons-grid">
             
-            <button id="startButton" class="menu-card-button menu-card-reset">
+            <button id="startButton1" class="menu-card-button menu-card-reset" data-script="js/main.js">
                 🎮<br>ひらがな単語ゲーム
+            </button>
+            
+            <button id="startButton2" class="menu-card-button menu-card-reset" data-script="js/main2.js">
+                ⭐<br>ひらがなゲーム2 (並び替え)
             </button>
             
             <a href="hiragana.html" class="menu-card-button menu-card-reset">
@@ -34,9 +39,68 @@
     </div>
     
     <div id="game-area" class="container" style="display:none;">
-        <p>JavaScriptが読み込まれています...</p>
+        <p>ゲームを読み込んでいます...</p>
     </div>
     
-    <script src="js/main.js"></script>
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButtons = document.querySelectorAll('.menu-buttons-grid button');
+            const menu = document.getElementById('main-menu');
+
+            // 既にロジックがロードされていないかチェックし、重複ロードを防ぐ
+            if (window.gameLoaderInitialized) return;
+            window.gameLoaderInitialized = true;
+            
+            menuButtons.forEach(button => {
+                // 明示的に type="button" を付与しておく（将来フォーム内に置かれた場合の誤送信防止）
+                if (!button.hasAttribute('type')) button.setAttribute('type', 'button');
+
+                button.addEventListener('click', () => {
+                    const scriptPath = button.getAttribute('data-script');
+                    if (scriptPath) {
+                        // メインメニューを一旦非表示にし、ゲームエリアに切り替え
+                        if (menu) menu.style.display = 'none';
+                        const gameArea = document.getElementById('game-area');
+                        if (gameArea) gameArea.style.display = 'block';
+
+                        // 動的に該当のスクリプトを読み込む
+                        loadScript(scriptPath);
+                    }
+                });
+            });
+
+            function loadScript(src) {
+                // 既に同じスクリプトが読み込まれている場合は無視
+                if (document.querySelector('script[src="' + src + '"]')) return;
+
+                // 古いゲームスクリプトを削除（簡易アンロード）
+                document.querySelectorAll('script[data-game-script]').forEach(s => s.remove());
+
+                const script = document.createElement('script');
+                script.src = src;
+                // マークをつけて後で削除できるようにする
+                script.setAttribute('data-game-script', 'true');
+
+                script.onload = () => {
+                    // 注意: 動的に追加したスクリプトは、既に DOMContentLoaded が発生していると
+                    // そのイベント待ちの初期化コードが実行されない場合があります。
+                    // そこで、安全策としてドキュメントがすでに読み込み済みの場合のみ
+                    // 再発火（DOMContentLoaded）を行い、内部で addEventListener('DOMContentLoaded', ...) を
+                    // 利用しているスクリプトを動かせるようにします。
+                    if (document.readyState !== 'loading') {
+                        try {
+                            document.dispatchEvent(new Event('DOMContentLoaded'));
+                        } catch (e) {
+                            // 再発火が失敗しても致命的ではない
+                            console.warn('Could not dispatch DOMContentLoaded to dynamic script:', e);
+                        }
+                    }
+                };
+
+                document.body.appendChild(script);
+            }
+        });
+    </script>
+    
+    </body>
 </html>

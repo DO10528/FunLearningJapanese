@@ -1,8 +1,21 @@
+/* 全体設定: ボックスサイズを安定させ、カラーパレットを変数で管理 */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root{
+    --bg: #f7f9fc;
+    --text: #333;
+    --accent: #ff6f61;   /* h1, 強調色 */
+    --accent-2: #ffcc5c; /* 黄色のアクセント */
+    --primary: #5c7aff;  /* 青 (ボタン等) */
+    --primary-2: #4a6de1; /* hover の青 */
+    --muted-bg: #fff8e1; /* ホバー時の薄い黄色 */
+}
+
 /* サイト全体の基本的なデザイン設定 */
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: #f7f9fc;
-    color: #333;
+    background-color: var(--bg);
+    color: var(--text);
     margin: 0;
     padding: 20px;
     text-align: center;
@@ -10,9 +23,9 @@ body {
 
 /* タイトル（h1）の設定 */
 h1 {
-    color: #ff6f61;
+    color: var(--accent);
     font-size: 2.5em;
-    border-bottom: 4px solid #ffcc5c;
+    border-bottom: 4px solid var(--accent-2);
     display: inline-block;
     padding-bottom: 5px;
 }
@@ -42,51 +55,59 @@ h1 {
 
 /* カード型ボタンの共通デザインとサイズ設定 */
 .menu-card-button {
-    border: 2px solid #ffcc5c; /* 明るい黄色の枠線 */
-    padding: 20px;
-    margin: 0; 
+    border: 2px solid var(--accent-2); /* 明るい黄色の枠線 */
+    padding: 12px;
+    margin: 0;
     border-radius: 15px;
-    font-size: 1.3em; 
+    font-size: 1.3em;
     font-weight: bold;
-    text-decoration: none; 
+    text-decoration: none;
     text-align: center;
-    
-    /* サイズを固定し、中身を中央に配置 */
-    width: 200px;
+
+    /* レスポンシブ化: 画面幅に応じて幅を縮小 */
+    width: min(200px, 46vw);
+    max-width: 200px;
     height: 150px;
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
+
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     cursor: pointer;
 }
 
 /* 青いボタンのスタイルを上書きし、デザインをリセットする */
 button.menu-card-reset,
 a.menu-card-reset {
-    background-color: white !important; /* 背景色を白で固定 */
-    color: #333 !important;            /* 文字色を黒で固定 */
-    border: 2px solid #ffcc5c !important; /* 枠線を固定 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    background-color: white;
+    color: var(--text);
+    border: 2px solid var(--accent-2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* リンク要素の色とカーソルを調整 */
 a.menu-card-button {
-    color: #333;
+    color: var(--text);
 }
 
 .menu-card-button:hover {
-    transform: translateY(-5px); /* 少し上に浮き上がる */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
-    background-color: #fff8e1; /* 薄い黄色に変化 */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: var(--muted-bg);
+}
+
+/* キーボード操作で見つけやすくするフォーカススタイル */
+.menu-card-button:focus,
+.choice-card:focus {
+    outline: 3px solid rgba(92,122,255,0.28);
+    outline-offset: 4px;
 }
 
 /* ゲーム中の選択肢ボタン (標準ボタンのスタイルを保持) */
 .choice-button {
-    background-color: #5c7aff;
+    background-color: var(--primary);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -94,11 +115,11 @@ a.menu-card-button {
     border-radius: 8px;
     font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
 }
 
 .choice-button:hover:not(:disabled) {
-    background-color: #4a6de1;
+    background-color: var(--primary-2);
 }
 
 /* 画像がロードされない時にレイアウトが崩れないようにするCSS */
@@ -111,13 +132,12 @@ a.menu-card-button {
     object-fit: cover;
     display: block;
     border-radius: 5px;
-    box-sizing: border-box;
 }
 
-/* メイン表示用の画像（問題画像など） */
+/* ★修正・統合: メイン表示用の画像スタイルを一本化★ */
 #image-area img,
 #game-area img,
-#shiritori-game-area img {
+#shiritori-game-area img { 
     width: 150px; 
     height: 150px; 
     object-fit: cover;
@@ -125,6 +145,10 @@ a.menu-card-button {
     margin: 0 auto 15px;
     border-radius: 10px;
 }
+
+/* 画像専用カード（HTML構造を少し変えられる場合のオプション） */
+.card--image .card-image { width:100%; height:100%; overflow:hidden; border-radius:8px; }
+.card--image .card-image img { width:100%; height:100%; object-fit:cover; display:block; }
 
 
 /* --- ★ ひらがなゲーム2 の文字ブロック スタイル ★ --- */
@@ -154,7 +178,13 @@ a.menu-card-button {
 
 /* 選択中のブロック */
 .char-block.selected {
-    border: 3px solid #5c7aff; /* 青い枠線でハイライト */
+    border: 3px solid var(--primary); /* 青い枠線でハイライト */
     background-color: #cce0ff; /* 薄い青に変化 */
     transform: translateY(-2px);
+}
+
+/* アニメーションを無効にしたいユーザーへの配慮 */
+@media (prefers-reduced-motion: reduce) {
+    .menu-card-button, .menu-card-button *,
+    .choice-button, .char-block { transition: none !important; animation: none !important; }
 }

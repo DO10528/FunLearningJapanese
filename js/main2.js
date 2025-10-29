@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentWord = null;
     let score = 0;          // 正解数
     let incorrectCount = 0; // 失敗数
+    let correctCount = 0;   // 正解回数（カウント用）
+    let FEEDBACK = null;    // feedback 要素を保持（renderQuestion で設定）
     let askedWordIds = new Set();
     let selectedBlocks = []; // 現在選択中のブロックのDOM要素を格納
     
@@ -29,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (GAME_AREA) GAME_AREA.style.display = 'none';
 
         if (SCORE_MESSAGE) {
+            // correctCount / incorrectCount は上部で初期化済み
             SCORE_MESSAGE.innerHTML = `<p id="current-score">前回のスコア: ${score}点 (正解: ${correctCount}問, 失敗: ${incorrectCount}回)</p>`;
         }
         
@@ -126,9 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.char-block').forEach(block => {
             block.addEventListener('click', handleBlockClick);
         });
-        
-        document.getElementById('checkButton').addEventListener('click', checkAnswer);
-        document.getElementById('backToMenu2').addEventListener('click', renderMenu);
+
+        // FEEDBACK 要素をキャッシュ（他関数で参照するため）
+        FEEDBACK = document.getElementById('feedback');
+
+        const checkBtn = document.getElementById('checkButton');
+        if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+
+        const backBtn = document.getElementById('backToMenu2');
+        if (backBtn) backBtn.addEventListener('click', renderMenu);
     }
 
     // 6. ブロックをクリックしたときの処理（並び替えロジック）
@@ -170,8 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedBlocks = [];
         }
         
-        FEEDBACK.textContent = 'クリックで文字を入れ替え！';
-        FEEDBACK.style.color = '#333';
+        if (FEEDBACK) {
+            FEEDBACK.textContent = 'クリックで文字を入れ替え！';
+            FEEDBACK.style.color = '#333';
+        }
     }
 
     // 7. 答え合わせの処理
@@ -182,8 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // 正解チェック
         if (attemptedReading === currentWord.reading) {
             // 正解
-            FEEDBACK.textContent = 'せいかい！✨';
-            FEEDBACK.style.color = '#5c7aff';
+            if (FEEDBACK) {
+                FEEDBACK.textContent = 'せいかい！✨';
+                FEEDBACK.style.color = '#5c7aff';
+            }
             score += 10;
             correctCount += 1; 
 
@@ -194,8 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             // 失敗
-            FEEDBACK.textContent = 'ざんねん... もう一度やり直してください。';
-            FEEDBACK.style.color = '#ff6f61';
+            if (FEEDBACK) {
+                FEEDBACK.textContent = 'ざんねん... もう一度やり直してください。';
+                FEEDBACK.style.color = '#ff6f61';
+            }
             incorrectCount += 1; // 失敗数をカウントアップ
 
             // 失敗したらやり直し（画面はそのままで、ボタンだけリセット）
