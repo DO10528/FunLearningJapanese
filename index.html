@@ -2,44 +2,65 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Fun Learning Japanese</title> 
-    <link rel="stylesheet" href="css/style.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Learning Japanese - 楽しく日本語を学ぼう！</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    
-    <h1>Fun Learning Japanese</h1>
-    
-    <div id="main-menu" class="container">
-        <h2>何をして遊ぶ？</h2>
-        
-        <div id="score-message" style="margin-bottom: 20px;">
-            <p>ようこそ！ゲームを選んでね。</p>
-        </div>
-        
-        <div class="menu-buttons-grid">
-            <button class="menu-card-button" onclick="loadGameScript('./js/main.js')">
-                ひらがな
-                <small>基本のひらがな学習</small>
-            </button>
-            <button class="menu-card-button" onclick="loadGameScript('./js/main2.js')">
-                ひらがな2
-                <small>応用のひらがな学習</small>
-            </button>
-            <button class="menu-card-button" onclick="loadGameScript('./js/shiritori.js')">
-                しりとり
-                <small>言葉をつなげよう</small>
-            </button>
-        </div>
-    </div>
-    
-    <div id="game-area" class="container" style="display:none;">
-        <h3>ゲームを読み込んでいます...</h3>
-        <div id="loading-area">
-            <div class="loading-spinner"></div>
-        </div>
-        <div id="game-content"></div>
-        <button id="startButton1" class="menu-card-button menu-card-reset" style="display: none;">はじめる</button>
+    <div class="page-container">
+        <header>
+            <h1>Fun Learning Japanese</h1>
+            <p class="subtitle">たのしく にほんごを まなぼう！</p>
+        </header>
+
+        <main>
+            <div id="main-menu" class="container">
+                <div class="menu-buttons-grid">
+                    <button class="game-button" onclick="loadGame('hiragana')">
+                        <h3>ひらがな</h3>
+                        <p>basic hiragana</p>
+                        <small>かんたんな ひらがなの べんきょう</small>
+                    </button>
+                    
+                    <button class="game-button" onclick="loadGame('hiragana2')">
+                        <h3>ひらがな２</h3>
+                        <p>advanced hiragana</p>
+                        <small>むずかしい ひらがなの べんきょう</small>
+                    </button>
+                    
+                    <button class="game-button" onclick="loadGame('shiritori')">
+                        <h3>しりとり</h3>
+                        <p>word chain game</p>
+                        <small>たのしく ことばを つなげよう</small>
+                    </button>
+                    
+                    <button class="game-button" onclick="loadGame('pronunciation')">
+                        <h3>よみかた</h3>
+                        <p>pronunciation</p>
+                        <small>ひらがな・カタカナの よみかた</small>
+                    </button>
+                </div>
+            </div>
+
+            <div id="game-container" class="container" style="display: none;">
+                <div id="game-header">
+                    <button class="back-button" onclick="returnToMenu()">
+                        ←メニューに もどる
+                    </button>
+                    <div id="game-title"></div>
+                    <div id="game-score"></div>
+                </div>
+                
+                <div id="game-content">
+                    <div class="loading-spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 Fun Learning Japanese - For children learning Japanese</p>
+        </footer>
     </div>
     
     <script>

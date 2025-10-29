@@ -1,43 +1,69 @@
-/* 全体設定: ボックスサイズを安定させ、カラーパレットを変数で管理 */
-*, *::before, *::after { box-sizing: border-box; }
-
-:root{
-    --bg: #f7f9fc;
-    --text: #333;
-    --accent: #ff6f61;   /* h1, 強調色 */
-    --accent-2: #ffcc5c; /* 黄色のアクセント */
-    --primary: #5c7aff;  /* 青 (ボタン等) */
-    --primary-2: #4a6de1; /* hover の青 */
-    --muted-bg: #fff8e1; /* ホバー時の薄い黄色 */
+/* ベース設定 */
+:root {
+    --primary: #FF6B6B;     /* メインカラー（ピンク） */
+    --secondary: #4ECDC4;   /* アクセントカラー（ターコイズ） */
+    --accent: #FFE66D;      /* 強調カラー（黄色） */
+    --background: #F7F7F7;  /* 背景色（薄いグレー） */
+    --text: #2C3E50;        /* テキストカラー（濃紺） */
+    --white: #FFFFFF;
+    --shadow: rgba(0, 0, 0, 0.1);
 }
 
-/* サイト全体の基本的なデザイン設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: var(--bg);
+    background-color: var(--background);
     color: var(--text);
-    margin: 0;
-    padding: 20px;
+    line-height: 1.6;
+}
+
+/* ページレイアウト */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: var(--white);
+    padding: 2rem;
     text-align: center;
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
-/* タイトル（h1）の設定 */
 h1 {
-    color: var(--accent);
-    font-size: 2.5em;
-    border-bottom: 4px solid var(--accent-2);
-    display: inline-block;
-    padding-bottom: 5px;
+    color: var(--primary);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
 }
 
-/* ゲームやコンテンツのコンテナ（枠）の基本設定 */
+.subtitle {
+    color: var(--secondary);
+    font-size: 1.2rem;
+}
+
+/* メインコンテンツ */
+main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* コンテナ */
 .container {
-    background-color: white;
-    padding: 30px;
+    background-color: var(--white);
     border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 30px auto;
+    padding: 2rem;
+    box-shadow: 0 4px 6px var(--shadow);
+    margin: 0 auto;
+    max-width: 1000px;
 }
 
 /* ------------------------------------ */
