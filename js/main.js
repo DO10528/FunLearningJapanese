@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+(function(){
     // HTML要素のIDを正確に取得
     const MAIN_MENU = document.getElementById('main-menu'); 
     const GAME_AREA = document.getElementById('game-area');
@@ -19,7 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadWords() {
         try {
             const response = await fetch('data/words.json');
-            allWords = await response.json();
+            const data = await response.json();
+            // 読み（reading）の最後が「ん」または「ン」で終わる単語のみを除外
+            allWords = data.filter(w => {
+                const reading = w.reading || '';
+                return !reading.endsWith('ん') && !reading.endsWith('ン');
+            });
             return allWords;
         } catch (error) {
             console.error('単語データの読み込みに失敗しました:', error);
@@ -188,6 +193,56 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // 全ての処理を開始
-    loadWords().then(renderMenu);
-});
+    // 公開 API: init / dispose
+    window.initHiragana = function() {
+        MAIN_MENU = document.getElementById('main-menu');
+        GAME_AREA = document.getElementById('game-area');
+        START_BUTTON = document.getElementById('startButton');
+        SCORE_MESSAGE = document.getElementById('score-message');
+
+        // 初期化前に古い状態が残っている場合は dispose
+        if (window.__hiragana_inited) {
+            if (typeof window.disposeHiragana === 'function') window.disposeHiragana();
+        }
+
+        window.__hiragana_inited = true;
+
+        // 読み込みとメニュー初期化
+        loadWords().then(() => {
+            renderMenu();
+        });
+    };
+
+    window.disposeHiragana = function() {
+        // イベントリスナーを全て解除
+        attachedListeners.forEach(item => {
+            try {
+                if (item.el && item.type && item.fn) item.el.removeEventListener(item.type, item.fn);
+            } catch (e) {
+                console.warn('Failed to remove listener', e);
+            }
+        });
+        attachedListeners = [];
+
+        // タイマーをクリア
+        activeTimeouts.forEach(tid => clearTimeout(tid));
+        activeTimeouts = [];
+
+        // ゲーム領域をクリア
+        if (GAME_AREA) GAME_AREA.innerHTML = '';
+
+        // メニューを再表示
+        if (MAIN_MENU) MAIN_MENU.style.display = 'block';
+
+        // 内部状態をリセット
+        allWords = [];
+        currentWord = null;
+        score = 0;
+        correctCount = 0;
+        incorrectCount = 0;
+        askedWordIds.clear();
+
+        window.__hiragana_inited = false;
+    };
+
+})();

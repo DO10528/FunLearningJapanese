@@ -82,18 +82,28 @@
                 script.setAttribute('data-game-script', 'true');
 
                 script.onload = () => {
-                    // 注意: 動的に追加したスクリプトは、既に DOMContentLoaded が発生していると
-                    // そのイベント待ちの初期化コードが実行されない場合があります。
-                    // そこで、安全策としてドキュメントがすでに読み込み済みの場合のみ
-                    // 再発火（DOMContentLoaded）を行い、内部で addEventListener('DOMContentLoaded', ...) を
-                    // 利用しているスクリプトを動かせるようにします。
-                    if (document.readyState !== 'loading') {
+                    // 優先: スクリプトが公開する初期化関数があれば呼び出す
+                    if (typeof window.initHiragana2 === 'function') {
                         try {
-                            document.dispatchEvent(new Event('DOMContentLoaded'));
+                            window.initHiragana2();
                         } catch (e) {
-                            // 再発火が失敗しても致命的ではない
-                            console.warn('Could not dispatch DOMContentLoaded to dynamic script:', e);
+                            console.warn('initHiragana2 threw:', e);
                         }
+                        return;
+                    }
+                    if (typeof window.initHiragana === 'function') {
+                        try {
+                            window.initHiragana();
+                        } catch (e) {
+                            console.warn('initHiragana threw:', e);
+                        }
+                        return;
+                    }
+
+                    // フォールバック: 既に DOMContentLoaded が発生している場合は再発火して互換性を保つ
+                    if (document.readyState !== 'loading') {
+                        try { document.dispatchEvent(new Event('DOMContentLoaded')); }
+                        catch (e) { console.warn('Could not dispatch DOMContentLoaded to dynamic script:', e); }
                     }
                 };
 

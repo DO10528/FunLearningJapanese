@@ -1,9 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // HTML要素のIDを正確に取得
-    const MAIN_MENU = document.getElementById('main-menu'); 
-    const GAME_AREA = document.getElementById('game-area'); 
-    const SCORE_MESSAGE = document.getElementById('score-message'); 
-    
+(function(){
+    // モジュールスコープの状態
+    let MAIN_MENU = null;
+    let GAME_AREA = null;
+    let SCORE_MESSAGE = null;
+
     let allWords = [];
     let currentWord = null;
     let score = 0;          // 正解数
@@ -12,15 +12,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let FEEDBACK = null;    // feedback 要素を保持（renderQuestion で設定）
     let askedWordIds = new Set();
     let selectedBlocks = []; // 現在選択中のブロックのDOM要素を格納
-    
-    // 1. JSONデータを読み込む関数 (imagesを使用するためにwords.jsonを読み込み)
+    // 追跡用: 動的に追加したリスナやタイマーを保持して dispose 時に解除する
+    let attachedListeners = [];
+    let activeTimeouts = [];
+
+    // ハンドラ参照（dispose のために保持）
+    let startButtonHandler = null;
+
+    // 1. JSONデータを読み込む関数
     async function loadWords() {
         try {
             const response = await fetch('data/words.json');
-            allWords = await response.json();
+            const data = await response.json();
+            // 読み（reading）の最後が「ん」または「ン」で終わる単語のみを除外
+            allWords = data.filter(w => {
+                const reading = w.reading || '';
+                return !reading.endsWith('ん') && !reading.endsWith('ン');
+            });
             return allWords;
         } catch (error) {
             console.error('単語データの読み込みに失敗しました:', error);
+            allWords = [];
             return [];
         }
     }
@@ -31,14 +43,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (GAME_AREA) GAME_AREA.style.display = 'none';
 
         if (SCORE_MESSAGE) {
-            // correctCount / incorrectCount は上部で初期化済み
             SCORE_MESSAGE.innerHTML = `<p id="current-score">前回のスコア: ${score}点 (正解: ${correctCount}問, 失敗: ${incorrectCount}回)</p>`;
         }
-        
-        // メニューのボタンにイベントリスナーを再設定（index.htmlの動的読み込みに対応）
+
+        // メニューのボタンにイベントリスナーを再設定
         const startButton2 = document.getElementById('startButton2');
         if (startButton2) {
-            startButton2.addEventListener('click', startNewGame);
+            // 重複登録を避けるため既存ハンドラを除去してから登録
+            if (startButtonHandler) startButton2.removeEventListener('click', startButtonHandler);
+            startButtonHandler = startNewGame;
+            startButton2.addEventListener('click', startButtonHandler);
         }
     }
 
@@ -46,22 +60,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function startNewGame() {
         if (allWords.length === 0) {
             alert('ゲームを開始するには最低限の単語データが必要です。');
-            // データが読み込まれていない場合はここで終了し、メニューに戻るための処理を行う
             loadWords().then(() => {
-                if(allWords.length > 0) startNewGame();
+                if (allWords.length > 0) startNewGame();
                 else renderMenu();
             });
             return;
         }
-        
-        if (MAIN_MENU) MAIN_MENU.style.display = 'none'; 
-        if (GAME_AREA) GAME_AREA.style.display = 'block'; 
+
+        if (MAIN_MENU) MAIN_MENU.style.display = 'none';
+        if (GAME_AREA) GAME_AREA.style.display = 'block';
 
         // 状態をリセット
-        score = 0; 
+        score = 0;
         correctCount = 0;
         incorrectCount = 0;
-        askedWordIds.clear(); 
+        askedWordIds.clear();
         selectedBlocks = [];
 
         showNextQuestion();
@@ -69,116 +82,136 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. 問題をランダムに選び、ブロックを生成する
     function showNextQuestion() {
-        
+        if (!allWords || allWords.length === 0) {
+            alert('単語データがありません。');
+            renderMenu();
+            return;
+        }
+
         // 全ての単語が出題されたかチェック
         if (askedWordIds.size >= allWords.length) {
             alert(`全${allWords.length}問を終了しました！\n最終スコア: ${score}点\n正解: ${correctCount}問, 失敗: ${incorrectCount}回`);
-            renderMenu(); 
+            renderMenu();
             return;
         }
 
         // 未出題の単語だけを抽出して選択
         let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
-        
+        if (availableWords.length === 0) {
+            // 安全策: askedWordIds をリセットして再チャレンジ
+            askedWordIds.clear();
+            availableWords = allWords.slice();
+        }
+
         const correctIndex = Math.floor(Math.random() * availableWords.length);
         currentWord = availableWords[correctIndex];
-        askedWordIds.add(currentWord.id); // 出題リストに追加
-        
+        if (currentWord && currentWord.id !== undefined) askedWordIds.add(currentWord.id);
+
         // 読み仮名を一文字ずつに分解し、シャッフル
-        let readingChars = Array.from(currentWord.reading);
-        let shuffledChars = shuffleArray([...readingChars]); // シャッフルしたコピー
-        
+        let readingChars = Array.from(currentWord.reading || '');
+        let shuffledChars = shuffleArray([...readingChars]);
+
         renderQuestion(currentWord, shuffledChars);
     }
 
     // 5. 画面に問題とブロックを表示する
     function renderQuestion(word, shuffledChars) {
-        // 画像は既存の assets/images フォルダを参照
-        const imagePath = `assets/images/${word.image}`; 
-        
-        const scoreDisplay = `${correctCount}/${incorrectCount}`; 
+        if (!GAME_AREA) return;
 
-        // 文字ブロックを生成
-        let blocksHtml = shuffledChars.map((char, index) => 
-            `<div class="char-block" data-char="${char}" data-original-index="${index}">${char}</div>`
+        const imagePath = `assets/images/${word.image}`;
+        const scoreDisplay = `${correctCount}/${incorrectCount}`;
+
+        let blocksHtml = shuffledChars.map((char, index) =>
+            `<div class="char-block" data-char="${char}" data-original-index="${index}" tabindex="0">${char}</div>`
         ).join('');
 
         GAME_AREA.innerHTML = `
             <h3>このイラストの言葉を並び替えてください (${scoreDisplay})</h3>
             <div style="min-height: 170px;">
-                <img src="${imagePath}" 
-                     alt="${word.word}" 
-                     onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';" 
+                <img src="${imagePath}"
+                     alt="${word.word}"
+                     onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';"
                      style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover; margin-bottom: 20px;">
             </div>
-            
+
             <div id="word-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
                 ${blocksHtml}
             </div>
-            
+
             <div id="check-area" style="margin-top: 30px;">
-                <button id="checkButton" class="menu-card-button choice-button" style="width: 150px; height: 50px; margin: 0 auto; display: block;">答え合わせ</button>
+                <button id="checkButton" class="menu-card-button choice-button" style="width: 150px; height: 50px; margin: 0 auto; display: block;" type="button">答え合わせ</button>
             </div>
 
             <p id="feedback" style="font-weight: bold; margin-top: 15px; min-height: 25px;">クリックで文字を入れ替え！</p>
-            
-            <button id="backToMenu2" class="menu-card-button menu-card-reset" style="margin-top: 20px;">メニューに戻る</button>
+
+            <button id="backToMenu2" class="menu-card-button menu-card-reset" style="margin-top: 20px;" type="button">メニューに戻る</button>
         `;
 
         // イベントリスナーを設定
         document.querySelectorAll('.char-block').forEach(block => {
-            block.addEventListener('click', handleBlockClick);
+            const clickHandler = (ev) => handleBlockClick(ev);
+            const keydownHandler = (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    handleBlockClick({ target: block });
+                }
+            };
+
+            block.addEventListener('click', clickHandler);
+            block.addEventListener('keydown', keydownHandler);
+
+            attachedListeners.push({ el: block, type: 'click', fn: clickHandler });
+            attachedListeners.push({ el: block, type: 'keydown', fn: keydownHandler });
         });
 
-        // FEEDBACK 要素をキャッシュ（他関数で参照するため）
         FEEDBACK = document.getElementById('feedback');
 
         const checkBtn = document.getElementById('checkButton');
-        if (checkBtn) checkBtn.addEventListener('click', checkAnswer);
+        if (checkBtn) {
+            checkBtn.addEventListener('click', checkAnswer);
+            attachedListeners.push({ el: checkBtn, type: 'click', fn: checkAnswer });
+        }
 
         const backBtn = document.getElementById('backToMenu2');
-        if (backBtn) backBtn.addEventListener('click', renderMenu);
+        if (backBtn) {
+            backBtn.addEventListener('click', renderMenu);
+            attachedListeners.push({ el: backBtn, type: 'click', fn: renderMenu });
+        }
     }
 
     // 6. ブロックをクリックしたときの処理（並び替えロジック）
     function handleBlockClick(event) {
         const clickedBlock = event.target;
-        
-        // 選択されたブロックをハイライト
+        if (!clickedBlock) return;
+
         if (selectedBlocks.includes(clickedBlock)) {
-            // 既に選択されていたら解除
             selectedBlocks = selectedBlocks.filter(block => block !== clickedBlock);
             clickedBlock.classList.remove('selected');
         } else {
-            // 新しく選択
             selectedBlocks.push(clickedBlock);
             clickedBlock.classList.add('selected');
         }
 
-        // 2つ選択されたら入れ替え処理
         if (selectedBlocks.length === 2) {
             const block1 = selectedBlocks[0];
             const block2 = selectedBlocks[1];
 
-            // DOM上の位置を入れ替える
             const container = document.getElementById('word-container');
             const nodes = Array.from(container.children);
             const index1 = nodes.indexOf(block1);
             const index2 = nodes.indexOf(block2);
 
             if (index1 !== -1 && index2 !== -1) {
-                // DOM操作: 一時的に全て削除し、順番を入れ替えて再挿入
                 container.innerHTML = '';
                 [nodes[index1], nodes[index2]] = [nodes[index2], nodes[index1]];
                 nodes.forEach(node => container.appendChild(node));
             }
-            
-            // 選択状態をリセット
+
             block1.classList.remove('selected');
             block2.classList.remove('selected');
             selectedBlocks = [];
         }
-        
+
         if (FEEDBACK) {
             FEEDBACK.textContent = 'クリックで文字を入れ替え！';
             FEEDBACK.style.color = '#333';
@@ -189,51 +222,45 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAnswer() {
         const blocks = Array.from(document.querySelectorAll('.char-block'));
         const attemptedReading = blocks.map(block => block.dataset.char).join('');
-        
-        // 正解チェック
-        if (attemptedReading === currentWord.reading) {
-            // 正解
+
+        if (attemptedReading === (currentWord && currentWord.reading)) {
             if (FEEDBACK) {
                 FEEDBACK.textContent = 'せいかい！✨';
                 FEEDBACK.style.color = '#5c7aff';
             }
             score += 10;
-            correctCount += 1; 
+            correctCount += 1;
 
-            // 次へ自動で進む
-            setTimeout(() => {
+            const t = setTimeout(() => {
                 showNextQuestion();
-            }, 1500);
+            }, 900);
+            activeTimeouts.push(t);
 
         } else {
-            // 失敗
             if (FEEDBACK) {
                 FEEDBACK.textContent = 'ざんねん... もう一度やり直してください。';
                 FEEDBACK.style.color = '#ff6f61';
             }
-            incorrectCount += 1; // 失敗数をカウントアップ
+            incorrectCount += 1;
 
-            // 失敗したらやり直し（画面はそのままで、ボタンだけリセット）
             document.querySelectorAll('.char-block').forEach(block => {
-                block.classList.remove('selected'); // 選択状態を解除
+                block.classList.remove('selected');
             });
             selectedBlocks = [];
-            
-            // スコア表示を更新
+
             renderScoreTitleUpdate();
         }
     }
-    
-    // 7.5 スコア表示のみを更新する補助関数
+
     function renderScoreTitleUpdate() {
+        if (!GAME_AREA) return;
         const titleElement = GAME_AREA.querySelector('h3');
         if (titleElement) {
-            const scoreDisplay = `${correctCount}/${incorrectCount}`; 
+            const scoreDisplay = `${correctCount}/${incorrectCount}`;
             titleElement.textContent = `このイラストの言葉を並び替えてください (${scoreDisplay})`;
         }
     }
 
-    // 8. 配列をランダムにシャッフルするユーティリティ関数
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -242,6 +269,61 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // 全ての処理を開始（index.htmlのボタンが押されるのを待つ）
-    loadWords();
-});
+    // 公開 API: init / dispose
+    window.initHiragana2 = function() {
+        MAIN_MENU = document.getElementById('main-menu');
+        GAME_AREA = document.getElementById('game-area');
+        SCORE_MESSAGE = document.getElementById('score-message');
+
+        // 初期化前に古い状態が残っている場合は dispose
+        if (window.__hiragana2_inited) {
+            if (typeof window.disposeHiragana2 === 'function') window.disposeHiragana2();
+        }
+
+        window.__hiragana2_inited = true;
+
+        // 読み込みとメニュー初期化
+        loadWords().then(() => {
+            renderMenu();
+        });
+    };
+
+    window.disposeHiragana2 = function() {
+        // start ボタンのハンドラを削除
+        const startButton2 = document.getElementById('startButton2');
+        if (startButton2 && startButtonHandler) startButton2.removeEventListener('click', startButtonHandler);
+        startButtonHandler = null;
+        // 動的に追加したイベントリスナを全て解除
+        attachedListeners.forEach(item => {
+            try {
+                if (item.el && item.type && item.fn) item.el.removeEventListener(item.type, item.fn);
+            } catch (e) {
+                console.warn('Failed to remove listener', e);
+            }
+        });
+        attachedListeners = [];
+
+        // 保留中のタイマーを全てクリア
+        activeTimeouts.forEach(tid => clearTimeout(tid));
+        activeTimeouts = [];
+
+        // ゲーム領域をクリア
+        if (GAME_AREA) GAME_AREA.innerHTML = '';
+
+        // メニューを再表示
+        if (MAIN_MENU) MAIN_MENU.style.display = 'block';
+
+        // 内部状態をリセット
+        allWords = [];
+        currentWord = null;
+        score = 0;
+        incorrectCount = 0;
+        correctCount = 0;
+        askedWordIds.clear();
+        selectedBlocks = [];
+
+        window.__hiragana2_inited = false;
+    };
+
+    // 自動 init はしない。index.html から明示的に initHiragana2 を呼ぶ。
+})();

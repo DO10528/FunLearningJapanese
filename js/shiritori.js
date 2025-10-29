@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('data/words.json');
             const data = await response.json();
-            // 読み仮名が「ん」で終わらない単語のみを使用
-            allWords = data.filter(word => !word.reading.endsWith('ん'));
+            // 読み（reading）の最後が「ん」または「ン」で終わる単語のみを除外
+            allWords = data.filter(word => !word.reading.endsWith('ん') && !word.reading.endsWith('ン'));
             return allWords;
         } catch (error) {
             console.error('単語データの読み込みに失敗しました:', error);
