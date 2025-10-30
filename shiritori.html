@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>しりとりゲーム</title> 
+    <link rel="stylesheet" href="css/style.css"> 
+</head>
+<body>
+    
+    <h1>しりとりゲーム</h1>
+    
+    <div id="shiritori-menu" class="container">
+        <h2>しりとりであそぼう！</h2>
+        
+        <div id="shiritori-start-message" style="margin-bottom: 20px;">
+            <p>ルール: 直前の単語の最後の文字から始まる単語を、3択のイラストから選んで連鎖させよう！</p>
+            <p>「ん」で終わる単語を選んだら、ゲームオーバーです。</p>
+        </div> 
+        
+        <button id="shiritoriStartButton" class="menu-card-button menu-card-reset" onclick="startNewGame()">
+            🎮<br>ゲームスタート！
+        </button>
+
+        <a href="index.html" class="menu-card-button menu-card-reset">
+            🏠<br>ホームに戻る
+        </a>
+    </div>
+    
+    <div id="shiritori-game-area" class="container" style="display:none;">
+        
+        <p id="turn-message" style="font-size: 1.5em; font-weight: bold; color: #5c7aff; margin-bottom: 10px;">ゲーム開始</p>
+        
+        <div id="wordHistory" style="display: none;"></div>
+        
+        <div id="currentWordDisplay" style="margin-bottom: 30px;">
+            <p id="current-word-text" style="font-size: 1.1em;">直前の単語: <span id="current-word-display" style="font-weight: bold; color: #ff6f61;"></span></p>
+            <div id="image-area">
+                </div>
+        </div>
+
+        <h3 id="question-text">さあ、次はどのイラストを選ぶ？</h3>
+
+        <div id="choice-buttons-area" style="margin-top: 20px;">
+            </div>
+
+        <p id="feedback" style="font-weight: bold; margin-top: 20px; min-height: 20px;">単語を選んでね！</p>
+        
+        <div id="game-controls" style="min-height: 50px; margin-top: 20px;">
+            </div>
+
+        <div id="endGameControls" style="margin-top: 30px; display: none;">
+            </div>
+        
+    </div>
+    
+    <script src="js/shiritori.js"></script>
+</body>
+</html>

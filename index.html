@@ -2,118 +2,47 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun Learning Japanese - 楽しく日本語を学ぼう！</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Fun Learning Japanese</title> 
+    <link rel="stylesheet" href="css/style.css"> 
 </head>
 <body>
-    <div class="page-container">
-        <header>
-            <h1>Fun Learning Japanese</h1>
-            <p class="subtitle">たのしく にほんごを まなぼう！</p>
-        </header>
-
-        <main>
-            <div id="main-menu" class="container">
-                <div class="menu-buttons-grid">
-                    <button class="game-button" onclick="loadGameScript('./js/hiragana.js', 'ひらがな')">
-                        <h3>ひらがな</h3>
-                        <p>basic hiragana</p>
-                        <small>かんたんな ひらがなの べんきょう</small>
-                    </button>
-                    
-                    <button class="game-button" onclick="loadGameScript('./js/hiragana2.js', 'ひらがな２')">
-                        <h3>ひらがな２</h3>
-                        <p>advanced hiragana</p>
-                        <small>むずかしい ひらがなの べんきょう</small>
-                    </button>
-                    
-                    <button class="game-button" onclick="loadGameScript('./js/shiritori.js', 'しりとり')">
-                        <h3>しりとり</h3>
-                        <p>word chain game</p>
-                        <small>たのしく ことばを つなげよう</small>
-                    </button>
-                    
-                    <button class="game-button" onclick="loadGameScript('./js/pronunciation.js', 'よみかた')">
-                        <h3>よみかた</h3>
-                        <p>pronunciation</p>
-                        <small>ひらがな・カタカナの よみかた</small>
-                    </button>
-                </div>
-            </div>
-
-            <div id="game-container" class="container" style="display: none;">
-                <div id="game-header">
-                    <button class="back-button" onclick="returnToMenu()">
-                        ←メニューに もどる
-                    </button>
-                    <div id="game-title"></div>
-                    <div id="game-score"></div>
-                </div>
-                
-                <div id="game-content">
-                    <div class="loading-spinner"></div>
-                    <p>Loading...</p>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <p>© 2025 Fun Learning Japanese - For children learning Japanese</p>
-        </footer>
+    
+    <h1>Fun Learning Japanese</h1>
+    
+    <div id="main-menu" class="container">
+        <h2>何をして遊ぶ？</h2>
+        
+        <div id="score-message" style="margin-bottom: 20px;">
+            <p>ようこそ！ゲームを選んでね。</p>
+        </div> 
+        
+        <div class="menu-buttons-grid">
+            
+            <button id="startButton1" class="menu-card-button menu-card-reset">
+                🎮<br>ひらがな単語ゲーム
+            </button>
+            
+            <button id="startButton2" class="menu-card-button menu-card-reset">
+                ⭐<br>ひらがなゲーム2 (並び替え)
+            </button>
+            
+            <a href="hiragana.html" class="menu-card-button menu-card-reset">
+                📝<br>ひらがな・カタカナ学習
+            </a>
+            
+            <a href="shiritori.html" class="menu-card-button menu-card-reset">
+                🗣️<br>しりとりゲーム
+            </a>
+            
+        </div>
     </div>
     
-    <script src="js/gameLoader.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ボタンにtype属性を追加
-            document.querySelectorAll('.menu-buttons-grid button').forEach(button => {
-                if (!button.hasAttribute('type')) {
-                    button.setAttribute('type', 'button');
-                }
-            });
-        });
-    </script>
+    <div id="game-area" class="container" style="display:none;">
+        <p>ゲームを読み込んでいます...</p>
+    </div>
     
-    </body>
-</html><script>
-        // 外部JSファイルがロードされたときに、そのファイル内の開始関数を呼び出す
-        window.startGame = function(scriptPath, startFunc) {
-            
-            // 既にロード済みなら直接開始関数を呼ぶ
-            if (window[startFunc]) {
-                window[startFunc]();
-                return;
-            }
-
-            // スクリプトがDOMに存在しない場合、新しくロードする
-            const script = document.createElement('script');
-            script.src = scriptPath;
-            
-            script.onload = () => {
-                // ロード完了後、グローバルに公開された開始関数を実行
-                if (window[startFunc]) {
-                    window[startFunc]();
-                }
-            };
-            document.body.appendChild(script);
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const startButton1 = document.getElementById('startButton1');
-            const startButton2 = document.getElementById('startButton2');
-
-            // main.js の起動
-            if (startButton1) {
-                startButton1.addEventListener('click', () => window.startGame('js/main.js', 'startMainGame'));
-            }
-
-            // main2.js の起動
-            if (startButton2) {
-                startButton2.addEventListener('click', () => window.startGame('js/main2.js', 'startMain2Game'));
-            }
-        });
-    </script>
-    
-    </body>
+    <script src="js/main.js"></script>
+    <script src="js/main2.js"></script>
+</body>
 </html>

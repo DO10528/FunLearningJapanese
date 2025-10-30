@@ -1,10 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // グローバルスコープにゲーム開始関数を公開 (index.htmlから呼び出される)
-    window.startMainGame = function() {
-        loadWords().then(startNewGame);
-    };
-
-    // HTML要素のIDを正確に取得 (index.htmlを直接操作するため、IDは共通)
+    // HTML要素のIDを正確に取得
     const MAIN_MENU = document.getElementById('main-menu'); 
     const GAME_AREA = document.getElementById('game-area');
     const SCORE_MESSAGE = document.getElementById('score-message'); 
@@ -36,11 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // 画面の表示を切り替え
         if (MAIN_MENU) MAIN_MENU.style.display = 'none'; 
         if (GAME_AREA) GAME_AREA.style.display = 'block'; 
 
-        // 状態をリセット
         score = 0; 
         correctCount = 0;
         incorrectCount = 0;
@@ -74,13 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentWord = availableWords[correctIndex];
         askedWordIds.add(currentWord.id); 
 
-        // 不正解の選択肢を2つ選ぶ
         let wrongChoices = [];
         while (wrongChoices.length < 2) {
             const randomIndex = Math.floor(Math.random() * allWords.length);
             const randomWord = allWords[randomIndex];
             
-            // 正解の読み方と異なる単語を不正解の選択肢とする
             const isDifferent = randomWord.reading !== currentWord.reading;
             const isDuplicate = wrongChoices.includes(randomWord.word);
 
@@ -99,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderQuestion(word, choices) {
         const imagePath = `assets/images/${word.image}`; 
         
-        // 選択肢ボタンを作成（言葉で表示）
         let buttonsHtml = choices.map(choice => 
             `<button class="choice-button" data-word="${choice}">${choice}</button>`
         ).join('');
@@ -184,5 +174,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // 起動ロジックはindex.htmlの動的ロードに委ねる
+    // 8. DOMContentLoaded (イベントリスナーの設定)
+    document.addEventListener('DOMContentLoaded', () => {
+        const startButton1 = document.getElementById('startButton1');
+
+        // 外部から呼ばれる startMainGame 関数を公開
+        window.startMainGame = function() {
+            loadWords().then(startNewGame);
+        };
+
+        if (startButton1) {
+            startButton1.addEventListener('click', () => {
+                const MAIN_MENU = document.getElementById('main-menu');
+                const GAME_AREA = document.getElementById('game-area');
+                if (MAIN_MENU) MAIN_MENU.style.display = 'none';
+                if (GAME_AREA) GAME_AREA.style.display = 'block';
+                
+                window.startMainGame();
+            });
+        }
+        
+        loadWords();
+    });
 });

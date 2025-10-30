@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>ひらがな・カタカナ学習</title> 
+    <link rel="stylesheet" href="css/style.css"> 
+    <style>
+        /* ひらがな表の表示を調整する簡易CSS */
+        .hiragana-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .char-card {
+            background-color: #fff8e1;
+            border: 1px solid #ffcc5c;
+            padding: 15px 5px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>ひらがな・カタカナを学ぼう！</h1>
+    
+    <div class="container">
+        
+        <div style="margin-bottom: 20px;">
+            <a href="index.html" class="menu-card-button menu-card-reset" style="width: 150px; height: 50px; padding: 10px; display: inline-flex;">
+                🏠 ホームに戻る
+            </a>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <button id="show-hiragana" class="choice-button">ひらがな</button>
+            <button id="show-katakana" class="choice-button">カタカナ</button>
+        </div>
+        
+        <div id="learning-content">
+            <h3>学習コンテンツを読み込み中...</h3>
+        </div>
+        
+    </div>
+    
+    <script src="js/hiragana.js"></script>
+</body>
+</html>

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '<h3>カタカナ一覧</h3><div class="hiragana-grid">';
         
         hiraganaData.forEach(char => {
-            // ひらがなをカタカナに変換する簡易的なロジック（実際にはより複雑なマッピングが必要）
+            // 簡易的なひらがな→カタカナ変換ロジック
             const katakana = char.replace(/あ/g, 'ア').replace(/い/g, 'イ').replace(/う/g, 'ウ').replace(/え/g, 'エ').replace(/お/g, 'オ')
                                  .replace(/か/g, 'カ').replace(/き/g, 'キ').replace(/く/g, 'ク').replace(/け/g, 'ケ').replace(/こ/g, 'コ')
                                  .replace(/さ/g, 'サ').replace(/し/g, 'シ').replace(/す/g, 'ス').replace(/せ/g, 'セ').replace(/そ/g, 'ソ')

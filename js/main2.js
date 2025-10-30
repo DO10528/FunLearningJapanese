@@ -1,8 +1,3 @@
-// グローバルスコープにゲーム開始関数を公開 (index.htmlから呼び出される)
-window.startMain2Game = function() {
-    loadWords().then(renderMenu);
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     // HTML要素のIDを正確に取得
     const MAIN_MENU = document.getElementById('main-menu'); 
@@ -11,10 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let allWords = [];
     let currentWord = null;
-    let score = 0;          // 正解数
-    let incorrectCount = 0; // 失敗数
+    let score = 0;          
+    let correctCount = 0;   
+    let incorrectCount = 0; 
     let askedWordIds = new Set();
     let selectedBlocks = []; 
+
+    // グローバルスコープにゲーム開始関数を公開 (index.htmlから呼び出される)
+    window.startMain2Game = function() {
+        loadWords().then(startNewGame);
+    };
     
     // 1. JSONデータを読み込む関数
     async function loadWords() {
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             SCORE_MESSAGE.innerHTML = `<p id="current-score">前回のスコア: ${score}点 (正解: ${correctCount}問, 失敗: ${incorrectCount}回)</p>`;
         }
     }
-
+    
     // 3. ゲーム開始と新しい問題の生成
     function startNewGame() {
         if (allWords.length === 0) {
@@ -49,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (MAIN_MENU) MAIN_MENU.style.display = 'none'; 
         if (GAME_AREA) GAME_AREA.style.display = 'block'; 
 
-        // 状態をリセット
         score = 0; 
         correctCount = 0;
         incorrectCount = 0;
@@ -72,10 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const correctIndex = Math.floor(Math.random() * availableWords.length);
         currentWord = availableWords[correctIndex];
-        askedWordIds.add(currentWord.id); 
         
         let readingChars = Array.from(currentWord.reading);
         let shuffledChars = shuffleArray([...readingChars]);
+        
+        // 最初の出題時のみ、出題リストに追加
+        askedWordIds.add(currentWord.id);
         
         renderQuestion(currentWord, shuffledChars);
     }
@@ -152,18 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedBlocks = [];
         }
         
-        FEEDBACK.textContent = 'クリックで文字を入れ替え！';
-        FEEDBACK.style.color = '#333';
+        document.getElementById('feedback').textContent = 'クリックで文字を入れ替え！';
+        document.getElementById('feedback').style.color = '#333';
     }
 
-    // 7. 答え合わせの処理
+    // 7. 答え合わせの処理 (不正解なら同じ問題)
     function checkAnswer() {
         const blocks = Array.from(document.querySelectorAll('.char-block'));
         const attemptedReading = blocks.map(block => block.dataset.char).join('');
-        
+        const feedbackElement = document.getElementById('feedback');
+
         if (attemptedReading === currentWord.reading) {
-            FEEDBACK.textContent = 'せいかい！✨';
-            FEEDBACK.style.color = '#5c7aff';
+            feedbackElement.textContent = 'せいかい！✨';
+            feedbackElement.style.color = '#5c7aff';
             score += 10;
             correctCount += 1; 
 
@@ -172,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
-            FEEDBACK.textContent = 'ざんねん... もう一度やり直してください。';
-            FEEDBACK.style.color = '#ff6f61';
+            feedbackElement.textContent = 'ざんねん...。もう一度並び替えてください。';
+            feedbackElement.style.color = '#ff6f61';
             incorrectCount += 1; 
 
             document.querySelectorAll('.char-block').forEach(block => {
@@ -202,7 +205,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return array;
     }
+    
+    // 9. DOMContentLoaded (イベントリスナーの設定とデータロード)
+    document.addEventListener('DOMContentLoaded', () => {
+        const startButton2 = document.getElementById('startButton2');
 
-    // DOMContentLoadedではデータをロードするのみ
-    loadWords();
+        // ボタンがクリックされたら、ゲームを開始する
+        if (startButton2) {
+            startButton2.addEventListener('click', () => {
+                const MAIN_MENU = document.getElementById('main-menu');
+                const GAME_AREA = document.getElementById('game-area');
+                if (MAIN_MENU) MAIN_MENU.style.display = 'none';
+                if (GAME_AREA) GAME_AREA.style.display = 'block';
+
+                window.startMain2Game();
+            });
+        }
+        
+        loadWords();
+    });
 });
