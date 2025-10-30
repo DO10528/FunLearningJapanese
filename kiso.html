@@ -1,74 +1,68 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-    const CONTENT_AREA = document.getElementById('learning-content-kiso');
-    const HIRAGANA_BUTTON = document.getElementById('show-hiragana-kiso');
-    const KATAKANA_BUTTON = document.getElementById('show-katakana-kiso');
-
-    // ★ひらがなと、対応する英語の読み方、イラストのファイル名を定義★
-    const kisoData = [
-        { char: "あ", reading: "a / Ant (アリ)", image: "ari.png" }, // ari.png の画像データがあれば表示
-        { char: "い", reading: "i / Squid (イカ)", image: "ika.png" },
-        { char: "う", reading: "u / Cow (ウシ)", image: "ushi.png" },
-        // ★中略: 全てを記載せず、ファイルに合った正しいデータを使ってください★
-        { char: "か", reading: "ka / Umbrella (カサ)", image: "kasa.png" },
-        { char: "き", reading: "ki / Tree (キ)", image: "ki.png" },
-        { char: "く", reading: "ku / Bear (クマ)", image: "kuma.png" },
-        { char: "さ", reading: "sa / Monkey (サル)", image: "saru.png" },
-        { char: "し", reading: "shi / Deer (シカ)", image: "shika.png" },
-        { char: "す", reading: "su / Watermelon (スイカ)", image: "suika.png" },
-        { char: "た", reading: "ta / Octopus (タコ)", image: "tako.png" },
-        { char: "と", reading: "to / Clock (トケイ)", image: "tokei.png" },
-        { char: "ん", reading: "n / End", image: "nendo.png" },
-        // ★データが不足している場合は、assets/images/にある画像名に合わせて追記してください★
-    ];
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>ひらがな・カタカナ基礎学習</title> 
+    <link rel="stylesheet" href="css/style.css"> 
+    <style>
+        /* kiso.html 専用のスタイル */
+        .kiso-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .char-card-kiso {
+            background-color: #fff8e1;
+            border: 2px solid #ffcc5c;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .char-card-kiso h3 {
+            margin: 0 0 5px 0;
+            font-size: 2.5em;
+            color: #ff6f61;
+        }
+        .char-card-kiso p {
+            margin: 0;
+            font-size: 1em;
+            color: #5c7aff;
+            font-weight: bold;
+        }
+        .char-card-kiso img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-top: 5px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
     
-    // ひらがな -> カタカナの簡易変換マップ
-    const hiraganaToKatakana = {
-        'あ': 'ア', 'い': 'イ', 'う': 'ウ', 'え': 'エ', 'お': 'オ',
-        'か': 'カ', 'き': 'キ', 'く': 'ク', 'け': 'ケ', 'こ': 'コ',
-        'さ': 'サ', 'し': 'シ', 'す': 'ス', 'せ': 'セ', 'そ': 'ソ',
-        'た': 'タ', 'ち': 'チ', 'つ': 'ツ', 'て': 'テ', 'と': 'ト',
-        'な': 'ナ', 'に': 'ニ', 'ぬ': 'ヌ', 'ね': 'ネ', 'の': 'ノ',
-        'は': 'ハ', 'ひ': 'ヒ', 'ふ': 'フ', 'へ': 'ヘ', 'ほ': 'ホ',
-        'ま': 'マ', 'み': 'ミ', 'む': 'ム', 'め': 'メ', 'も': 'モ',
-        'や': 'ヤ', 'ゆ': 'ユ', 'よ': 'ヨ',
-        'ら': 'ラ', 'り': 'リ', 'る': 'ル', 'れ': 'レ', 'ろ': 'ロ',
-        'わ': 'ワ', 'を': 'ヲ', 'ん': 'ン'
-    };
-
-
-    function renderKisoTable(type = 'hiragana') {
-        let html = `<h3>${type === 'hiragana' ? 'ひらがな' : 'カタカナ'}基礎一覧</h3><div class="kiso-grid">`;
+    <h1>ひらがな・カタカナの基礎を学ぼう！</h1>
+    
+    <div class="container">
         
-        kisoData.forEach(item => {
-            const char = type === 'hiragana' ? item.char : hiraganaToKatakana[item.char] || '';
-            const reading = item.reading;
-            const imagePath = `assets/images/${item.image}`;
-            
-            if (char) {
-                html += `
-                    <div class="char-card-kiso">
-                        <h3>${char}</h3>
-                        <p>${reading}</p>
-                        <img src="${imagePath}" 
-                             alt="${char}のイラスト" 
-                             onerror="this.src='assets/images/placeholder.png'; this.alt='No Image';">
-                    </div>
-                `;
-            }
-        });
+        <div style="margin-bottom: 20px;">
+            <a href="index.html" class="menu-card-button menu-card-reset" style="width: 150px; height: 50px; padding: 10px; display: inline-flex;">
+                🏠 ホームに戻る
+            </a>
+        </div>
         
-        html += '</div>';
-        CONTENT_AREA.innerHTML = html;
-    }
-
-    if (HIRAGANA_BUTTON) {
-        HIRAGANA_BUTTON.addEventListener('click', () => renderKisoTable('hiragana'));
-    }
-    if (KATAKANA_BUTTON) {
-        KATAKANA_BUTTON.addEventListener('click', () => renderKisoTable('katakana'));
-    }
-
-    // 初期表示
-    renderKisoTable('hiragana');
-});
+        <div style="margin-bottom: 30px;">
+            <button id="show-hiragana-kiso" class="choice-button">ひらがなを学ぶ</button>
+            <button id="show-katakana-kiso" class="choice-button">カタカナを学ぶ</button>
+        </div>
+        
+        <div id="learning-content-kiso">
+            <h3>コンテンツを読み込み中...</h3>
+        </div>
+        
+    </div>
+    
+    <script src="js/kiso.js"></script>
+</body>
+</html>

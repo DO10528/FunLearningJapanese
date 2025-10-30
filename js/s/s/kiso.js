@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const KATAKANA_BUTTON = document.getElementById('show-katakana-kiso');
 
     // ★ひらがなと、対応する英語の読み方、イラストのファイル名を定義★
-    // 注意: ここで定義されていない文字のイラストは表示されません
+    // ※assets/imagesフォルダ内の画像ファイル名と一致している必要があります
     const kisoData = [
         { char: "あ", reading: "a / Ant (アリ)", image: "ari.png" },
         { char: "い", reading: "i / Squid (イカ)", image: "ika.png" },
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { char: "へ", reading: "he / Snake (ヘビ)", image: "hebi.png" },
         { char: "ほ", reading: "ho / Star (ホシ)", image: "hoshi.png" },
         
-        // ... 他の行は省略（必要に応じて追加してください）
+        // ★注意: データが不足している場合は、assets/images/にある画像名に合わせて追記してください★
     ];
     
     // ひらがな -> カタカナの簡易変換マップ
@@ -93,6 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         KATAKANA_BUTTON.addEventListener('click', () => renderKisoTable('katakana'));
     }
 
-    // 初期表示
+    // ★修正: ページロード時にコンテンツを自動表示する★
     renderKisoTable('hiragana');
 });

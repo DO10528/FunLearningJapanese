@@ -19,9 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrectCount = 0;
     let askedWordIds = new Set(); 
 
-    // ----------------------------------------------------
     // 1. ゲーム開始関数 (HTMLの onclick="startQuizGame()" から呼ばれる)
-    // ----------------------------------------------------
     window.startQuizGame = function() {
         if (allWords.length === 0) {
             loadWords().then(startNewGameLogic);
@@ -37,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // 画面の表示を切り替え
         if (MENU_AREA) MENU_AREA.style.display = 'none'; 
         if (GAME_AREA) GAME_AREA.style.display = 'block'; 
 
@@ -47,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         incorrectCount = 0;
         askedWordIds.clear(); 
         
-        // 初期フィードバック表示
         if (TURN_MESSAGE) TURN_MESSAGE.textContent = 'チャレンジ中！ (正解 0/失敗 0)';
         
         showNextQuestion();
@@ -73,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (SCORE_MESSAGE) {
             SCORE_MESSAGE.innerHTML = `<p>前回のスコア: ${score}点 (正解: ${correctCount}問, 不正解: ${incorrectCount}問)</p>`;
         }
+        if (GAME_CONTROLS) GAME_CONTROLS.innerHTML = '';
     }
 
     // 4. 問題をランダムに選び、選択肢を生成する
@@ -85,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
-        
         const correctIndex = Math.floor(Math.random() * availableWords.length);
         currentWord = availableWords[correctIndex];
         askedWordIds.add(currentWord.id);
@@ -146,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. ユーザーの回答を処理する
     function handleAnswer(event) {
-        // クリックした要素から親のカード要素を取得
         const cardElement = event.target.closest('.choice-card');
         if (!cardElement) return;
 
@@ -162,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
             correctCount += 1; 
             updateTurnMessage();
             
-            // 正解なら次の問題へ自動で進む
             setTimeout(() => {
                 showNextQuestion();
             }, 1500);
@@ -173,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
             incorrectCount += 1; 
             updateTurnMessage();
             
-            // 不正解なら次の問題へ進むボタンを表示
+            // ★修正: 不正解時は「次へ」ボタンと「メニューに戻る」ボタンの両方を表示★
             setTimeout(() => {
-                renderGameControls(true); // 次のボタンとメニューボタンを表示
+                renderGameControls(true); 
             }, 1500); 
         }
     }
@@ -187,40 +181,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 8. 補助関数: プレイ中のメニューボタンを表示 (不正解時には「次へ」も表示)
+    // 8. 補助関数: プレイ中のメニューボタンを表示
     function renderGameControls(showNextButton) {
         if (!GAME_CONTROLS) return;
         
-        GAME_CONTROLS.style.display = 'flex'; // ボタンを横並びにするためflexを設定
+        GAME_CONTROLS.style.display = 'flex'; 
         GAME_CONTROLS.style.justifyContent = 'center';
 
-        // 常にメニューボタンは表示
-        let buttonsHtml = `
+        // 常にメニューボタンは表示 
+        let menuButtonHtml = `
             <button id="backToMenuControl" class="menu-card-button menu-card-reset" style="width: 200px; height: 50px;">
                 メニューに戻る
             </button>
         `;
 
-        // 不正解時のみ「つぎのもんだいへ」ボタンを追加
         if (showNextButton) {
-            buttonsHtml = `
+            // 不正解時: 「次へ」と「メニュー」を並べる
+            GAME_CONTROLS.innerHTML = `
                 <button id="nextQuizButton" class="menu-card-button choice-button" style="width: 200px; height: 50px; margin-right: 10px;">
                     つぎのもんだいへ
                 </button>
-                ${buttonsHtml}
+                ${menuButtonHtml}
             `;
+            GAME_CONTROLS.style.justifyContent = 'center'; // 2つのボタンを中央寄せ
         } else {
-             // 正解後のボタンは中央に配置するため、メニューボタン単独でマージンを調整
-             buttonsHtml = `
-                <button id="backToMenuControl" class="menu-card-button menu-card-reset" style="width: 200px; height: 50px; margin: 0 auto;">
-                    メニューに戻る
-                </button>
-            `;
-             GAME_CONTROLS.style.justifyContent = 'center'; // 単独ボタンの場合は中央寄せ
+             // 正解/初期表示時: メニューボタン単独で中央寄せ
+             GAME_CONTROLS.innerHTML = menuButtonHtml;
+             GAME_CONTROLS.style.justifyContent = 'center'; 
+             document.getElementById('backToMenuControl').style.margin = '0 auto'; // 単独ボタンを中央に
         }
 
-        GAME_CONTROLS.innerHTML = buttonsHtml;
-        
         // イベントリスナーの設定
         if (showNextButton) {
             document.getElementById('nextQuizButton').addEventListener('click', () => {
