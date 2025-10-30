@@ -76,4 +76,44 @@
     </script>
     
     </body>
+</html><script>
+        // 外部JSファイルがロードされたときに、そのファイル内の開始関数を呼び出す
+        window.startGame = function(scriptPath, startFunc) {
+            
+            // 既にロード済みなら直接開始関数を呼ぶ
+            if (window[startFunc]) {
+                window[startFunc]();
+                return;
+            }
+
+            // スクリプトがDOMに存在しない場合、新しくロードする
+            const script = document.createElement('script');
+            script.src = scriptPath;
+            
+            script.onload = () => {
+                // ロード完了後、グローバルに公開された開始関数を実行
+                if (window[startFunc]) {
+                    window[startFunc]();
+                }
+            };
+            document.body.appendChild(script);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton1 = document.getElementById('startButton1');
+            const startButton2 = document.getElementById('startButton2');
+
+            // main.js の起動
+            if (startButton1) {
+                startButton1.addEventListener('click', () => window.startGame('js/main.js', 'startMainGame'));
+            }
+
+            // main2.js の起動
+            if (startButton2) {
+                startButton2.addEventListener('click', () => window.startGame('js/main2.js', 'startMain2Game'));
+            }
+        });
+    </script>
+    
+    </body>
 </html>
