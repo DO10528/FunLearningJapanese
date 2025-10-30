@@ -54,15 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. 問題をランダムに選び、選択肢を生成する
     function showNextQuestion() {
-        
+        // ... (問題ロジックは省略) ...
         if (askedWordIds.size >= allWords.length) {
             alert(`全${allWords.length}問を終了しました！\n最終スコア: ${score}点\n正解: ${correctCount}問, 不正解: ${incorrectCount}問`);
             renderMenu();
             return;
         }
-
         let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
-        
         const correctIndex = Math.floor(Math.random() * availableWords.length);
         currentWord = availableWords[correctIndex];
         askedWordIds.add(currentWord.id); 
@@ -82,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let choices = [currentWord.word, ...wrongChoices];
         choices = shuffleArray(choices);
-
         renderQuestion(currentWord, choices);
     }
 
@@ -119,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. ユーザーの回答を処理する 
     function handleAnswer(event) {
+        // ... (回答ロジックは省略) ...
         const selectedWord = event.target.dataset.word;
         const feedbackElement = document.getElementById('feedback');
         
@@ -156,15 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 6.5. スコア表示のみを更新する補助関数
-    function renderScoreTitleUpdate() {
-        const titleElement = GAME_AREA.querySelector('h3');
-        if (titleElement) {
-            const scoreDisplay = `${correctCount}/${incorrectCount}`; 
-            titleElement.textContent = `この絵はどれかな？ (${scoreDisplay})`;
-        }
-    }
-
     // 7. 配列をランダムにシャッフルするユーティリティ関数
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -185,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (startButton1) {
             startButton1.addEventListener('click', () => {
+                // index.html側で既に定義されている要素を再取得
                 const MAIN_MENU = document.getElementById('main-menu');
                 const GAME_AREA = document.getElementById('game-area');
                 if (MAIN_MENU) MAIN_MENU.style.display = 'none';

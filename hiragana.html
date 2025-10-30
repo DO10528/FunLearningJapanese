@@ -3,47 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>ひらがな・カタカナ学習</title> 
+    <title>ひらがな単語クイズ</title> 
     <link rel="stylesheet" href="css/style.css"> 
-    <style>
-        /* ひらがな表の表示を調整する簡易CSS */
-        .hiragana-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .char-card {
-            background-color: #fff8e1;
-            border: 1px solid #ffcc5c;
-            padding: 15px 5px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border-radius: 8px;
-        }
-    </style>
 </head>
 <body>
     
-    <h1>ひらがな・カタカナを学ぼう！</h1>
+    <h1>ひらがな単語クイズ</h1>
     
-    <div class="container">
+    <div id="quiz-menu-area" class="container">
+        <h2>イラストを見て言葉を選ぼう！</h2>
         
-        <div style="margin-bottom: 20px;">
-            <a href="index.html" class="menu-card-button menu-card-reset" style="width: 150px; height: 50px; padding: 10px; display: inline-flex;">
-                🏠 ホームに戻る
-            </a>
-        </div>
+        <div id="quiz-score-message" style="margin-bottom: 20px;">
+            <p>ルール: イラストと同じ言葉を3択から選んでね。</p>
+            <p>スコアは下のゲーム開始ボタンを押すとリセットされます。</p>
+        </div> 
         
-        <div style="margin-bottom: 30px;">
-            <button id="show-hiragana" class="choice-button">ひらがな</button>
-            <button id="show-katakana" class="choice-button">カタカナ</button>
-        </div>
+        <button id="quizStartButton" class="menu-card-button menu-card-reset" onclick="startQuizGame()">
+            🎮<br>ゲームスタート！
+        </button>
+
+        <a href="index.html" class="menu-card-button menu-card-reset">
+            🏠<br>ホームに戻る
+        </a>
+    </div>
+    
+    <div id="quiz-game-area" class="container" style="display:none;">
         
-        <div id="learning-content">
-            <h3>学習コンテンツを読み込み中...</h3>
-        </div>
+        <p id="quiz-turn-message" style="font-size: 1.5em; font-weight: bold; color: #5c7aff; margin-bottom: 10px;">チャレンジ中！</p>
         
+        <div id="quiz-image-area" style="margin-bottom: 30px;">
+            </div>
+
+        <h3 id="quiz-question-text">このイラストはどれかな？</h3>
+
+        <div id="choice-buttons-area" style="margin-top: 20px;">
+            </div>
+
+        <p id="quiz-feedback" style="font-weight: bold; margin-top: 20px; min-height: 20px;">答えを選んでね！</p>
+        
+        <div id="quiz-game-controls" style="margin-top: 30px;">
+            </div>
+
     </div>
     
     <script src="js/hiragana.js"></script>

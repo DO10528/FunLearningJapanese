@@ -130,8 +130,8 @@ a.menu-card-button {
 #choice-buttons-area {
     display: flex;
     justify-content: center; /* 横方向の中央揃え */
-    flex-wrap: wrap; /* 画面幅が狭くなったら折り返す */
-    gap: 20px; /* カード間のスペース */
+    flex-wrap: wrap; 
+    gap: 20px; 
     margin-top: 30px;
 }
 
@@ -166,13 +166,13 @@ a.menu-card-button {
     font-weight: bold;
     
     /* ブロックのデザイン */
-    background-color: #ffcc5c; /* 明るい黄色 */
+    background-color: #ffcc5c; 
     color: #333;
-    border: 2px solid #ff6f61; /* 赤系の枠線 */
+    border: 2px solid #ff6f61; 
     border-radius: 8px;
-    margin: 0 5px; /* ブロック間のスペース */
+    margin: 0 5px; 
     cursor: pointer;
-    user-select: none; /* 文字選択を禁止 */
+    user-select: none;
     transition: background-color 0.1s, transform 0.1s;
 }
 
@@ -182,7 +182,7 @@ a.menu-card-button {
 
 /* 選択中のブロック */
 .char-block.selected {
-    border: 3px solid #5c7aff; /* 青い枠線でハイライト */
-    background-color: #cce0ff; /* 薄い青に変化 */
+    border: 3px solid #5c7aff; 
+    background-color: #cce0ff;
     transform: translateY(-2px);
 }
