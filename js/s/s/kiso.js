@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const KATAKANA_BUTTON = document.getElementById('show-katakana-kiso');
 
     // ★ひらがなと、対応する英語の読み方、イラストのファイル名を定義★
-    // ※assets/imagesフォルダ内の画像ファイル名と一致している必要があります
     const kisoData = [
         { char: "あ", reading: "a / Ant (アリ)", image: "ari.png" },
         { char: "い", reading: "i / Squid (イカ)", image: "ika.png" },
@@ -42,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { char: "ふ", reading: "fu / Ship (フネ)", image: "fune.png" },
         { char: "へ", reading: "he / Snake (ヘビ)", image: "hebi.png" },
         { char: "ほ", reading: "ho / Star (ホシ)", image: "hoshi.png" },
-        
-        // ★注意: データが不足している場合は、assets/images/にある画像名に合わせて追記してください★
+        // ... (他の行は省略) ...
     ];
     
     // ひらがな -> カタカナの簡易変換マップ
@@ -86,13 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
         CONTENT_AREA.innerHTML = html;
     }
 
-    if (HIRAGANA_BUTTON) {
-        HIRAGANA_BUTTON.addEventListener('click', () => renderKisoTable('hiragana'));
-    }
-    if (KATAKANA_BUTTON) {
-        KATAKANA_BUTTON.addEventListener('click', () => renderKisoTable('katakana'));
-    }
+    // ★修正: ボタンが存在することを確認してからリスナーを設定し、初期表示を行う★
+    if (HIRAGANA_BUTTON && KATAKANA_BUTTON) {
+        HIRAGANA_BUTTON.addEventListener('click', () => {
+            renderKisoTable('hiragana');
+        });
+        KATAKANA_BUTTON.addEventListener('click', () => {
+            renderKisoTable('katakana');
+        });
 
-    // ★修正: ページロード時にコンテンツを自動表示する★
-    renderKisoTable('hiragana');
+        // ページロード時にコンテンツを自動表示する
+        renderKisoTable('hiragana');
+    } else {
+        // ボタンが取得できなかった場合のエラーメッセージ
+        CONTENT_AREA.innerHTML = '<h3>エラー: ボタン要素の読み込みに失敗しました。</h3>';
+    }
 });

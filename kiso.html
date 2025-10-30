@@ -38,6 +38,13 @@
             margin-top: 5px;
             border: none;
         }
+        /* ボタンコンテナのスタイルを明確化 */
+        #kiso-menu-controls {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -52,7 +59,7 @@
             </a>
         </div>
         
-        <div style="margin-bottom: 30px;">
+        <div id="kiso-menu-controls">
             <button id="show-hiragana-kiso" class="choice-button">ひらがなを学ぶ</button>
             <button id="show-katakana-kiso" class="choice-button">カタカナを学ぶ</button>
         </div>
