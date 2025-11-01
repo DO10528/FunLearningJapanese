@@ -3,6 +3,11 @@
 let MAIN_MENU_2 = null; // hiragana2.htmlのメニューエリア
 let GAME_AREA_2 = null; // hiragana2.htmlのゲームエリア
 
+// ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
+const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
+const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+// ★★★★★★★★★★★★★★★★★★★★★
+
 let allWords = [];
 let currentWord = null;
 let score = 0;          
@@ -10,6 +15,13 @@ let correctCount = 0;
 let incorrectCount = 0; 
 let askedWordIds = new Set();
 let selectedBlocks = []; 
+
+// ★★★ 補助関数: 音源を再生する関数 ★★★
+function playSound(path) {
+    const audio = new Audio(path);
+    audio.play().catch(e => console.error("音声再生エラー:", e));
+}
+// ★★★★★★★★★★★★★★★★★★★★★
 
 // ----------------------------------------------------
 // 1. ゲーム開始関数 (HTMLの onclick="startNewGame2()" から呼ばれる)
@@ -185,16 +197,27 @@ function checkAnswer() {
     const feedbackElement = document.getElementById('feedback');
 
     if (attemptedReading === currentWord.reading) {
+        // ★★★ 正解時の音源再生 ★★★
+        playSound(SOUND_CORRECT_PATH);
+        
         feedbackElement.textContent = 'せいかい！✨';
         feedbackElement.style.color = '#5c7aff';
         score += 10;
         correctCount += 1; 
+        
+        // ボタンを無効化
+        document.getElementById('checkButton').disabled = true;
 
         setTimeout(() => {
+            // ボタンを再有効化し、次の問題へ
+            document.getElementById('checkButton').disabled = false;
             showNextQuestion();
         }, 1500);
 
     } else {
+        // ★★★ 不正解時の音源再生 ★★★
+        playSound(SOUND_INCORRECT_PATH);
+        
         feedbackElement.textContent = 'ざんねん...。もう一度並び替えてください。';
         feedbackElement.style.color = '#ff6f61';
         incorrectCount += 1; 

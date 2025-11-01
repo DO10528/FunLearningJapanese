@@ -12,12 +12,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const GAME_CONTROLS = document.getElementById('quiz-game-controls');
 
+    // ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
+    const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+    // ★★★★★★★★★★★★★★★★★★★★★
+
     let allWords = [];
     let currentWord = null;
     let score = 0;
     let correctCount = 0;
     let incorrectCount = 0;
     let askedWordIds = new Set(); 
+
+    // ★★★ 補助関数: 音源を再生する関数 ★★★
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
+    // ★★★★★★★★★★★★★★★★★★★★★
 
     // 1. ゲーム開始関数 (HTMLの onclick="startQuizGame()" から呼ばれる)
     window.startQuizGame = function() {
@@ -80,11 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMenu();
             return;
         }
+        
+        // ★修正: 不正解時は currentWord がそのまま残っているので、ここで新しい問題を選ぶのは「正解時」または「新規開始時」のみ
+        if (!currentWord || askedWordIds.has(currentWord.id)) {
+            let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
+            const correctIndex = Math.floor(Math.random() * availableWords.length);
+            currentWord = availableWords[correctIndex];
+        }
 
-        let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
-        const correctIndex = Math.floor(Math.random() * availableWords.length);
-        currentWord = availableWords[correctIndex];
-        askedWordIds.add(currentWord.id);
 
         let wrongWords = [];
         let wrongChoices = [];
@@ -137,6 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', handleAnswer);
+            // ★修正: 選択肢を有効化
+            card.style.pointerEvents = 'auto'; 
+            card.style.opacity = '1';
+            card.classList.remove('incorrect-choice');
         });
     }
 
@@ -144,17 +163,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleAnswer(event) {
         const cardElement = event.target.closest('.choice-card');
         if (!cardElement) return;
+        
+        // 回答直後に全ての選択肢を無効化（二重クリック防止）
+        document.querySelectorAll('.choice-card').forEach(btn => btn.style.pointerEvents = 'none');
+
 
         const selectedWord = cardElement.dataset.word;
         const feedbackElement = FEEDBACK;
         
-        document.querySelectorAll('.choice-card').forEach(btn => btn.style.pointerEvents = 'none');
-
         if (selectedWord === currentWord.word) {
+            // ★★★ 正解時の音源再生と自動次へ移行 ★★★
+            playSound(SOUND_CORRECT_PATH);
+            
             feedbackElement.textContent = 'せいかい！✨';
             feedbackElement.style.color = '#5c7aff';
             score += 10;
             correctCount += 1; 
+            askedWordIds.add(currentWord.id); // 正解時のみ追加
+
             updateTurnMessage();
             
             setTimeout(() => {
@@ -162,16 +188,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
-            feedbackElement.textContent = `ざんねん...。正解は「${currentWord.word}」だよ。`;
-            feedbackElement.style.color = '#ff6f61';
-            incorrectCount += 1; 
-            updateTurnMessage();
+            // ★★★ 不正解時の音源再生と再挑戦 ★★★
+            playSound(SOUND_INCORRECT_PATH);
             
-            // ★修正: 不正解時は「次へ」ボタンと「メニューに戻る」ボタンの両方を表示★
-            setTimeout(() => {
-                renderGameControls(true); 
-            }, 1500); 
+            feedbackElement.textContent = `ざんねん...。もう一度、よーく考えて選んでね。`;
+            feedbackElement.style.color = '#ff6f61';
+            
+            cardElement.classList.add('incorrect-choice'); // スタイルで不正解を強調
+            cardElement.style.pointerEvents = 'none'; // 間違った選択肢を無効化
+            
+            // 間違ったので、他の選択肢を再度有効化して再挑戦を促す
+            document.querySelectorAll('.choice-card').forEach(btn => {
+                if (btn !== cardElement) {
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+            // ★不正解時はスコアやカウントを更新しない（正解するまでやり直しのため）★
         }
+        // ★不正解時は renderGameControls(true) を削除し、再挑戦を促す★
     }
     
     // 7. 補助関数: スコア表示を更新
@@ -187,37 +221,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         GAME_CONTROLS.style.display = 'flex'; 
         GAME_CONTROLS.style.justifyContent = 'center';
-
-        // 常にメニューボタンは表示 
+        GAME_CONTROLS.innerHTML = '';
+        
         let menuButtonHtml = `
-            <button id="backToMenuControl" class="menu-card-button menu-card-reset" style="width: 200px; height: 50px;">
+            <button id="backToMenuControl" class="menu-card-button menu-card-reset" style="width: 200px; height: 50px; margin: 0 auto;">
                 メニューに戻る
             </button>
         `;
 
-        if (showNextButton) {
-            // 不正解時: 「次へ」と「メニュー」を並べる
-            GAME_CONTROLS.innerHTML = `
-                <button id="nextQuizButton" class="menu-card-button choice-button" style="width: 200px; height: 50px; margin-right: 10px;">
-                    つぎのもんだいへ
-                </button>
-                ${menuButtonHtml}
-            `;
-            GAME_CONTROLS.style.justifyContent = 'center'; // 2つのボタンを中央寄せ
-        } else {
-             // 正解/初期表示時: メニューボタン単独で中央寄せ
-             GAME_CONTROLS.innerHTML = menuButtonHtml;
-             GAME_CONTROLS.style.justifyContent = 'center'; 
-             document.getElementById('backToMenuControl').style.margin = '0 auto'; // 単独ボタンを中央に
-        }
-
+        // 常にメニューボタンは表示 
+        GAME_CONTROLS.innerHTML = menuButtonHtml;
+        
         // イベントリスナーの設定
-        if (showNextButton) {
-            document.getElementById('nextQuizButton').addEventListener('click', () => {
-                GAME_CONTROLS.innerHTML = '';
-                showNextQuestion();
-            });
-        }
         document.getElementById('backToMenuControl').addEventListener('click', renderMenu);
     }
 

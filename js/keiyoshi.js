@@ -6,6 +6,11 @@ const IMAGE_PATHS = [
     'assets/images/keiyoshi_quiz_3.gif'  // 必要に応じて追加・変更
 ];
 
+// ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
+const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
+const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+// ★★★★★★★★★★★★★★★★★★★★★
+
 // グローバル変数
 let adjectives = [];        // 全形容詞リスト
 let quizQuestions = [];     // 今回のクイズで出題される問題のリスト
@@ -23,6 +28,18 @@ const resultMessageElement = document.getElementById('result-message');
 const homeButton = document.getElementById('home-button');
 const restartButton = document.getElementById('restart-button');
 const finalScoreElement = document.getElementById('final-score');
+
+
+/**
+ * 指定されたパスの音源を再生する関数
+ * @param {string} path - 音源ファイルへのパス
+ */
+function playSound(path) {
+    // Audioオブジェクトを作成し、再生する
+    const audio = new Audio(path);
+    audio.play().catch(e => console.error("音声再生エラー:", e));
+}
+
 
 /**
  * ページロード時にデータを読み込み、クイズの準備を開始する
@@ -181,6 +198,10 @@ function checkAnswer(clickedButton, selectedKanji) {
     const isCorrect = (selectedKanji === question.correctKanji);
     
     if (isCorrect) {
+        // ★★★ 正解時の音源再生 ★★★
+        playSound(SOUND_CORRECT_PATH);
+        // ★★★★★★★★★★★★★★★★★
+        
         score++;
         resultMessageElement.textContent = "✅ 正解です！次の問題へ進みます。";
         resultMessageElement.classList.remove('incorrect');
@@ -196,6 +217,10 @@ function checkAnswer(clickedButton, selectedKanji) {
         }, 1500); // 1.5秒後に次の問題へ
         
     } else {
+        // ★★★ 不正解時の音源再生 ★★★
+        playSound(SOUND_INCORRECT_PATH);
+        // ★★★★★★★★★★★★★★★★★
+        
         resultMessageElement.textContent = "❌ 不正解です。もう一度挑戦してください。";
         resultMessageElement.classList.remove('correct');
         resultMessageElement.classList.add('incorrect');

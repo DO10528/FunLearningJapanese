@@ -1,23 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- グローバル変数 ---
-    let MENU_AREA = document.getElementById('shiritori-menu');
-    let GAME_AREA = document.getElementById('shiritori-game-area');
+    // ----------------------------------------------------
+    // DOM要素の取得
+    // ----------------------------------------------------
+    const MENU_AREA = document.getElementById('shiritori-menu');
+    const GAME_AREA = document.getElementById('shiritori-game-area');
     // ... (他の要素の取得は省略) ...
-    let QUESTION_TEXT = document.getElementById('question-text');
-    let FEEDBACK = document.getElementById('feedback');
-    let CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
-    let CURRENT_WORD_TEXT = document.getElementById('current-word-text');
-    let IMAGE_AREA = document.getElementById('image-area');
-    let TURN_MESSAGE = document.getElementById('turn-message');
+    const QUESTION_TEXT = document.getElementById('question-text');
+    const FEEDBACK = document.getElementById('feedback');
+    const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
+    const CURRENT_WORD_TEXT = document.getElementById('current-word-text');
+    const IMAGE_AREA = document.getElementById('image-area');
+    const TURN_MESSAGE = document.getElementById('turn-message');
     
-    let GAME_CONTROLS = document.getElementById('game-controls');
-    let END_GAME_CONTROLS = document.getElementById('endGameControls');
+    const GAME_CONTROLS = document.getElementById('game-controls');
+    const END_GAME_CONTROLS = document.getElementById('endGameControls');
+
+    // ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
+    const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+    // ★★★★★★★★★★★★★★★★★★★★★
     
     let allWords = [];
     let usedWords = new Set();
     let lastChar = ''; 
     let score = 0;             
     let incorrectCount = 0;    
+
+    // ★★★ 補助関数: 音源を再生する関数 ★★★
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
+    // ★★★★★★★★★★★★★★★★★★★★★
 
     // ----------------------------------------------------
     // 1. ゲーム開始関数 (HTMLの onclick="startNewGame()" から呼ばれる)
@@ -80,7 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const isUsed = usedWords.has(randomWord.reading);
             const isDuplicate = wrongWords.some(w => w.id === randomWord.id);
             const isCorrect = correctWord.id === randomWord.id;
-            if (!isUsed && !isDuplicate && !isCorrect && randomWord.reading.charAt(0) !== correctWord.reading.charAt(0)) {
+            
+            // ルール適合の単語を含めないように、かつ重複しないようにする
+            if (!isUsed && !isDuplicate && !isCorrect && randomWord.reading.charAt(0) !== lastChar) { 
                 wrongWords.push(randomWord);
             }
         }
@@ -132,6 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. ゲーム終了処理
     function endGame(message, isWin) {
+        
+        // ★★★ ゲームオーバー時音源再生 ★★★
+        playSound(SOUND_INCORRECT_PATH);
+        // ★★★★★★★★★★★★★★★★★
         
         // ... (フィードバックメッセージ設定、スコア表示ロジックは省略) ...
         const finalMessage = isWin ? 
@@ -229,6 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 1. ルールチェック (しりとりが繋がっているか)
         if (selectedReading.charAt(0) !== lastChar) {
+            // ★★★ 不正解時の音源再生とゲームオーバー ★★★
+            playSound(SOUND_INCORRECT_PATH);
+            
             if(FEEDBACK) FEEDBACK.textContent = `ざんねん！「${lastChar}」から始まっていません。`;
             if(FEEDBACK) FEEDBACK.style.color = '#ff6f61';
             card.style.backgroundColor = '#ff6f61';
@@ -239,6 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. 「ん」チェック (ゲームオーバー)
         if (selectedReading.slice(-1) === 'ん') {
+            // ★★★ 不正解時の音源再生とゲームオーバー ★★★
+            playSound(SOUND_INCORRECT_PATH);
+            
             if(FEEDBACK) FEEDBACK.textContent = `「${selectedWordData.word}」は「ん」で終わります！ゲームオーバーです。`;
             if(FEEDBACK) FEEDBACK.style.color = '#ff6f61';
             card.style.backgroundColor = '#ff6f61';
@@ -249,6 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 3. 使用済みチェック 
         if (usedWords.has(selectedReading)) {
+             // ★★★ 不正解時の音源再生とゲームオーバー ★★★
+             playSound(SOUND_INCORRECT_PATH);
+             
              if(FEEDBACK) FEEDBACK.textContent = `既に使用されています。`;
              if(FEEDBACK) FEEDBACK.style.color = '#ff6f61';
              incorrectCount++;
@@ -257,6 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- 成功処理（ルール適合）---
+        // ★★★ 正解時の音源再生 ★★★
+        playSound(SOUND_CORRECT_PATH);
+        
         if(FEEDBACK) FEEDBACK.textContent = 'せいかい！✨ しりとりが繋がりました。';
         if(FEEDBACK) FEEDBACK.style.color = '#5c7aff';
         card.style.backgroundColor = '#d1e7dd';
