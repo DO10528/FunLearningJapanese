@@ -1,109 +1,162 @@
 // データのパス
 const DATA_PATH = 'data/keiyoshi.json';
+const IMAGE_PATHS = [
+    'assets/images/keiyoshi_quiz_1.png', // 準備した画像ファイルのパスに変更してください
+    'assets/images/keiyoshi_quiz_2.jpg',
+    'assets/images/keiyoshi_quiz_3.gif'  // 必要に応じて追加・変更
+];
+
 // グローバル変数
-let adjectives = []; // 全形容詞リスト
-let currentQuestionIndex = 0; // 現在の問題番号
-let currentQuestion; // 現在の問題オブジェクト
-const QUIZ_COUNT = 5; // 出題数
+let adjectives = [];        // 全形容詞リスト
+let quizQuestions = [];     // 今回のクイズで出題される問題のリスト
+let currentQuestionIndex = 0; // 現在の問題番号 (0-indexed)
+let score = 0;              // 正解数
+const QUIZ_TOTAL_QUESTIONS = 5; // 総出題数
+const CHOICES_COUNT = 3;    // 選択肢の数
 
 // DOM要素の取得
+const quizImageElement = document.getElementById('quiz-image');
 const questionNumberElement = document.getElementById('question-number');
 const questionMeaningElement = document.getElementById('question-meaning');
 const choicesContainer = document.getElementById('choices-container');
 const resultMessageElement = document.getElementById('result-message');
-const nextButton = document.getElementById('next-button');
+const homeButton = document.getElementById('home-button');
+const restartButton = document.getElementById('restart-button');
+const finalScoreElement = document.getElementById('final-score');
 
 /**
- * データを読み込み、クイズを開始する関数
+ * ページロード時にデータを読み込み、クイズの準備を開始する
  */
-async function loadDataAndStartQuiz() {
+async function initializeQuiz() {
     try {
         const response = await fetch(DATA_PATH);
         const data = await response.json();
         adjectives = data.adjectives;
         
-        if (adjectives.length < 4) {
-            // 選択肢を生成するには最低4つのデータが必要
-            questionMeaningElement.textContent = "データが不足しています。形容詞を4つ以上用意してください。";
+        if (adjectives.length < CHOICES_COUNT) {
+            questionMeaningElement.textContent = "エラー: データが不足しています。形容詞を3つ以上用意してください。";
+            disableAllButtons();
             return;
         }
         
-        // 最初の問題を設定
-        setupQuestion();
+        homeButton.addEventListener('click', () => {
+            window.location.href = 'index.html'; // ホームページのパスに適宜変更
+        });
+        restartButton.addEventListener('click', startNewQuiz);
+
+        startNewQuiz(); // 初回クイズ開始
         
     } catch (error) {
         console.error("データの読み込み中にエラーが発生しました:", error);
-        questionMeaningElement.textContent = "データの読み込みに失敗しました。ファイルパスを確認してください。";
+        questionMeaningElement.textContent = "エラー: データの読み込みに失敗しました。ファイルパスを確認してください。";
+        disableAllButtons();
     }
 }
 
 /**
- * ランダムに問題と3つのダミー選択肢を選び、問題オブジェクトを生成する
- * @returns {object} 問題オブジェクト
+ * 新しいクイズセッションを開始する
  */
-function createNewQuestion() {
-    // 1. 正解の形容詞を選ぶ
-    const correctAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+function startNewQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    quizQuestions = generateQuizQuestions();
+
+    // 画面要素のリセット
+    resultMessageElement.style.display = 'none';
+    finalScoreElement.style.display = 'none';
+    restartButton.style.display = 'none';
+    choicesContainer.style.display = 'grid'; // 選択肢を再表示
+    homeButton.style.display = 'inline-block'; // ホームボタンを表示
+
+    displayQuestion(); // 最初の問題を表示
+}
+
+/**
+ * クイズの問題リストを生成する
+ * @returns {Array<object>} 生成された問題の配列
+ */
+function generateQuizQuestions() {
+    const questions = [];
+    const usedAdjectives = new Set(); // 重複出題を避けるためのSet
     
-    // 2. ダミーの選択肢を選ぶ (正解と重複しないように)
-    let wrongAdjectives = [];
-    while (wrongAdjectives.length < 3) {
-        const randomIndex = Math.floor(Math.random() * adjectives.length);
-        const dummyAdjective = adjectives[randomIndex];
+    // 総出題数分の問題を作成
+    while (questions.length < QUIZ_TOTAL_QUESTIONS && adjectives.length >= CHOICES_COUNT) {
+        // 1. 正解の形容詞を選ぶ (重複しないように)
+        let correctAdjective;
+        do {
+            correctAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        } while (usedAdjectives.has(correctAdjective.meaning)); // 意味で重複判定
+
+        usedAdjectives.add(correctAdjective.meaning); // 使用済みとして追加
         
-        // 正解や既にあるダミーと重複しない & 意味が全く同じでないことを確認 (簡易チェック)
-        if (dummyAdjective.meaning !== correctAdjective.meaning && 
-            !wrongAdjectives.includes(dummyAdjective)) {
-            wrongAdjectives.push(dummyAdjective);
+        // 2. ダミーの選択肢を選ぶ (正解や既にあるダミーと重複しないように)
+        let wrongAdjectives = [];
+        while (wrongAdjectives.length < CHOICES_COUNT - 1) {
+            const randomIndex = Math.floor(Math.random() * adjectives.length);
+            const dummyAdjective = adjectives[randomIndex];
+            
+            // 正解や既にあるダミーと重複しないか確認
+            if (dummyAdjective.meaning !== correctAdjective.meaning && 
+                !wrongAdjectives.some(adj => adj.meaning === dummyAdjective.meaning)) {
+                wrongAdjectives.push(dummyAdjective);
+            }
         }
-    }
-    
-    // 3. 選択肢リストを作成
-    const choices = [correctAdjective, ...wrongAdjectives];
-    
-    // 4. 選択肢をシャッフル
-    for (let i = choices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [choices[i], choices[j]] = [choices[j], choices[i]];
-    }
+        
+        // 3. 選択肢リストを作成
+        const choices = [correctAdjective, ...wrongAdjectives];
+        
+        // 4. 選択肢をシャッフル
+        for (let i = choices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [choices[i], choices[j]] = [choices[j], choices[i]];
+        }
 
-    return {
-        meaning: correctAdjective.meaning,
-        correctKanji: correctAdjective.kanji,
-        choices: choices
-    };
+        // 5. 問題オブジェクトとして追加
+        questions.push({
+            meaning: correctAdjective.meaning,
+            correctKanji: correctAdjective.kanji,
+            choices: choices,
+            image: getRandomImage() // ランダムな画像パスを割り当てる
+        });
+    }
+    return questions;
 }
 
 /**
- * 現在の問題を画面に設定する
+ * ランダムな画像パスを取得する
+ * @returns {string} 画像ファイルのパス
  */
-function setupQuestion() {
-    // クイズ終了判定
-    if (currentQuestionIndex >= QUIZ_COUNT) {
-        questionNumberElement.textContent = "クイズ終了！";
-        questionMeaningElement.textContent = "全問終了しました。お疲れ様でした！";
-        choicesContainer.innerHTML = '';
-        nextButton.style.display = 'none';
+function getRandomImage() {
+    if (IMAGE_PATHS.length === 0) return '';
+    return IMAGE_PATHS[Math.floor(Math.random() * IMAGE_PATHS.length)];
+}
+
+
+/**
+ * 現在の問題を画面に表示する
+ */
+function displayQuestion() {
+    if (currentQuestionIndex >= QUIZ_TOTAL_QUESTIONS) {
+        endQuiz();
         return;
     }
 
-    // 問題番号を更新
-    currentQuestionIndex++;
-    questionNumberElement.textContent = `第 ${currentQuestionIndex} 問 (全 ${QUIZ_COUNT} 問)`;
+    const question = quizQuestions[currentQuestionIndex];
     
-    // 新しい問題を作成し、グローバル変数に保持
-    currentQuestion = createNewQuestion();
-    
-    // 質問の意味を表示
-    questionMeaningElement.textContent = currentQuestion.meaning;
+    // 画像表示
+    quizImageElement.src = question.image;
+    quizImageElement.alt = `クイズ画像 ${currentQuestionIndex + 1}`;
+
+    // 問題番号と意味を表示
+    questionNumberElement.textContent = `第 ${currentQuestionIndex + 1} 問 (全 ${QUIZ_TOTAL_QUESTIONS} 問)`;
+    questionMeaningElement.textContent = question.meaning;
     
     // 選択肢ボタンを生成
     choicesContainer.innerHTML = ''; // 既存の選択肢をクリア
-    currentQuestion.choices.forEach(adjective => {
+    question.choices.forEach(adjective => {
         const button = document.createElement('button');
         
         // 漢字 + ひらがな + 形容詞タイプを表示
-        // な形容詞の場合は "(な)" を追加
         const suffix = adjective.type === 'na' ? ' (な)' : '';
         button.textContent = `${adjective.kanji}（${adjective.hiragana}）${suffix}`;
         
@@ -115,10 +168,7 @@ function setupQuestion() {
     
     // 結果メッセージをリセット
     resultMessageElement.style.display = 'none';
-    resultMessageElement.className = 'result';
-    
-    // 次へボタンを無効化
-    nextButton.disabled = true;
+    resultMessageElement.className = 'result-message'; // クラス名をリセット
 }
 
 /**
@@ -127,36 +177,66 @@ function setupQuestion() {
  * @param {string} selectedKanji - ユーザーが選んだ形容詞の漢字
  */
 function checkAnswer(clickedButton, selectedKanji) {
-    // 全てのボタンを無効化
+    const question = quizQuestions[currentQuestionIndex];
+    const isCorrect = (selectedKanji === question.correctKanji);
+    
+    if (isCorrect) {
+        score++;
+        resultMessageElement.textContent = "✅ 正解です！次の問題へ進みます。";
+        resultMessageElement.classList.remove('incorrect');
+        resultMessageElement.classList.add('correct');
+        clickedButton.classList.add('correct-answer'); // 正解ボタンにスタイル適用
+
+        // 正解なので、全てのボタンを無効化し、少し待ってから次の問題へ
+        disableAllButtons();
+        resultMessageElement.style.display = 'block';
+        setTimeout(() => {
+            currentQuestionIndex++;
+            displayQuestion();
+        }, 1500); // 1.5秒後に次の問題へ
+        
+    } else {
+        resultMessageElement.textContent = "❌ 不正解です。もう一度挑戦してください。";
+        resultMessageElement.classList.remove('correct');
+        resultMessageElement.classList.add('incorrect');
+        clickedButton.disabled = true; // 不正解のボタンは無効化する
+        clickedButton.style.backgroundColor = '#ff6b6b'; // 不正解の色に
+        clickedButton.style.borderColor = '#ff6b6b';
+        
+        resultMessageElement.style.display = 'block';
+    }
+}
+
+/**
+ * 全ての選択肢ボタンを無効化する
+ */
+function disableAllButtons() {
     Array.from(choicesContainer.children).forEach(button => {
         button.disabled = true;
     });
-
-    const isCorrect = (selectedKanji === currentQuestion.correctKanji);
-    
-    if (isCorrect) {
-        resultMessageElement.textContent = "✅ 正解です！";
-        resultMessageElement.classList.add('correct');
-        clickedButton.style.backgroundColor = '#d4edda';
-    } else {
-        resultMessageElement.textContent = `❌ 不正解です。正解は「${currentQuestion.correctKanji}」でした。`;
-        resultMessageElement.classList.add('incorrect');
-        clickedButton.style.backgroundColor = '#f8d7da';
-        
-        // 正解のボタンをハイライト
-        Array.from(choicesContainer.children).forEach(button => {
-            if (button.textContent.includes(currentQuestion.correctKanji)) {
-                button.style.backgroundColor = '#c3e6cb';
-            }
-        });
-    }
-
-    resultMessageElement.style.display = 'block';
-    nextButton.disabled = false;
 }
 
-// 次へボタンにイベントリスナーを設定
-nextButton.addEventListener('click', setupQuestion);
+/**
+ * クイズを終了し、結果を表示する
+ */
+function endQuiz() {
+    questionNumberElement.textContent = "クイズ終了！";
+    questionMeaningElement.textContent = "全問終了しました。お疲れ様でした！";
+    choicesContainer.innerHTML = ''; // 選択肢をクリア
+    choicesContainer.style.display = 'none'; // 選択肢コンテナを非表示
 
-// ページロード時にクイズを開始
-loadDataAndStartQuiz();
+    quizImageElement.src = ''; // 画像をクリア
+    quizImageElement.alt = '';
+
+    resultMessageElement.style.display = 'none'; // 結果メッセージを非表示
+
+    finalScoreElement.textContent = `${QUIZ_TOTAL_QUESTIONS} 問中 ${score} 問正解でした！`;
+    finalScoreElement.style.display = 'block';
+
+    homeButton.style.display = 'inline-block';
+    restartButton.style.display = 'inline-block';
+}
+
+
+// ページロード時にクイズを初期化
+document.addEventListener('DOMContentLoaded', initializeQuiz);
