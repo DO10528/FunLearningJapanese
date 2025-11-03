@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ユーザーが提供した単語リスト
-    // 提供されたJSONデータ全体をWORD_DATAとして定義します。
+    // 1. ----------------- ユーザー提供の単語リスト -----------------
+    // (提供されたJSONデータをここに含めます)
     const WORD_DATA = [
         {"id": 101, "word": "いも", "reading": "いも", "image": "imo.png"},
         {"id": 102, "word": "いけ", "reading": "いけ", "image": "ike.png"},
@@ -183,87 +183,16 @@ document.addEventListener('DOMContentLoaded', () => {
         {"id": 67, "word": "りす", "reading": "りす", "image": "risu.png"}
     ];
 
-    // マッピング作成: ひらがなの最初の文字をキーとして、単語データを格納
+    // 2. ----------------- 単語マップの作成 -----------------
     const WordMap = new Map();
     WORD_DATA.forEach(item => {
         const firstChar = item.reading.charAt(0);
-        // 同じ頭文字が複数ある場合、最初のもの（JSONの上にあるもの）を採用
+        // 優先順位: 既にマップにない文字だけ追加（リストの上にあるものを優先）
         if (!WordMap.has(firstChar)) {
             WordMap.set(firstChar, { word: item.word, image: item.image });
         }
     });
 
-    // --- KISO_DATAの最終構築 ---
-    // カタカナは、ひらがなからの変換ルール（ベース）で定義する
-    const KISO_DATA_BASE = [
-        // 清音
-        { hira: 'あ', kata: 'ア' }, { hira: 'い', kata: 'イ' }, { hira: 'う', kata: 'ウ' }, { hira: 'え', kata: 'エ' }, { hira: 'お', kata: 'オ' },
-        { hira: 'か', kata: 'カ' }, { hira: 'き', kata: 'キ' }, { hira: 'く', kata: 'ク' }, { hira: 'け', kata: 'ケ' }, { hira: 'こ', kata: 'コ' },
-        { hira: 'さ', kata: 'サ' }, { hira: 'し', kata: 'シ' }, { hira: 'す', kata: 'ス' }, { hira: 'せ', kata: 'セ' }, { hira: 'そ', kata: 'ソ' },
-        { hira: 'た', kata: 'タ' }, { hira: 'ち', kata: 'チ' }, { hira: 'つ', kata: 'ツ' }, { hira: 'て', kata: 'テ' }, { hira: 'と', kata: 'ト' },
-        { hira: 'な', kata: 'ナ' }, { hira: 'に', kata: 'ニ' }, { hira: 'ぬ', kata: 'ヌ' }, { hira: 'ね', kata: 'ネ' }, { hira: 'の', kata: 'ノ' },
-        { hira: 'は', kata: 'ハ' }, { hira: 'ひ', kata: 'ヒ' }, { hira: 'ふ', kata: 'フ' }, { hira: 'へ', kata: 'ヘ' }, { hira: 'ほ', kata: 'ホ' },
-        { hira: 'ま', kata: 'マ' }, { hira: 'み', kata: 'ミ' }, { hira: 'む', kata: 'ム' }, { hira: 'め', kata: 'メ' }, { hira: 'も', kata: 'モ' },
-        { hira: 'や', kata: 'ヤ' }, { hira: 'ゆ', kata: 'ユ' }, { hira: 'よ', kata: 'ヨ' },
-        { hira: 'ら', kata: 'ラ' }, { hira: 'り', kata: 'リ' }, { hira: 'る', kata: 'ル' }, { hira: 'れ', kata: 'レ' }, { hira: 'ろ', kata: 'ロ' },
-        { hira: 'わ', kata: 'ワ' }, { hira: 'を', kata: 'ヲ' }, { hira: 'ん', kata: 'ン' },
+    // 3. ----------------- データ構造の定義 -----------------
 
-        // 濁音・半濁音・拗音 (提供データに合わせて、空のものは null)
-        { hira: 'が', kata: 'ガ' }, { hira: 'ぎ', kata: 'ギ' }, { hira: 'ぐ', kata: 'グ' }, { hira: 'げ', kata: 'ゲ' }, { hira: 'ご', kata: 'ゴ' },
-        { hira: 'ざ', kata: 'ザ' }, { hira: 'じ', kata: 'ジ' }, { hira: 'ず', kata: 'ズ' }, { hira: 'ぜ', kata: 'ゼ' }, { hira: 'ぞ', kata: 'ゾ' },
-        { hira: 'だ', kata: 'ダ' }, { hira: 'ぢ', kata: 'ヂ' }, { hira: 'づ', kata: 'ヅ' }, { hira: 'で', kata: 'デ' }, { hira: 'ど', kata: 'ド' },
-        { hira: 'ば', kata: 'バ' }, { hira: 'び', kata: 'ビ' }, { hira: 'ぶ', kata: 'ブ' }, { hira: 'べ', kata: 'ベ' }, { hira: 'ぼ', kata: 'ボ' },
-        { hira: 'ぱ', kata: 'パ' }, { hira: 'ぴ', kata: 'ピ' }, { hira: 'ぷ', kata: 'プ' }, { hira: 'ぺ', kata: 'ペ' }, { hira: 'ぽ', kata: 'ポ' },
-        { hira: 'きゃ', kata: 'キャ' }, { hira: 'しゃ', kata: 'シャ' }, { hira: 'ちゃ', kata: 'チャ' }, { hira: 'にゃ', kata: 'ニャ' }, { hira: 'ひゃ', kata: 'ヒャ' },
-        // ... (他の拗音はスペース節約のため省略。必要に応じて追加してください) ...
-    ];
-
-    // KISO_DATAを、提供されたデータで上書き結合する
-    const FINAL_KISO_DATA = KISO_DATA_BASE.map(base => {
-        const char = base.hira.charAt(0); // 最初の文字（きゃ->き）で検索
-        const mapped = WordMap.get(char);
-        
-        // 提供データに該当する単語がある場合は上書き
-        if (mapped) {
-            return {
-                hira: base.hira,
-                kata: base.kata,
-                word: mapped.word,
-                image: mapped.image
-            };
-        }
-        
-        // ない場合はデフォルト値（この場合は全てnullとして扱う）
-        return {
-            hira: base.hira,
-            kata: base.kata,
-            word: 'なし',
-            image: null
-        };
-    });
-
-
-    const tbody = document.getElementById('kiso-tbody'); 
-    
-    if (tbody) {
-        let html = '';
-        FINAL_KISO_DATA.forEach(item => {
-            const imagePath = item.image ? `assets/images/${item.image}` : null;
-            
-            // 単語が「なし」の場合は表示しない
-            const wordDisplay = item.word && item.word !== 'なし' ? `<br>(${item.word})` : '';
-
-            // ひらがな表では、文字ごとに縦の列を作るため、全文字のデータを出力します。
-            html += `
-                <tr>
-                    <td class="char-hira">${item.hira}</td>
-                    <td class="char-kata">${item.kata}</td>
-                    <td class="char-illust">
-                        ${imagePath ? `<img src="${imagePath}" alt="${item.word}" onerror="this.src='assets/images/placeholder.png'; this.alt='画像なし'" class="kiso-illust">${wordDisplay}` : 'ー'}
-                    </td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
-    }
-});
+    // 3a.

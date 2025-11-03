@@ -6,10 +6,10 @@
     <title>ひらがな・カタカナ基礎表</title> 
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
-        /* 全体の共通スタイル */
+        /* --- 共通スタイル --- */
         body { 
             font-family: 'Arial', sans-serif; 
-            max-width: 800px; 
+            max-width: 900px; /* ★レイアウト変更のため幅を拡大★ */
             margin: 20px auto; 
             padding: 20px; 
             background-color: #f4f7f6;
@@ -22,6 +22,14 @@
             color: #5c7aff; 
             margin-bottom: 20px;
         }
+        h2.table-title {
+            text-align: center;
+            color: #5c7aff;
+            background-color: #e6f3ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
         .container-content {
             background-color: #ffffff; 
             padding: 25px; 
@@ -29,21 +37,64 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* --- テーブルスタイル --- */
+        /* ★★★ 1. 50音グリッド (Seion) スタイル ★★★ */
+        #kiso-chart-container-seion {
+            display: grid;
+            /* 10列 (あ,か,さ,た,な,は,ま,や,ら,わ) */
+            grid-template-columns: repeat(10, 1fr); 
+            gap: 5px;
+            border: 2px solid #5c7aff;
+            border-radius: 8px;
+            padding: 5px;
+            background-color: #f0f8ff;
+        }
+        .kiso-cell {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+            min-height: 100px;
+        }
+        .kiso-cell.empty {
+            background-color: transparent;
+            border: none;
+        }
+        .kiso-chars {
+            display: flex;
+            justify-content: space-around;
+            font-weight: bold;
+        }
+        .kiso-hira { font-size: 1.4em; color: #333; }
+        .kiso-kata { font-size: 1.4em; color: #007bff; }
+        .kiso-illust {
+            max-width: 100%;
+            max-height: 40px;
+            display: block;
+            margin: 3px auto 0;
+            border-radius: 3px;
+        }
+        .kiso-illust-placeholder {
+            height: 40px; /* 画像がない場合も高さを確保 */
+        }
+        .kiso-word {
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        /* ★★★ 2. 3列テーブル (Dakuon etc.) スタイル ★★★ */
         .table-container { 
             margin-top: 20px; 
             overflow-x: auto; 
             border: 1px solid #ddd; 
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            min-width: 750px; /* イラスト列追加に合わせて幅を広げる */
         }
         th, td { 
-            padding: 12px 10px; /* パディングを少し減らす */
+            padding: 10px; 
             border: 1px solid #ddd; 
             text-align: center; 
             font-size: 1.1em;
@@ -53,38 +104,17 @@
             font-weight: bold; 
             color: #5c7aff;
         }
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-        tr:hover { 
-            background-color: #eef; 
-        }
-        
-        /* 文字の列のスタイル */
-        td:nth-child(3), td:nth-child(4) { /* 3番目と4番目の列 (ひらがな・カタカナ) */
-            font-size: 1.5em; 
-            letter-spacing: 5px; 
-            font-family: 'Noto Sans JP', sans-serif;
+        .char-hira, .char-kata { 
+            font-size: 2.0em; 
             font-weight: bold;
+            width: 20%;
         }
-        /* 行名の列（あ行、か行など） */
-        .row-name {
-            font-weight: bold;
-            background-color: #f0f8ff;
-            width: 80px;
+        .char-illust {
+            width: 40%;
+            font-size: 0.9em;
         }
-        /* ★イラスト列のスタイル★ */
-        .row-image {
-            width: 80px;
-            background-color: #ffffff;
-            padding: 5px;
-        }
-        .kiso-illust {
-            max-width: 100%;
-            max-height: 40px; /* 画像の高さを制限 */
-            display: block;
-            margin: 0 auto;
-            border-radius: 3px;
+        .char-illust .kiso-illust { /* .kiso-illustを再利用 */
+            max-height: 50px;
         }
         
         /* --- ボタン共通スタイル --- */
@@ -101,53 +131,61 @@
             transition: background-color 0.3s;
             background-color: #6c757d;
             color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .navigation-buttons button:hover {
             background-color: #5a6268;
         }
-
     </style>
 </head>
 <body>
     
     <h1>📝 ひらがな・カタカナ基礎表</h1>
     
-    <div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>行名</th>
-                <th>イラスト</th> <th>ひらがな</th>
-                <th>カタカナ</th>
-            </tr>
-        </thead>
-        <tbody id="kiso-tbody">
-            </tbody>
-    </table>
-</div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>行名</th>
-                        <th>イラスト</th> <th>ひらがな</th>
-                        <th>カタカナ</th>
-                    </tr>
-                </thead>
-                <tbody id="kiso-tbody">
-                    </tbody>
-            </table>
-        </div>
+    <div class="container-content">
         
         <div class="navigation-buttons">
             <button onclick="window.location.href='index.html'">ホームに戻る</button>
         </div>
 
+        <h2 class="table-title">50音 (ごじゅうおん)</h2>
+        <div id="kiso-chart-container-seion">
+            </div>
+
+        <h2 class="table-title">濁音 (だくおん)</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ひらがな</th>
+                        <th>カタカナ</th>
+                        <th>イラストと単語</th>
+                    </tr>
+                </thead>
+                <tbody id="kiso-tbody-dakuon">
+                    </tbody>
+            </table>
+        </div>
+        
+        <h2 class="table-title">半濁音 (はんだくおん)</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ひらがな</th>
+                        <th>カタカナ</th>
+                        <th>イラストと単語</th>
+                    </tr>
+                </thead>
+                <tbody id="kiso-tbody-handakuon">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="navigation-buttons">
+            <button onclick="window.location.href='index.html'">ホームに戻る</button>
+        </div>
     </div>
     
     <script src="js/kiso.js"></script>
-
 </body>
 </html>
