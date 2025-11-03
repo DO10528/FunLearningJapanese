@@ -17,7 +17,7 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            min-width: 600px;
+            min-width: 600px; 
         }
         th, td { 
             padding: 12px 15px; 
@@ -37,8 +37,16 @@
             background-color: #eef; 
         }
         .kanji-char { font-size: 2.0em; font-weight: bold; }
-        .reading-kun { color: #007bff; } /* 訓読み */
-        .reading-on { color: #dc3545; } /* 音読み */
+        .reading-kun { color: #007bff; } 
+        .reading-on { color: #dc3545; } 
+
+        /* ★追加: 番号列のスタイル */
+        .kanji-number { 
+            text-align: center; 
+            font-weight: bold; 
+            width: 50px; 
+            background-color: #e6f7ff;
+        }
 
         .home-button-container {
             text-align: center;
@@ -67,6 +75,7 @@
         <table id="kanji-table">
             <thead>
                 <tr>
+                    <th>No.</th>
                     <th>漢字</th>
                     <th>訓読み (Kun-yomi)</th>
                     <th>音読み (On-yomi)</th>
