@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漢字 一覧表 (小学1年生)</title>
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #cc6600; }
+        .table-container { 
+            margin-top: 20px; 
+            overflow-x: auto; 
+            border: 1px solid #ccc; 
+            border-radius: 8px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 600px;
+        }
+        th, td { 
+            padding: 12px 15px; 
+            border: 1px solid #ddd; 
+            text-align: left;
+            font-size: 16px;
+        }
+        th { 
+            background-color: #f2f2f2; 
+            font-weight: bold; 
+            color: #333;
+        }
+        tr:nth-child(even) { 
+            background-color: #f9f9f9; 
+        }
+        tr:hover { 
+            background-color: #eef; 
+        }
+        .kanji-char { font-size: 2.0em; font-weight: bold; }
+        .reading-kun { color: #007bff; } /* 訓読み */
+        .reading-on { color: #dc3545; } /* 音読み */
+
+        .home-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .home-button-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📝 漢字 一覧表 (小学1年生)</h1>
+
+    <div class="home-button-container">
+        <button onclick="window.location.href='index.html'">ホームに戻る</button>
+    </div>
+
+    <div class="table-container">
+        <table id="kanji-table">
+            <thead>
+                <tr>
+                    <th>漢字</th>
+                    <th>訓読み (Kun-yomi)</th>
+                    <th>音読み (On-yomi)</th>
+                    <th>意味 (Meaning)</th>
+                </tr>
+            </thead>
+            <tbody id="kanji-tbody">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="home-button-container">
+        <button onclick="window.location.href='index.html'">ホームに戻る</button>
+    </div>
+
+    <script src="js/kanji_list.js"></script>
+
+</body>
+</html>

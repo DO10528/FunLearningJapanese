@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漢字クイズ (小学1年生)</title>
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    <style>
+        /* CSSスタイルはkeiyoshi.htmlと似たものを使用します */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background-color: #f4f7f6;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        h1 { 
+            text-align: center; 
+            color: #cc6600; 
+            margin-bottom: 30px;
+        }
+        .quiz-container { 
+            background-color: #ffffff; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .image-box { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            padding: 10px; 
+            background-color: #fafafa;
+        }
+        .image-box img { 
+            max-width: 100%; 
+            height: auto; 
+            max-height: 200px;
+            border-radius: 5px; 
+            object-fit: contain; 
+        }
+        .question-area { 
+            margin-bottom: 25px; 
+            text-align: center;
+        }
+        #question-number { 
+            font-size: 1.1em; 
+            color: #555; 
+            margin-bottom: 10px;
+        }
+        #question-text { 
+            font-size: 2.5em; /* 漢字を大きく表示 */
+            font-weight: bold; 
+            color: #2a2a2a;
+            padding: 10px;
+            background-color: #fff0e6;
+            border-radius: 5px;
+            display: inline-block; 
+            margin-top: 5px;
+        }
+        .choices { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 12px; 
+            margin-bottom: 20px;
+        }
+        .choices button {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: 1px solid #cc6600;
+            background-color: #cc6600;
+            color: white;
+            border-radius: 25px; 
+            transition: background-color 0.3s, border-color 0.3s, transform 0.1s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .choices button:hover:not(:disabled) { 
+            background-color: #a35200; 
+            border-color: #a35200; 
+            transform: translateY(-2px);
+        }
+        /* ... (その他のスタイルはkeiyoshi.htmlから継承または調整) ... */
+        .choices button:disabled { opacity: 0.7; cursor: not-allowed; background-color: #cccccc; border-color: #bbbbbb; color: #666666; }
+        .choices button.correct-answer { background-color: #28a745; border-color: #28a745; color: white; }
+        .result-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
+        .result-message.correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .result-message.incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .navigation-buttons { text-align: center; margin-top: 30px; }
+        .navigation-buttons button { padding: 10px 25px; font-size: 1em; border: none; border-radius: 20px; cursor: pointer; margin: 0 10px; transition: background-color 0.3s; }
+        #home-button { background-color: #6c757d; color: white; }
+        #home-button:hover { background-color: #5a6268; }
+        #restart-button { background-color: #ffc107; color: #333; }
+        #restart-button:hover { background-color: #e0a800; }
+        #final-score { text-align: center; font-size: 1.8em; color: #cc6600; margin-top: 30px; background-color: #fff0e6; padding: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>漢字クイズ (小学1年生)</h1>
+
+    <div class="quiz-container">
+        <div class="image-box">
+            <img id="quiz-image" src="" alt="クイズ画像">
+        </div>
+
+        <div class="question-area">
+            <p id="question-number">第 1 問</p>
+            <p>この漢字の読み方を選びなさい：</p>
+            <h2 id="question-text">漢字が表示されます...</h2>
+        </div>
+
+        <div class="choices" id="choices-container">
+            </div>
+
+        <div id="result-message" class="result-message" style="display: none;">
+            </div>
+        
+        <div id="final-score" style="display: none;">
+            </div>
+
+        <div class="navigation-buttons">
+            <button id="home-button">ホームに戻る</button>
+            <button id="restart-button" style="display: none;">もう一度プレイ</button>
+        </div>
+    </div>
+
+    <script src="js/kanji_quiz.js"></script>
+
+</body>
+</html>
