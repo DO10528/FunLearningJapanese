@@ -1,75 +1,39 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>ひらがな・カタカナ基礎学習</title> 
-    <link rel="stylesheet" href="css/style.css"> 
-    <style>
-        /* kiso.html 専用のスタイル */
-        .kiso-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .char-card-kiso {
-            background-color: #fff8e1;
-            border: 2px solid #ffcc5c;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .char-card-kiso h3 {
-            margin: 0 0 5px 0;
-            font-size: 2.5em;
-            color: #ff6f61;
-        }
-        .char-card-kiso p {
-            margin: 0;
-            font-size: 1em;
-            color: #5c7aff;
-            font-weight: bold;
-        }
-        .char-card-kiso img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-top: 5px;
-            border: none;
-        }
-        /* ボタンコンテナのスタイルを明確化 */
-        #kiso-menu-controls {
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-    </style>
-</head>
-<body>
-    
-    <h1>ひらがな・カタカナの基礎を学ぼう！</h1>
-    
-    <div class="container">
-        
-        <div style="margin-bottom: 20px;">
-            <a href="index.html" class="menu-card-button menu-card-reset" style="width: 150px; height: 50px; padding: 10px; display: inline-flex;">
-                🏠 ホームに戻る
-            </a>
-        </div>
-        
-        <div id="kiso-menu-controls">
-            <button id="show-hiragana-kiso" class="choice-button">ひらがなを学ぶ</button>
-            <button id="show-katakana-kiso" class="choice-button">カタカナを学ぶ</button>
-        </div>
-        
-        <div id="learning-content-kiso">
-            <h3>コンテンツを読み込み中...</h3>
-        </div>
-        
-    </div>
-    
-    <script src="js/kiso.js"></script>
-</body>
-</html>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>行</th>
+                <th>ひらがな</th>
+                <th>カタカナ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>あ行</td><td>あ い う え お</td><td>ア イ ウ エ オ</td></tr>
+            <tr><td>か行</td><td>か き く け こ</td><td>カ キ ク ケ コ</td></tr>
+            <tr><td>さ行</td><td>さ し す せ そ</td><td>サ シ ス セ ソ</td></tr>
+            <tr><td>た行</td><td>た ち つ て と</td><td>タ チ ツ テ ト</td></tr>
+            <tr><td>な行</td><td>な に ぬ ね の</td><td>ナ ニ ヌ ネ ノ</td></tr>
+            <tr><td>は行</td><td>は ひ ふ へ ほ</td><td>ハ ヒ フ ヘ ホ</td></tr>
+            <tr><td>ま行</td><td>ま み む め も</td><td>マ ミ ム メ モ</td></tr>
+            <tr><td>や行</td><td>や ゆ よ</td><td>ヤ ユ ヨ</td></tr>
+            <tr><td>ら行</td><td>ら り る れ ろ</td><td>ラ リ ル レ ロ</td></tr>
+            <tr><td>わ行</td><td>わ を ん</td><td>ワ ヲ ン</td></tr>
+            <tr><td>濁音</td><td>が ぎ ぐ げ ご</td><td>ガ ギ グ ゲ ゴ</td></tr>
+            <tr><td></td><td>ざ じ ず ぜ ぞ</td><td>ザ ジ ズ ゼ ゾ</td></tr>
+            <tr><td></td><td>だ ぢ づ で ど</td><td>ダ ヂ ヅ デ ド</td></tr>
+            <tr><td></td><td>ば び ぶ べ ぼ</td><td>バ ビ ブ ベ ボ</td></tr>
+            <tr><td>半濁音</td><td>ぱ ぴ ぷ ぺ ぽ</td><td>パ ピ プ ペ ポ</td></tr>
+            <tr><td>拗音</td><td>きゃ きゅ きょ</td><td>キャ キュ キョ</td></tr>
+            <tr><td></td><td>しゃ しゅ しょ</td><td>シャ シュ ショ</td></tr>
+            <tr><td></td><td>ちゃ ちゅ ちょ</td><td>チャ チュ チョ</td></tr>
+            <tr><td></td><td>にゃ にゅ にょ</td><td>ニャ ニュ ニョ</td></tr>
+            <tr><td></td><td>ひゃ ひゅ ひょ</td><td>ヒャ ヒュ ヒョ</td></tr>
+            <tr><td></td><td>みゃ みゅ みょ</td><td>ミャ ミュ ミョ</td></tr>
+            <tr><td></td><td>りゃ りゅ りょ</td><td>リャ リュ リョ</td></tr>
+            <tr><td></td><td>ぎゃ ぎゅ ぎょ</td><td>ギャ ギュ ギョ</td></tr>
+            <tr><td></td><td>じゃ じゅ じょ</td><td>ジャ ジュ ジョ</td></tr>
+            <tr><td></td><td>びゃ びゅ びょ</td><td>ビャ ビュ ビョ</td></tr>
+            <tr><td></td><td>ぴゃ ぴゅ ぴょ</td><td>ピャ ピュ ピョ</td></tr>
+        </tbody>
+    </table>
+</div>
