@@ -1,34 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ⚠️ 注意: imageプロパティには、実際に 'assets/images/' フォルダに保存したファイル名を指定してください。
+    // ファイル名がない場合は 'null' にしています。
     const KISO_DATA = [
-        { row: 'あ行', hira: 'あ い う え お', kata: 'ア イ ウ エ オ', image: 'a_line.png' },
-        { row: 'か行', hira: 'か き く け こ', kata: 'カ キ ク ケ コ', image: 'ka_line.png' },
-        { row: 'さ行', hira: 'さ し す せ そ', kata: 'サ シ ス セ ソ', image: 'sa_line.png' },
-        { row: 'た行', hira: 'た ち つ て と', kata: 'タ チ ツ テ ト', image: 'ta_line.png' },
-        { row: 'な行', hira: 'な に ぬ ね の', kata: 'ナ ニ ヌ ネ ノ', image: 'na_line.png' },
-        { row: 'は行', hira: 'は ひ ふ へ ほ', kata: 'ハ ヒ フ ヘ ホ', image: 'ha_line.png' },
-        { row: 'ま行', hira: 'ま み む め も', kata: 'マ ミ ム メ モ', image: 'ma_line.png' },
-        { row: 'や行', hira: 'や ゆ よ', kata: 'ヤ ユ ヨ', image: 'ya_line.png' },
-        { row: 'ら行', hira: 'ら り る れ ろ', kata: 'ラ リ ル レ ロ', image: 'ra_line.png' },
-        { row: 'わ行', hira: 'わ を ん', kata: 'ワ ヲ ン', image: 'wa_line.png' },
+        // あ行
+        { hira: 'あ', kata: 'ア', word: 'あり', image: 'a_ari.png' },
+        { hira: 'い', kata: 'イ', word: 'いぬ', image: 'i_inu.png' },
+        { hira: 'う', kata: 'ウ', word: 'うま', image: 'u_uma.png' },
+        { hira: 'え', kata: 'エ', word: 'えんぴつ', image: 'e_enpitsu.png' },
+        { hira: 'お', kata: 'オ', word: 'おに', image: 'o_oni.png' },
+
+        // か行
+        { hira: 'か', kata: 'カ', word: 'かさ', image: 'ka_kasa.png' },
+        { hira: 'き', kata: 'キ', word: 'きつね', image: 'ki_kitsune.png' },
+        { hira: 'く', kata: 'ク', word: 'くま', image: 'ku_kuma.png' },
+        { hira: 'け', kata: 'ケ', word: 'けむし', image: 'ke_kemushi.png' },
+        { hira: 'こ', kata: 'コ', word: 'こあら', image: 'ko_koara.png' },
         
-        // 濁音・半濁音・拗音には、代表となるイラスト、または空の画像 'no_image.png' を使用
-        { row: '濁音', hira: 'が ぎ ぐ げ ご', kata: 'ガ ギ グ ゲ ゴ', image: 'daku_line.png' },
-        { row: '', hira: 'ざ じ ず ぜ ぞ', kata: 'ザ ジ ズ ゼ ゾ', image: 'daku_line.png' },
-        { row: '', hira: 'だ ぢ づ で ど', kata: 'ダ ヂ ヅ デ ド', image: 'daku_line.png' },
-        { row: '', hira: 'ば び ぶ べ ぼ', kata: 'バ ビ ブ ベ ボ', image: 'daku_line.png' },
-        { row: '半濁音', hira: 'ぱ ぴ ぷ ぺ ぽ', kata: 'パ ピ プ ペ ポ', image: 'han_daku_line.png' },
-        { row: '拗音', hira: 'きゃ きゅ きょ', kata: 'キャ キュ キョ', image: 'yoon_line.png' },
-        { row: '', hira: 'しゃ しゅ しょ', kata: 'シャ シュ ショ', image: 'yoon_line.png' },
-        { row: '', hira: 'ちゃ ちゅ ちょ', kata: 'チャ チュ チョ', image: 'yoon_line.png' },
-        { row: '', hira: 'にゃ にゅ にょ', kata: 'ニャ ニュ ニョ', image: 'yoon_line.png' },
-        { row: '', hira: 'ひゃ ひゅ ひょ', kata: 'ヒャ ヒュ ヒョ', image: 'yoon_line.png' },
-        { row: '', hira: 'みゃ みゅ みょ', kata: 'ミャ ミュ ミョ', image: 'yoon_line.png' },
-        { row: '', hira: 'りゃ りゅ りょ', kata: 'リャ リュ リョ', image: 'yoon_line.png' },
-        { row: '', hira: 'ぎゃ ぎゅ ぎょ', kata: 'ギャ ギュ ギョ', image: 'yoon_daku_line.png' },
-        { row: '', hira: 'じゃ じゅ じょ', kata: 'ジャ ジュ ジョ', image: 'yoon_daku_line.png' },
-        { row: '', hira: 'びゃ びゅ びょ', kata: 'ビャ ビュ ビョ', image: 'yoon_daku_line.png' },
-        { row: '', hira: 'ぴゃ ぴゅ ぴょ', kata: 'ピャ ピュ ピョ', image: 'yoon_han_daku_line.png' }
+        // さ行
+        { hira: 'さ', kata: 'サ', word: 'さかな', image: 'sa_sakana.png' },
+        { hira: 'し', kata: 'シ', word: 'しか', image: 'shi_shika.png' },
+        { hira: 'す', kata: 'ス', word: 'すいか', image: 'su_suika.png' },
+        { hira: 'せ', kata: 'セ', word: 'せんす', image: 'se_sensu.png' },
+        { hira: 'そ', kata: 'ソ', word: 'そら', image: 'so_sora.png' },
+
+        // た行
+        { hira: 'た', kata: 'タ', word: 'たまご', image: 'ta_tamago.png' },
+        { hira: 'ち', kata: 'チ', word: 'ちず', image: 'chi_chizu.png' },
+        { hira: 'つ', kata: 'ツ', word: 'つき', image: 'tsu_tsuki.png' },
+        { hira: 'て', kata: 'テ', word: 'てぶくろ', image: 'te_tebukuro.png' },
+        { hira: 'と', kata: 'ト', word: 'とけい', image: 'to_tokei.png' },
+
+        // な行
+        { hira: 'な', kata: 'ナ', word: 'なす', image: 'na_nasu.png' },
+        { hira: 'に', kata: 'ニ', word: 'にわとり', image: 'ni_niwatori.png' },
+        { hira: 'ぬ', kata: 'ヌ', word: 'ぬいぐるみ', image: 'nu_nuigurumi.png' },
+        { hira: 'ね', kata: 'ネ', word: 'ねこ', image: 'ne_neko.png' },
+        { hira: 'の', kata: 'ノ', word: 'のり', image: 'no_nori.png' },
+
+        // は行
+        { hira: 'は', kata: 'ハ', word: 'はし', image: 'ha_hashi.png' },
+        { hira: 'ひ', kata: 'ヒ', word: 'ひつじ', image: 'hi_hitsuji.png' },
+        { hira: 'ふ', kata: 'フ', word: 'ふうせん', image: 'fu_fuusen.png' },
+        { hira: 'へ', kata: 'ヘ', word: 'へび', image: 'he_hebi.png' },
+        { hira: 'ほ', kata: 'ホ', word: 'ほし', image: 'ho_hoshi.png' },
+
+        // ま行
+        { hira: 'ま', kata: 'マ', word: 'まくら', image: 'ma_makura.png' },
+        { hira: 'み', kata: 'ミ', word: 'みかん', image: 'mi_mikan.png' },
+        { hira: 'む', kata: 'ム', word: 'むし', image: 'mu_mushi.png' },
+        { hira: 'め', kata: 'メ', word: 'めがね', image: 'me_megane.png' },
+        { hira: 'も', kata: 'モ', word: 'もも', image: 'mo_momo.png' },
+
+        // やゆよ行
+        { hira: 'や', kata: 'ヤ', word: 'やかん', image: 'ya_yakan.png' },
+        { hira: 'ゆ', kata: 'ユ', word: 'ゆきだるま', image: 'yu_yukidaruma.png' },
+        { hira: 'よ', kata: 'ヨ', word: 'ようふく', image: 'yo_youfuku.png' },
+        
+        // らりるれろ行
+        { hira: 'ら', kata: 'ラ', word: 'らっぱ', image: 'ra_rappa.png' },
+        { hira: 'り', kata: 'リ', word: 'りんご', image: 'ri_ringo.png' },
+        { hira: 'る', kata: 'ル', word: 'るすばん', image: 'ru_rusuban.png' },
+        { hira: 'れ', kata: 'レ', word: 'れんこん', image: 're_renkon.png' },
+        { hira: 'ろ', kata: 'ロ', word: 'ろうそく', image: 'ro_rousoku.png' },
+
+        // わをん行
+        { hira: 'わ', kata: 'ワ', word: 'わに', image: 'wa_wani.png' },
+        { hira: 'を', kata: 'ヲ', word: 'なし', image: null }, // 「を」は通常、単語の頭には来ない
+        { hira: 'ん', kata: 'ン', word: 'なし', image: null }
     ];
 
     const tbody = document.getElementById('kiso-tbody'); 
@@ -36,16 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tbody) {
         let html = '';
         KISO_DATA.forEach(item => {
-            const imagePath = `assets/images/${item.image}`;
-            
+            const imagePath = item.image ? `assets/images/${item.image}` : null;
+            const wordDisplay = item.word && item.image ? `<br>(${item.word})` : '';
+
             html += `
                 <tr>
-                    <td class="row-name">${item.row}</td>
-                    <td class="row-image">
-                        ${item.image ? `<img src="${imagePath}" alt="${item.row}" onerror="this.style.display='none'" class="kiso-illust">` : ''}
+                    <td class="char-hira">${item.hira}</td>
+                    <td class="char-kata">${item.kata}</td>
+                    <td class="char-illust">
+                        ${imagePath ? `<img src="${imagePath}" alt="${item.word}" onerror="this.style.display='none'" class="kiso-illust">${wordDisplay}` : 'ー'}
                     </td>
-                    <td>${item.hira}</td>
-                    <td>${item.kata}</td>
                 </tr>
             `;
         });
