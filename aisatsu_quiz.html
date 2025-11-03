@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>挨拶クイズ</title>
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    <style>
+        /* CSSスタイルはkanji_quizと似たものを使用します */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background-color: #f4f7f6;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        h1 { 
+            text-align: center; 
+            color: #008080; /* テーマカラーを調整 */
+            margin-bottom: 30px;
+        }
+        .quiz-container { 
+            background-color: #ffffff; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* 画像エリア (今回は不要な可能性もありますが、構造を維持) */
+        .image-box { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            padding: 10px; 
+            background-color: #fafafa;
+        }
+        .image-box img { 
+            max-width: 100%; 
+            height: auto; 
+            max-height: 200px;
+            border-radius: 5px; 
+            object-fit: contain; 
+        }
+
+        /* 質問エリア */
+        .question-area { 
+            margin-bottom: 25px; 
+            text-align: center;
+        }
+        #question-number { 
+            font-size: 1.1em; 
+            color: #555; 
+            margin-bottom: 10px;
+        }
+        #question-text { 
+            font-size: 1.4em; 
+            font-weight: bold; 
+            color: #2a2a2a;
+            padding: 15px;
+            background-color: #e6ffff;
+            border: 3px solid #008080;
+            border-radius: 10px;
+            display: inline-block; 
+            margin-top: 5px;
+            min-width: 80%;
+            text-align: center;
+        }
+
+        /* ★追加: 制限時間表示エリア */
+        #timer-box {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            background-color: #ff6347; /* 赤系の目立つ色 */
+            width: 150px;
+            margin: 15px auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* 選択肢ボタン */
+        .choices { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 12px; 
+            margin-bottom: 20px;
+        }
+        .choices button {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: 1px solid #008080;
+            background-color: #008080;
+            color: white;
+            border-radius: 25px; 
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .choices button:hover:not(:disabled) { 
+            background-color: #006666; 
+            border-color: #006666; 
+            transform: translateY(-2px);
+        }
+        .choices button:disabled { opacity: 0.7; cursor: not-allowed; background-color: #cccccc !important; border-color: #bbbbbb !important; color: #666666 !important; }
+        .choices button.correct-answer { background-color: #28a745; border-color: #28a745; color: white; }
+        
+        /* 結果メッセージ */
+        .result-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
+        .result-message.correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .result-message.incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        /* ナビゲーションボタン */
+        .navigation-buttons { text-align: center; margin-top: 30px; }
+        .navigation-buttons button { padding: 10px 25px; font-size: 1em; border: none; border-radius: 20px; cursor: pointer; margin: 0 10px; transition: background-color 0.3s; }
+        #home-button { background-color: #6c757d; color: white; }
+        #home-button:hover { background-color: #5a6268; }
+        #restart-button { background-color: #ffc107; color: #333; }
+        #restart-button:hover { background-color: #e0a800; }
+        
+        /* 最終スコア */
+        #final-score { text-align: center; font-size: 1.8em; color: #008080; margin-top: 30px; background-color: #e6ffff; padding: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>挨拶クイズ</h1>
+
+    <div class="quiz-container">
+        
+        <div class="image-box" style="display:none;">
+            <img id="quiz-image" src="" alt="クイズ画像">
+        </div>
+
+        <div class="question-area">
+            <p id="question-number">第 1 問</p>
+            <div id="timer-box">残り 5 秒</div> <p id="question-prompt">問題文が表示されます：</p>
+            <h2 id="question-text">挨拶文を選びなさい</h2> 
+        </div>
+
+        <div class="choices" id="choices-container">
+            </div>
+
+        <div id="result-message" class="result-message" style="display: none;">
+            </div>
+        
+        <div id="final-score" style="display: none;">
+            </div>
+
+        <div class="navigation-buttons">
+            <button id="home-button">ホームに戻る</button>
+            <button id="restart-button" style="display: none;">もう一度プレイ</button>
+        </div>
+    </div>
+
+    <script src="js/aisatsu_quiz.js"></script>
+
+</body>
+</html>
