@@ -1,128 +1,265 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ⚠️ 注意: imageプロパティには、実際に 'assets/images/' フォルダに保存したファイル名を指定してください。
-    // ファイル名がない場合は 'null' にしています。
-    const KISO_DATA = [
-        // --- 清音 ---
-        // あ行
-        { hira: 'あ', kata: 'ア', word: 'あり', image: 'a_ari.png' },
-        { hira: 'い', kata: 'イ', word: 'いぬ', image: 'i_inu.png' },
-        { hira: 'う', kata: 'ウ', word: 'うし', image: 'u_ushi.png' },
-        { hira: 'え', kata: 'エ', word: 'えんぴつ', image: 'e_enpitsu.png' },
-        { hira: 'お', kata: 'オ', word: 'おに', image: 'o_oni.png' },
-
-        // か行
-        { hira: 'か', kata: 'カ', word: 'かさ', image: 'ka_kasa.png' },
-        { hira: 'き', kata: 'キ', word: 'きりん', image: 'ki_kirin.png' },
-        { hira: 'く', kata: 'ク', word: 'くま', image: 'ku_kuma.png' },
-        { hira: 'け', kata: 'ケ', word: 'けーき', image: 'ke_keiki.png' },
-        { hira: 'こ', kata: 'コ', word: 'こあら', image: 'ko_koara.png' },
-        
-        // さ行
-        { hira: 'さ', kata: 'サ', word: 'さかな', image: 'sa_sakana.png' },
-        { hira: 'し', kata: 'シ', word: 'しんごう', image: 'shi_shingou.png' },
-        { hira: 'す', kata: 'ス', word: 'すいか', image: 'su_suika.png' },
-        { hira: 'せ', kata: 'セ', word: 'せんせい', image: 'se_sensei.png' },
-        { hira: 'そ', kata: 'ソ', word: 'そら', image: 'so_sora.png' },
-
-        // た行
-        { hira: 'た', kata: 'タ', word: 'たまご', image: 'ta_tamago.png' },
-        { hira: 'ち', kata: 'チ', word: 'ちーず', image: 'chi_chiizu.png' },
-        { hira: 'つ', kata: 'ツ', word: 'つくえ', image: 'tsu_tsukue.png' },
-        { hira: 'て', kata: 'テ', word: 'てんとうむし', image: 'te_tentoumushi.png' },
-        { hira: 'と', kata: 'ト', word: 'とけい', image: 'to_tokei.png' },
-
-        // な行
-        { hira: 'な', kata: 'ナ', word: 'なす', image: 'na_nasu.png' },
-        { hira: 'に', kata: 'ニ', word: 'にんじん', image: 'ni_ninjin.png' },
-        { hira: 'ぬ', kata: 'ヌ', word: 'ぬりえ', image: 'nu_nurie.png' },
-        { hira: 'ね', kata: 'ネ', word: 'ねこ', image: 'ne_neko.png' },
-        { hira: 'の', kata: 'ノ', word: 'のり', image: 'no_nori.png' },
-
-        // は行
-        { hira: 'は', kata: 'ハ', word: 'はし', image: 'ha_hashi.png' },
-        { hira: 'ひ', kata: 'ヒ', word: 'ひこうき', image: 'hi_hikouki.png' },
-        { hira: 'ふ', kata: 'フ', word: 'ふじさん', image: 'fu_fujisan.png' },
-        { hira: 'へ', kata: 'ヘ', word: 'へび', image: 'he_hebi.png' },
-        { hira: 'ほ', kata: 'ホ', word: 'ほし', image: 'ho_hoshi.png' },
-
-        // ま行
-        { hira: 'ま', kata: 'マ', word: 'まくら', image: 'ma_makura.png' },
-        { hira: 'み', kata: 'ミ', word: 'みかん', image: 'mi_mikan.png' },
-        { hira: 'む', kata: 'ム', word: 'むし', image: 'mu_mushi.png' },
-        { hira: 'め', kata: 'メ', word: 'めがね', image: 'me_megane.png' },
-        { hira: 'も', kata: 'モ', word: 'もも', image: 'mo_momo.png' },
-
-        // やゆよ行
-        { hira: 'や', kata: 'ヤ', word: 'やま', image: 'ya_yama.png' },
-        { hira: 'ゆ', kata: 'ユ', word: 'ゆき', image: 'yu_yuki.png' },
-        { hira: 'よ', kata: 'ヨ', word: 'よる', image: 'yo_yoru.png' },
-        
-        // らりるれろ行
-        { hira: 'ら', kata: 'ラ', word: 'らっぱ', image: 'ra_rappa.png' },
-        { hira: 'り', kata: 'リ', word: 'りんご', image: 'ri_ringo.png' },
-        { hira: 'る', kata: 'ル', word: 'るすばん', image: 'ru_rusuban.png' },
-        { hira: 'れ', kata: 'レ', word: 'れもん', image: 're_remon.png' },
-        { hira: 'ろ', kata: 'ロ', word: 'ろうそく', image: 'ro_rousoku.png' },
-
-        // わをん行
-        { hira: 'わ', kata: 'ワ', word: 'わに', image: 'wa_wani.png' },
-        { hira: 'を', kata: 'ヲ', word: 'なし', image: null }, 
-        { hira: 'ん', kata: 'ン', word: 'なし', image: null },
-
-        // --- 濁音 ---
-        { hira: 'が', kata: 'ガ', word: 'がまがえる', image: 'ga_gamagaeru.png' },
-        { hira: 'ぎ', kata: 'ギ', word: 'ぎん', image: 'gi_gin.png' },
-        { hira: 'ぐ', kata: 'グ', word: 'ぐんて', image: 'gu_gunte.png' },
-        { hira: 'げ', kata: 'ゲ', word: 'げた', image: 'ge_geta.png' },
-        { hira: 'ご', kata: 'ゴ', word: 'ごま', image: 'go_goma.png' },
-
-        { hira: 'ざ', kata: 'ザ', word: 'ざっし', image: 'za_zasshi.png' },
-        { hira: 'じ', kata: 'ジ', word: 'じめん', image: 'ji_jimen.png' },
-        { hira: 'ず', kata: 'ズ', word: 'ずかん', image: 'zu_zukan.png' },
-        { hira: 'ぜ', kata: 'ゼ', word: 'ぜんまい', image: 'ze_zenmai.png' },
-        { hira: 'ぞ', kata: 'ゾ', word: 'ぞう', image: 'zo_zou.png' },
-
-        { hira: 'だ', kata: 'ダ', word: 'だんご', image: 'da_dango.png' },
-        { hira: 'ぢ', kata: 'ヂ', word: 'ちぢみ', image: 'di_chijimi.png' },
-        { hira: 'づ', kata: 'ヅ', word: 'つづみ', image: 'du_tsuzumi.png' },
-        { hira: 'で', kata: 'デ', word: 'でんわ', image: 'de_denwa.png' },
-        { hira: 'ど', kata: 'ド', word: 'どあ', image: 'do_doa.png' },
-        
-        { hira: 'ば', kata: 'バ', word: 'ばら', image: 'ba_bara.png' },
-        { hira: 'び', kata: 'ビ', word: 'びーだま', image: 'bi_biidama.png' },
-        { hira: 'ぶ', kata: 'ブ', word: 'ぶた', image: 'bu_buta.png' },
-        { hira: 'べ', kata: 'ベ', word: 'べんち', image: 'be_benchi.png' },
-        { hira: 'ぼ', kata: 'ボ', word: 'ぼうし', image: 'bo_boushi.png' },
-        
-        // --- 半濁音 ---
-        { hira: 'ぱ', kata: 'パ', word: 'ぱん', image: 'pa_pan.png' },
-        { hira: 'ぴ', kata: 'ピ', word: 'ぴあの', image: 'pi_piano.png' },
-        { hira: 'ぷ', kata: 'プ', word: 'ぷりん', image: 'pu_purin.png' },
-        { hira: 'ぺ', kata: 'ペ', word: 'ぺん', image: 'pe_pen.png' },
-        { hira: 'ぽ', kata: 'ポ', word: 'ぽすと', image: 'po_posuto.png' },
-        
-        // --- 拗音（データ量が多いので代表的なもののみ）---
-        { hira: 'きゃ', kata: 'キャ', word: 'きゃく', image: 'kya_kyaku.png' },
-        { hira: 'しゃ', kata: 'シャ', word: 'しゃしん', image: 'sha_shashin.png' },
-        { hira: 'ちゃ', kata: 'チャ', word: 'ちゃいろ', image: 'cha_chairo.png' },
-        { hira: 'にゃ', kata: 'ニャ', word: 'にゃんこ', image: 'nya_nyanko.png' },
-        { hira: 'ひゃ', kata: 'ヒャ', word: 'ひゃく', image: 'hya_hyaku.png' }
+    // ユーザーが提供した単語リスト
+    // 提供されたJSONデータ全体をWORD_DATAとして定義します。
+    const WORD_DATA = [
+        {"id": 101, "word": "いも", "reading": "いも", "image": "imo.png"},
+        {"id": 102, "word": "いけ", "reading": "いけ", "image": "ike.png"},
+        {"id": 103, "word": "うで", "reading": "うで", "image": "ude.png"},
+        {"id": 104, "word": "うめ", "reading": "うめ", "image": "ume.png"},
+        {"id": 105, "word": "えだ", "reading": "えだ", "image": "eda.png"},
+        {"id": 106, "word": "えほん", "reading": "えほん", "image": "ehon.png"},
+        {"id": 107, "word": "おおかみ", "reading": "おおかみ", "image": "okami.png"},
+        {"id": 108, "word": "かえる", "reading": "かえる", "image": "kaeru.png"},
+        {"id": 109, "word": "かぎ", "reading": "かぎ", "image": "kagi.png"},
+        {"id": 110, "word": "きつつき", "reading": "きつつき", "image": "kitsutsuki.png"},
+        {"id": 111, "word": "くち", "reading": "くち", "image": "kuchi.png"},
+        {"id": 112, "word": "くり", "reading": "くり", "image": "kuri.png"},
+        {"id": 113, "word": "けいと", "reading": "けいと", "image": "keito.png"},
+        {"id": 114, "word": "こおり", "reading": "こおり", "image": "kori.png"},
+        {"id": 115, "word": "さくら", "reading": "さくら", "image": "sakura.png"},
+        {"id": 116, "word": "すし", "reading": "すし", "image": "sushi.png"},
+        {"id": 117, "word": "すず", "reading": "すず", "image": "suzu.png"},
+        {"id": 118, "word": "たけ", "reading": "たけ", "image": "take.png"},
+        {"id": 119, "word": "たいよう", "reading": "たいよう", "image": "taiyo.png"},
+        {"id": 120, "word": "てぶくろ", "reading": "てぶくろ", "image": "tebukuro.png"},
+        {"id": 121, "word": "とかげ", "reading": "とかげ", "image": "tokage.png"},
+        {"id": 122, "word": "とり", "reading": "とり", "image": "tori.png"},
+        {"id": 123, "word": "なみ", "reading": "なみ", "image": "nami.png"},
+        {"id": 124, "word": "にく", "reading": "にく", "image": "niku.png"},
+        {"id": 125, "word": "ぬの", "reading": "ぬの", "image": "nuno.png"},
+        {"id": 127, "word": "はさみ", "reading": "はさみ", "image": "hasami.png"},
+        {"id": 128, "word": "ひとで", "reading": "ひとで", "image": "hitode.png"},
+        {"id": 129, "word": "ふうせん", "reading": "ふうせん", "image": "fusen.png"},
+        {"id": 130, "word": "へび", "reading": "へび", "image": "hebi.png"},
+        {"id": 131, "word": "ほし", "reading": "ほし", "image": "hoshi.png"},
+        {"id": 132, "word": "まめ", "reading": "まめ", "image": "mame.png"},
+        {"id": 134, "word": "むし", "reading": "むし", "image": "mushi.png"},
+        {"id": 135, "word": "めだか", "reading": "めだか", "image": "medaka.png"},
+        {"id": 136, "word": "もも", "reading": "もも", "image": "momo.png"},
+        {"id": 137, "word": "やぎ", "reading": "やぎ", "image": "yagi.png"},
+        {"id": 138, "word": "ゆき", "reading": "ゆき", "image": "yuki.png"},
+        {"id": 139, "word": "よう", "reading": "よう", "image": "yo.png"},
+        {"id": 140, "word": "らっぱ", "reading": "らっぱ", "image": "rappa.png"},
+        {"id": 142, "word": "るり", "reading": "るり", "image": "ruri.png"},
+        {"id": 143, "word": "れもん", "reading": "れもん", "image": "remon.png"},
+        {"id": 144, "word": "ろうそく", "reading": "ろうそく", "image": "rosoku.png"},
+        {"id": 145, "word": "わに", "reading": "わに", "image": "wani.png"},
+        {"id": 146, "word": "あさがお", "reading": "あさがお", "image": "asagao.png"},
+        {"id": 147, "word": "いるか", "reading": "いるか", "image": "iruka.png"},
+        {"id": 149, "word": "えのぐ", "reading": "えのぐ", "image": "enogu.png"},
+        {"id": 151, "word": "かたつむり", "reading": "かたつむり", "image": "katatsumuri.png"},
+        {"id": 153, "word": "くじら", "reading": "くじら", "image": "kujira.png"},
+        {"id": 154, "word": "けむり", "reading": "けむり", "image": "kemuri.png"},
+        {"id": 155, "word": "こけ", "reading": "こけ", "image": "koke.png"},
+        {"id": 157, "word": "しお", "reading": "しお", "image": "shio.png"},
+        {"id": 159, "word": "せんせい", "reading": "せんせい", "image": "sensei.png"},
+        {"id": 161, "word": "たいこ", "reading": "たいこ", "image": "taiko.png"},
+        {"id": 162, "word": "ちょう", "reading": "ちょう", "image": "cho.png"},
+        {"id": 163, "word": "つばめ", "reading": "つばめ", "image": "tsubame.png"},
+        {"id": 164, "word": "てるてる", "reading": "てるてる", "image": "teruteru.png"},
+        {"id": 165, "word": "とうふ", "reading": "とうふ", "image": "tofu.png"},
+        {"id": 166, "word": "なべ", "reading": "なべ", "image": "nabe.png"},
+        {"id": 167, "word": "にわ", "reading": "にわ", "image": "niwa.png"},
+        {"id": 168, "word": "ぬいぐるみ", "reading": "ぬいぐるみ", "image": "nuigurumi.png"},
+        {"id": 169, "word": "のりもの", "reading": "のりもの", "image": "norimono.png"},
+        {"id": 170, "word": "はくちょう", "reading": "はくちょう", "image": "hakucho.png"},
+        {"id": 172, "word": "ふうりん", "reading": "ふうりん", "image": "furin.png"},
+        {"id": 173, "word": "へちま", "reading": "へちま", "image": "hechima.png"},
+        {"id": 174, "word": "ほうき", "reading": "ほうき", "image": "hoki.png"},
+        {"id": 175, "word": "まくら", "reading": "まくら", "image": "makura.png"},
+        {"id": 176, "word": "みずうみ", "reading": "みずうみ", "image": "mizuumi.png"},
+        {"id": 177, "word": "むぎ", "reading": "むぎ", "image": "mugi.png"},
+        {"id": 178, "word": "めがね", "reading": "めがね", "image": "megane.png"},
+        {"id": 179, "word": "もり", "reading": "もり", "image": "mori.png"},
+        {"id": 180, "word": "やま", "reading": "やま", "image": "yama.png"},
+        {"id": 181, "word": "ゆびわ", "reading": "ゆびわ", "image": "yubiwa.png"},
+        {"id": 182, "word": "よしず", "reading": "よしず", "image": "yoshizu.png"},
+        {"id": 185, "word": "るりびたき", "reading": "るりびたき", "image": "ruribitaki.png"},
+        {"id": 186, "word": "れんげ", "reading": "れんげ", "image": "renge.png"},
+        {"id": 187, "word": "ろぼっと", "reading": "ろぼっと", "image": "robotto.png"},
+        {"id": 188, "word": "わかめ", "reading": "わかめ", "image": "wakame.png"},
+        {"id": 190, "word": "いとまき", "reading": "いとまき", "image": "itomaki.png"},
+        {"id": 191, "word": "うちわ", "reading": "うちわ", "image": "uchiwa.png"},
+        {"id": 192, "word": "えびふらい", "reading": "えびふらい", "image": "ebifurai.png"},
+        {"id": 193, "word": "おもちゃ", "reading": "おもちゃ", "image": "omocha.png"},
+        {"id": 194, "word": "かたな", "reading": "かたな", "image": "katana.png"},
+        {"id": 195, "word": "きもの", "reading": "きもの", "image": "kimono.png"},
+        {"id": 196, "word": "くさ", "reading": "くさ", "image": "kusa.png"},
+        {"id": 197, "word": "けしごむ", "reading": "けしごむ", "image": "keshigomu.png"},
+        {"id": 198, "word": "こま", "reading": "こま", "image": "koma.png"},
+        {"id": 199, "word": "さいふ", "reading": "さいふ", "image": "saifu.png"},
+        {"id": 6, "word": "あめ", "reading": "あめ", "image": "ame.png"},
+        {"id": 8, "word": "アヒル", "reading": "アヒル", "image": "ahiru.png"},
+        {"id": 10, "word": "あり", "reading": "あり", "image": "ari.png"},
+        {"id": 17, "word": "いか", "reading": "いか", "image": "ika.png"},
+        {"id": 18, "word": "いちご", "reading": "いちご", "image": "ichigo.png"},
+        {"id": 16, "word": "いす", "reading": "いす", "image": "isu.png"},
+        {"id": 2, "word": "いぬ", "reading": "いぬ", "image": "inu.png"},
+        {"id": 92, "word": "うさぎ", "reading": "うさぎ", "image": "usagi.png"},
+        {"id": 93, "word": "うし", "reading": "うし", "image": "ushi.png"},
+        {"id": 91, "word": "うま", "reading": "うま", "image": "uma.png"},
+        {"id": 14, "word": "えび", "reading": "えび", "image": "ebi.png"},
+        {"id": 13, "word": "えんぴつ", "reading": "えんぴつ", "image": "enpitsu.png"},
+        {"id": 61, "word": "おにぎり", "reading": "おにぎり", "image": "onigiri.png"},
+        {"id": 60, "word": "おに", "reading": "おに", "image": "oni.png"},
+        {"id": 59, "word": "オムレツ", "reading": "オムレツ", "image": "omuretsu.png"},
+        {"id": 19, "word": "かばん", "reading": "かばん", "image": "kaban.png"},
+        {"id": 23, "word": "かさ", "reading": "かさ", "image": "kasa.png"},
+        {"id": 20, "word": "かに", "reading": "かに", "image": "kani.png"},
+        {"id": 22, "word": "かめ", "reading": "かめ", "image": "kame.png"},
+        {"id": 46, "word": "きゅうり", "reading": "きゅうり", "image": "kyuuri.png"},
+        {"id": 47, "word": "くつ", "reading": "くつ", "image": "kutsu.png"},
+        {"id": 40, "word": "くま", "reading": "くま", "image": "kuma.png"},
+        {"id": 41, "word": "くも", "reading": "くも", "image": "kumo.png"},
+        {"id": 45, "word": "くるま", "reading": "くるま", "image": "kuruma.png"},
+        {"id": 21, "word": "ケーキ", "reading": "ケーキ", "image": "keki.png"},
+        {"id": 42, "word": "けむし", "reading": "けむし", "image": "kemushi.png"},
+        {"id": 35, "word": "き", "reading": "き", "image": "ki.png"},
+        {"id": 36, "word": "きりん", "reading": "きりん", "image": "kirin.png"},
+        {"id": 43, "word": "きのこ", "reading": "きのこ", "image": "kinoko.png"},
+        {"id": 37, "word": "きつね", "reading": "きつね", "image": "kitsune.png"},
+        {"id": 39, "word": "コアラ", "reading": "コアラ", "image": "koara.png"},
+        {"id": 44, "word": "コップ", "reading": "コップ", "image": "koppu.png"},
+        {"id": 38, "word": "こいのぼり", "reading": "こいのぼり", "image": "koinobori.png"},
+        {"id": 9, "word": "ごはん", "reading": "ごはん", "image": "gohan.png"},
+        {"id": 34, "word": "ごみばこ", "reading": "ごみばこ", "image": "gomibako.png"},
+        {"id": 28, "word": "ごくう", "reading": "ごくう", "image": "goku.png"},
+        {"id": 25, "word": "ごま", "reading": "ごま", "image": "goma.png"},
+        {"id": 30, "word": "ゴリラ", "reading": "ゴリラ", "image": "gorira.png"},
+        {"id": 3, "word": "さかな", "reading": "さかな", "image": "sakana.png"},
+        {"id": 68, "word": "さる", "reading": "さる", "image": "saru.png"},
+        {"id": 71, "word": "しか", "reading": "しか", "image": "shika.png"},
+        {"id": 72, "word": "しまうま", "reading": "しまうま", "image": "shimauma.png"},
+        {"id": 73, "word": "しんごう", "reading": "しんごう", "image": "shingou.png"},
+        {"id": 77, "word": "すいか", "reading": "すいか", "image": "suika.png"},
+        {"id": 78, "word": "すなはま", "reading": "すなはま", "image": "sunahama.png"},
+        {"id": 76, "word": "すべりだい", "reading": "すべりだい", "image": "suberidai.png"},
+        {"id": 69, "word": "せみ", "reading": "せみ", "image": "semi.png"},
+        {"id": 70, "word": "せんぷうき", "reading": "せんぷうき", "image": "senpuki.png"},
+        {"id": 74, "word": "そら", "reading": "そら", "image": "sora.png"},
+        {"id": 75, "word": "そらまめ", "reading": "そらまめ", "image": "soramame.png"},
+        {"id": 79, "word": "たこ", "reading": "たこ", "image": "tako.png"},
+        {"id": 80, "word": "たまご", "reading": "たまご", "image": "tamago.png"},
+        {"id": 81, "word": "たぬき", "reading": "たぬき", "image": "tanuki.png"},
+        {"id": 5, "word": "だんご", "reading": "だんご", "image": "dango.png"},
+        {"id": 7, "word": "ちず", "reading": "ちず", "image": "chizu.png"},
+        {"id": 11, "word": "チョコレート", "reading": "チョコレート", "image": "choko.png"},
+        {"id": 12, "word": "チューリップ", "reading": "チューリップ", "image": "churippu.png"},
+        {"id": 88, "word": "つき", "reading": "つき", "image": "tsuki.png"},
+        {"id": 89, "word": "つくえ", "reading": "つくえ", "image": "tsukue.png"},
+        {"id": 90, "word": "つみき", "reading": "つみき", "image": "tsumiki.png"},
+        {"id": 82, "word": "て", "reading": "て", "image": "te.png"},
+        {"id": 84, "word": "テレビ", "reading": "テレビ", "image": "terebi.png"},
+        {"id": 83, "word": "テント", "reading": "テント", "image": "tento.png"},
+        {"id": 85, "word": "とけい", "reading": "とけい", "image": "tokei.png"},
+        {"id": 87, "word": "とら", "reading": "とら", "image": "tora.png"},
+        {"id": 86, "word": "トマト", "reading": "トマト", "image": "tomato.png"},
+        {"id": 52, "word": "なす", "reading": "なす", "image": "nasu.png"},
+        {"id": 51, "word": "なし", "reading": "なし", "image": "nashi.png"},
+        {"id": 48, "word": "なっとう", "reading": "なっとう", "image": "natto.png"},
+        {"id": 53, "word": "にじ", "reading": "にじ", "image": "niji.png"},
+        {"id": 54, "word": "にんじん", "reading": "にんじん", "image": "ninjin.png"},
+        {"id": 55, "word": "にわとり", "reading": "にわとり", "image": "niwatori.png"},
+        {"id": 1, "word": "ねこ", "reading": "ねこ", "image": "neko.png"},
+        {"id": 50, "word": "ねずみ", "reading": "ねずみ", "image": "nezumi.png"},
+        {"id": 49, "word": "ねんど", "reading": "ねんど", "image": "nendo.png"},
+        {"id": 56, "word": "のこぎり", "reading": "のこぎり", "image": "nokogiri.png"},
+        {"id": 57, "word": "のり", "reading": "のり", "image": "nori.png"},
+        {"id": 58, "word": "ぬりえ", "reading": "ぬりえ", "image": "nurie.png"},
+        {"id": 29, "word": "は", "reading": "は", "image": "ha.png"},
+        {"id": 32, "word": "はし", "reading": "はし", "image": "hashi.png"},
+        {"id": 26, "word": "はな", "reading": "はな", "image": "hana.png"},
+        {"id": 33, "word": "はみがき", "reading": "はみがき", "image": "hamigaki.png"},
+        {"id": 31, "word": "ひ", "reading": "ひ", "image": "hi.png"},
+        {"id": 27, "word": "ひこうき", "reading": "ひこうき", "image": "hikoki.png"},
+        {"id": 24, "word": "ひよこ", "reading": "ひよこ", "image": "hiyoko.png"},
+        {"id": 15, "word": "ひまわり", "reading": "ひまわり", "image": "himawari.png"},
+        {"id": 63, "word": "ライオン", "reading": "ライオン", "image": "raion.png"},
+        {"id": 64, "word": "ラクダ", "reading": "ラクダ", "image": "rakuda.png"},
+        {"id": 62, "word": "ラジオ", "reading": "ラジオ", "image": "radio.png"},
+        {"id": 65, "word": "りか", "reading": "りか", "image": "rika.png"},
+        {"id": 66, "word": "りきし", "reading": "りきし", "image": "rikishi.png"},
+        {"id": 4, "word": "りんご", "reading": "りんご", "image": "ringo.png"},
+        {"id": 67, "word": "りす", "reading": "りす", "image": "risu.png"}
     ];
+
+    // マッピング作成: ひらがなの最初の文字をキーとして、単語データを格納
+    const WordMap = new Map();
+    WORD_DATA.forEach(item => {
+        const firstChar = item.reading.charAt(0);
+        // 同じ頭文字が複数ある場合、最初のもの（JSONの上にあるもの）を採用
+        if (!WordMap.has(firstChar)) {
+            WordMap.set(firstChar, { word: item.word, image: item.image });
+        }
+    });
+
+    // --- KISO_DATAの最終構築 ---
+    // カタカナは、ひらがなからの変換ルール（ベース）で定義する
+    const KISO_DATA_BASE = [
+        // 清音
+        { hira: 'あ', kata: 'ア' }, { hira: 'い', kata: 'イ' }, { hira: 'う', kata: 'ウ' }, { hira: 'え', kata: 'エ' }, { hira: 'お', kata: 'オ' },
+        { hira: 'か', kata: 'カ' }, { hira: 'き', kata: 'キ' }, { hira: 'く', kata: 'ク' }, { hira: 'け', kata: 'ケ' }, { hira: 'こ', kata: 'コ' },
+        { hira: 'さ', kata: 'サ' }, { hira: 'し', kata: 'シ' }, { hira: 'す', kata: 'ス' }, { hira: 'せ', kata: 'セ' }, { hira: 'そ', kata: 'ソ' },
+        { hira: 'た', kata: 'タ' }, { hira: 'ち', kata: 'チ' }, { hira: 'つ', kata: 'ツ' }, { hira: 'て', kata: 'テ' }, { hira: 'と', kata: 'ト' },
+        { hira: 'な', kata: 'ナ' }, { hira: 'に', kata: 'ニ' }, { hira: 'ぬ', kata: 'ヌ' }, { hira: 'ね', kata: 'ネ' }, { hira: 'の', kata: 'ノ' },
+        { hira: 'は', kata: 'ハ' }, { hira: 'ひ', kata: 'ヒ' }, { hira: 'ふ', kata: 'フ' }, { hira: 'へ', kata: 'ヘ' }, { hira: 'ほ', kata: 'ホ' },
+        { hira: 'ま', kata: 'マ' }, { hira: 'み', kata: 'ミ' }, { hira: 'む', kata: 'ム' }, { hira: 'め', kata: 'メ' }, { hira: 'も', kata: 'モ' },
+        { hira: 'や', kata: 'ヤ' }, { hira: 'ゆ', kata: 'ユ' }, { hira: 'よ', kata: 'ヨ' },
+        { hira: 'ら', kata: 'ラ' }, { hira: 'り', kata: 'リ' }, { hira: 'る', kata: 'ル' }, { hira: 'れ', kata: 'レ' }, { hira: 'ろ', kata: 'ロ' },
+        { hira: 'わ', kata: 'ワ' }, { hira: 'を', kata: 'ヲ' }, { hira: 'ん', kata: 'ン' },
+
+        // 濁音・半濁音・拗音 (提供データに合わせて、空のものは null)
+        { hira: 'が', kata: 'ガ' }, { hira: 'ぎ', kata: 'ギ' }, { hira: 'ぐ', kata: 'グ' }, { hira: 'げ', kata: 'ゲ' }, { hira: 'ご', kata: 'ゴ' },
+        { hira: 'ざ', kata: 'ザ' }, { hira: 'じ', kata: 'ジ' }, { hira: 'ず', kata: 'ズ' }, { hira: 'ぜ', kata: 'ゼ' }, { hira: 'ぞ', kata: 'ゾ' },
+        { hira: 'だ', kata: 'ダ' }, { hira: 'ぢ', kata: 'ヂ' }, { hira: 'づ', kata: 'ヅ' }, { hira: 'で', kata: 'デ' }, { hira: 'ど', kata: 'ド' },
+        { hira: 'ば', kata: 'バ' }, { hira: 'び', kata: 'ビ' }, { hira: 'ぶ', kata: 'ブ' }, { hira: 'べ', kata: 'ベ' }, { hira: 'ぼ', kata: 'ボ' },
+        { hira: 'ぱ', kata: 'パ' }, { hira: 'ぴ', kata: 'ピ' }, { hira: 'ぷ', kata: 'プ' }, { hira: 'ぺ', kata: 'ペ' }, { hira: 'ぽ', kata: 'ポ' },
+        { hira: 'きゃ', kata: 'キャ' }, { hira: 'しゃ', kata: 'シャ' }, { hira: 'ちゃ', kata: 'チャ' }, { hira: 'にゃ', kata: 'ニャ' }, { hira: 'ひゃ', kata: 'ヒャ' },
+        // ... (他の拗音はスペース節約のため省略。必要に応じて追加してください) ...
+    ];
+
+    // KISO_DATAを、提供されたデータで上書き結合する
+    const FINAL_KISO_DATA = KISO_DATA_BASE.map(base => {
+        const char = base.hira.charAt(0); // 最初の文字（きゃ->き）で検索
+        const mapped = WordMap.get(char);
+        
+        // 提供データに該当する単語がある場合は上書き
+        if (mapped) {
+            return {
+                hira: base.hira,
+                kata: base.kata,
+                word: mapped.word,
+                image: mapped.image
+            };
+        }
+        
+        // ない場合はデフォルト値（この場合は全てnullとして扱う）
+        return {
+            hira: base.hira,
+            kata: base.kata,
+            word: 'なし',
+            image: null
+        };
+    });
+
 
     const tbody = document.getElementById('kiso-tbody'); 
     
     if (tbody) {
         let html = '';
-        KISO_DATA.forEach(item => {
+        FINAL_KISO_DATA.forEach(item => {
             const imagePath = item.image ? `assets/images/${item.image}` : null;
-            const wordDisplay = item.word && item.image ? `<br>(${item.word})` : '';
+            
+            // 単語が「なし」の場合は表示しない
+            const wordDisplay = item.word && item.word !== 'なし' ? `<br>(${item.word})` : '';
 
+            // ひらがな表では、文字ごとに縦の列を作るため、全文字のデータを出力します。
             html += `
                 <tr>
                     <td class="char-hira">${item.hira}</td>
                     <td class="char-kata">${item.kata}</td>
                     <td class="char-illust">
-                        ${imagePath ? `<img src="${imagePath}" alt="${item.word}" onerror="this.style.display='none'" class="kiso-illust">${wordDisplay}` : 'ー'}
+                        ${imagePath ? `<img src="${imagePath}" alt="${item.word}" onerror="this.src='assets/images/placeholder.png'; this.alt='画像なし'" class="kiso-illust">${wordDisplay}` : 'ー'}
                     </td>
                 </tr>
             `;
