@@ -55,6 +55,9 @@
             padding: 5px;
             text-align: center;
             min-height: 100px;
+            display: flex; /* ★セルの中身を縦に積む */
+            flex-direction: column;
+            justify-content: center;
         }
         .kiso-cell.empty {
             background-color: transparent;
@@ -115,6 +118,7 @@
         }
         .char-illust .kiso-illust { /* .kiso-illustを再利用 */
             max-height: 50px;
+            margin: 0 auto;
         }
         
         /* --- ボタン共通スタイル --- */

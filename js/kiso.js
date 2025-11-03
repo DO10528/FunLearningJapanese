@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
     // 1. ----------------- ユーザー提供の単語リスト -----------------
-    // (提供されたJSONデータをここに含めます)
+    // (提供されたJSONデータをここに1回だけ定義します)
     const WORD_DATA = [
         {"id": 101, "word": "いも", "reading": "いも", "image": "imo.png"},
         {"id": 102, "word": "いけ", "reading": "いけ", "image": "ike.png"},
@@ -186,13 +187,154 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. ----------------- 単語マップの作成 -----------------
     const WordMap = new Map();
     WORD_DATA.forEach(item => {
+        // カタカナの単語（アヒルなど）もひらがなに変換してキーにする
         const firstChar = item.reading.charAt(0);
-        // 優先順位: 既にマップにない文字だけ追加（リストの上にあるものを優先）
+        
         if (!WordMap.has(firstChar)) {
             WordMap.set(firstChar, { word: item.word, image: item.image });
         }
     });
+    
+    // ごくう、だんご など、濁音のキーもマップに追加
+    WordMap.set('ご', { word: 'ごくう', image: 'goku.png' });
+    WordMap.set('だ', { word: 'だんご', image: 'dango.png' });
+    // ... (必要に応じて濁音の単語を手動でWordMapに追加)
+
 
     // 3. ----------------- データ構造の定義 -----------------
 
-    // 3a.
+    // 3a. 清音 (Seion) - 50音 (10列の縦レイアウト)
+    // (これがユーザーが修正を依頼した「3a」セクションです)
+    const SEION_COLUMNS = [
+        // 1列目 (あ行)
+        [ { hira: 'あ', kata: 'ア' }, { hira: 'い', kata: 'イ' }, { hira: 'う', kata: 'ウ' }, { hira: 'え', kata: 'エ' }, { hira: 'お', kata: 'オ' } ],
+        // 2列目 (か行)
+        [ { hira: 'か', kata: 'カ' }, { hira: 'き', kata: 'キ' }, { hira: 'く', kata: 'ク' }, { hira: 'け', kata: 'ケ' }, { hira: 'こ', kata: 'コ' } ],
+        // 3列目 (さ行)
+        [ { hira: 'さ', kata: 'サ' }, { hira: 'し', kata: 'シ' }, { hira: 'す', kata: 'ス' }, { hira: 'せ', kata: 'セ' }, { hira: 'そ', kata: 'ソ' } ],
+        // 4列目 (た行)
+        [ { hira: 'た', kata: 'タ' }, { hira: 'ち', kata: 'チ' }, { hira: 'つ', kata: 'ツ' }, { hira: 'て', kata: 'テ' }, { hira: 'と', kata: 'ト' } ],
+        // 5列目 (な行)
+        [ { hira: 'な', kata: 'ナ' }, { hira: 'に', kata: 'ニ' }, { hira: 'ぬ', kata: 'ヌ' }, { hira: 'ね', kata: 'ネ' }, { hira: 'の', kata: 'ノ' } ],
+        // 6列目 (は行)
+        [ { hira: 'は', kata: 'ハ' }, { hira: 'ひ', kata: 'ヒ' }, { hira: 'ふ', kata: 'フ' }, { hira: 'へ', kata: 'ヘ' }, { hira: 'ほ', kata: 'ホ' } ],
+        // 7列目 (ま行)
+        [ { hira: 'ま', kata: 'マ' }, { hira: 'み', kata: 'ミ' }, { hira: 'む', kata: 'ム' }, { hira: 'め', kata: 'メ' }, { hira: 'も', kata: 'モ' } ],
+        // 8列目 (や行)
+        [ { hira: 'や', kata: 'ヤ' }, null, { hira: 'ゆ', kata: 'ユ' }, null, { hira: 'よ', kata: 'ヨ' } ],
+        // 9列目 (ら行)
+        [ { hira: 'ら', kata: 'ラ' }, { hira: 'り', kata: 'リ' }, { hira: 'る', kata: 'ル' }, { hira: 'れ', kata: 'レ' }, { hira: 'ろ', kata: 'ロ' } ],
+        // 10列目 (わ行)
+        [ { hira: 'わ', kata: 'ワ' }, { hira: 'を', kata: 'ヲ' }, null, null, { hira: 'ん', kata: 'ン' } ]
+    ];
+
+    // 3b. 濁音 (Dakuon) - 3列テーブル用
+    const DAKUON_DATA = [
+        { hira: 'が', kata: 'ガ' }, { hira: 'ぎ', kata: 'ギ' }, { hira: 'ぐ', kata: 'グ' }, { hira: 'げ', kata: 'ゲ' }, { hira: 'ご', kata: 'ゴ' },
+        { hira: 'ざ', kata: 'ザ' }, { hira: 'じ', kata: 'ジ' }, { hira: 'ず', kata: 'ズ' }, { hira: 'ぜ', kata: 'ゼ' }, { hira: 'ぞ', kata: 'ゾ' },
+        { hira: 'だ', kata: 'ダ' }, { hira: 'ぢ', kata: 'ヂ' }, { hira: 'づ', kata: 'ヅ' }, { hira: 'で', kata: 'デ' }, { hira: 'ど', kata: 'ド' },
+        { hira: 'ば', kata: 'バ' }, { hira: 'び', kata: 'ビ' }, { hira: 'ぶ', kata: 'ブ' }, { hira: 'べ', kata: 'ベ' }, { hira: 'ぼ', kata: 'ボ' }
+    ];
+
+    // 3c. 半濁音 (Handakuon)
+    const HANDAKUON_DATA = [
+        { hira: 'ぱ', kata: 'パ' }, { hira: 'ぴ', kata: 'ピ' }, { hira: 'ぷ', kata: 'プ' }, { hira: 'ぺ', kata: 'ペ' }, { hira: 'ぽ', kata: 'ポ' }
+    ];
+    
+    // 4. ----------------- 描画ロジック -----------------
+
+    /**
+     * 単語マップから画像と単語を取得するヘルパー関数
+     */
+    function getMappedData(char) {
+        // 'きゃ' の場合は 'き' を検索キーにする (拗音は未対応だがロジックとしては安全)
+        const searchChar = char.charAt(0); 
+        const mapped = WordMap.get(searchChar) || { word: 'なし', image: null };
+        
+        // ★修正点: 濁音・半濁音（'が', 'ぱ'など）も検索できるようにする★
+        const mappedDakuon = WordMap.get(char); 
+        
+        let finalMapped = mapped;
+        // もし「が」で検索して「ごくう」などが見つかれば、そちらを優先
+        if (mappedDakuon && mappedDakuon.word !== 'なし') {
+            finalMapped = mappedDakuon;
+        }
+
+        const imagePath = finalMapped.image ? `assets/images/${finalMapped.image}` : null;
+        const wordDisplay = (finalMapped.word && finalMapped.word !== 'なし') ? `<span class="kiso-word">(${finalMapped.word})</span>` : '';
+        const imageTag = imagePath ? 
+            `<img src="${imagePath}" alt="${finalMapped.word}" class="kiso-illust" onerror="this.style.display='none'; this.nextSibling.style.display='none'; this.previousSibling.style.display='block';">` : 
+            '<div class="kiso-illust-placeholder"></div>';
+            
+        // ★修正: onerror時にプレースホルダーを表示し、単語を隠す
+        const imageTagWithErrorHandling = imagePath ?
+            `<img src="${imagePath}" alt="${finalMapped.word}" class="kiso-illust" onerror="this.style.display='none'; if(this.nextSibling) this.nextSibling.style.display='none'; this.parentElement.querySelector('.kiso-illust-placeholder').style.display='block';">` :
+            '';
+
+        return {
+            imageTag: imageTagWithErrorHandling + '<div class="kiso-illust-placeholder" style="display:' + (imagePath ? 'none' : 'block') + ';"></div>',
+            wordDisplay: wordDisplay
+        };
+    }
+
+    // 4a. 清音(Seion) 50音グリッドの描画
+    const seionContainer = document.getElementById('kiso-chart-container-seion');
+    if (seionContainer) {
+        let html = '';
+        const numRows = 5; // あ, い, う, え, お (段)
+        const numCols = 10; // あ, か, さ, ... わ (行)
+
+        for (let i = 0; i < numRows; i++) { // 縦(i) (0='あ'段, 1='い'段...)
+            for (let j = 0; j < numCols; j++) { // 横(j) (0=あ行, 1=か行...)
+                
+                const cell = (SEION_COLUMNS[j] && SEION_COLUMNS[j][i]) ? SEION_COLUMNS[j][i] : null;
+
+                if (cell) {
+                    const { imageTag, wordDisplay } = getMappedData(cell.hira);
+                    
+                    html += `
+                        <div class="kiso-cell">
+                            <div class="kiso-chars">
+                                <span class="kiso-hira">${cell.hira}</span>
+                                <span class="kiso-kata">${cell.kata}</span>
+                            </div>
+                            ${imageTag}
+                            ${wordDisplay}
+                        </div>
+                    `;
+                } else {
+                    html += '<div class="kiso-cell empty"></div>'; // (や行・わ行の空き)
+                }
+            }
+        }
+        
+        seionContainer.innerHTML = html;
+    }
+
+    // 4b. 濁音・半濁音 (3列テーブルの描画)
+    function renderTable(tbodyId, data) {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+
+        let html = '';
+        data.forEach(item => {
+            const { imageTag, wordDisplay } = getMappedData(item.hira);
+
+            html += `
+                <tr>
+                    <td class="char-hira">${item.hira}</td>
+                    <td class="char-kata">${item.kata}</td>
+                    <td class="char-illust">
+                        ${imageTag}
+                        ${wordDisplay}
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    renderTable('kiso-tbody-dakuon', DAKUON_DATA);
+    renderTable('kiso-tbody-handakuon', HANDAKUON_DATA);
+
+}); // End of DOMContentLoaded
