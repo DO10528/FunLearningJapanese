@@ -19,7 +19,7 @@
         }
         h1 { 
             text-align: center; 
-            color: #5c7aff; /* テーマカラー（ひらがな系に合わせる） */
+            color: #5c7aff; 
             margin-bottom: 20px;
         }
         .container-content {
@@ -40,12 +40,12 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            min-width: 650px; 
+            min-width: 750px; /* イラスト列追加に合わせて幅を広げる */
         }
         th, td { 
-            padding: 12px 15px; 
+            padding: 12px 10px; /* パディングを少し減らす */
             border: 1px solid #ddd; 
-            text-align: center; /* 文字を中央寄せ */
+            text-align: center; 
             font-size: 1.1em;
         }
         th { 
@@ -59,17 +59,32 @@
         tr:hover { 
             background-color: #eef; 
         }
+        
         /* 文字の列のスタイル */
-        td:nth-child(2), td:nth-child(3) { 
-            font-size: 1.5em; /* 文字を大きく */
-            letter-spacing: 5px; /* 文字間隔を調整 */
+        td:nth-child(3), td:nth-child(4) { /* 3番目と4番目の列 (ひらがな・カタカナ) */
+            font-size: 1.5em; 
+            letter-spacing: 5px; 
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: bold;
         }
         /* 行名の列（あ行、か行など） */
-        td:nth-child(1) {
+        .row-name {
             font-weight: bold;
             background-color: #f0f8ff;
+            width: 80px;
+        }
+        /* ★イラスト列のスタイル★ */
+        .row-image {
+            width: 80px;
+            background-color: #ffffff;
+            padding: 5px;
+        }
+        .kiso-illust {
+            max-width: 100%;
+            max-height: 40px; /* 画像の高さを制限 */
+            display: block;
+            margin: 0 auto;
+            border-radius: 3px;
         }
         
         /* --- ボタン共通スタイル --- */
@@ -108,8 +123,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th>行</th>
-                        <th>ひらがな</th>
+                        <th>行名</th>
+                        <th>イラスト</th> <th>ひらがな</th>
                         <th>カタカナ</th>
                     </tr>
                 </thead>
