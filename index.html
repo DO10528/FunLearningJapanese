@@ -5,56 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Fun Learning Japanese</title> 
     <link rel="stylesheet" href="css/style.css"> 
+    
+    <style>
+        /* メインコンテナ（白）の中のグループ分け */
+        .menu-group {
+            background-color: #f0f8ff; /* 薄い青色の背景 */
+            border: 2px solid #5c7aff;  /* kiso.html と色を合わせる */
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 25px; /* 2つのグループ間の余白 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* グループのタイトル (h2) */
+        .menu-group h2 {
+            text-align: center;
+            color: #5c7aff; /* 青色 */
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        /* 既存のグリッドスタイルをそのまま利用 */
+        /* .menu-buttons-grid は css/style.css で定義されています */
+    </style>
 </head>
 <body>
     
     <h1>Fun Learning Japanese</h1>
     
     <div id="main-menu" class="container">
-        <h2>何をして遊ぶ？</h2>
         
-        <div id="score-message" style="margin-bottom: 20px;">
-            <p>ようこそ！ゲームを選んでね。</p>
-        </div> 
-        
-        <div class="menu-buttons-grid">
+        <div class="menu-group">
+            <h2>きそ・たんごリスト</h2>
             
-            <a href="hiragana.html" class="menu-card-button menu-card-reset">
-                🎮<br>ひらがな単語ゲーム
-            </a>
-            
-            <a href="hiragana2.html" class="menu-card-button menu-card-reset">
-                ⭐<br>ひらがなゲーム2 (並び替え)
-            </a>
-            
-            <a href="kiso.html" class="menu-card-button menu-card-reset">
-                📝<br>ひらがな・カタカナ基礎
-            </a>
-            
-            <a href="shiritori.html" class="menu-card-button menu-card-reset">
-                🗣️<br>しりとりゲーム
-            </a>
-            
-            <a href="keiyoshi.html" class="menu-card-button menu-card-reset">
-                🤔<br>形容詞クイズ
-            </a>
-            
-            <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset">
-                📚<br>形容詞リスト
-            </a>
-            
-            <a href="kanji_quiz.html" class="menu-card-button menu-card-reset">
-                🈳<br>漢字クイズ (小1)
-            </a>
-            
-            <a href="kanji_list.html" class="menu-card-button menu-card-reset">
-                📖<br>漢字リスト (小1)
-            </a>
+            <div class="menu-buttons-grid">
+                
+                <a href="kiso.html" class="menu-card-button menu-card-reset">
+                    📝<br>ひらがな・カタカナ基礎
+                </a>
+                
+                <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset">
+                    📚<br>形容詞リスト
+                </a>
+                
+                <a href="kanji_list.html" class="menu-card-button menu-card-reset">
+                    📖<br>漢字リスト (小1)
+                </a>
 
-            <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset">
-                🗣️<br>挨拶クイズ (5秒制限)
-</a>
             </div>
+        </div>
+
+        <div class="menu-group">
+            <h2>なにをしてあそぶ?</h2>
+
+            <div class="menu-buttons-grid">
+            
+                <a href="hiragana.html" class="menu-card-button menu-card-reset">
+                    🎮<br>ひらがな単語ゲーム
+                </a>
+                
+                <a href="hiragana2.html" class="menu-card-button menu-card-reset">
+                    ⭐<br>ひらがなゲーム2 (並び替え)
+                </a>
+                
+                <a href="shiritori.html" class="menu-card-button menu-card-reset">
+                    🗣️<br>しりとりゲーム
+                </a>
+                
+                <a href="keiyoshi.html" class="menu-card-button menu-card-reset">
+                    🤔<br>形容詞クイズ
+                </a>
+                
+                <a href="kanji_quiz.html" class="menu-card-button menu-card-reset">
+                    🈳<br>漢字クイズ (小1)
+                </a>
+                
+                <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset">
+                    🗣️<br>挨拶クイズ (10秒制限)
+                </a>
+                
+            </div>
+        </div>
+        
     </div>
     
     <div id="game-area" class="container" style="display:none;">
