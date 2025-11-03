@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画の再生</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container {
+            max-width: 800px;
+            text-align: center;
+        }
+        #video-player {
+            width: 100%;
+            max-width: 720px;
+            height: auto;
+            background-color: #000;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        #video-title {
+            color: #333;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎥 ひらがな練習</h1>
+
+    <div class="container">
+        
+        <h2 id="video-title">...</h2>
+        
+        <video id="video-player" controls autoplay playsinline>
+            <p>お使いのブラウザは動画の再生に対応していません。</p>
+        </video>
+
+        <div class="navigation-buttons" style="margin-top: 30px;">
+            <button onclick="window.location.href='hiragana_video_list.html'">リストにもどる</button>
+        </div>
+    </div>
+
+    <script>
+        // ページが読み込まれたら、URLから動画ファイル名を取得して再生します
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoFile = urlParams.get('video'); // ?video= の値
+            const videoTitle = urlParams.get('title'); // ?title= の値
+
+            const videoPlayer = document.getElementById('video-player');
+            const titleElement = document.getElementById('video-title');
+
+            if (videoFile) {
+                videoPlayer.src = videoFile;
+                titleElement.textContent = videoTitle || '動画'; // タイトルがなければ「動画」と表示
+            } else {
+                titleElement.textContent = 'エラー: 動画が見つかりません。';
+            }
+        });
+    </script>
+
+</body>
+</html>

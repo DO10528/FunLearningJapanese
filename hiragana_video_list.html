@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ひらがな練習 動画リスト</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container {
+            max-width: 700px;
+        }
+        .video-list-container {
+            margin-top: 20px;
+        }
+        .video-link {
+            display: block;
+            background-color: #fff;
+            border: 2px solid #5c7aff;
+            color: #333;
+            padding: 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .video-link:hover {
+            background-color: #f0f8ff;
+        }
+        /* クリックできないボタンのスタイル */
+        .video-link.disabled {
+            background-color: #f4f4f4;
+            border-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎥 ひらがな練習 動画リスト</h1>
+
+    <div class="container">
+        
+        <div class="video-list-container">
+            
+            <a href="video_player.html?video=assets/videos/あいうえお.mov&title=あ行 (あいうえお)" class="video-link">
+                ▶ あ行 (あいうえお)
+            </a>
+
+            <a href="#" class="video-link disabled">
+                ▶ か行 (かきくけこ)
+            </a>
+            
+            <a href="#" class="video-link disabled">
+                ▶ さ行 (さしすせそ)
+            </a>
+            
+            <a href="#" class="video-link disabled">
+                ▶ た行 (たちつてと)
+            </a>
+            
+            </div>
+
+        <div class="navigation-buttons" style="margin-top: 30px; text-align: center;">
+            <button onclick="window.location.href='index.html'">ホームにもどる</button>
+        </div>
+    </div>
+
+</body>
+</html>
