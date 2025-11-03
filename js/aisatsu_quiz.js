@@ -11,19 +11,18 @@ let quizQuestions = [];
 let currentQuestionIndex = 0; 
 let score = 0;              
 
-// ★追加: タイマーと間違い回数の設定
+// ★変更点★ タイマーと間違い回数の設定
 const MAX_WRONG_ANSWERS = 3;    
 let wrongAnswerCount = 0;       
-const TIME_LIMIT = 5;           // 制限時間（秒）
-let timerId = null;             // タイマーIDを保持
-
+const TIME_LIMIT = 10;           // ★10秒に変更
+let timerId = null;             
 const CHOICES_COUNT = 3;        
 
 // DOM要素の取得
 const questionNumberElement = document.getElementById('question-number');
-const questionTextElement = document.getElementById('question-text'); // 挨拶文
-const questionPromptElement = document.getElementById('question-prompt'); // 状況説明
-const timerBoxElement = document.getElementById('timer-box'); // ★追加
+const questionTextElement = document.getElementById('question-text'); 
+const questionPromptElement = document.getElementById('question-prompt'); 
+const timerBoxElement = document.getElementById('timer-box'); 
 const choicesContainer = document.getElementById('choices-container');
 const resultMessageElement = document.getElementById('result-message');
 const homeButton = document.getElementById('home-button');
@@ -36,7 +35,7 @@ const finalScoreElement = document.getElementById('final-score');
  */
 function playSound(path) {
     const audio = new Audio(path);
-    audio.play().catch(e => console.error("音声再生エラー:", e));
+    audio.play().catch(e => console.error("おとを ならせませんでした:", e));
 }
 
 /**
@@ -49,7 +48,7 @@ async function initializeQuiz() {
         greetingsList = data.greetings;
         
         if (greetingsList.length < CHOICES_COUNT) {
-            questionTextElement.textContent = "エラー: データが不足しています。挨拶を3つ以上用意してください。";
+            questionTextElement.textContent = "エラー: データがたりません。あいさつを3ついじょうよういしてください。";
             disableAllButtons();
             return;
         }
@@ -60,13 +59,13 @@ async function initializeQuiz() {
         restartButton.addEventListener('click', startNewQuiz);
 
         // タイマーエリアを初期化
-        timerBoxElement.textContent = `残り ${TIME_LIMIT} 秒`;
+        timerBoxElement.textContent = `のこり ${TIME_LIMIT} びょう`;
 
         startNewQuiz(); 
         
     } catch (error) {
-        console.error("データの読み込み中にエラーが発生しました:", error);
-        questionTextElement.textContent = "エラー: データの読み込みに失敗しました。ファイルパスを確認してください。";
+        console.error("データのよみこみに しっぱいしました:", error);
+        questionTextElement.textContent = "エラー: データのよみこみにしっぱいしました。ファイルパスをかくにんしてください。";
         disableAllButtons();
     }
 }
@@ -75,14 +74,12 @@ async function initializeQuiz() {
  * 新しいクイズセッションを開始する
  */
 function startNewQuiz() {
-    // 既存のタイマーをクリア
     if (timerId) clearInterval(timerId); 
 
     currentQuestionIndex = 0;
     score = 0;
     wrongAnswerCount = 0; 
 
-    // 全ての挨拶リストから問題を作成（シャッフル）
     quizQuestions = generateQuizQuestions(); 
 
     resultMessageElement.style.display = 'none';
@@ -95,22 +92,18 @@ function startNewQuiz() {
 }
 
 /**
- * クイズの問題リストを生成する (挨拶リスト全体をシャッフル)
+ * クイズの問題リストを生成する
  */
 function generateQuizQuestions() {
-    // 挨拶リストを複製してシャッフル
     const shuffledGreetings = [...greetingsList]; 
     for (let i = shuffledGreetings.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffledGreetings[i], shuffledGreetings[j]] = [shuffledGreetings[j], shuffledGreetings[i]];
     }
     
-    // 挨拶クイズはデータにwrongsが含まれているため、カスタムロジックは不要
-    // データ構造から直接問題を作成する
     const questions = shuffledGreetings.map(item => {
         const choices = [item.correct, ...item.wrongs].slice(0, CHOICES_COUNT);
         
-        // 選択肢をシャッフル
         for (let i = choices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [choices[i], choices[j]] = [choices[j], choices[i]];
@@ -131,15 +124,15 @@ function generateQuizQuestions() {
  */
 function startTimer() {
     let timeLeft = TIME_LIMIT;
-    timerBoxElement.textContent = `残り ${timeLeft} 秒`;
-    timerBoxElement.style.backgroundColor = '#ff6347'; // 初期色 (赤系)
+    timerBoxElement.textContent = `のこり ${timeLeft} びょう`;
+    timerBoxElement.style.backgroundColor = '#ff6347'; 
 
     timerId = setInterval(() => {
         timeLeft--;
-        timerBoxElement.textContent = `残り ${timeLeft} 秒`;
+        timerBoxElement.textContent = `のこり ${timeLeft} びょう`;
         
-        if (timeLeft <= 2) {
-            timerBoxElement.style.backgroundColor = '#ff4500'; // 焦る色
+        if (timeLeft <= 3) { // 3秒以下で色を強調
+            timerBoxElement.style.backgroundColor = '#ff4500'; 
         }
 
         if (timeLeft <= 0) {
@@ -153,10 +146,7 @@ function startTimer() {
  * 時間切れ時の処理
  */
 function handleTimeUp() {
-    // 選択肢を無効化
     disableAllButtons();
-    
-    // 不正解として扱う
     const currentQuestion = quizQuestions[currentQuestionIndex];
     checkAnswer(null, 'TIME_UP', currentQuestion.correctAnswer);
 }
@@ -166,23 +156,19 @@ function handleTimeUp() {
  * 現在の問題を画面に表示する
  */
 function displayQuestion() {
-    // 既存のタイマーをクリアしてから再スタート
     if (timerId) clearInterval(timerId); 
     
-    // 画面をリセット
     choicesContainer.innerHTML = '';
     resultMessageElement.style.display = 'none';
     resultMessageElement.className = 'result-message';
-    timerBoxElement.textContent = `残り ${TIME_LIMIT} 秒`;
+    timerBoxElement.textContent = `のこり ${TIME_LIMIT} びょう`;
     timerBoxElement.style.backgroundColor = '#ff6347'; 
     
-    // ゲームオーバー判定
     if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
         endQuiz(true); 
         return;
     }
 
-    // 全問終了判定
     if (currentQuestionIndex >= quizQuestions.length) {
         endQuiz(false); 
         return;
@@ -191,8 +177,9 @@ function displayQuestion() {
     const question = quizQuestions[currentQuestionIndex];
     
     questionNumberElement.textContent = 
-        `第 ${currentQuestionIndex + 1} 問 (残り間違い ${MAX_WRONG_ANSWERS - wrongAnswerCount} 回)`; 
-    questionPromptElement.textContent = "この挨拶を選んでください："; // プロンプトを標準に戻す
+        `だい ${currentQuestionIndex + 1} もん (のこり まちがい ${MAX_WRONG_ANSWERS - wrongAnswerCount} かい)`; 
+    
+    questionPromptElement.textContent = "ただしい あいさつを えらんでね："; 
 
     // 状況説明をh2タグ（質問文エリア）に表示
     questionTextElement.textContent = question.situation; 
@@ -203,7 +190,6 @@ function displayQuestion() {
         button.textContent = choice;
         
         button.addEventListener('click', (event) => {
-            // クリックしたらタイマーを停止
             if (timerId) clearInterval(timerId); 
             checkAnswer(event.target, choice, question.correctAnswer);
         });
@@ -211,37 +197,29 @@ function displayQuestion() {
         choicesContainer.appendChild(button);
     });
 
-    // タイマー開始
     startTimer();
 }
 
 /**
  * ユーザーの回答をチェックし、結果を表示する関数
- * @param {HTMLElement} clickedButton - クリックされたボタン、またはnull (時間切れ時)
- * @param {string} selectedChoice - ユーザーの選択、または'TIME_UP'
- * @param {string} correctAnswer - 正解の挨拶
  */
 function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
     
-    // 既に結果が表示されている場合は二重処理を避ける
     if (resultMessageElement.style.display === 'block') return;
 
-    // 時間切れの場合はボタンを無効化
     if (selectedChoice === 'TIME_UP') {
-        resultMessageElement.textContent = `🚨 時間切れです！`;
+        resultMessageElement.textContent = `🚨 じかんぎれです！`;
     }
     
     const isCorrect = (selectedChoice === correctAnswer);
     
-    // 全てのボタンを無効化
     disableAllButtons();
     
     if (isCorrect) {
-        // ★★★ 正解時の処理 ★★★
         playSound(SOUND_CORRECT_PATH);
         
         score++;
-        resultMessageElement.textContent = "✅ 正解です！次の問題へ進みます。";
+        resultMessageElement.textContent = "✅ せいかい！つぎの もんだいへ すすみます。";
         resultMessageElement.classList.remove('incorrect');
         resultMessageElement.classList.add('correct');
         if (clickedButton) clickedButton.classList.add('correct-answer'); 
@@ -254,14 +232,12 @@ function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
         }, 1500); 
         
     } else {
-        // ★★★ 不正解時の処理 ★★★
         playSound(SOUND_INCORRECT_PATH);
         
-        wrongAnswerCount++; // 間違い回数をカウント
+        wrongAnswerCount++; 
         
-        // 3回間違えてゲームオーバーの場合
         if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
-            resultMessageElement.textContent = `🚨 残念！${MAX_WRONG_ANSWERS}回間違えました。ゲームオーバーです。`;
+            resultMessageElement.textContent = `🚨 ざんねん！${MAX_WRONG_ANSWERS}かい まちがえました。ゲームオーバーです。`;
             resultMessageElement.classList.remove('correct');
             resultMessageElement.classList.add('incorrect');
             resultMessageElement.style.display = 'block';
@@ -272,28 +248,24 @@ function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
             return;
         }
 
-        // まだチャンスがある場合
-        const msg = selectedChoice === 'TIME_UP' ? `❌ 時間切れです。` : `❌ 不正解です。`;
-        resultMessageElement.textContent = `${msg} 残り間違い ${MAX_WRONG_ANSWERS - wrongAnswerCount} 回。`;
+        const msg = selectedChoice === 'TIME_UP' ? `❌ じかんぎれです。` : `❌ ふせいかいです。`;
+        resultMessageElement.textContent = `${msg} のこり まちがい ${MAX_WRONG_ANSWERS - wrongAnswerCount} かい。`;
         resultMessageElement.classList.remove('correct');
         resultMessageElement.classList.add('incorrect');
         
-        // 不正解の選択肢は赤く表示
         if (clickedButton) {
             clickedButton.style.backgroundColor = '#f8d7da'; 
             clickedButton.style.color = '#721c24';
         }
 
-        // 正解を表示
         Array.from(choicesContainer.children).forEach(button => {
             if (button.textContent === correctAnswer) {
-                 button.style.backgroundColor = '#c3e6cb'; // 正解のハイライト
+                 button.style.backgroundColor = '#c3e6cb'; 
             }
         });
         
         resultMessageElement.style.display = 'block';
         
-        // 間違い後は少し待ってから次の問題へ（再挑戦はなし、時間制限があるため）
         setTimeout(() => {
             currentQuestionIndex++;
             displayQuestion();
@@ -314,22 +286,22 @@ function disableAllButtons() {
  * クイズを終了し、結果を表示する
  */
 function endQuiz(isGameOver) {
-    if (timerId) clearInterval(timerId); // タイマーを確実に止める
+    if (timerId) clearInterval(timerId); 
 
     choicesContainer.innerHTML = ''; 
     choicesContainer.style.display = 'none'; 
 
     if (isGameOver) {
         questionNumberElement.textContent = "ゲームオーバー！";
-        questionTextElement.textContent = "残念！最初からやり直しましょう。";
+        questionTextElement.textContent = "ざんねん！はじめから やりなおしましょう。";
         finalScoreElement.style.color = '#dc3545'; 
     } else {
-        questionNumberElement.textContent = "クイズクリア！";
-        questionTextElement.textContent = "全問正解しました！おめでとうございます！";
+        questionNumberElement.textContent = "クイズ クリア！";
+        questionTextElement.textContent = "ぜんもん せいかいしました！おめでとう！";
         finalScoreElement.style.color = '#28a745'; 
     }
 
-    finalScoreElement.textContent = `正解数: ${score} 問`;
+    finalScoreElement.textContent = `せいかいした もんだい: ${score} もん`;
     finalScoreElement.style.display = 'block';
 
     homeButton.style.display = 'inline-block';

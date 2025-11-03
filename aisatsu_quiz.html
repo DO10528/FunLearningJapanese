@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>挨拶クイズ</title>
+    <title>あいさつクイズ (10びょうせいげん)</title>
     <link rel="stylesheet" href="assets/css/style.css"> 
     <style>
-        /* CSSスタイルはkanji_quizと似たものを使用します */
+        /* CSSスタイルはkanji_quizと統一感を持ちます */
         body { 
             font-family: 'Arial', sans-serif; 
             max-width: 700px; 
@@ -19,7 +19,7 @@
         }
         h1 { 
             text-align: center; 
-            color: #008080; /* テーマカラーを調整 */
+            color: #008080; /* テーマカラー */
             margin-bottom: 30px;
         }
         .quiz-container { 
@@ -27,23 +27,6 @@
             padding: 25px; 
             border-radius: 8px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* 画像エリア (今回は不要な可能性もありますが、構造を維持) */
-        .image-box { 
-            text-align: center; 
-            margin-bottom: 20px; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 8px; 
-            padding: 10px; 
-            background-color: #fafafa;
-        }
-        .image-box img { 
-            max-width: 100%; 
-            height: auto; 
-            max-height: 200px;
-            border-radius: 5px; 
-            object-fit: contain; 
         }
 
         /* 質問エリア */
@@ -56,7 +39,23 @@
             color: #555; 
             margin-bottom: 10px;
         }
+        
+        /* タイマー表示エリア */
+        #timer-box {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            background-color: #ff6347; /* 目立つ色 */
+            width: 180px; /* 少し幅を広げる */
+            margin: 15px auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 状況説明（問題文）のスタイル */
         #question-text { 
+            font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif; 
             font-size: 1.4em; 
             font-weight: bold; 
             color: #2a2a2a;
@@ -70,19 +69,6 @@
             text-align: center;
         }
 
-        /* ★追加: 制限時間表示エリア */
-        #timer-box {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: white;
-            background-color: #ff6347; /* 赤系の目立つ色 */
-            width: 150px;
-            margin: 15px auto;
-            padding: 5px 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
         /* 選択肢ボタン */
         .choices { 
             display: grid; 
@@ -126,22 +112,24 @@
         
         /* 最終スコア */
         #final-score { text-align: center; font-size: 1.8em; color: #008080; margin-top: 30px; background-color: #e6ffff; padding: 20px; border-radius: 8px; }
+
+        /* 画像エリアは構造上残しますが、今回のクイズでは非表示を維持 */
+        .image-box { display:none; }
     </style>
 </head>
 <body>
 
-    <h1>挨拶クイズ</h1>
+    <h1>あいさつ クイズ (10びょうせいげん)</h1>
 
     <div class="quiz-container">
         
-        <div class="image-box" style="display:none;">
-            <img id="quiz-image" src="" alt="クイズ画像">
-        </div>
-
         <div class="question-area">
-            <p id="question-number">第 1 問</p>
-            <div id="timer-box">残り 5 秒</div> <p id="question-prompt">問題文が表示されます：</p>
-            <h2 id="question-text">挨拶文を選びなさい</h2> 
+            <p id="question-number">だい 1 もん</p>
+            <div id="timer-box">のこり 10 びょう</div> 
+            
+            <p id="question-prompt">ただしい あいさつを えらんでね：</p>
+            
+            <h2 id="question-text">もんだいぶんが ひょうじされます...</h2> 
         </div>
 
         <div class="choices" id="choices-container">
@@ -154,8 +142,8 @@
             </div>
 
         <div class="navigation-buttons">
-            <button id="home-button">ホームに戻る</button>
-            <button id="restart-button" style="display: none;">もう一度プレイ</button>
+            <button id="home-button">ホームにもどる</button>
+            <button id="restart-button" style="display: none;">もういちど あそぶ</button>
         </div>
     </div>
 
