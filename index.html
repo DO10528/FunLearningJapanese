@@ -2,96 +2,63 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Fun Learning Japanese</title> 
-    <link rel="stylesheet" href="css/style.css"> 
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画の再生</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* メインコンテナ（白）の中のグループ分け */
-        .menu-group {
-            background-color: #f0f8ff; /* 薄い青色の背景 */
-            border: 2px solid #5c7aff;  /* kiso.html と色を合わせる */
-            border-radius: 15px;
-            padding: 15px 20px;
-            margin-bottom: 25px; /* 2つのグループ間の余白 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        /* グループのタイトル (h2) */
-        .menu-group h2 {
+        .container {
+            max-width: 800px;
             text-align: center;
-            color: #5c7aff; /* 青色 */
-            font-size: 1.5em;
-            margin-bottom: 20px;
         }
-
-        /* 既存のグリッドスタイルをそのまま利用 */
-        /* .menu-buttons-grid は css/style.css で定義されています */
+        #video-player {
+            width: 100%;
+            max-width: 720px;
+            height: auto;
+            background-color: #000;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        #video-title {
+            color: #333;
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <body>
-    
-    <h1>Fun Learning Japanese</h1>
-    
-    <div id="main-menu" class="container">
+
+    <h1>🎥 ひらがな練習</h1>
+
+    <div class="container">
         
-        <div class="menu-group">
-            <h2>きそ・たんごリスト</h2>
-            
-            <div class="menu-buttons-grid">
-                
-                <a href="kiso.html" class="menu-card-button menu-card-reset">
-                    📝<br>ひらがな・カタカナ基礎
-                </a>
-                
-                <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset">
-                    📚<br>形容詞リスト
-                </a>
-                
-                <a href="kanji_list.html" class="menu-card-button menu-card-reset">
-                    📖<br>漢字リスト (小1)
-                </a>
-
-            </div>
-        </div>
-
-        <div class="menu-group">
-            <h2>なにをしてあそぶ?</h2>
-
-            <div class="menu-buttons-grid">
-            
-                <a href="hiragana.html" class="menu-card-button menu-card-reset">
-                    🎮<br>ひらがな単語ゲーム
-                </a>
-                
-                <a href="hiragana2.html" class="menu-card-button menu-card-reset">
-                    ⭐<br>ひらがなゲーム2 (並び替え)
-                </a>
-                
-                <a href="shiritori.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>しりとりゲーム
-                </a>
-                
-                <a href="keiyoshi.html" class="menu-card-button menu-card-reset">
-                    🤔<br>形容詞クイズ
-                </a>
-                
-                <a href="kanji_quiz.html" class="menu-card-button menu-card-reset">
-                    🈳<br>漢字クイズ (小1)
-                </a>
-                
-                <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>挨拶クイズ (10秒制限)
-                </a>
-                
-            </div>
-        </div>
+        <h2 id="video-title">...</h2>
         
+        <video id="video-player" controls autoplay playsinline>
+            <p>お使いのブラウザは動画の再生に対応していません。</p>
+        </video>
+
+        <div class="navigation-buttons" style="margin-top: 30px;">
+            <button onclick="window.location.href='hiragana_video_list.html'">リストにもどる</button>
+        </div>
     </div>
-    
-    <div id="game-area" class="container" style="display:none;">
-        <p>ゲームを読み込んでいます...</p>
-    </div>
-    
+
+    <script>
+        // ページが読み込まれたら、URLから動画ファイル名を取得して再生します
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoFile = urlParams.get('video'); // ?video= の値
+            const videoTitle = urlParams.get('title'); // ?title= の値
+
+            const videoPlayer = document.getElementById('video-player');
+            const titleElement = document.getElementById('video-title');
+
+            if (videoFile) {
+                videoPlayer.src = videoFile;
+                titleElement.textContent = videoTitle || '動画'; // タイトルがなければ「動画」と表示
+            } else {
+                titleElement.textContent = 'エラー: 動画が見つかりません。';
+            }
+        });
+    </script>
+
 </body>
 </html>
