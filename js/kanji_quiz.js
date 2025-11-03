@@ -15,21 +15,24 @@ let kanjiList = [];
 let quizQuestions = [];     
 let currentQuestionIndex = 0; 
 let score = 0;              
-let currentMode = 'kun'; // ★追加: 現在の出題モードを保持
-const QUIZ_TOTAL_QUESTIONS = 5; 
-const CHOICES_COUNT = 3;    
+let currentMode = 'kun'; 
+
+// ★変更点★ 制限とカウンターの追加
+const MAX_WRONG_ANSWERS = 3;    // 間違いの許容回数
+let wrongAnswerCount = 0;       // 現在の間違い回数
+const CHOICES_COUNT = 3;        // 選択肢の数 (変更なし)
 
 // DOM要素の取得
 const quizImageElement = document.getElementById('quiz-image');
 const questionNumberElement = document.getElementById('question-number');
 const questionTextElement = document.getElementById('question-text');
-const questionPromptElement = document.getElementById('question-prompt'); // ★追加
+const questionPromptElement = document.getElementById('question-prompt'); 
 const choicesContainer = document.getElementById('choices-container');
 const resultMessageElement = document.getElementById('result-message');
 const homeButton = document.getElementById('home-button');
 const restartButton = document.getElementById('restart-button');
 const finalScoreElement = document.getElementById('final-score');
-const modeSelectionRadios = document.querySelectorAll('input[name="readingMode"]'); // ★追加
+const modeSelectionRadios = document.querySelectorAll('input[name="readingMode"]'); 
 
 /**
  * 指定されたパスの音源を再生する関数
@@ -59,11 +62,9 @@ async function initializeQuiz() {
         });
         restartButton.addEventListener('click', startNewQuiz);
 
-        // ★モード選択のイベントリスナーを設定
         modeSelectionRadios.forEach(radio => {
             radio.addEventListener('change', (event) => {
                 currentMode = event.target.value;
-                // モードが変更されたら、クイズをリセットして開始
                 startNewQuiz(); 
             });
         });
@@ -83,7 +84,9 @@ async function initializeQuiz() {
 function startNewQuiz() {
     currentQuestionIndex = 0;
     score = 0;
-    quizQuestions = generateQuizQuestions();
+    wrongAnswerCount = 0; // ★リセット
+    // 漢字リストの数が総出題数として扱われます
+    quizQuestions = generateQuizQuestions(kanjiList.length); 
 
     resultMessageElement.style.display = 'none';
     finalScoreElement.style.display = 'none';
@@ -96,69 +99,61 @@ function startNewQuiz() {
 
 /**
  * 漢字アイテムから出題モードに基づいた正解の読み方を取得する
- * @param {object} item - 漢字データオブジェクト
- * @param {string} mode - 'kun' または 'on'
- * @returns {string | null} 正解の読み方、または null
  */
 function getCorrectReading(item, mode) {
     if (mode === 'kun' && item.kun) {
-        // 訓読みが存在すれば最初の一つを返す
         return item.kun.split('・')[0].trim();
     }
     if (mode === 'on' && item.on) {
-        // 音読みが存在すれば最初の一つを返す
         return item.on.split('・')[0].trim();
     }
-    // どちらの読み方も存在しない、またはモードが不正な場合は null
     return null; 
 }
 
 
 /**
- * クイズの問題リストを生成する
+ * クイズの問題リストを生成する (全漢字リストからシャッフル)
  */
-function generateQuizQuestions() {
-    const questions = [];
-    const usedKanji = new Set(); 
+function generateQuizQuestions(totalQuestions) {
+    const shuffledKanji = [...kanjiList]; // リストを複製
     
+    // 選択されたモードの読み方が存在する漢字のみをフィルタリング
+    const availableKanji = shuffledKanji.filter(item => getCorrectReading(item, currentMode) !== null);
+
+    // シャッフル
+    for (let i = availableKanji.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [availableKanji[i], availableKanji[j]] = [availableKanji[j], availableKanji[i]];
+    }
+    
+    const questions = [];
+
     // 選択されたモードに基づいて出題プロンプトを更新
     const promptText = currentMode === 'on' ? "この漢字の**音読み**を選びなさい：" : "この漢字の**訓読み**を選びなさい：";
     questionPromptElement.innerHTML = promptText;
 
-    while (questions.length < QUIZ_TOTAL_QUESTIONS) {
-        let correctItem;
-        let correctReading = null;
-
-        // 正解かつ、選択されたモードの読み方が存在する漢字を見つける
-        do {
-            const randomIndex = Math.floor(Math.random() * kanjiList.length);
-            correctItem = kanjiList[randomIndex];
-            correctReading = getCorrectReading(correctItem, currentMode);
-        } while (usedKanji.has(correctItem.kanji) || correctReading === null);
-
-        usedKanji.add(correctItem.kanji); 
+    for (let i = 0; i < availableKanji.length; i++) {
+        const correctItem = availableKanji[i];
+        const correctReading = getCorrectReading(correctItem, currentMode);
         
         // ダミーの選択肢を選ぶ
         let wrongReadings = [];
-        while (wrongReadings.length < CHOICES_COUNT - 1) {
-            const randomIndex = Math.floor(Math.random() * kanjiList.length);
-            const dummyItem = kanjiList[randomIndex];
-            
-            // ダミーの読み方を取得 (ここでは簡単のため、出題モードに関係なく最初の読み方をダミーに使う)
-            const dummyReading = getCorrectReading(dummyItem, currentMode) || getCorrectReading(dummyItem, currentMode === 'kun' ? 'on' : 'kun');
+        const allReadings = kanjiList.map(item => getCorrectReading(item, currentMode)).filter(r => r !== null && r !== correctReading);
 
-            if (dummyReading !== null && dummyReading !== correctReading && 
-                !wrongReadings.includes(dummyReading)) {
-                wrongReadings.push(dummyReading);
-            }
+        // 重複のないダミー選択肢をランダムに2つ選ぶ
+        while (wrongReadings.length < CHOICES_COUNT - 1 && allReadings.length > 0) {
+            const randomIndex = Math.floor(Math.random() * allReadings.length);
+            const dummyReading = allReadings.splice(randomIndex, 1)[0]; // 選んだものをリストから削除
+            
+            wrongReadings.push(dummyReading);
         }
         
         const choices = [correctReading, ...wrongReadings];
         
         // 選択肢をシャッフル
-        for (let i = choices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [choices[i], choices[j]] = [choices[j], choices[i]];
+        for (let j = choices.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [choices[j], choices[k]] = [choices[k], choices[j]];
         }
 
         // 問題オブジェクトとして追加
@@ -190,6 +185,12 @@ function displayQuestion() {
     resultMessageElement.style.display = 'none';
     resultMessageElement.className = 'result-message';
     
+    // ゲームオーバー判定
+    if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
+        endQuiz(true); // ★ゲームオーバー
+        return;
+    }
+
     // 全てのボタンを有効化（再挑戦のため）
     Array.from(choicesContainer.children).forEach(button => {
         button.disabled = false;
@@ -198,8 +199,9 @@ function displayQuestion() {
         button.style.borderColor = '';
     });
     
-    if (currentQuestionIndex >= QUIZ_TOTAL_QUESTIONS) {
-        endQuiz();
+    // 全問終了判定
+    if (currentQuestionIndex >= quizQuestions.length) {
+        endQuiz(false); // ★全問正解でクリア
         return;
     }
 
@@ -208,7 +210,9 @@ function displayQuestion() {
     quizImageElement.src = question.image;
     quizImageElement.alt = `クイズ画像 ${currentQuestionIndex + 1}`;
 
-    questionNumberElement.textContent = `第 ${currentQuestionIndex + 1} 問 (全 ${QUIZ_TOTAL_QUESTIONS} 問)`;
+    // 問題番号と間違い回数を表示
+    questionNumberElement.textContent = 
+        `第 ${currentQuestionIndex + 1} 問 (残り間違い ${MAX_WRONG_ANSWERS - wrongAnswerCount} 回)`; 
     questionTextElement.textContent = question.kanji; 
     
     question.choices.forEach(choice => {
@@ -229,7 +233,7 @@ function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
     const isCorrect = (selectedChoice === correctAnswer);
     
     if (isCorrect) {
-        // ★★★ 正解時の音源再生 ★★★
+        // ★★★ 正解時の処理 ★★★
         playSound(SOUND_CORRECT_PATH);
         
         score++;
@@ -238,7 +242,7 @@ function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
         resultMessageElement.classList.add('correct');
         clickedButton.classList.add('correct-answer'); 
 
-        // 全てのボタンを無効化（次の問題へ進むため）
+        // 次の問題へ進むため、全てのボタンを無効化
         disableAllButtons();
         resultMessageElement.style.display = 'block';
         
@@ -248,19 +252,41 @@ function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
         }, 1500); 
         
     } else {
-        // ★★★ 不正解時の音源再生 ★★★
+        // ★★★ 不正解時の処理 ★★★
         playSound(SOUND_INCORRECT_PATH);
         
-        resultMessageElement.textContent = `❌ 不正解です。もう一度挑戦してください。`;
+        wrongAnswerCount++; // ★間違い回数をカウント
+        
+        // 3回間違えてゲームオーバーの場合
+        if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
+            // エラーメッセージを表示して、ゲームオーバー処理へ移行
+            resultMessageElement.textContent = `🚨 残念！${MAX_WRONG_ANSWERS}回間違えました。ゲームオーバーです。`;
+            resultMessageElement.classList.remove('correct');
+            resultMessageElement.classList.add('incorrect');
+            resultMessageElement.style.display = 'block';
+            disableAllButtons(); // ボタンを無効化
+            
+            setTimeout(() => {
+                endQuiz(true);
+            }, 2500);
+            return;
+        }
+
+        // まだチャンスがある場合
+        resultMessageElement.textContent = `❌ 不正解です。残り間違い ${MAX_WRONG_ANSWERS - wrongAnswerCount} 回。`;
         resultMessageElement.classList.remove('correct');
         resultMessageElement.classList.add('incorrect');
         
-        // 不正解のボタンを無効化
+        // 不正解のボタンを無効化（再挑戦不可）
         clickedButton.disabled = true; 
         clickedButton.style.backgroundColor = '#f8d7da'; 
         clickedButton.style.color = '#721c24';
         
         resultMessageElement.style.display = 'block';
+        
+        // 問題番号を更新して残り間違い回数を表示
+        questionNumberElement.textContent = 
+            `第 ${currentQuestionIndex + 1} 問 (残り間違い ${MAX_WRONG_ANSWERS - wrongAnswerCount} 回)`; 
     }
 }
 
@@ -275,10 +301,9 @@ function disableAllButtons() {
 
 /**
  * クイズを終了し、結果を表示する
+ * @param {boolean} isGameOver - trueなら間違いすぎによるゲームオーバー
  */
-function endQuiz() {
-    questionNumberElement.textContent = "クイズ終了！";
-    questionTextElement.textContent = "全問終了しました。お疲れ様でした！";
+function endQuiz(isGameOver) {
     choicesContainer.innerHTML = ''; 
     choicesContainer.style.display = 'none'; 
 
@@ -287,7 +312,17 @@ function endQuiz() {
 
     resultMessageElement.style.display = 'none'; 
 
-    finalScoreElement.textContent = `${QUIZ_TOTAL_QUESTIONS} 問中 ${score} 問正解でした！`;
+    if (isGameOver) {
+        questionNumberElement.textContent = "ゲームオーバー！";
+        questionTextElement.textContent = "残念！最初からやり直しましょう。";
+        finalScoreElement.style.color = '#dc3545'; // 赤系の色
+    } else {
+        questionNumberElement.textContent = "クイズクリア！";
+        questionTextElement.textContent = "全問正解しました！おめでとうございます！";
+        finalScoreElement.style.color = '#28a745'; // 緑系の色
+    }
+
+    finalScoreElement.textContent = `正解数: ${score} 問`;
     finalScoreElement.style.display = 'block';
 
     homeButton.style.display = 'inline-block';
