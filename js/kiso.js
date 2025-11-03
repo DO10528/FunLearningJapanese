@@ -204,28 +204,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. ----------------- データ構造の定義 -----------------
 
     // 3a. 清音 (Seion) - 50音 (10列の縦レイアウト)
-    // (これがユーザーが修正を依頼した「3a」セクションです)
+    // ★レイアウト変更: 伝統的な「わ行」が左、「あ行」が右になるように配列の順序を逆にします。
     const SEION_COLUMNS = [
-        // 1列目 (あ行)
-        [ { hira: 'あ', kata: 'ア' }, { hira: 'い', kata: 'イ' }, { hira: 'う', kata: 'ウ' }, { hira: 'え', kata: 'エ' }, { hira: 'お', kata: 'オ' } ],
-        // 2列目 (か行)
-        [ { hira: 'か', kata: 'カ' }, { hira: 'き', kata: 'キ' }, { hira: 'く', kata: 'ク' }, { hira: 'け', kata: 'ケ' }, { hira: 'こ', kata: 'コ' } ],
-        // 3列目 (さ行)
-        [ { hira: 'さ', kata: 'サ' }, { hira: 'し', kata: 'シ' }, { hira: 'す', kata: 'ス' }, { hira: 'せ', kata: 'セ' }, { hira: 'そ', kata: 'ソ' } ],
-        // 4列目 (た行)
-        [ { hira: 'た', kata: 'タ' }, { hira: 'ち', kata: 'チ' }, { hira: 'つ', kata: 'ツ' }, { hira: 'て', kata: 'テ' }, { hira: 'と', kata: 'ト' } ],
-        // 5列目 (な行)
-        [ { hira: 'な', kata: 'ナ' }, { hira: 'に', kata: 'ニ' }, { hira: 'ぬ', kata: 'ヌ' }, { hira: 'ね', kata: 'ネ' }, { hira: 'の', kata: 'ノ' } ],
-        // 6列目 (は行)
-        [ { hira: 'は', kata: 'ハ' }, { hira: 'ひ', kata: 'ヒ' }, { hira: 'ふ', kata: 'フ' }, { hira: 'へ', kata: 'ヘ' }, { hira: 'ほ', kata: 'ホ' } ],
-        // 7列目 (ま行)
-        [ { hira: 'ま', kata: 'マ' }, { hira: 'み', kata: 'ミ' }, { hira: 'む', kata: 'ム' }, { hira: 'め', kata: 'メ' }, { hira: 'も', kata: 'モ' } ],
-        // 8列目 (や行)
-        [ { hira: 'や', kata: 'ヤ' }, null, { hira: 'ゆ', kata: 'ユ' }, null, { hira: 'よ', kata: 'ヨ' } ],
+        // 10列目 (わ行) ※これがCSS Gridの1列目（左端）になります
+        [ { hira: 'わ', kata: 'ワ' }, { hira: 'を', kata: 'ヲ' }, null, null, { hira: 'ん', kata: 'ン' } ],
         // 9列目 (ら行)
         [ { hira: 'ら', kata: 'ラ' }, { hira: 'り', kata: 'リ' }, { hira: 'る', kata: 'ル' }, { hira: 'れ', kata: 'レ' }, { hira: 'ろ', kata: 'ロ' } ],
-        // 10列目 (わ行)
-        [ { hira: 'わ', kata: 'ワ' }, { hira: 'を', kata: 'ヲ' }, null, null, { hira: 'ん', kata: 'ン' } ]
+        // 8列目 (や行)
+        [ { hira: 'や', kata: 'ヤ' }, null, { hira: 'ゆ', kata: 'ユ' }, null, { hira: 'よ', kata: 'ヨ' } ],
+        // 7列目 (ま行)
+        [ { hira: 'ま', kata: 'マ' }, { hira: 'み', kata: 'ミ' }, { hira: 'む', kata: 'ム' }, { hira: 'め', kata: 'メ' }, { hira: 'も', kata: 'モ' } ],
+        // 6列目 (は行)
+        [ { hira: 'は', kata: 'ハ' }, { hira: 'ひ', kata: 'ヒ' }, { hira: 'ふ', kata: 'フ' }, { hira: 'へ', kata: 'ヘ' }, { hira: 'ほ', kata: 'ホ' } ],
+        // 5列目 (な行)
+        [ { hira: 'な', kata: 'ナ' }, { hira: 'に', kata: 'ニ' }, { hira: 'ぬ', kata: 'ヌ' }, { hira: 'ね', kata: 'ネ' }, { hira: 'の', kata: 'ノ' } ],
+        // 4列目 (た行)
+        [ { hira: 'た', kata: 'タ' }, { hira: 'ち', kata: 'チ' }, { hira: 'つ', kata: 'ツ' }, { hira: 'て', kata: 'テ' }, { hira: 'と', kata: 'ト' } ],
+        // 3列目 (さ行)
+        [ { hira: 'さ', kata: 'サ' }, { hira: 'し', kata: 'シ' }, { hira: 'す', kata: 'ス' }, { hira: 'せ', kata: 'セ' }, { hira: 'そ', kata: 'ソ' } ],
+        // 2列目 (か行)
+        [ { hira: 'か', kata: 'カ' }, { hira: 'き', kata: 'キ' }, { hira: 'く', kata: 'ク' }, { hira: 'け', kata: 'ケ' }, { hira: 'こ', kata: 'コ' } ],
+        // 1列目 (あ行) ※これがCSS Gridの10列目（右端）になります
+        [ { hira: 'あ', kata: 'ア' }, { hira: 'い', kata: 'イ' }, { hira: 'う', kata: 'ウ' }, { hira: 'え', kata: 'エ' }, { hira: 'お', kata: 'オ' } ]
     ];
 
     // 3b. 濁音 (Dakuon) - 3列テーブル用
