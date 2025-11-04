@@ -40,8 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 単語の読みを正規化し、しりとりで使う最後の文字（長音、小書き仮名処理済み）を返す
-     * ★濁音・半濁音を区別するために、そのまま返すように修正
+     * 単語の読みを正規化し、しりとりで使う次の文字を返す
      * @param {string} reading - 単語の読み（ひらがな）
      * @returns {string} しりとりで使う次の文字
      */
@@ -58,6 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const smallKana = {'ゃ': 'や', 'ゅ': 'ゆ', 'ょ': 'よ'};
         return smallKana[lastChar] || lastChar;
     }
+    
+    /**
+     * 不正解の場合にカードを元の場所に戻す
+     * @param {HTMLElement} card - 戻すカード要素
+     */
+    function restoreCardToSelectionArea(card) {
+        CARD_SELECTION_AREA.appendChild(card);
+        // カードのスタイルをリセット
+        card.classList.remove('dragging', 'incorrect-drop');
+        card.style.opacity = '1';
+        card.style.transform = 'none';
+        
+        // カードを元の場所（リストの最後）に戻すと探しにくくなるため、
+        // 最初の表示順に近い状態にソートしても良いが、今回はシンプルにリストの最後に戻す
+    }
+
 
     // ----------------------------------------------------
     // 1. ゲームの初期化と開始
@@ -86,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function setupGame() {
-        // ... (省略: UIの初期化は変更なし) ...
         if (allWords.length < MAX_WORDS) {
             alert(`エラー: ゲームに必要な単語数が不足しています。（${MAX_WORDS}語必要です）`);
             return;
@@ -103,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 16マスを再生成 (1マス目は固定)
         // 「しりとり」の次の文字は「り」
         SHIRITORI_GRID.innerHTML = `
-            <div id="cell-0" class="grid-cell filled" data-word="しりとり" data-last-char="り" data-next-char="り">
+            <div id="cell-0" class="grid-cell filled" data-word="しりとり" data-next-char="り">
                 <span class="word-text">しりとり</span>
             </div>
         `;
@@ -118,18 +132,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ----------------------------------------------------
-    // 2. カードの選択と表示 (修正版)
+    // 2. カードの選択と表示 (優先選出ロジックを修正)
     // ----------------------------------------------------
 
     function selectAndRenderCards() {
-        const chainLength = MAX_WORDS; // 15
+        const chainLength = MAX_WORDS; 
         
-        // 1. 15個の連続するしりとりチェーンを探索する (修正されたfindShiritoriChainを使用)
+        // 1. 15個の連続するしりとりチェーンを探索する
         let selectedChain = findShiritoriChain(chainLength);
 
         if (selectedChain.length < chainLength) {
-            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットしてください。';
-            // データが不足している場合や、うまく連鎖が見つからない場合に備え、エラーを詳細に表示
+            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。データを見直すか、リセットしてください。';
             console.error("しりとりチェーンが見つかりませんでした。データを確認してください。", selectedChain);
             return;
         }
@@ -137,16 +150,17 @@ document.addEventListener('DOMContentLoaded', () => {
         gameWords = selectedChain;
         CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`;
         
+        // ユーザーが自分で正しい順序を探せるよう、シャッフルしたカードを表示
         shuffleArray(gameWords).forEach(word => {
-            const nextChar = getNextChar(word.reading); // 次の単語の開始文字
+            const nextChar = getNextChar(word.reading); // この単語の終わりの文字
             const card = document.createElement('div');
             
             card.className = 'word-card';
             card.draggable = true;
             card.dataset.word = word.word;
             card.dataset.reading = word.reading;
-            card.dataset.nextChar = nextChar; // この単語の終わりの文字
-            card.dataset.firstChar = word.reading.charAt(0); // この単語の最初の文字
+            card.dataset.nextChar = nextChar;
+            card.dataset.firstChar = word.reading.charAt(0);
             
             card.innerHTML = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image">
@@ -157,48 +171,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 指定された長さのしりとりチェーンを探索する (バックトラック方式)
-     * ★ここが核心の修正箇所です
-     * @param {number} length - 必要なチェーンの長さ
-     * @returns {Array<object>} 見つかった単語の配列
+     * 指定された長さのしりとりチェーンを探索する (濁音・半濁音考慮、初期単語優先)
      */
     function findShiritoriChain(length) {
-        // 「ん」で終わるものを除外したリスト
         let allAvailable = allWords.filter(word => getNextChar(word.reading) !== 'ん');
         if (allAvailable.length < length) return []; 
         
         const startChar = 'り'; // 最初の単語「しりとり」の終わり
-        let chain = [];
-        let usedIds = new Set();
         let attempts = 0;
-        const maxAttempts = 200; // 試行回数を少し増やす
+        const maxAttempts = 500; // 試行回数を増やして成功率を上げる
 
-        // 濁音・半濁音変換マップ（最初の文字をこれでチェックする）
         const SHIRITORI_MAP = {
+            // ... (濁音・半濁音マップは変更なし) ...
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
             'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
             'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
             'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
         };
 
-        // 成功するまで何度も試行する
         while (attempts < maxAttempts) {
-            chain = [];
-            usedIds.clear();
+            let chain = [];
+            let usedIds = new Set();
             let currentLastChar = startChar;
             
-            for (let i = 0; i < length; i++) {
+            // ★★★ 改善点 1: 最初の「り」から始まる単語を優先して選ぶ ★★★
+            let candidates = allAvailable.filter(word => word.reading.charAt(0) === startChar && !usedIds.has(word.id));
+            if (candidates.length === 0) {
+                 // 「り」から始まる単語が1つもない場合はエラー
+                 if (attempts === 0) console.error("「り」から始まる単語がありません。");
+                 attempts++;
+                 continue;
+            }
+            
+            // 最初の単語を決定し、チェーンに追加
+            const firstWord = candidates[Math.floor(Math.random() * candidates.length)];
+            chain.push(firstWord);
+            usedIds.add(firstWord.id);
+            currentLastChar = getNextChar(firstWord.reading);
+
+
+            for (let i = 1; i < length; i++) { // 2番目の単語から探索
                 const requiredChars = [currentLastChar];
                 
-                // 濁音・半濁音の前の文字（清音）の場合、その濁音・半濁音も許容する
-                // 例: 「り」-> 「り」で始まる単語を探す
-                // 例: 「か」-> 「か」または「が」で始まる単語を探す
+                // 濁音・半濁音の許容ルールを適用
+                if (SHIRITORI_MAP[currentLastChar]) {
+                    requiredChars.push(...SHIRITORI_MAP[currentLastChar]);
+                }
                 for (const [key, values] of Object.entries(SHIRITORI_MAP)) {
                     if (values.includes(currentLastChar)) {
                         requiredChars.push(key);
-                        break; // 既に見つかったらループを抜ける
-                    } else if (key === currentLastChar) {
-                        requiredChars.push(...values);
                         break;
                     }
                 }
@@ -213,24 +234,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 }
                 
-                // ランダムに次の単語を選択
                 const nextWord = candidates[Math.floor(Math.random() * candidates.length)];
                 
                 chain.push(nextWord);
                 usedIds.add(nextWord.id);
-                // 次の単語の最後の文字を設定
                 currentLastChar = getNextChar(nextWord.reading); 
             }
 
             if (chain.length === length) {
-                return chain; // 成功！
+                return chain; 
             }
             attempts++;
-            // 試行回数が増えたら、次の単語の選択に使うリストをリフレッシュする
-            allAvailable = shuffleArray(allAvailable); 
         }
 
-        return []; // 最大試行回数に達しても見つからなかった場合
+        return []; 
     }
 
     // ----------------------------------------------------
@@ -238,10 +255,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
 
     function setupDragAndDropListeners() {
-        // ... (変更なし) ...
-        // 省略
+        // ドラッグ開始/終了 (変更なし)
+
+        CARD_SELECTION_AREA.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('word-card')) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.word);
+                e.target.classList.add('dragging');
+                // ★追加: カードをドロップターゲットのマスにドロップされるまで隠す
+                e.target.style.opacity = '0.5'; 
+            }
+        });
+
+        CARD_SELECTION_AREA.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('word-card')) {
+                e.target.classList.remove('dragging');
+                // ドロップ成功しなかった場合、透明度を元に戻す（handleDropで成功時に消す）
+                if (e.target.parentNode === CARD_SELECTION_AREA) {
+                    e.target.style.opacity = '1';
+                }
+            }
+        });
+
+        // ドロップターゲット（マス）のイベント
+        SHIRITORI_GRID.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.drop-target');
+            if (dropTarget && !dropTarget.classList.contains('filled')) {
+                dropTarget.classList.add('drag-over');
+            }
+        });
+
+        SHIRITORI_GRID.addEventListener('dragleave', (e) => {
+            const target = e.target.closest('.drop-target');
+            if (target) {
+                target.classList.remove('drag-over');
+            }
+        });
+
         SHIRITORI_GRID.addEventListener('drop', handleDrop);
 
+        // リセットボタンとメニューボタン
         RESET_BUTTON.addEventListener('click', resetGame);
         BACK_BUTTON.addEventListener('click', () => {
             GAME_AREA.style.display = 'none';
@@ -249,12 +302,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     function handleDrop(e) {
         e.preventDefault();
-        e.target.classList.remove('drag-over');
+        
+        let dropTarget = e.target.closest('.drop-target');
+        
+        if (!dropTarget || dropTarget.classList.contains('filled')) return;
 
-        const dropTarget = e.target.closest('.drop-target');
-        if (!dropTarget) return;
+        dropTarget.classList.remove('drag-over');
 
         const droppedWord = e.dataTransfer.getData('text/plain');
         const draggedCard = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
@@ -266,24 +322,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cellIndex === currentCellIndex) {
             checkAnswer(draggedCard, dropTarget);
         } else {
+            // 不正解マスへのドロップ
             playSound(SOUND_INCORRECT_PATH);
             FEEDBACK_MESSAGE.textContent = `❌ ${currentCellIndex + 1}マス目に入れてね！`;
             FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            
+            // ★追加: 不正解なマスにドロップしても、カードは元の場所に戻る
+            restoreCardToSelectionArea(draggedCard); 
         }
     }
     
     // ----------------------------------------------------
-    // 4. 正誤判定 (修正: 濁音・半濁音を考慮)
+    // 4. 正誤判定 (不正解時の復元処理を追加)
     // ----------------------------------------------------
 
     function checkAnswer(card, dropTarget) {
         const prevCell = document.getElementById(`cell-${currentCellIndex - 1}`);
-        const requiredChar = prevCell.dataset.nextChar; // 前の単語の次の文字（濁音・半濁音を含む）
-        const droppedFirstChar = card.dataset.firstChar; // ドロップされた単語の最初の文字
+        const requiredChar = prevCell.dataset.nextChar; 
+        const droppedFirstChar = card.dataset.firstChar; 
         
         let isCorrect = false;
 
-        // 濁音・半濁音の許容範囲マップ
         const SHIRITORI_ALLOW_MAP = {
             'か': ['か', 'が'], 'き': ['き', 'ぎ'], 'く': ['く', 'ぐ'], 'け': ['け', 'げ'], 'こ': ['こ', 'ご'],
             'さ': ['さ', 'ざ'], 'し': ['し', 'じ'], 'す': ['す', 'ず'], 'せ': ['せ', 'ぜ'], 'そ': ['そ', 'ぞ'],
@@ -301,14 +360,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // ★ 正解 ★
             playSound(SOUND_CORRECT_PATH);
             
-            // マスにカードを移動して固定
+            // マスにカードの内容をコピーして固定
             dropTarget.innerHTML = card.innerHTML;
             dropTarget.classList.remove('drop-target');
             dropTarget.classList.add('filled');
             dropTarget.dataset.word = card.dataset.word;
-            dropTarget.dataset.nextChar = card.dataset.nextChar; // 次の単語の開始文字を保存
+            dropTarget.dataset.nextChar = card.dataset.nextChar; 
 
-            // 元のカードを削除
+            // 元のカードを**削除**
             card.remove();
 
             // 次のマスに進む
@@ -327,6 +386,9 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(SOUND_INCORRECT_PATH);
             FEEDBACK_MESSAGE.textContent = `❌「${requiredChar}」から始まる言葉じゃないよ...。`;
             FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            
+            // ★★★ 修正点: カードを元の場所に戻す ★★★
+            restoreCardToSelectionArea(card);
         }
     }
     
@@ -335,17 +397,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
 
     function updateUI(isCorrectMove) {
-        const prevChar = document.getElementById(`cell-${currentCellIndex - 1}`).dataset.nextChar;
+        const prevCell = document.getElementById(`cell-${currentCellIndex - 1}`);
+        // prevCellがnullでないことを確認
+        if (!prevCell) return; 
+
+        const prevChar = prevCell.dataset.nextChar;
         const nextCellNumber = currentCellIndex + 1;
         
         GAME_STATUS_MESSAGE.textContent = `マス目 ${currentCellIndex} / ${MAX_WORDS}`;
         
         // UIのメッセージで、濁音/半濁音のルールをヒントとして出す
+        const HINT_CHARS = ['か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'は', 'ひ', 'ふ', 'へ', 'ほ'];
         let hint = '';
-        if (prevChar in {'か':1, 'き':1, 'く':1, 'け':1, 'こ':1, 'さ':1, 'し':1, 'す':1, 'せ':1, 'そ':1, 'た':1, 'ち':1, 'つ':1, 'て':1, 'と':1, 'は':1, 'ひ':1, 'ふ':1, 'へ':1, 'ほ':1}) {
-             hint = `（${prevChar}でも濁音/半濁音でもOK）`;
+        if (HINT_CHARS.includes(prevChar)) {
+             hint = `（または濁音/半濁音）`;
         }
-
 
         FEEDBACK_MESSAGE.textContent = `次は${nextCellNumber}マス目。「${prevChar}」${hint}から始まるカードをドロップしてね！`;
         FEEDBACK_MESSAGE.style.color = '#3f51b5';
@@ -353,14 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetGame() {
         if (confirm("ゲームを最初からリセットしますか？")) {
-            setupGame();
+            // リセット時はページ全体をリロードすると簡単で確実
+            window.location.reload(); 
         }
     }
 
     function endGame(isWin) {
-        let finalMessage;
         // ... (変更なし) ...
-        // 省略
+        let finalMessage;
+        
         if (isWin) {
             playSound(SOUND_CORRECT_PATH);
             finalMessage = "🎉 全15問クリア！すごい！おめでとう！ 🎉";
@@ -375,7 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
         FEEDBACK_MESSAGE.textContent = finalMessage;
         GAME_STATUS_MESSAGE.textContent = 'ゲーム終了';
         
+        // リスナーを削除
         SHIRITORI_GRID.removeEventListener('drop', handleDrop);
+        // リセットボタンを強調
         RESET_BUTTON.style.backgroundColor = '#4CAF50';
     }
 
