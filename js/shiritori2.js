@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 単語の読みを正規化し、しりとりで使う次の文字を返す
+     * 単語の読みを正規化し、しりとりで使う次の文字を返す (濁音・半濁音はそのまま)
      */
     function getNextChar(reading) {
         if (!reading) return '';
@@ -54,6 +54,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return smallKana[lastChar] || lastChar;
     }
     
+    /**
+     * 濁音/半濁音を清音に戻すマップ
+     * @param {string} char - 1文字のひらがな
+     * @returns {string} 該当する清音、または元の文字
+     */
+    function getClearChar(char) {
+        const clearMap = {
+            'が': 'か', 'ぎ': 'き', 'ぐ': 'く', 'げ': 'け', 'ご': 'こ',
+            'ざ': 'さ', 'じ': 'し', 'ず': 'す', 'ぜ': 'せ', 'ぞ': 'そ',
+            'だ': 'た', 'ぢ': 'ち', 'づ': 'つ', 'で': 'て', 'ど': 'と',
+            'ば': 'は', 'び': 'ひ', 'ぶ': 'ふ', 'べ': 'へ', 'ぼ': 'ほ',
+            'ぱ': 'は', 'ぴ': 'ひ', 'ぷ': 'ふ', 'ぺ': 'へ', 'ぽ': 'ほ'
+        };
+        return clearMap[char] || char;
+    }
+
     /**
      * 不正解の場合にカードを元の場所に戻す
      * @param {HTMLElement} card - 戻すカード要素
@@ -124,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ----------------------------------------------------
-    // 2. カードの選択と表示 (★カードレンダリングの確実化)
+    // 2. カードの選択と表示
     // ----------------------------------------------------
 
     function selectAndRenderCards() {
@@ -132,27 +148,25 @@ document.addEventListener('DOMContentLoaded', () => {
         let selectedChain = findShiritoriChain(chainLength);
 
         if (selectedChain.length < chainLength) {
-            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。データを見直すか、リセットしてください。';
+            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットして再試行してください。';
             console.error("しりとりチェーンが見つかりませんでした。データを確認してください。", selectedChain);
             return;
         }
 
         gameWords = selectedChain;
-        // カードエリアの表示をクリア
         CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`; 
         
         // ユーザーが自分で正しい順序を探せるよう、シャッフルしたカードを表示
         shuffleArray(selectedChain).forEach(word => {
-            const nextChar = getNextChar(word.reading); 
+            const nextChar = getNextChar(word.reading); // この単語の終わりの文字
             const card = document.createElement('div');
             
             card.className = 'word-card';
             card.draggable = true;
-            // ★修正点: データセットに単語情報と次の文字情報を正しく格納
             card.dataset.word = word.word;
             card.dataset.reading = word.reading;
-            card.dataset.nextChar = nextChar; 
-            card.dataset.firstChar = word.reading.charAt(0); 
+            card.dataset.nextChar = nextChar; // この単語の終わりの文字を保存
+            card.dataset.firstChar = word.reading.charAt(0); // この単語の最初の文字を保存
             
             card.innerHTML = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image">
@@ -177,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
             'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
             'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
-            'は': ['ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
+            'は': ['ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
         };
 
         // 濁音・半濁音から清音に戻すマップ
@@ -193,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let usedIds = new Set();
             let currentLastChar = startChar;
             
-            // 1. 最初の「り」から始まる単語を決定
+            // 1. 最初の「り」から始まる単語を決定 (修正なし)
             let candidates = allAvailable.filter(word => word.reading.charAt(0) === startChar && !usedIds.has(word.id));
             if (candidates.length === 0) { attempts++; continue; }
             
@@ -272,8 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // ... (dragover, dragleave は変更なし) ...
-
+        // ドロップターゲット（マス）のイベント
         SHIRITORI_GRID.addEventListener('dragover', (e) => {
             e.preventDefault();
             const dropTarget = e.target.closest('.drop-target');
@@ -313,11 +326,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dropTarget.classList.remove('drag-over');
 
         const droppedWord = e.dataTransfer.getData('text/plain');
-        // ドロップされたカード要素を取得
+        
+        // ★修正点2: ドラッグされたカードを確実に取得するために、透明なものも含めて探す
         const draggedCard = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
         
         if (!draggedCard) {
-             // カードが見つからない場合はここで復元せず、次の処理に進む（または終了）
+             console.log("カード要素が見つかりませんでした。");
              return;
         }
 
