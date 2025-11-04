@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const GAME_CONTROLS = document.getElementById('quiz-game-controls');
 
-    // ★★★ 音声ファイルのパス設定 (ここを修正します) ★★★
+    // ★★★ 音声ファイルのパス設定 (ここを修正しました) ★★★
     const SOUND_CORRECT_PATH = 'assets/audio/correct.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/audio/incorrect.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
@@ -93,13 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // ★修正: 不正解時は currentWord がそのまま残っているので、ここで新しい問題を選ぶのは「正解時」または「新規開始時」のみ
         if (!currentWord || askedWordIds.has(currentWord.id)) {
             let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
             const correctIndex = Math.floor(Math.random() * availableWords.length);
             currentWord = availableWords[correctIndex];
         }
-
 
         let wrongWords = [];
         let wrongChoices = [];
@@ -121,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderQuestion(currentWord, choices);
         
-        // ★修正: 新しい問題が表示されたら、メニューボタンのみを表示する★
         renderGameControls(false); 
     }
 
@@ -152,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', handleAnswer);
-            // ★修正: 選択肢を有効化
             card.style.pointerEvents = 'auto'; 
             card.style.opacity = '1';
             card.classList.remove('incorrect-choice');
@@ -164,22 +160,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardElement = event.target.closest('.choice-card');
         if (!cardElement) return;
         
-        // 回答直後に全ての選択肢を無効化（二重クリック防止）
         document.querySelectorAll('.choice-card').forEach(btn => btn.style.pointerEvents = 'none');
-
 
         const selectedWord = cardElement.dataset.word;
         const feedbackElement = FEEDBACK;
         
         if (selectedWord === currentWord.word) {
-            // ★★★ 正解時の音源再生と自動次へ移行 ★★★
+            // ★★★ 正解時の音源再生 ★★★
             playSound(SOUND_CORRECT_PATH);
             
             feedbackElement.textContent = 'せいかい！✨';
             feedbackElement.style.color = '#5c7aff';
             score += 10;
             correctCount += 1; 
-            askedWordIds.add(currentWord.id); // 正解時のみ追加
+            askedWordIds.add(currentWord.id); 
 
             updateTurnMessage();
             
@@ -188,24 +182,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
-            // ★★★ 不正解時の音源再生と再挑戦 ★★★
+            // ★★★ 不正解時の音源再生 ★★★
             playSound(SOUND_INCORRECT_PATH);
             
             feedbackElement.textContent = `ざんねん...。もう一度、よーく考えて選んでね。`;
             feedbackElement.style.color = '#ff6f61';
             
-            cardElement.classList.add('incorrect-choice'); // スタイルで不正解を強調
-            cardElement.style.pointerEvents = 'none'; // 間違った選択肢を無効化
+            cardElement.classList.add('incorrect-choice'); 
+            cardElement.style.pointerEvents = 'none'; 
             
-            // 間違ったので、他の選択肢を再度有効化して再挑戦を促す
             document.querySelectorAll('.choice-card').forEach(btn => {
                 if (btn !== cardElement) {
                     btn.style.pointerEvents = 'auto';
                 }
             });
-            // ★不正解時はスコアやカウントを更新しない（正解するまでやり直しのため）★
         }
-        // ★不正解時は renderGameControls(true) を削除し、再挑戦を促す★
     }
     
     // 7. 補助関数: スコア表示を更新
@@ -229,10 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
         `;
 
-        // 常にメニューボタンは表示 
         GAME_CONTROLS.innerHTML = menuButtonHtml;
         
-        // イベントリスナーの設定
         document.getElementById('backToMenuControl').addEventListener('click', renderMenu);
     }
 
@@ -245,6 +234,5 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // ページロード時に単語データをプリロードしておく
     loadWords();
 });
