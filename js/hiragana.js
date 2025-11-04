@@ -123,24 +123,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderQuestion(word, choices) {
         const imagePath = `assets/images/${word.image}`; 
         
+        // お題のイラスト (ここは変更なし)
         if (IMAGE_AREA) {
             IMAGE_AREA.innerHTML = `
                 <img src="${imagePath}" 
                      alt="${word.word}" 
                      onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';" 
                      style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain;">
-            `; // ★修正: object-fit: cover を contain に変更
+            `; 
         }
         
+        // ★★★ 修正点: 選択肢を「イラスト」から「文字」に変更 ★★★
         if (CHOICE_BUTTONS_AREA) {
             CHOICE_BUTTONS_AREA.innerHTML = choices.map(choiceObj => 
                 `<div class="menu-card-button menu-card-reset choice-card" data-word="${choiceObj.word}">
                     
-                    <img src="assets/images/${choiceObj.image}" alt="${choiceObj.word}" style="width: 130px; height: 130px; object-fit: contain; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
-                    
-                </div>` // ★修正: object-fit: cover を contain に変更
+                    <div style="font-size: 1.8rem; font-weight: bold; padding: 20px 10px; line-height: 1.3;">
+                        ${choiceObj.word}
+                    </div>
+
+                </div>`
             ).join('');
         }
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
         if (QUESTION_TEXT) QUESTION_TEXT.textContent = `このイラストはどれかな？`;
         if (FEEDBACK) FEEDBACK.textContent = '答えを選んでね！';
