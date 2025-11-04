@@ -21,7 +21,7 @@
     <div id="shiritori2-menu" class="menu-area-reset">
         <div class="menu-card-reset" style="padding: 30px;">
             <h2>🎮 しりとり2 ゲーム説明</h2>
-            <p>左側の単語カード (15枚) を、右側のマス目にドラッグ＆ドロップして、しりとりを完成させましょう！</p>
+            <p>左側のマス (4×4) に、右の単語カード (15枚) をドラッグ＆ドロップして、しりとりを完成させましょう！</p>
             <p>最初のマスは「しりとり」からスタートです。</p>
             <button id="startButton2" class="menu-card-button menu-card-reset" onclick="startShiritori2Game()">
                 ゲームスタート
@@ -34,24 +34,16 @@
         
         <div class="shiritori2-container">
 
-            <!-- 左側：カード選択エリア -->
-            <div id="card-selection-area" class="card-area">
-                <h3>残りの単語 (15枚)</h3>
-                <!-- JavaScriptでカードをここに追加 -->
-            </div>
-
-            <!-- 右側：マス目エリア -->
+            <!-- 左側：4×4のマスエリア -->
             <div id="drop-grid-area" class="grid-area">
                 <h3 id="game-status-message">チャレンジ開始！</h3>
 
-                <!-- しりとりマス -->
                 <div id="shiritori-grid" class="shiritori-grid">
-                    <!-- 最初のマス -->
+                    <!-- 1マス目 -->
                     <div id="cell-0" class="grid-cell filled shiritori-start" data-word="しりとり" data-next-char="り">
                         <span class="word-text">しりとり</span>
                     </div>
-
-                    <!-- 残りの15マスを手動で配置 -->
+                    <!-- 残りの15マス -->
                     <div id="cell-1" class="grid-cell"></div>
                     <div id="cell-2" class="grid-cell"></div>
                     <div id="cell-3" class="grid-cell"></div>
@@ -69,18 +61,23 @@
                     <div id="cell-15" class="grid-cell"></div>
                 </div>
                 
-                <p id="feedback-message" class="feedback-message">「り」から始まるカードを2マス目に入れてね！</p>
+                <p id="feedback-message" class="feedback-message">「り」から始まるカードを入れてね！</p>
 
-                <!-- 戻すボタン -->
                 <div id="return-card-area">
                     <button id="returnCardButton" class="control-button" style="background-color: #f0a000; margin-top: 10px; display: none;">
                         マスに置いたカードを戻す
                     </button>
                 </div>
             </div>
+
+            <!-- 右側：カードリスト -->
+            <div id="card-selection-area" class="card-area">
+                <h3>残りの単語 (15枚)</h3>
+                <!-- JSでカードを生成 -->
+            </div>
         </div>
 
-        <!-- 下部の操作ボタン -->
+        <!-- 下部ボタン -->
         <div class="game-controls-area">
             <button id="resetButton" class="control-button" style="background-color: #ff6f61;">
                 リセット

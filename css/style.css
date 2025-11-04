@@ -153,27 +153,68 @@ header {
     background-color: #e0e7ff;
 }
 
-/* ======================================== */
-/* ゲームメインエリア */
-/* ======================================== */
+/* ============================= */
+/* しりとり2：レイアウト修正版 */
+/* ============================= */
+
 .shiritori2-container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 40px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* 横並び固定 */
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* 残りの単語エリア */
+/* 左側：4x4のグリッド */
+.shiritori-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: repeat(4, 100px);
+    gap: 8px;
+    justify-content: center;
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 0 auto;
+}
+
+.grid-area {
+    flex: 1;
+    text-align: center;
+}
+
+.grid-cell {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #aaa;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    transition: background-color 0.2s;
+}
+
+.grid-cell.filled {
+    border: 2px solid #3f51b5;
+}
+
+.grid-cell:hover {
+    background-color: #e8f0ff;
+}
+
+/* 右側：カードリスト */
 .card-area {
     width: 280px;
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 10px;
     background-color: #fafafa;
-    max-height: 700px;
-    overflow-y: auto;
+    text-align: center;
 }
+
 
 /* ドロップエリア（マス配置） */
 .grid-area {
