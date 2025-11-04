@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const GAME_CONTROLS = document.getElementById('quiz-game-controls');
 
-    // ★★★ 修正点 1: 音声ファイルのパスを修正 ★★★
+    // ★★★ 音声ファイルのパス設定 (修正済み) ★★★
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
@@ -24,14 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrectCount = 0;
     let askedWordIds = new Set(); 
 
-    // ★★★ 補助関数: 音源を再生する関数 (変更なし) ★★★
+    // ★★★ 補助関数: 音源を再生する関数 ★★★
     function playSound(path) {
         const audio = new Audio(path);
         audio.play().catch(e => console.error("音声再生エラー:", e));
     }
     // ★★★★★★★★★★★★★★★★★★★★★
 
-    // 1. ゲーム開始関数 (変更なし)
+    // 1. ゲーム開始関数
     window.startQuizGame = function() {
         if (allWords.length === 0) {
             loadWords().then(startNewGameLogic);
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showNextQuestion();
     }
     
-    // 2. JSONデータを読み込む関数 (変更なし)
+    // 2. JSONデータを読み込む関数
     async function loadWords() {
         try {
             const response = await fetch('data/words.json');
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. メインメニュー画面を表示する関数 (変更なし)
+    // 3. メインメニュー画面を表示する関数
     function renderMenu() {
         if (MENU_AREA) MENU_AREA.style.display = 'block';
         if (GAME_AREA) GAME_AREA.style.display = 'none';
@@ -98,26 +98,21 @@ document.addEventListener('DOMContentLoaded', () => {
             currentWord = availableWords[correctIndex];
         }
 
-        // ★★★ 修正点 2: 選択肢を「文字」から「単語オブジェクト」に変更 ★★★
-        
-        let wrongChoices = []; // 間違った選択肢（単語オブジェクト）を格納する配列
+        let wrongChoices = [];
         
         while (wrongChoices.length < 2) {
             const randomIndex = Math.floor(Math.random() * allWords.length);
             const randomWord = allWords[randomIndex];
             
-            // 正解の単語(currentWord)と重複せず、
-            // 既にwrongChoicesに入っている単語とも重複しないようにチェック
             const isDuplicate = randomWord.id === currentWord.id || wrongChoices.some(w => w.id === randomWord.id);
 
             if (!isDuplicate) {
-                wrongChoices.push(randomWord); // ★「randomWord.word」ではなく「randomWord」オブジェクト全体を入れる
+                wrongChoices.push(randomWord);
             }
         }
         
-        let choices = [currentWord, ...wrongChoices]; // ★正解(currentWord)もオブジェクトで入れる
+        let choices = [currentWord, ...wrongChoices];
         choices = shuffleArray(choices);
-        // ★★★★★★★★★★★★★★★★★★★★★
 
         renderQuestion(currentWord, choices);
         
@@ -126,30 +121,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. 画面に問題と選択肢を表示する
     function renderQuestion(word, choices) {
-        // 質問の画像（お題）を表示 (変更なし)
         const imagePath = `assets/images/${word.image}`; 
+        
         if (IMAGE_AREA) {
             IMAGE_AREA.innerHTML = `
                 <img src="${imagePath}" 
                      alt="${word.word}" 
                      onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';" 
-                     style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover;">
-            `;
+                     style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain;">
+            `; // ★修正: object-fit: cover を contain に変更
         }
         
-        // ★★★ 修正点 3: 選択肢を「文字」から「イラスト」に変更 ★★★
         if (CHOICE_BUTTONS_AREA) {
-            // choices 配列には単語の「オブジェクト」が入っている
             CHOICE_BUTTONS_AREA.innerHTML = choices.map(choiceObj => 
-                // data-word に「単語の文字（例: いぬ）」をセットする（答え合わせで使うため）
                 `<div class="menu-card-button menu-card-reset choice-card" data-word="${choiceObj.word}">
                     
-                    <img src="assets/images/${choiceObj.image}" alt="${choiceObj.word}" style="width: 130px; height: 130px; object-fit: cover; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
+                    <img src="assets/images/${choiceObj.image}" alt="${choiceObj.word}" style="width: 130px; height: 130px; object-fit: contain; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
                     
-                    </div>`
+                </div>` // ★修正: object-fit: cover を contain に変更
             ).join('');
         }
-        // ★★★★★★★★★★★★★★★★★★★★★
 
         if (QUESTION_TEXT) QUESTION_TEXT.textContent = `このイラストはどれかな？`;
         if (FEEDBACK) FEEDBACK.textContent = '答えを選んでね！';
@@ -163,9 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. ユーザーの回答を処理する (ロジックは変更なし)
+    // 6. ユーザーの回答を処理する
     function handleAnswer(event) {
-        // (data-word="${choiceObj.word}" のおかげで、ここのロジックは変更不要です)
         const cardElement = event.target.closest('.choice-card');
         if (!cardElement) return;
         
@@ -175,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const feedbackElement = FEEDBACK;
         
         if (selectedWord === currentWord.word) {
-            // ★★★ 正解時の音源再生 ★★★
             playSound(SOUND_CORRECT_PATH);
             
             feedbackElement.textContent = 'せいかい！✨';
@@ -191,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
-            // ★★★ 不正解時の音源再生 ★★★
             playSound(SOUND_INCORRECT_PATH);
             
             feedbackElement.textContent = `ざんねん...。もう一度、よーく考えて選んでね。`;
@@ -208,14 +196,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 7. 補助関数: スコア表示を更新 (変更なし)
+    // 7. 補助関数: スコア表示を更新
     function updateTurnMessage() {
         if (TURN_MESSAGE) {
             TURN_MESSAGE.textContent = `チャレンジ中！ (正解 ${correctCount}/失敗 ${incorrectCount})`;
         }
     }
     
-    // 8. 補助関数: プレイ中のメニューボタンを表示 (変更なし)
+    // 8. 補助関数: プレイ中のメニューボタンを表示
     function renderGameControls(showNextButton) {
         if (!GAME_CONTROLS) return;
         
@@ -234,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('backToMenuControl').addEventListener('click', renderMenu);
     }
 
-    // 9. 配列をランダムにシャッフルするユーティリティ関数 (変更なし)
+    // 9. 配列をランダムにシャッフルするユーティリティ関数
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));

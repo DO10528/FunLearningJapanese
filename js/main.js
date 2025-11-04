@@ -1,15 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // HTML要素のIDを正確に取得
+    // ----------------------------------------------------
+    // DOM要素の取得
+    // ----------------------------------------------------
     const MAIN_MENU = document.getElementById('main-menu'); 
     const GAME_AREA = document.getElementById('game-area');
     const SCORE_MESSAGE = document.getElementById('score-message'); 
     
+    // ★★★ 1. 音声ファイルのパス設定 ★★★
+    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
+    // ★★★★★★★★★★★★★★★★★★★★★
+
     let allWords = [];
     let currentWord = null;
     let score = 0;
     let correctCount = 0;
     let incorrectCount = 0;
     let askedWordIds = new Set(); 
+
+    // ★★★ 2. 補助関数: 音源を再生する関数 ★★★
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
+    // ★★★★★★★★★★★★★★★★★★★★★
 
     // 1. JSONデータを読み込む関数
     async function loadWords() {
@@ -54,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. 問題をランダムに選び、選択肢を生成する
     function showNextQuestion() {
-        // ... (問題ロジックは省略) ...
         if (askedWordIds.size >= allWords.length) {
             alert(`全${allWords.length}問を終了しました！\n最終スコア: ${score}点\n正解: ${correctCount}問, 不正解: ${incorrectCount}問`);
             renderMenu();
@@ -98,7 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <img src="${imagePath}" 
                  alt="${word.word}" 
                  onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';" 
-                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover;">
+                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain;"> 
+            
             <div style="margin-top: 20px;">
                 ${buttonsHtml}
             </div>
@@ -116,13 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. ユーザーの回答を処理する 
     function handleAnswer(event) {
-        // ... (回答ロジックは省略) ...
         const selectedWord = event.target.dataset.word;
         const feedbackElement = document.getElementById('feedback');
         
         document.querySelectorAll('.choice-button').forEach(btn => btn.disabled = true);
 
         if (selectedWord === currentWord.word) {
+            // ★★★ 4. 正解の音を追加 ★★★
+            playSound(SOUND_CORRECT_PATH);
+
             feedbackElement.textContent = 'せいかい！✨';
             feedbackElement.style.color = '#5c7aff';
             score += 10;
@@ -133,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
+            // ★★★ 5. 不正解の音を追加 ★★★
+            playSound(SOUND_INCORRECT_PATH);
+
             feedbackElement.textContent = `ざんねん...。正解は「${currentWord.word}」だよ。`;
             feedbackElement.style.color = '#ff6f61';
             incorrectCount += 1; 
@@ -162,28 +181,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return array;
     }
-
-    // 8. DOMContentLoaded (イベントリスナーの設定)
-    document.addEventListener('DOMContentLoaded', () => {
-        const startButton1 = document.getElementById('startButton1');
-
-        // 外部から呼ばれる startMainGame 関数を公開
-        window.startMainGame = function() {
-            loadWords().then(startNewGame);
-        };
-
-        if (startButton1) {
-            startButton1.addEventListener('click', () => {
-                // index.html側で既に定義されている要素を再取得
-                const MAIN_MENU = document.getElementById('main-menu');
-                const GAME_AREA = document.getElementById('game-area');
-                if (MAIN_MENU) MAIN_MENU.style.display = 'none';
-                if (GAME_AREA) GAME_AREA.style.display = 'block';
-                
-                window.startMainGame();
-            });
+    
+    // 8. スコア表示のみを更新する補助関数 (handleAnswerから呼び出されるため追加)
+    function renderScoreTitleUpdate() {
+        const titleElement = GAME_AREA.querySelector('h3');
+        if (titleElement) {
+            const scoreDisplay = `${correctCount}/${incorrectCount}`; 
+            titleElement.textContent = `この絵はどれかな？ (${scoreDisplay})`;
         }
-        
-        loadWords();
-    });
+    }
+
+
+    // ★★★ 9. DOMContentLoadedのネストを解消 ★★★
+    // (ページが読み込まれたら、まずデータをロードする)
+    loadWords();
+    
+    // 外部から呼ばれる startMainGame 関数を公開
+    // (index.html から "startMainGame()" で呼び出される)
+    window.startMainGame = function() {
+        if (allWords.length === 0) {
+            loadWords().then(startNewGame);
+        } else {
+            startNewGame();
+        }
+    };
+    
+    // (startButton1 のロジックは、このファイルではなく index.html 側にあるべきなので削除)
+    
 });

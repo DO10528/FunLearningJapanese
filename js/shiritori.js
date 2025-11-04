@@ -5,22 +5,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const MENU_AREA = document.getElementById('shiritori-menu');
     const GAME_AREA = document.getElementById('shiritori-game-area');
     const TURN_MESSAGE = document.getElementById('turn-message');
-    const CURRENT_WORD_DISPLAY_TEXT = document.getElementById('current-word-display'); // 単語表示スパン
-    const IMAGE_AREA = document.getElementById('image-area'); // 現在の単語の画像エリア
+    const CURRENT_WORD_DISPLAY_TEXT = document.getElementById('current-word-display');
+    const IMAGE_AREA = document.getElementById('image-area'); 
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const FEEDBACK = document.getElementById('feedback');
-    const GAME_CONTROLS = document.getElementById('game-controls'); // プレイ中のボタンエリア
-    const END_GAME_CONTROLS = document.getElementById('endGameControls'); // ゲーム終了時ボタンエリア
+    const GAME_CONTROLS = document.getElementById('game-controls');
+    const END_GAME_CONTROLS = document.getElementById('endGameControls');
 
-    // ★★★ 修正点 1: 音声ファイルのパスを修正 ★★★
+    // ★★★ 音声ファイルのパス設定 (修正済み) ★★★
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
 
-    let allWords = []; // data/words.json から読み込む全単語
-    let currentWord = null; // 直前の単語
-    let gameHistoryIds = new Set(); // 既に使用した単語のID
-    let turnCount = 0; // しりとりが続いた回数
+    let allWords = [];
+    let currentWord = null; 
+    let gameHistoryIds = new Set();
+    let turnCount = 0; 
 
     // ★★★ 補助関数: 音源を再生する関数 ★★★
     function playSound(path) {
@@ -29,8 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // ★★★★★★★★★★★★★★★★★★★★★
 
-    // 1. ゲーム開始関数 (HTMLの onclick="startNewGame()" から呼ばれる)
-    // ★★★これが shiritori.html のボタンから呼ばれる関数です★★★
+    // 1. ゲーム開始関数
     window.startNewGame = function() {
         if (allWords.length === 0) {
             loadWords().then(startNewGameLogic);
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function startNewGameLogic() {
-        if (allWords.length < 4) { // しりとりには最低4単語は必要
+        if (allWords.length < 4) {
             alert('ゲームを開始するには最低4つ以上の単語データが必要です。');
             return;
         }
@@ -48,14 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
         MENU_AREA.style.display = 'none'; 
         GAME_AREA.style.display = 'block'; 
         END_GAME_CONTROLS.style.display = 'none';
-        GAME_CONTROLS.style.display = 'block'; // プレイ中ボタンを表示
+        GAME_CONTROLS.style.display = 'block'; 
 
-        // 状態をリセット
         gameHistoryIds.clear();
         turnCount = 0;
         FEEDBACK.textContent = '単語を選んでね！';
         
-        // 最初の単語をランダムに選ぶ (「ん」で終わらないもの)
         let availableWords = allWords.filter(word => getCleanLastChar(word.reading) !== 'ん');
         currentWord = availableWords[Math.floor(Math.random() * availableWords.length)];
         
@@ -70,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('data/words.json');
             allWords = await response.json();
-            // 読み（reading）がないデータを除外
             allWords = allWords.filter(word => word.reading && word.reading.trim() !== '');
             return allWords;
         } catch (error) {
@@ -114,33 +110,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. 画面に問題と選択肢を表示する
     function renderQuestion(choices) {
-        // 4a. 直前の単語（現在のお題）を表示
         CURRENT_WORD_DISPLAY_TEXT.textContent = currentWord.word;
         const imagePath = `assets/images/${currentWord.image}`; 
         IMAGE_AREA.innerHTML = `
             <img src="${imagePath}" alt="${currentWord.word}" 
                  onerror="this.style.border='3px solid red'; this.alt='画像なし';" 
-                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover;">
-        `;
+                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain;">
+        `; // ★修正: object-fit: cover を contain に変更
         
-        // ★★★ 修正点 2: 3択の選択肢を「イラストのみ」に変更 ★★★
         CHOICE_BUTTONS_AREA.innerHTML = choices.map(word => 
             `<div class="menu-card-button menu-card-reset choice-card" data-id="${word.id}">
                 
-                <img src="assets/images/${word.image}" alt="${word.word}" style="width: 130px; height: 130px; object-fit: cover; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
+                <img src="assets/images/${word.image}" alt="${word.word}" style="width: 130px; height: 130px; object-fit: contain; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
                 
-                </div>`
+            </div>` // ★修正: object-fit: cover を contain に変更
         ).join('');
-        // ★★★★★★★★★★★★★★★★★★★★★
 
-        // 4c. イベントリスナーを設定
         document.querySelectorAll('.choice-card').forEach(card => {
             card.addEventListener('click', handleAnswer);
             card.style.pointerEvents = 'auto'; 
             card.style.opacity = '1';
         });
         
-        // 4d. 「メニューに戻る」ボタン
         GAME_CONTROLS.innerHTML = `
             <button id="backToMenuControl" class="menu-card-button menu-card-reset" style="width: 200px; height: 50px; margin: 0 auto;">
                 メニューに戻る
@@ -165,28 +156,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastChar = getCleanLastChar(currentWord.reading);
         
         if (selectedWord.reading.startsWith(lastChar)) {
-            // ★★★ 正解 ★★★
             playSound(SOUND_CORRECT_PATH);
             
             FEEDBACK.textContent = 'せいかい！✨ つぎは...';
             FEEDBACK.style.color = '#5c7aff';
             turnCount += 1;
             
-            currentWord = selectedWord; // お題を更新
-            gameHistoryIds.add(currentWord.id); // 履歴に追加
+            currentWord = selectedWord; 
+            gameHistoryIds.add(currentWord.id);
             updateTurnMessage();
             
             const newLastChar = getCleanLastChar(currentWord.reading);
             if (newLastChar === 'ん' || newLastChar === 'っ') {
                 setTimeout(() => {
-                    endGame(false); // false = 負け
+                    endGame(false); // false = D
                 }, 1500);
             } else {
                 setTimeout(showNextQuestion, 1500);
             }
 
         } else {
-            // ★★★ 不正解 ★★★
             playSound(SOUND_INCORRECT_PATH);
             
             FEEDBACK.textContent = `ざんねん...。「${lastChar}」から はじまるのはどれかな？`;
@@ -211,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         CURRENT_WORD_DISPLAY_TEXT.textContent = currentWord.word;
         const imagePath = `assets/images/${currentWord.image}`; 
-        IMAGE_AREA.innerHTML = `<img src="${imagePath}" alt="${currentWord.word}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover;">`;
+        IMAGE_AREA.innerHTML = `<img src="${imagePath}" alt="${currentWord.word}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: contain;">`; // ★修正: object-fit: cover を contain に変更
         
         if (isWin) {
             playSound(SOUND_CORRECT_PATH);

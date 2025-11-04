@@ -3,9 +3,9 @@
 let MAIN_MENU_2 = null; // hiragana2.htmlのメニューエリア
 let GAME_AREA_2 = null; // hiragana2.htmlのゲームエリア
 
-// ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
-const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
-const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+// ★★★ 修正点 1: 音声ファイルのパスを修正 ★★★
+const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 // ★★★★★★★★★★★★★★★★★★★★★
 
 let allWords = [];
@@ -27,7 +27,6 @@ function playSound(path) {
 // 1. ゲーム開始関数 (HTMLの onclick="startNewGame2()" から呼ばれる)
 // ----------------------------------------------------
 window.startNewGame2 = function() {
-    // DOM要素がまだ取得できていない場合、初期化を待ってから実行
     if (!MAIN_MENU_2) {
         document.addEventListener('DOMContentLoaded', () => {
             initializeDomElements();
@@ -37,7 +36,6 @@ window.startNewGame2 = function() {
     }
 
     if (allWords.length === 0) {
-        // データが未ロードならロードしてから再実行
         loadWords().then(startNewGameLogic);
     } else {
         startNewGameLogic();
@@ -51,11 +49,9 @@ function startNewGameLogic() {
         return;
     }
     
-    // 画面切り替え
     if (MAIN_MENU_2) MAIN_MENU_2.style.display = 'none'; 
     if (GAME_AREA_2) GAME_AREA_2.style.display = 'block'; 
 
-    // 状態をリセット
     score = 0; 
     correctCount = 0;
     incorrectCount = 0;
@@ -105,7 +101,6 @@ function showNextQuestion() {
     let readingChars = Array.from(currentWord.reading);
     let shuffledChars = shuffleArray([...readingChars]);
     
-    // 最初の出題時のみ、出題リストに追加
     askedWordIds.add(currentWord.id);
     
     renderQuestion(currentWord, shuffledChars);
@@ -121,15 +116,14 @@ function renderQuestion(word, shuffledChars) {
         `<div class="char-block" data-char="${char}" data-original-index="${index}">${char}</div>`
     ).join('');
 
-    // ★修正: ゲームエリアIDを 'game-area-2' に合わせ、HTMLを生成し、メニューボタンを追加する★
     GAME_AREA_2.innerHTML = `
         <h3>このイラストの言葉を並び替えてください (${scoreDisplay})</h3>
         <div style="min-height: 170px;">
             <img src="${imagePath}" 
                  alt="${word.word}" 
                  onerror="this.style.border='3px solid red'; this.alt='エラー: 画像が見つかりません (${word.image})';" 
-                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: cover; margin-bottom: 20px;">
-        </div>
+                 style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain; margin-bottom: 20px;">
+        </div> 
         
         <div id="word-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
             ${blocksHtml}
@@ -205,11 +199,9 @@ function checkAnswer() {
         score += 10;
         correctCount += 1; 
         
-        // ボタンを無効化
         document.getElementById('checkButton').disabled = true;
 
         setTimeout(() => {
-            // ボタンを再有効化し、次の問題へ
             document.getElementById('checkButton').disabled = false;
             showNextQuestion();
         }, 1500);

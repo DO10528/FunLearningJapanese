@@ -6,9 +6,9 @@ const IMAGE_PATHS = [
     'assets/images/keiyoshi_quiz_3.gif'  // 必要に応じて追加・変更
 ];
 
-// ★★★ 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください) ★★★
-const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
-const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+// ★★★ 修正点 1: 音声ファイルのパスを修正 ★★★
+const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 // ★★★★★★★★★★★★★★★★★★★★★
 
 // グローバル変数
@@ -163,6 +163,10 @@ function displayQuestion() {
     // 画像表示
     quizImageElement.src = question.image;
     quizImageElement.alt = `クイズ画像 ${currentQuestionIndex + 1}`;
+    
+    // ★★★ 修正点 2: イラストが切れないように contain を指定 ★★★
+    quizImageElement.style.objectFit = 'contain';
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
     // 問題番号と意味を表示
     questionNumberElement.textContent = `第 ${currentQuestionIndex + 1} 問 (全 ${QUIZ_TOTAL_QUESTIONS} 問)`;
