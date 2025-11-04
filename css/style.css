@@ -184,7 +184,7 @@ a.menu-card-button {
 }
 
 /* ------------------------------------ */
-/* ★★★ しりとり2 専用スタイル (ここから追加) ★★★ */
+/* ★★★ しりとり2 専用スタイル (ここから修正) ★★★ */
 /* ------------------------------------ */
 
 header {
@@ -272,7 +272,7 @@ header {
     cursor: grab;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     
-    /* ★ ここで新しいトランジション効果を追加 */
+    /* トランジション効果 */
     transition: transform 0.2s ease, opacity 0.3s ease;
 }
 
@@ -280,7 +280,7 @@ header {
     transform: scale(1.02);
 }
 
-/* ★ ドラッグ中のアニメーション効果 */
+/* ドラッグ中のアニメーション効果 */
 .word-card.dragging {
     transform: scale(0.95);
     opacity: 0.6;
@@ -350,11 +350,24 @@ header {
     border-color: #1a237e;
 }
 
-.word-text {
-    font-size: 1.5rem;
+/* ★★★ 修正点: word-textの改行制御 ★★★ */
+.grid-cell .word-text {
+    font-size: 1.3rem; /* 1.5rem から 1.3rem に縮小 (全てのマス) */
     font-weight: bold;
     color: #333;
+    white-space: nowrap; /* ★追加: 強制的に改行を禁止 */
+    margin: 0;
 }
+
+/* スタートマス専用のスタイル調整 */
+.grid-cell.shiritori-start {
+    padding: 2px;
+}
+
+.grid-cell.shiritori-start .word-text {
+    font-size: 1.5rem; /* スタートマスは少し大きくする */
+}
+
 
 .grid-cell.filled .card-image {
     width: 80px;
