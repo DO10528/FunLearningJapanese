@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); 
 
     // ★★★ 音声ファイルのパス設定 ★★★
-    const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
-    const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
+    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 
     let allWords = [];          
     let gameWords = [];         
