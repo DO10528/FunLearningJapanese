@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // DOM要素の定義
+    // DOM要素の定義 (変更なし)
     // ----------------------------------------------------
     const MENU_AREA = document.getElementById('shiritori2-menu');
     const GAME_AREA = document.getElementById('shiritori2-game-area');
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const RESET_BUTTON = document.getElementById('resetButton');
     const BACK_BUTTON = document.getElementById('backToMenuButton');
 
-    // ★★★ 音声ファイルのパス設定 ★★★
+    // ★★★ 音声ファイルのパス設定 (変更なし) ★★★
     const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_WORDS = 15;       // 使用するカードの枚数
 
     // ----------------------------------------------------
-    // 補助関数
+    // 補助関数 (変更なし)
     // ----------------------------------------------------
 
     function playSound(path) {
@@ -40,9 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 単語の読みを正規化し、しりとりで使う次の文字を返す
-     * @param {string} reading - 単語の読み（ひらがな）
-     * @returns {string} しりとりで使う次の文字
+     * 単語の読みを正規化し、しりとりで使う次の文字を返す (変更なし)
      */
     function getNextChar(reading) {
         if (!reading) return '';
@@ -59,8 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     /**
-     * 不正解の場合にカードを元の場所に戻す
-     * ★修正点2: カードを確実に戻し、透明度をリセット
+     * 不正解の場合にカードを元の場所に戻す (変更なし)
      * @param {HTMLElement} card - 戻すカード要素
      */
     function restoreCardToSelectionArea(card) {
@@ -134,7 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectAndRenderCards() {
         const chainLength = MAX_WORDS; 
-        let selectedChain = findShiritoriChain(chainLength);
+        // findShiritoriChainを呼び出して連鎖を取得
+        let selectedChain = findShiritoriChain(chainLength); 
 
         if (selectedChain.length < chainLength) {
             GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。データを見直すか、リセットしてください。';
@@ -145,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gameWords = selectedChain;
         CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`;
         
-        shuffleArray(gameWords).forEach(word => {
+        // ユーザーが自分で正しい順序を探せるよう、シャッフルしたカードを表示
+        shuffleArray(selectedChain).forEach(word => {
             const nextChar = getNextChar(word.reading); // この単語の終わりの文字
             const card = document.createElement('div');
             
@@ -174,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startChar = 'り'; 
         const maxAttempts = 500; 
 
-        // 濁音・半濁音変換マップ（清音から濁音・半濁音への変換を許容）
+        // 濁音・半濁音の対応マップ（清音をキーとする）
         const SHIRITORI_MAP = {
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
             'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
@@ -182,12 +181,21 @@ document.addEventListener('DOMContentLoaded', () => {
             'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
         };
 
+        // 濁音・半濁音から清音に戻すマップ
+        const CLEAR_MAP = {};
+        for (const [clear, dakuList] of Object.entries(SHIRITORI_MAP)) {
+            dakuList.forEach(daku => {
+                CLEAR_MAP[daku] = clear;
+            });
+        }
+
+
         while (attempts < maxAttempts) {
             let chain = [];
             let usedIds = new Set();
             let currentLastChar = startChar;
             
-            // 1. 最初の「り」から始まる単語を決定
+            // 1. 最初の「り」から始まる単語を決定 (変更なし)
             let candidates = allAvailable.filter(word => word.reading.charAt(0) === startChar && !usedIds.has(word.id));
             if (candidates.length === 0) { attempts++; continue; }
             
@@ -202,14 +210,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 次の単語の開始文字として許容される文字のリスト
                 let requiredChars = [currentLastChar];
                 
-                // ★★★ 修正点1: 濁音/半濁音の処理をより厳密に ★★★
-                // 前の単語の終わりが「清音」なら、次の単語は「清音」か対応する「濁音/半濁音」を許容する
+                // ★★★ 修正点1: 連鎖構築ロジックの改善 (濁音/半濁音の扱い) ★★★
+                
+                // 前の単語の終わりが清音の場合 (例:「ま」) -> 次は清音/濁音/半濁音を許容 (ま, ば, ぱ)
                 if (SHIRITORI_MAP[currentLastChar]) {
                     requiredChars.push(...SHIRITORI_MAP[currentLastChar]);
+                } 
+                // 前の単語の終わりが濁音/半濁音の場合 (例:「ご」)
+                // -> 次は濁音/半濁音（ご）だけでなく、対応する清音（こ）も許容する
+                else if (CLEAR_MAP[currentLastChar]) {
+                    requiredChars.push(CLEAR_MAP[currentLastChar]);
                 }
-                // (前が濁音/半濁音の場合、そのままの文字で始まる単語を探すため、追加の処理は不要)
-                
-                
+
                 let candidates = allAvailable.filter(word => 
                     requiredChars.includes(word.reading.charAt(0)) && 
                     !usedIds.has(word.id)
@@ -230,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return chain; 
             }
             attempts++;
-            // 失敗したら、単語の選択順をリシャッフルして再試行
             allAvailable = shuffleArray(allAvailable); 
         }
 
@@ -245,7 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ドラッグ開始
         CARD_SELECTION_AREA.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('word-card')) {
-                e.dataTransfer.setData('text/plain', e.target.dataset.word);
+                // data-wordを保存 (ドロップ時にカードを見つけるためのキー)
+                e.dataTransfer.setData('text/plain', e.target.dataset.word); 
                 e.target.classList.add('dragging');
                 // ドロップされるまでカードを透明にする
                 e.target.style.opacity = '0.5'; 
@@ -307,7 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // ドロップされたカード要素を取得
         const draggedCard = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
         
-        if (!draggedCard) return;
+        // ★★★ 修正点2: ドラッグカードが見つからない場合は処理を中止 ★★★
+        if (!draggedCard) {
+             // 既にドロップされ削除されたカードを再度ドロップしようとした場合など
+             console.log("カード要素が見つかりませんでした。");
+             return;
+        }
 
         const cellIndex = parseInt(dropTarget.dataset.cellIndex, 10);
 
@@ -341,9 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
             'た': ['た', 'だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['て', 'で'], 'と': ['と', 'ど'],
             'は': ['は', 'ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
         };
-
-        // requiredChar が清音の場合、droppedFirstCharが清音/濁音/半濁音のどれでもOK
+        
+        // 許容される最初の文字リストを取得
         const allowChars = SHIRITORI_ALLOW_MAP[requiredChar] || [requiredChar];
+        
+        // 濁音・半濁音で終わった場合、清音で始まるものも許容するルールをチェック
+        // 例: requiredCharが「だ」の場合、そのまま「だ」のみを許容。
+        // 例: requiredCharが「と」の場合、「と」「ど」を許容。
         
         if (allowChars.includes(droppedFirstChar)) {
             isCorrect = true;
@@ -378,10 +399,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // ★ 不正解 ★
             playSound(SOUND_INCORRECT_PATH);
             
-            // 正解に必要な文字を明確に表示
-            const requiredDisplay = SHIRITORI_ALLOW_MAP[requiredChar] ? 
-                                    `${requiredChar}（または${SHIRITORI_ALLOW_MAP[requiredChar].filter(c => c !== requiredChar).join('/')}）` : 
-                                    requiredChar;
+            // 正解に必要な文字を明確に表示 (UIヒントと同じロジックを使う)
+            const HINT_CHARS = Object.keys(SHIRITORI_ALLOW_MAP);
+            let requiredDisplay;
+
+            if (HINT_CHARS.includes(requiredChar)) {
+                 // 清音で終わる場合: 清音と濁音/半濁音の両方を表示
+                 const dakuOns = SHIRITORI_ALLOW_MAP[requiredChar].filter(c => c !== requiredChar).join('/');
+                 requiredDisplay = `${requiredChar}（または${dakuOns}）`;
+            } else {
+                // その他の文字（濁音/半濁音を含む）で終わる場合: その文字のみ
+                requiredDisplay = requiredChar;
+            }
             
             FEEDBACK_MESSAGE.textContent = `❌「${requiredDisplay}」から始まる言葉じゃないよ...。`;
             FEEDBACK_MESSAGE.style.color = '#ff6f61';
