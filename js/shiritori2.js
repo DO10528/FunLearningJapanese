@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // DOM要素の定義 (変更なし)
+    // DOM要素の定義
     // ----------------------------------------------------
     const MENU_AREA = document.getElementById('shiritori2-menu');
     const GAME_AREA = document.getElementById('shiritori2-game-area');
@@ -11,18 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const RESET_BUTTON = document.getElementById('resetButton');
     const BACK_BUTTON = document.getElementById('backToMenuButton');
 
-    // ★★★ 音声ファイルのパス設定 (変更なし) ★★★
+    // ★★★ 音声ファイルのパス設定 ★★★
     const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
 
-    let allWords = [];          // words.json から読み込む全単語
-    let gameWords = [];         // 今回のゲームで使用する15単語
-    let currentCellIndex = 1;   // 次にドロップすべきマス (1は「しりとり」の次のマス)
-    const MAX_WORDS = 15;       // 使用するカードの枚数
-
+    let allWords = [];          
+    let gameWords = [];         
+    let currentCellIndex = 1;   
+    const MAX_WORDS = 15;       
+    
     // ----------------------------------------------------
-    // 補助関数 (変更なし)
+    // 補助関数
     // ----------------------------------------------------
 
     function playSound(path) {
@@ -40,24 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 単語の読みを正規化し、しりとりで使う次の文字を返す (変更なし)
+     * 単語の読みを正規化し、しりとりで使う次の文字を返す
      */
     function getNextChar(reading) {
         if (!reading) return '';
         let lastChar = reading.slice(-1);
         
-        // 長音（ー）の場合、その前の文字を使う
         if (lastChar === 'ー' && reading.length > 1) {
             lastChar = reading.slice(-2, -1);
         }
         
-        // 小書き仮名（ゃゅょ）を大きな仮名に戻す
         const smallKana = {'ゃ': 'や', 'ゅ': 'ゆ', 'ょ': 'よ'};
         return smallKana[lastChar] || lastChar;
     }
     
     /**
-     * 不正解の場合にカードを元の場所に戻す (変更なし)
+     * 不正解の場合にカードを元の場所に戻す
      * @param {HTMLElement} card - 戻すカード要素
      */
     function restoreCardToSelectionArea(card) {
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // 1. ゲームの初期化と開始 (変更なし)
+    // 1. ゲームの初期化と開始
     // ----------------------------------------------------
 
     async function loadWords() {
@@ -126,13 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ----------------------------------------------------
-    // 2. カードの選択と表示 (連鎖探索ロジック)
+    // 2. カードの選択と表示 (★カードレンダリングの確実化)
     // ----------------------------------------------------
 
     function selectAndRenderCards() {
         const chainLength = MAX_WORDS; 
-        // findShiritoriChainを呼び出して連鎖を取得
-        let selectedChain = findShiritoriChain(chainLength); 
+        let selectedChain = findShiritoriChain(chainLength);
 
         if (selectedChain.length < chainLength) {
             GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。データを見直すか、リセットしてください。';
@@ -141,19 +138,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         gameWords = selectedChain;
-        CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`;
+        // カードエリアの表示をクリア
+        CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`; 
         
         // ユーザーが自分で正しい順序を探せるよう、シャッフルしたカードを表示
         shuffleArray(selectedChain).forEach(word => {
-            const nextChar = getNextChar(word.reading); // この単語の終わりの文字
+            const nextChar = getNextChar(word.reading); 
             const card = document.createElement('div');
             
             card.className = 'word-card';
             card.draggable = true;
+            // ★修正点: データセットに単語情報と次の文字情報を正しく格納
             card.dataset.word = word.word;
             card.dataset.reading = word.reading;
-            card.dataset.nextChar = nextChar; // この単語の終わりの文字を保存
-            card.dataset.firstChar = word.reading.charAt(0); // この単語の最初の文字を保存
+            card.dataset.nextChar = nextChar; 
+            card.dataset.firstChar = word.reading.charAt(0); 
             
             card.innerHTML = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image">
@@ -178,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
             'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
             'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
-            'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
+            'は': ['ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
         };
 
         // 濁音・半濁音から清音に戻すマップ
@@ -189,13 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-
         while (attempts < maxAttempts) {
             let chain = [];
             let usedIds = new Set();
             let currentLastChar = startChar;
             
-            // 1. 最初の「り」から始まる単語を決定 (変更なし)
+            // 1. 最初の「り」から始まる単語を決定
             let candidates = allAvailable.filter(word => word.reading.charAt(0) === startChar && !usedIds.has(word.id));
             if (candidates.length === 0) { attempts++; continue; }
             
@@ -207,10 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. 2番目以降の単語を探索
             for (let i = 1; i < length; i++) {
                 
-                // 次の単語の開始文字として許容される文字のリスト
                 let requiredChars = [currentLastChar];
                 
-                // ★★★ 修正点1: 連鎖構築ロジックの改善 (濁音/半濁音の扱い) ★★★
+                // ★★★ 修正点1: 連鎖構築ロジックの安定化 ★★★
                 
                 // 前の単語の終わりが清音の場合 (例:「ま」) -> 次は清音/濁音/半濁音を許容 (ま, ば, ぱ)
                 if (SHIRITORI_MAP[currentLastChar]) {
@@ -221,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (CLEAR_MAP[currentLastChar]) {
                     requiredChars.push(CLEAR_MAP[currentLastChar]);
                 }
-
+                
                 let candidates = allAvailable.filter(word => 
                     requiredChars.includes(word.reading.charAt(0)) && 
                     !usedIds.has(word.id)
@@ -319,10 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // ドロップされたカード要素を取得
         const draggedCard = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
         
-        // ★★★ 修正点2: ドラッグカードが見つからない場合は処理を中止 ★★★
         if (!draggedCard) {
-             // 既にドロップされ削除されたカードを再度ドロップしようとした場合など
-             console.log("カード要素が見つかりませんでした。");
+             // カードが見つからない場合はここで復元せず、次の処理に進む（または終了）
              return;
         }
 
@@ -358,13 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'た': ['た', 'だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['て', 'で'], 'と': ['と', 'ど'],
             'は': ['は', 'ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
         };
-        
+
         // 許容される最初の文字リストを取得
         const allowChars = SHIRITORI_ALLOW_MAP[requiredChar] || [requiredChar];
-        
-        // 濁音・半濁音で終わった場合、清音で始まるものも許容するルールをチェック
-        // 例: requiredCharが「だ」の場合、そのまま「だ」のみを許容。
-        // 例: requiredCharが「と」の場合、「と」「ど」を許容。
         
         if (allowChars.includes(droppedFirstChar)) {
             isCorrect = true;
