@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const GAME_CONTROLS = document.getElementById('quiz-game-controls');
 
-    // ★★★ 音声ファイルのパス設定 (ここを修正しました) ★★★
-    const SOUND_CORRECT_PATH = 'assets/audio/correct.mp3'; 
-    const SOUND_INCORRECT_PATH = 'assets/audio/incorrect.mp3'; 
+    // ★★★ 音声ファイルのパス設定 (フォルダ名とファイル名を両方修正) ★★★
+    const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
 
     let allWords = [];
