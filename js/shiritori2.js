@@ -13,13 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); 
 
     // ★★★ 音声ファイルのパス設定 ★★★
-    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
-    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
+    const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
 
     let allWords = [];          
     let gameWords = [];         
     let currentCellIndex = 1;   
-    // ★★★ 修正箇所: MAX_WORDSを15に戻す (ドロップする単語数) ★★★
     const MAX_WORDS = 15;       
     
     // ----------------------------------------------------
@@ -158,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="word-text">しりとり</span>
             </div>
         `;
-        // ★★★ 修正箇所: 2マス目からMAX_WORDS+1 (16マス目)まで生成 ★★★
+        // 2マス目から16マス目まで（ドロップ可能マス）
         for (let i = 1; i <= MAX_WORDS; i++) {
             SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}"></div>`;
         }
@@ -206,6 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * 指定された長さのしりとり連鎖をランダムに探す (安定版)
+     */
     function findShiritoriChain(length) {
         let allAvailable = allWords.filter(word => getNextChar(word.reading) !== 'ん');
         if (allAvailable.length < length) return []; 
@@ -214,13 +216,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let attempts = 0;
         const maxAttempts = 500; 
 
+        // 濁音・半濁音の対応マップ（清音をキーとする）
         const SHIRITORI_MAP = {
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
             'さ': ['ざ'], 'し': ['し', 'じ'], 'す': ['す', 'ず'], 'せ': ['せ', 'ぜ'], 'そ': ['そ', 'ぞ'],
-            'た': ['だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['で'], 'と': ['と', 'ど'],
-            'は': ['ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
+            'た': ['だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['て', 'で'], 'と': ['と', 'ど'],
+            'は': ['ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
         };
 
+        // 濁音・半濁音から清音に戻すマップ
         const CLEAR_MAP = {};
         for (const [clear, dakuList] of Object.entries(SHIRITORI_MAP)) {
             dakuList.forEach(daku => { CLEAR_MAP[daku] = clear; });
@@ -230,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let usedIds = new Set();
             let availableWords = shuffleArray(allAvailable); 
 
+            // 1. 最初の「り」から始まる単語を決定
             let firstStepCandidates = availableWords.filter(word => word.reading.charAt(0) === startChar);
             if (firstStepCandidates.length === 0) { attempts++; continue; }
 
@@ -243,10 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let requiredChars = [currentLastChar];
                 
+                // ★★★ 修正箇所: 濁音/半濁音の許容範囲を広げるロジックをより安定させる ★★★
+
+                // 1. 前の単語の終わりが清音の場合 -> 次は清音/濁音/半濁音を許容
                 if (SHIRITORI_MAP[currentLastChar]) {
                     requiredChars.push(...SHIRITORI_MAP[currentLastChar]);
                 } 
+                // 2. 前の単語の終わりが濁音/半濁音の場合 -> 次は濁音/半濁音（自身）か、対応する清音を許容
                 else if (CLEAR_MAP[currentLastChar]) {
+                    // 例: 終わりが「ご」の場合、次の開始は「ご」または「こ」
                     requiredChars.push(CLEAR_MAP[currentLastChar]);
                 }
                 
