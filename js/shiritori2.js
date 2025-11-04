@@ -10,10 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAME_STATUS_MESSAGE = document.getElementById('game-status-message');
     const RESET_BUTTON = document.getElementById('resetButton');
     const BACK_BUTTON = document.getElementById('backToMenuButton');
-    // ★★★ 追加: カード戻すボタン ★★★
     const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); 
 
-    // ★★★ 音声ファイルのパス設定 (変更なし) ★★★
+    // ★★★ 音声ファイルのパス設定 ★★★
     const SOUND_CORRECT_PATH = 'assets/audio/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/audio/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
@@ -64,11 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * ★★★ 新規追加: マスに置かれた最後のカードを戻す ★★★
+     * マスに置かれた最後のカードを戻す (再生成して戻す)
      */
     function returnCardFromCell() {
-        // 現在のマス (currentCellIndex - 1) の一つ前のマス、つまり
-        // 最後にドロップされたカードが入っているマスを探す (index 1以上)
         if (currentCellIndex <= 1) {
             alert("「しりとり」のマスは戻せません。");
             return;
@@ -91,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.dataset.nextChar = getNextChar(wordData.reading); 
                 card.dataset.firstChar = wordData.reading.charAt(0);
                 
+                // ★★★ 修正箇所: wordData.image を使用してイラストを確実に再生成 ★★★
                 card.innerHTML = `
                     <img src="assets/images/${wordData.image}" alt="${wordData.word}" class="card-image">
                     <div class="card-label">${wordData.word}</div>
@@ -165,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}"></div>`;
         }
         
-        // ★★★ 修正: ボタンを非表示にリセット ★★★
         RETURN_CARD_BUTTON.style.display = 'none';
 
         selectAndRenderCards();
@@ -174,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ----------------------------------------------------
-    // 2. カードの選択と表示 (連鎖探索ロジックは変更なし)
+    // 2. カードの選択と表示
     // ----------------------------------------------------
 
     function selectAndRenderCards() {
@@ -183,6 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedChain.length < chainLength) {
             GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットして再試行してください。';
+            // 連鎖失敗時、カードエリアを空にして確実にエラー状態にする
+            CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
             return;
         }
 
@@ -200,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.nextChar = nextChar; 
             card.dataset.firstChar = word.reading.charAt(0); 
             
+            // ★★★ 修正箇所: word.image を使用してイラストを確実に生成 ★★★
             card.innerHTML = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image">
                 <div class="card-label">${word.word}</div>
@@ -217,9 +217,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const SHIRITORI_MAP = {
             'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
-            'さ': ['ざ'], 'し': ['じ'], 'す': ['す', 'ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
-            'た': ['だ'], 'ち': ['ぢ'], 'つ': ['つ', 'づ'], 'て': ['で'], 'と': ['ど'],
-            'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
+            'さ': ['ざ'], 'し': ['し', 'じ'], 'す': ['す', 'ず'], 'せ': ['せ', 'ぜ'], 'そ': ['そ', 'ぞ'],
+            'た': ['だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['で'], 'と': ['ど'],
+            'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
         };
 
         const CLEAR_MAP = {};
@@ -302,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // ドロップ時のイベントリスナーは変更なし
-
         SHIRITORI_GRID.addEventListener('dragover', (e) => {
             e.preventDefault();
             const dropTarget = e.target.closest('.drop-target');
@@ -330,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             MENU_AREA.style.display = 'block';
         });
         
-        // ★★★ 追加: カード戻すボタンのイベント設定 ★★★
+        // カード戻すボタンのイベント設定
         RETURN_CARD_BUTTON.addEventListener('click', returnCardFromCell);
     }
 
@@ -457,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         FEEDBACK_MESSAGE.textContent = `次は${nextCellNumber}マス目。「${prevChar}」${hint}から始まるカードをドロップしてね！`;
         FEEDBACK_MESSAGE.style.color = '#3f51b5';
         
-        // ★★★ 修正: 戻るボタンの表示制御 ★★★
+        // 戻るボタンの表示制御
         if (currentCellIndex > 1 && currentCellIndex <= MAX_WORDS + 1) {
             RETURN_CARD_BUTTON.style.display = 'inline-block';
         } else {
