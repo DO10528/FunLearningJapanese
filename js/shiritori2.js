@@ -108,19 +108,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI(true);
     }
     
-    // ----------------------------------------------------
-    // 2. カードの選択と表示
+   // ----------------------------------------------------
+    // 2. カードの選択と表示 (修正版)
     // ----------------------------------------------------
 
     function selectAndRenderCards() {
-        let availableWords = shuffleArray(allWords);
+        const chainLength = MAX_WORDS; // 15
         
-        // ランダムに15単語を選ぶ（※単純に先頭から15個を選ぶ）
-        gameWords = availableWords.slice(0, MAX_WORDS);
+        // 1. 15個の連続するしりとりチェーンを探索する
+        let selectedChain = findShiritoriChain(chainLength);
+
+        if (selectedChain.length < chainLength) {
+            // 見つからなかった場合（データの偏りなどで非常に稀に発生）
+            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットしてください。';
+            return;
+        }
+
+        // 今回のゲームで使用する15単語を設定
+        gameWords = selectedChain;
         
-        // カードエリアにシャッフルして表示
-        CARD_SELECTION_AREA.innerHTML = '<h3>残りの単語 (15枚)</h3>';
+        // 2. カードエリアにシャッフルして表示
+        CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${gameWords.length}枚)</h3>`;
         
+        // ユーザーが自分で正しい順序を探せるよう、シャッフルしたカードを表示
         shuffleArray(gameWords).forEach(word => {
             const lastChar = getCleanLastChar(word.reading);
             const card = document.createElement('div');
@@ -138,6 +148,59 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             CARD_SELECTION_AREA.appendChild(card);
         });
+    }
+
+    /**
+     * 指定された長さのしりとりチェーンを探索する (バックトラック方式)
+     * @param {number} length - 必要なチェーンの長さ
+     * @returns {Array<object>} 見つかった単語の配列
+     */
+    function findShiritoriChain(length) {
+        let allAvailable = allWords.filter(word => getCleanLastChar(word.reading) !== 'ん');
+        if (allAvailable.length < length) return []; // そもそも足りない
+        
+        const startChar = 'り'; // 最初の単語「しりとり」の終わり
+        let chain = [];
+        let usedIds = new Set();
+        let attempts = 0;
+        const maxAttempts = 100;
+
+        // 成功するまで何度も試行する
+        while (attempts < maxAttempts) {
+            chain = [];
+            usedIds.clear();
+            let currentLastChar = startChar;
+            
+            for (let i = 0; i < length; i++) {
+                // 現在の文字から始まる利用可能な単語を抽出
+                let candidates = allAvailable.filter(word => 
+                    word.reading.charAt(0) === currentLastChar && 
+                    !usedIds.has(word.id)
+                );
+                
+                if (candidates.length === 0) {
+                    // チェーンが途切れた
+                    break;
+                }
+                
+                // ランダムに次の単語を選択
+                const nextWord = candidates[Math.floor(Math.random() * candidates.length)];
+                
+                chain.push(nextWord);
+                usedIds.add(nextWord.id);
+                currentLastChar = getCleanLastChar(nextWord.reading);
+            }
+
+            if (chain.length === length) {
+                // 成功！
+                return chain;
+            }
+            attempts++;
+            // 試行回数が増えたら、次の単語の選択に使うリストをリフレッシュする（効率化のため）
+            allAvailable = shuffleArray(allAvailable); 
+        }
+
+        return []; // 最大試行回数に達しても見つからなかった場合
     }
 
     // ----------------------------------------------------
