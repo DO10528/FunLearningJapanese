@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>しりとり2 (マス埋め)</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="back-button">🏠 ホームへ</a>
+            <h1>しりとり2 (マス埋めゲーム)</h1>
+        </div>
+    </header>
+
+    <main class="shiritori2-main">
+
+        <div id="shiritori2-menu" class="menu-area-reset">
+            <div class="menu-card-reset" style="padding: 30px;">
+                <h2>🎮 しりとり2 ゲーム説明</h2>
+                <p>左側の単語カード (15枚) を、右側のマス目にドラッグ＆ドロップして、しりとりを完成させましょう！</p>
+                <p>最初のマスは「しりとり」からスタートです。</p>
+                <button id="startButton2" class="menu-card-button menu-card-reset" onclick="startShiritori2Game()">
+                    ゲームスタート
+                </button>
+            </div>
+        </div>
+
+        <div id="shiritori2-game-area" class="game-area-reset" style="display: none;">
+            
+            <div class="shiritori2-container">
+
+                <div id="card-selection-area" class="card-area">
+                    <h3>残りの単語 (15枚)</h3>
+                    </div>
+
+                <div id="drop-grid-area" class="grid-area">
+                    <h3 id="game-status-message">チャレンジ開始！</h3>
+
+                    <div id="shiritori-grid" class="shiritori-grid">
+                        <div id="cell-0" class="grid-cell filled" data-start-char="り">
+                            <span class="word-text">しりとり</span>
+                        </div>
+                        </div>
+                    
+                    <p id="feedback-message" class="feedback-message">「り」から始まるカードを2マス目に入れてね！</p>
+                </div>
+            </div>
+
+            <div class="game-controls-area">
+                <button id="resetButton" class="control-button" style="background-color: #ff6f61;">
+                    リセット
+                </button>
+                <button id="backToMenuButton" class="control-button" style="background-color: #3f51b5;">
+                    メニューに戻る
+                </button>
+            </div>
+        </div>
+
+    </main>
+    
+    <script src="js/shiritori2.js"></script>
+</body>
+</html>
