@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // DOM要素取得
+    // DOM要素
     // ----------------------------------------------------
     const MENU_AREA = document.getElementById('shiritori2-menu');
     const GAME_AREA = document.getElementById('shiritori2-game-area');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAME_STATUS_MESSAGE = document.getElementById('game-status-message');
     const RESET_BUTTON = document.getElementById('resetButton');
     const BACK_BUTTON = document.getElementById('backToMenuButton');
-    const RETURN_BUTTON = document.getElementById('returnCardButton'); // ← HTMLに合わせる
+    const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); // ← HTMLのボタンを利用
 
     // ----------------------------------------------------
     // 音声設定
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3';
 
     // ----------------------------------------------------
-    // 変数
+    // ゲーム変数
     // ----------------------------------------------------
     let allWords = [];
     let gameWords = [];
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (lastChar === 'ー' && reading.length > 1) {
             lastChar = reading.slice(-2, -1);
         }
-        const smallKana = {'ゃ': 'や', 'ゅ': 'ゆ', 'ょ': 'よ'};
+        const smallKana = { 'ゃ': 'や', 'ゅ': 'ゆ', 'ょ': 'よ' };
         return smallKana[lastChar] || lastChar;
     }
 
@@ -81,14 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupGame() {
         MENU_AREA.style.display = 'none';
         GAME_AREA.style.display = 'block';
+        RETURN_CARD_BUTTON.style.display = 'inline-block';
+
         SHIRITORI_GRID.style.display = 'flex';
-        SHIRITORI_GRID.style.gap = '6px';
-        SHIRITORI_GRID.style.overflowX = 'auto';
         SHIRITORI_GRID.style.flexWrap = 'nowrap';
+        SHIRITORI_GRID.style.overflowX = 'auto';
+        SHIRITORI_GRID.style.gap = '6px';
 
         currentCellIndex = 1;
         SHIRITORI_GRID.innerHTML = `
-            <div id="cell-0" class="grid-cell filled shiritori-start" data-word="しりとり" data-next-char="り">
+            <div id="cell-0" class="grid-cell filled" data-word="しりとり" data-next-char="り">
                 <span class="word-text">しりとり</span>
             </div>
         `;
@@ -98,11 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         selectAndRenderCards();
         setupDragAndDropListeners();
-        updateUI();
+        updateUI(true);
     }
 
     // ----------------------------------------------------
-    // カード描画
+    // カード作成
     // ----------------------------------------------------
     function selectAndRenderCards() {
         const chain = findShiritoriChain(MAX_WORDS);
@@ -116,13 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // カードをHTMLに描画
+    // カード表示
     // ----------------------------------------------------
     function renderCards(chain) {
         CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (${chain.length}枚)</h3>`;
-        const container = document.createElement('div');
-        container.className = 'card-container';
-        CARD_SELECTION_AREA.appendChild(container);
+        const cardContainer = document.createElement('div');
+        cardContainer.className = 'card-container';
+        CARD_SELECTION_AREA.appendChild(cardContainer);
 
         shuffleArray(chain).forEach(word => {
             const card = document.createElement('div');
@@ -136,24 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image">
                 <div class="card-label">${word.word}</div>
             `;
-            container.appendChild(card);
+            cardContainer.appendChild(card);
         });
     }
 
     // ----------------------------------------------------
-    // しりとり連鎖探索
+    // 連鎖生成
     // ----------------------------------------------------
     function findShiritoriChain(length) {
-        const startChar = 'り';
-        let available = [...allWords];
+        let allAvailable = [...allWords];
+        if (allAvailable.length < length) return [];
 
-        for (let attempt = 0; attempt < 500; attempt++) {
+        const startChar = 'り';
+        for (let attempts = 0; attempts < 500; attempts++) {
             let used = new Set();
             let result = [];
             let current = startChar;
 
             for (let i = 0; i < length; i++) {
-                const candidates = available.filter(w => 
+                const candidates = allAvailable.filter(w =>
                     w.reading.charAt(0) === current && !used.has(w.id)
                 );
                 if (candidates.length === 0) break;
@@ -163,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 used.add(next.id);
                 current = getNextChar(next.reading);
             }
+
             if (result.length === length) return result;
         }
         return [];
@@ -196,8 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             MENU_AREA.style.display = 'block';
         });
 
-        // 戻すボタン
-        RETURN_BUTTON.addEventListener('click', returnAllCardsToArea);
+        RETURN_CARD_BUTTON.addEventListener('click', returnAllCardsToArea);
     }
 
     // ----------------------------------------------------
@@ -242,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCellIndex++;
             if (currentCellIndex > MAX_WORDS) {
                 FEEDBACK_MESSAGE.textContent = '🎉 全クリア！おめでとう！';
-                RETURN_BUTTON.style.display = 'none';
+                RETURN_CARD_BUTTON.style.display = 'none';
                 return;
             }
             updateUI();
@@ -254,12 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 全カードを残りの単語エリアに戻す
+    // カードを全て戻す
     // ----------------------------------------------------
     function returnAllCardsToArea() {
         const filledCells = document.querySelectorAll('.grid-cell.filled:not(#cell-0)');
-        const cardContainer = CARD_SELECTION_AREA.querySelector('.card-container');
-
         filledCells.forEach(cell => {
             const word = cell.dataset.word;
             const wordObj = gameWords.find(w => w.word === word);
@@ -275,14 +276,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="assets/images/${wordObj.image}" alt="${wordObj.word}" class="card-image">
                     <div class="card-label">${wordObj.word}</div>
                 `;
-                cardContainer.appendChild(card);
+                CARD_SELECTION_AREA.querySelector('.card-container').appendChild(card);
             }
             cell.classList.remove('filled');
             cell.classList.add('drop-target');
             cell.innerHTML = '';
         });
 
-        FEEDBACK_MESSAGE.textContent = '🌀 全てのカードを元に戻しました！';
+        FEEDBACK_MESSAGE.textContent = '🌀 マスに置いたカードをすべて戻しました！';
         FEEDBACK_MESSAGE.style.color = '#009688';
         currentCellIndex = 1;
         updateUI();
@@ -295,9 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const prev = document.getElementById(`cell-${currentCellIndex - 1}`);
         const nextChar = prev.dataset.nextChar;
         GAME_STATUS_MESSAGE.textContent = `マス目 ${currentCellIndex} / ${MAX_WORDS}`;
-        FEEDBACK_MESSAGE.innerHTML = `次は「${nextChar}」から始まる言葉を探そう！`;
+        FEEDBACK_MESSAGE.textContent = `「${nextChar}」から始まる言葉を探してね！`;
         FEEDBACK_MESSAGE.style.color = '#3f51b5';
-        RETURN_BUTTON.style.display = 'inline-block';
     }
 
     loadWords();
