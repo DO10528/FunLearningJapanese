@@ -157,15 +157,12 @@ a.menu-card-button {
 
 /* --- ひらがなゲーム2 の文字ブロック スタイル --- */
 .char-block {
-    /* 要件5: 同じ大きさのブロック */
     width: 50px;
     height: 50px;
     line-height: 50px;
     text-align: center;
     font-size: 1.5em; 
     font-weight: bold;
-    
-    /* ブロックのデザイン */
     background-color: #ffcc5c; 
     color: #333;
     border: 2px solid #ff6f61; 
@@ -180,7 +177,6 @@ a.menu-card-button {
     background-color: #ffd880; 
 }
 
-/* 選択中のブロック */
 .char-block.selected {
     border: 3px solid #5c7aff; 
     background-color: #cce0ff;
@@ -275,22 +271,25 @@ header {
     margin-bottom: 8px;
     cursor: grab;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.1s;
+    
+    /* ★ ここで新しいトランジション効果を追加 */
+    transition: transform 0.2s ease, opacity 0.3s ease;
 }
 
 .word-card:hover {
     transform: scale(1.02);
 }
 
+/* ★ ドラッグ中のアニメーション効果 */
 .word-card.dragging {
-    opacity: 0.5;
-    border: 2px dashed #000;
+    transform: scale(0.95);
+    opacity: 0.6;
 }
 
 .card-image {
     width: 50px;
     height: 50px;
-    object-fit: contain; /* イラストが切れないように */
+    object-fit: contain;
     margin-right: 10px;
     border-radius: 4px;
 }
@@ -300,7 +299,6 @@ header {
     font-weight: bold;
     color: #333;
 }
-
 
 /* --- 右側: 16マスグリッドエリア --- */
 .grid-area {
@@ -313,7 +311,7 @@ header {
 
 .shiritori-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4x4のグリッド */
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     padding: 10px;
     background-color: #e3e9f7;
@@ -323,7 +321,7 @@ header {
 
 .grid-cell {
     width: 100%;
-    aspect-ratio: 1 / 1; /* 正方形に保つ */
+    aspect-ratio: 1 / 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -333,23 +331,20 @@ header {
     background-color: #ffffff;
     transition: background-color 0.2s, border-color 0.2s;
     overflow: hidden;
-    padding: 5px; /* カードの内容が収まるようにパディングを追加 */
+    padding: 5px;
 }
 
-/* スタートマス */
 #cell-0.filled {
     background-color: #ffcc5c;
     border: 3px solid #f0a000;
 }
 
-/* ドロップ後のマス */
 .grid-cell.filled {
     border: 3px solid #4CAF50;
     background-color: #e8f5e9;
     cursor: default;
 }
 
-/* ドロップ時のハイライト */
 .grid-cell.drop-target.drag-over {
     background-color: #d1d9fa;
     border-color: #1a237e;
@@ -361,7 +356,6 @@ header {
     color: #333;
 }
 
-/* マスに入ったカードのスタイルを調整 */
 .grid-cell.filled .card-image {
     width: 80px;
     height: 80px;
@@ -370,7 +364,6 @@ header {
 .grid-cell.filled .card-label {
     font-size: 1rem;
 }
-
 
 .feedback-message {
     margin-top: 15px;

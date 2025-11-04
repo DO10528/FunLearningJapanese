@@ -193,59 +193,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // ドロップ処理
-    // ----------------------------------------------------
-    function handleDrop(e) {
-        e.preventDefault();
-        const dropTarget = e.target.closest('.drop-target');
-        if (!dropTarget) return;
+// ドロップ処理（修正版）
+// ----------------------------------------------------
+function handleDrop(e) {
+    e.preventDefault();
+    const dropTarget = e.target.closest('.drop-target');
+    if (!dropTarget) return;
 
-        const droppedWord = e.dataTransfer.getData('text/plain');
-        const card = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
-        if (!card) return;
+    const droppedWord = e.dataTransfer.getData('text/plain');
+    const card = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
+    if (!card) return;
 
-        const cellIndex = parseInt(dropTarget.dataset.cellIndex, 10);
-        if (cellIndex !== currentCellIndex) {
-            playSound(SOUND_INCORRECT_PATH);
-            FEEDBACK_MESSAGE.textContent = `❌ ${currentCellIndex + 1}マス目に入れてね！`;
-            FEEDBACK_MESSAGE.style.color = '#ff6f61';
-            CARD_SELECTION_AREA.appendChild(card);
-            card.style.opacity = '1';
+    // ドラッグ元の要素を保持（戻すときに使う）
+    const originalParent = card.parentNode;
+
+    const cellIndex = parseInt(dropTarget.dataset.cellIndex, 10);
+    if (cellIndex !== currentCellIndex) {
+        playSound(SOUND_INCORRECT_PATH);
+        FEEDBACK_MESSAGE.textContent = `❌ ${currentCellIndex + 1}マス目に入れてね！`;
+        FEEDBACK_MESSAGE.style.color = '#ff6f61';
+
+        // 🔁 元のエリアに戻す（位置も維持）
+        CARD_SELECTION_AREA.appendChild(card);
+        card.style.opacity = '1';
+        return;
+    }
+
+    // ---- 正誤判定を呼び出し ----
+    checkAnswer(card, dropTarget, originalParent);
+}
+
+
+    function checkAnswer(card, dropTarget, originalParent) {
+    const prev = document.getElementById(`cell-${currentCellIndex - 1}`);
+    const required = prev.dataset.nextChar;
+    const first = card.dataset.firstChar;
+
+    if (required === first) {
+        playSound(SOUND_CORRECT_PATH);
+        dropTarget.innerHTML = card.innerHTML;
+        dropTarget.classList.remove('drop-target');
+        dropTarget.classList.add('filled');
+        dropTarget.dataset.word = card.dataset.word;
+        dropTarget.dataset.nextChar = card.dataset.nextChar;
+
+        // 🟢 ドラッグカード削除
+        card.remove();
+
+        currentCellIndex++;
+        if (currentCellIndex > MAX_WORDS) {
+            FEEDBACK_MESSAGE.textContent = '🎉 全クリア！おめでとう！';
+            FEEDBACK_MESSAGE.style.color = '#2e7d32';
             return;
         }
+        updateUI(true);
+    } else {
+        // ❌ 間違えた場合 → 元に戻す
+        playSound(SOUND_INCORRECT_PATH);
+        FEEDBACK_MESSAGE.textContent = `❌「${required}」から始まる単語を選んでね！`;
+        FEEDBACK_MESSAGE.style.color = '#ff6f61';
 
-        checkAnswer(card, dropTarget);
-    }
-
-    // ----------------------------------------------------
-    // 正誤判定
-    // ----------------------------------------------------
-    function checkAnswer(card, dropTarget) {
-        const prev = document.getElementById(`cell-${currentCellIndex - 1}`);
-        const required = prev.dataset.nextChar;
-        const first = card.dataset.firstChar;
-
-        if (required === first) {
-            playSound(SOUND_CORRECT_PATH);
-            dropTarget.innerHTML = card.innerHTML;
-            dropTarget.classList.remove('drop-target');
-            dropTarget.classList.add('filled');
-            dropTarget.dataset.word = card.dataset.word;
-            dropTarget.dataset.nextChar = card.dataset.nextChar;
-            card.remove();
-            currentCellIndex++;
-            if (currentCellIndex > MAX_WORDS) {
-                FEEDBACK_MESSAGE.textContent = '🎉 全クリア！おめでとう！';
-                return;
-            }
-            updateUI(true);
-        } else {
-            playSound(SOUND_INCORRECT_PATH);
-            FEEDBACK_MESSAGE.textContent = `❌「${required}」から始まる単語を選んでね！`;
-            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+        // 🔁 元の位置（残り単語リスト）に戻す
+        if (originalParent && !CARD_SELECTION_AREA.contains(card)) {
             CARD_SELECTION_AREA.appendChild(card);
         }
+        card.style.opacity = '1';
     }
+}
+
 
     // ----------------------------------------------------
     // UI更新
