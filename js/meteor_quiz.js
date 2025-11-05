@@ -1,27 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // DOM要素の定義 (省略)
+    // DOM要素の定義
     // ----------------------------------------------------
     const skyArea = document.getElementById('sky-area');
     const quizModal = document.getElementById('quiz-modal');
     const questionTextElement = document.getElementById('question-text');
     const choiceButtonsArea = document.getElementById('choice-buttons-area');
-    const englishTranslation = document.getElementById('english-translation'); // 参照はありますが、未使用
+    const scoreDisplay = document.getElementById('score');
+    const lifeDisplay = document.getElementById('life');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const explosionTemplate = document.getElementById('explosion-template');
 
     // ----------------------------------------------------
-    // ゲーム定数と状態 (省略)
+    // ゲーム定数と状態
     // ----------------------------------------------------
     const INITIAL_LIFE = 3;
-    const METEOR_INTERVAL = 1500;
+    const METEOR_INTERVAL = 1500; // 1.5秒ごとに隕石生成
     let gameInterval = null;
-    let meteorSpeed = 1;
+    let meteorSpeed = 1; 
     let score = 0;
     let life = INITIAL_LIFE;
     let isModalOpen = false;
     let currentMeteorElement = null;
     let currentQuizData = null;
 
-    // ★★★ 問題データ (日本語、英語、画像、不正解の選択肢) ★★★
+    // ★★★ 問題データ ★★★
     const QUIZ_DATA = [
         { word: "いぬ", english: "Dog", image: "inu.png", choices: ["Dog", "Cat", "Bird", "Mouse"] },
         { word: "ねこ", english: "Cat", image: "neko.png", choices: ["Cat", "Rabbit", "Fox", "Wolf"] },
@@ -38,13 +41,40 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     
     // ----------------------------------------------------
-    // ユーティリティ関数 (省略)
+    // ユーティリティ関数
     // ----------------------------------------------------
 
-    // ... (triggerExplosion, shuffleArray, updateScore, updateLife, endGame, startGame)
+    /**
+     * 配列をシャッフルする
+     */
+    function shuffleArray(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    /**
+     * 爆発アニメーションを生成し再生する
+     */
+    function triggerExplosion(x, y, isMiss = false) {
+        const explosion = explosionTemplate.cloneNode(true);
+        explosion.classList.remove('hidden');
+        explosion.id = '';
+
+        // 地面ヒットや不正解は赤/オレンジ、正解は黄色の爆発
+        explosion.style.backgroundColor = isMiss ? 'red' : 'yellow'; 
+
+        explosion.style.left = `${x - 25}px`;
+        explosion.style.top = `${y - 25}px`;
+        explosion.style.animation = 'explode 0.5s forwards';
+
+        skyArea.appendChild(explosion);
+
+        explosion.addEventListener('animationend', () => {
+            explosion.remove();
+        });
+    }
 
     // ----------------------------------------------------
-    // 隕石の生成とクリック
+    // 隕石の生成と落下処理
     // ----------------------------------------------------
 
     /**
@@ -61,27 +91,78 @@ document.addEventListener('DOMContentLoaded', () => {
         const quizIndex = Math.floor(Math.random() * QUIZ_DATA.length);
         meteor.dataset.quizIndex = quizIndex;
         
-        // ★隕石に問題の日本語単語を表示★
+        // 隕石に問題の日本語単語を表示
         meteor.textContent = QUIZ_DATA[quizIndex].word;
 
         meteor.addEventListener('click', handleMeteorClick);
         skyArea.appendChild(meteor);
     }
 
-    // ... (fallLoop, handleMeteorClick)
+    /**
+     * 落下アニメーションループ (修正済み)
+     */
+    function fallLoop() {
+        if (life <= 0) return;
+        
+        const allMeteors = document.querySelectorAll('.meteor');
+        
+        // ★修正ポイント: game-containerの高さを取得し、地面の位置を安定させる★
+        const gameContainer = document.getElementById('game-container');
+        // 地面の位置: ゲームコンテナの高さの90%（CSS設定に基づく）
+        const groundY = gameContainer.offsetHeight * 0.9; 
+
+        allMeteors.forEach(meteor => {
+            if (isModalOpen) return;
+
+            let currentY = parseFloat(meteor.style.top);
+            currentY += meteorSpeed;
+            meteor.style.top = `${currentY}px`;
+
+            // 地面に到達したら
+            if (currentY + meteor.offsetHeight >= groundY) {
+                const meteorX = meteor.offsetLeft + meteor.offsetWidth / 2;
+                triggerExplosion(meteorX, groundY, true); // 地面ヒット爆発
+                
+                updateLife(-1);
+                meteor.remove();
+            }
+        });
+
+        meteorSpeed = Math.min(4, 1 + score / 500); 
+        
+        requestAnimationFrame(fallLoop);
+    }
+
 
     // ----------------------------------------------------
-    // クイズ表示ロジック
+    // イベントハンドラ
     // ----------------------------------------------------
+
+    /**
+     * 隕石がクリックされたときの処理
+     */
+    function handleMeteorClick(e) {
+        if (isModalOpen) return;
+        
+        isModalOpen = true;
+        currentMeteorElement = e.target;
+        
+        const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
+        currentQuizData = quizData;
+
+        currentMeteorElement.style.display = 'none';
+
+        showQuizModal(currentQuizData);
+    }
 
     /**
      * クイズモーダルを表示し、問題を設定する
      */
     function showQuizModal(data) {
-        // ★修正点: 質問文エリアを空にする★
+        // 質問文エリアを空にする
         questionTextElement.textContent = ``; 
 
-        // ★修正点: 画像/大きな日本語表示エリアを空にする★
+        // 画像/大きな日本語表示エリアを空にする
         document.getElementById('quiz-image-area').innerHTML = ''; 
 
         // 選択肢の準備: 正解1つ + 不正解1つ
@@ -90,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const correct = data.english; 
         const incorrects = data.choices.filter(c => c !== correct);
         
-        // ★常に2つの選択肢のみを最終決定★
         const finalChoices = [correct]; 
         
         if (incorrects.length > 0) {
@@ -107,10 +187,91 @@ document.addEventListener('DOMContentLoaded', () => {
             choiceButtonsArea.appendChild(button);
         });
         
-        // フィードバックメッセージは残す
         quizFeedback.textContent = '答えを選んでください。';
         quizModal.classList.remove('hidden');
     }
     
-    // ... (handleChoiceClick とその他の関数)
+    /**
+     * 選択肢がクリックされたときの処理
+     */
+    function handleChoiceClick(e) {
+        const selectedAnswer = e.target.dataset.answer;
+        
+        document.querySelectorAll('#choice-buttons-area button').forEach(btn => btn.disabled = true);
+
+        const meteorX = currentMeteorElement.offsetLeft + currentMeteorElement.offsetWidth / 2;
+        const meteorY = currentMeteorElement.offsetTop + currentMeteorElement.offsetHeight / 2;
+
+        if (selectedAnswer === currentQuizData.english) {
+            // 正解
+            quizFeedback.textContent = '⭕ 正解！隕石破壊！';
+            e.target.style.backgroundColor = 'lightgreen';
+            updateScore(10);
+            
+            triggerExplosion(meteorX, meteorY, false); // 黄色い爆発
+            currentMeteorElement.remove();
+
+        } else {
+            // 不正解
+            quizFeedback.textContent = '❌ 不正解... 隕石が爆発！';
+            e.target.style.backgroundColor = 'red';
+            updateLife(-1);
+            
+            triggerExplosion(meteorX, meteorY, true); // 赤い爆発
+            currentMeteorElement.remove();
+        }
+
+        // モーダルを閉じる
+        setTimeout(() => {
+            quizModal.classList.add('hidden');
+            isModalOpen = false;
+        }, 1000);
+    }
+
+
+    // ----------------------------------------------------
+    // スコアとライフの更新
+    // ----------------------------------------------------
+
+    function updateScore(points) {
+        score += points;
+        scoreDisplay.textContent = score;
+    }
+
+    function updateLife(change) {
+        life += change;
+        lifeDisplay.textContent = Math.max(0, life);
+
+        if (life <= 0) {
+            endGame();
+        }
+    }
+    
+    // ----------------------------------------------------
+    // ゲームの開始と終了
+    // ----------------------------------------------------
+
+    function startGame() {
+        score = 0;
+        life = INITIAL_LIFE;
+        meteorSpeed = 1;
+        scoreDisplay.textContent = score;
+        lifeDisplay.textContent = life;
+        skyArea.innerHTML = ''; 
+
+        // 隕石生成インターバルを開始
+        gameInterval = setInterval(createMeteor, METEOR_INTERVAL);
+        
+        // 落下ループを開始
+        requestAnimationFrame(fallLoop);
+    }
+
+    function endGame() {
+        clearInterval(gameInterval);
+        isModalOpen = true; 
+        alert(`ゲームオーバー！あなたのスコアは ${score} 点です。`);
+    }
+
+    // ゲーム開始
+    startGame();
 });
