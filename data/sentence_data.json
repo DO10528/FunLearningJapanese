@@ -7,7 +7,7 @@
     { "id": "A5", "type": "NはAです", "hint": "（道具）の状態を表す文です。", "pattern": ["N_OBJECT_C", "は", "A_I_GOOD", "です"], "english": "The (N_OBJECT_C) is (A_I_GOOD)." },
 
     { "id": "B1", "type": "NをVます", "hint": "（人物）が（食べ物）を食べる動作を表します。", "pattern": ["P_CHILD", "は", "N_FOOD_E", "を", "V_EAT"], "english": "(P_CHILD) eats (N_FOOD_E)." },
-    { "id": "B2", "type": "NをVます", "hint": "（動物）が（食べ物）を食べる動作を表します。", "pattern": ["N_ANIMAL_H", "は", "N_FOOD_E", "を", "V_EAT"], "english": "The (N_ANIMAL_H) eats (N_FOOD_E)." },
+    { "id": "B2", "type": "NをVます", "hint": "（動物）が（食べ物）を食べる動作を表します。", "pattern": ["N_ANIMAL_H", "は", "N_FOOD_ANIMAL", "を", "V_EAT"], "english": "The (N_ANIMAL_H) eats (N_FOOD_ANIMAL)." },
     { "id": "B3", "type": "NをVます", "hint": "（人物）が（飲み物）を飲む動作を表します。", "pattern": ["P_CHILD", "は", "N_DRINK_OK", "を", "V_DRINK"], "english": "(P_CHILD) drinks (N_DRINK_OK)." },
     { "id": "B4", "type": "NをVます", "hint": "（人物）が（道具）を捜す動作を表します。", "pattern": ["P_CHILD", "は", "N_OBJECT_U", "を", "V_LOOK"], "english": "(P_CHILD) looks for (N_OBJECT_U)." },
     { "id": "B5", "type": "NをVます", "hint": "（人物）が（乗り物）に乗る動作を表します。", "pattern": ["P_CHILD", "は", "N_VEHICLE_R", "に", "V_RIDE"], "english": "(P_CHILD) rides (N_VEHICLE_R)." },
@@ -26,9 +26,9 @@
 
     { "id": "E1", "type": "NはNがAです", "hint": "（動物）は（体の部位）が（形容詞）です。", "pattern": ["N_ANIMAL_H", "は", "N_BODY", "が", "A_I_SIZE"], "english": "The (N_ANIMAL_H)'s (N_BODY) is (A_I_SIZE)." },
     { "id": "E2", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_SIZE"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_SIZE)." },
-    { "id": "E3", "type": "NはNがAです", "hint": "（動物）は（体の部位）が（形容詞）です。", "pattern": ["N_ANIMAL_H", "は", "N_BODY", "が", "A_I_GOOD"], "english": "The (N_ANIMAL_H)'s (N_BODY) is (A_I_GOOD)." },
-    { "id": "E4", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_GOOD"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_GOOD)." },
-    { "id": "E5", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_SIZE"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_SIZE)." },
+    { "id": "E3", "type": "NはNがAです", "hint": "（人物）は（体の部位）が（形容詞）です。", "pattern": ["P_CHILD", "は", "N_BODY", "が", "A_I_SIZE"], "english": "(P_CHILD)'s (N_BODY) is (A_I_SIZE)." },
+    { "id": "E4", "type": "NはNがAです", "hint": "（動物）は（体の部位）が（形容詞）です。", "pattern": ["N_ANIMAL_H", "は", "N_BODY", "が", "A_I_GOOD"], "english": "The (N_ANIMAL_H)'s (N_BODY) is (A_I_GOOD)." },
+    { "id": "E5", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_GOOD"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_GOOD)." },
 
     { "id": "F1", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
     { "id": "F2", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
@@ -56,7 +56,10 @@
       { "japanese": "りんご", "english": "apple" }, { "japanese": "すし", "english": "sushi" }, { "japanese": "みかん", "english": "mandarin orange" }, { "japanese": "ぎょうざ", "english": "gyoza" }, { "japanese": "とうふ", "english": "tofu" }, { "japanese": "あんこ", "english": "anko" }
     ],
     "N_FOOD_E": [
-      { "japanese": "ごはん", "english": "rice" }, { "japanese": "たまご", "english": "egg" }, { "japanese": "にく", "english": "meat" }, { "japanese": "バナナ", "english": "banana" }, { "japanese": "いちご", "english": "strawberry" }, { "japanese": "ぎょうざ", "english": "gyoza" }
+      { "japanese": "ごはん", "english": "rice" }, { "japanese": "たまご", "english": "egg" }, { "japanese": "にく", "english": "meat" }, { "japanese": "とうふ", "english": "tofu" }, { "japanese": "ぎょうざ", "english": "gyoza" }
+    ],
+    "N_FOOD_ANIMAL": [
+      { "japanese": "ごはん", "english": "rice" }, { "japanese": "にく", "english": "meat" }
     ],
     "N_DRINK_OK": [
       { "japanese": "みず", "english": "water" }, { "japanese": "こうちゃ", "english": "black tea" }, { "japanese": "こーら", "english": "cola" }, { "japanese": "コーヒー", "english": "coffee" }
@@ -92,13 +95,13 @@
       { "japanese": "くち", "english": "mouth" }, { "japanese": "て", "english": "hand" }, { "japanese": "あし", "english": "foot/leg" }
     ],
     "A_I_GOOD": [
-      { "japanese": "かわいい", "english": "cute" }, { "japanese": "たのしい", "english": "fun" }, { "japanese": "おいしい", "english": "delicious" }
+      { "japanese": "かわいい", "english": "cute" }, { "japanese": "たのしい", "english": "fun" }, { "japanese": "おもしろい", "english": "interesting" }
     ],
     "A_I_BAD": [
       { "japanese": "わるい", "english": "bad" }, { "japanese": "おそい", "english": "slow" }
     ],
     "A_I_STATE": [
-      { "japanese": "おもしろい", "english": "interesting" }, { "japanese": "つよい", "english": "strong" }
+      { "japanese": "つよい", "english": "strong" }, { "japanese": "おもしろい", "english": "interesting" }
     ],
     "A_I_TASTE": [
       { "japanese": "あまい", "english": "sweet" }, { "japanese": "からい", "english": "spicy" }, { "japanese": "すっぱい", "english": "sour" }
@@ -110,7 +113,7 @@
       { "japanese": "おおきい", "english": "big" }, { "japanese": "ひろい", "english": "wide" }, { "japanese": "せまい", "english": "narrow" }
     ],
     "A_I_TEMP": [
-      { "japanese": "あつい", "english": "hot" }, { "japanese": "さむい", "english": "cold" }, { "japanese": "つめたい", "english": "cold" }
+      { "japanese": "あつい", "english": "hot" }, { "japanese": "さむい", "english": "cold" }, { "japanese": "つめたい", "english": "chilly" }
     ],
     "V_EAT": [
       { "japanese": "たべます", "english": "eats" }

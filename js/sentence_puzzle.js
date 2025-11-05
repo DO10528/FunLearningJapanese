@@ -104,26 +104,27 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function generateRandomSentence(template) {
         const japaneseParts = [];
-        let englishText = template.english; // 英文テンプレートを取得
+        let englishText = template.english; 
         
         template.pattern.forEach(partKey => {
             if (partKey.startsWith('P_PERSON') || partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_')) {
-                // 単語プールからランダムに選択
                 const pool = wordPool[partKey];
+                
                 if (pool && pool.length > 0) {
-                    const randomItem = pool[Math.floor(Math.random() * pool.length)]; // ランダムな単語オブジェクトを取得
+                    const randomItem = pool[Math.floor(Math.random() * pool.length)];
                     
                     // 1. 日本語の単語を取得
                     japaneseParts.push(randomItem.japanese);
 
                     // 2. 英文のプレースホルダーを置換
-                    // プレースホルダーのパターンを正しく設定し、一致する部分のみを置換
-                    const englishPlaceholder = new RegExp(`\\(${partKey}\\)`, 'g');
+                    // (PARTKEY) という文字列をそのまま置換します (正規表現を使わず安全に置換)
+                    const placeholderString = `(${partKey})`;
                     
-                    englishText = englishText.replace(englishPlaceholder, randomItem.english);
+                    // 文字列置換を使用
+                    englishText = englishText.replace(placeholderString, randomItem.english);
 
                 } else {
-                    japaneseParts.push("[エラー]"); // プールが空の場合
+                    japaneseParts.push("[エラー]"); 
                 }
             } else {
                 // 助詞や助動詞などの固定語彙 (は、が、を、へ、です)
@@ -131,10 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 念のため、置換されずに残った汎用的なプレースホルダーを削除
-        englishText = englishText.replace(/\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)/g, '');
+        // 念のため、残ってしまったプレースホルダーを削除
+        englishText = englishText.replace(/\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)|\(P_[^\)]+\)/g, '');
+        // 句読点を追加（文末にピリオドがない場合）
+        if (!englishText.match(/[.!?]$/)) {
+            englishText += '.';
+        }
 
-        return { japaneseParts, englishText };
+        return { japaneseParts, englishText: englishText.trim() };
     }
 
 
