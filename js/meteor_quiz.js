@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const quizIndex = Math.floor(Math.random() * QUIZ_DATA.length);
         meteor.dataset.quizIndex = quizIndex;
         
-        // 隕石に問題のテキストを表示 (日本語)
-        meteor.textContent = QUIZ_DATA[quizIndex].word;
+        // 隕石に問題のテキストを表示する行を削除しました
+        // meteor.textContent = QUIZ_DATA[quizIndex].word; 
 
         // クリックイベントを設定
         meteor.addEventListener('click', handleMeteorClick);
