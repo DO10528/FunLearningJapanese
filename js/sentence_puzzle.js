@@ -12,13 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionText = document.getElementById('question-text');
     const scoreDisplay = document.getElementById('score-display');
 
-    // ★★★ 音声ファイルのパス設定 (修正済み) ★★★
+    // ★★★ 音声ファイルのパス設定 ★★★
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
     // ★★★★★★★★★★★★★★★★★★★★★
     
-    let allSentences = [];         // JSONから読み込んだ全ての問題
-    let currentSentence = null;    // 現在の問題オブジェクト
+    let allSentences = [];         
+    let currentSentence = null;    
     let score = 0;
     let totalQuestions = 0;
     let currentQuestionIndex = 0;
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(DATA_PATH);
             const data = await response.json();
-            allSentences = shuffleArray(data.sentences); // 問題をシャッフル
+            allSentences = shuffleArray(data.sentences); 
             totalQuestions = allSentences.length;
 
             if (totalQuestions === 0) {
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         feedbackMessage.classList.add('hidden');
-        feedbackMessage.className = '';
+        feedbackMessage.className = 'quiz-feedback-message'; // クラスをリセット
         checkButton.disabled = false;
         resetButton.disabled = false;
         
@@ -84,9 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             card.textContent = part.word;
             card.classList.add('word-card');
             card.draggable = true;
-            // 内部インデックスと正解の単語を保存
             card.dataset.correctIndex = currentSentence.parts.findIndex(p => p.word === part.word);
-            card.dataset.id = `${part.word}-${index}`; // ユニークIDを付与
+            card.dataset.id = `${part.word}-${index}`; 
             
             cardContainer.appendChild(card);
         });
@@ -102,13 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupCardEvents() {
         document.querySelectorAll('.word-card').forEach(card => {
             card.addEventListener('dragstart', handleDragStart);
-            // カードが解答エリア内にある場合、クリックでカードエリアに戻す機能を追加
             card.addEventListener('click', handleCardClick); 
         });
     }
     
     function setupDropZoneEvents() {
-        // dropZoneは親要素としてドロップ処理全体を管理
         dropZone.addEventListener('dragover', handleDragOver);
         dropZone.addEventListener('dragleave', handleDragLeave);
         dropZone.addEventListener('drop', handleDrop);
@@ -122,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.dataTransfer.setData('text/plain', e.target.dataset.id);
     }
     
-    // ドラッグ終了時、CSSをリセット
     document.addEventListener('dragend', () => {
         if (draggedElement) {
             draggedElement.classList.remove('dragging');
@@ -131,12 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleDragOver(e) {
-        e.preventDefault(); 
-        // ドロップ位置の近くにあるカードをハイライトする処理などをここに記述可能
+        e.preventDefault();
     }
 
     function handleDragLeave(e) {
-        // ドロップオーバー時のスタイルリセット
+        // スタイルリセット処理があればここに
     }
 
     function handleDrop(e) {
@@ -147,10 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!card) return;
 
-        // カードをドロップゾーンに追加
-        dropZone.appendChild(card);
-        
-        // ドロップ位置を調整するために、ドロップされた位置の近くにある既存のカードを探す
+        // ドロップ位置を調整するためのヘルパー関数を呼び出す
         const afterElement = getDragAfterElement(dropZone, e.clientX, e.clientY);
         if (afterElement == null) {
             dropZone.appendChild(card);
@@ -161,13 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.remove('dragging');
     }
 
-    // ドロップ時に、どのカードの後ろに挿入するかを決定するヘルパー関数
     function getDragAfterElement(container, x, y) {
         const draggableElements = [...container.querySelectorAll('.word-card:not(.dragging)')];
 
         return draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
-            // カードの中心とドロップ位置を比較
             const offset = x - box.left - box.width / 2; 
 
             if (offset < 0 && offset > closest.offset) {
@@ -185,11 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickedCard = e.target.closest('.word-card');
         if (!clickedCard) return;
 
-        // ドロップゾーン内にあり、まだ正誤判定されていないカードを対象とする
         if (clickedCard.parentNode === dropZone && !clickedCard.classList.contains('correct-slot')) {
-             // カードを元のコンテナに戻す
              cardContainer.appendChild(clickedCard);
-             // スタイルをリセット
              clickedCard.classList.remove('correct-slot', 'wrong-slot');
              feedbackMessage.classList.add('hidden');
         }
@@ -222,21 +209,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const correctWord = currentSentence.parts[index].word;
             
             if (card.textContent === correctWord) {
-                // 正解の単語
                 card.classList.add('correct-slot');
                 card.classList.remove('wrong-slot');
             } else {
-                // 不正解の単語
                 card.classList.add('wrong-slot');
                 card.classList.remove('correct-slot');
                 isCorrect = false;
             }
-            // 判定後のカードはドラッグ不可にする
             card.draggable = false;
         });
 
         if (isCorrect) {
             // ★★★ 全て正解 ★★★
+            playSound(SOUND_CORRECT_PATH); // ★追加★
             score++;
             currentQuestionIndex++;
             displayFeedback(true, `🎉 素晴らしい！正解です。`);
@@ -245,11 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } else {
             // ★★★ 不正解 ★★★
+            playSound(SOUND_INCORRECT_PATH); // ★追加★
             displayFeedback(false, `🤔 残念、並び順が違います。カードをリセットして再挑戦！`);
             checkButton.disabled = false;
             resetButton.disabled = false;
-            
-            // 間違ったカードはクリックで戻せるようにするため、handleCardClickに処理を委ねる
         }
     }
 
@@ -262,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cardsToMove.forEach(card => {
             cardContainer.appendChild(card);
             card.classList.remove('correct-slot', 'wrong-slot');
-            card.draggable = true; // ドラッグを再度有効化
+            card.draggable = true; 
         });
         
         dropZone.innerHTML = '';
@@ -297,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * ゲーム終了処理
      */
     function endGame() {
+        playSound(SOUND_CORRECT_PATH); // ★追加★
         questionText.textContent = `🎉 ゲームクリア！`;
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
@@ -306,8 +291,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // ユーティリティ
+    // ユーティリティ (playSound 関数を追加)
     // ----------------------------------------------------
+    
+    /**
+     * 指定されたパスの音源を再生する関数
+     */
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
 
     function shuffleArray(array) {
         let newArray = [...array];
