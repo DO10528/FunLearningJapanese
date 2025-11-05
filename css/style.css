@@ -2,218 +2,332 @@
 /* サイト全体の基本設定 */
 /* ======================================== */
 body {
-    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: #f7f9fc;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+background-color: #f7f9fc;
+color: #333;
+margin: 0;
+padding: 20px;
+text-align: center;
 }
 
 /* タイトル設定 */
 h1 {
-    color: #ff6f61;
-    font-size: 2.5em;
-    border-bottom: 4px solid #ffcc5c;
-    display: inline-block;
-    padding-bottom: 5px;
+color: #ff6f61;
+font-size: 2.5em;
+border-bottom: 4px solid #ffcc5c;
+display: inline-block;
+padding-bottom: 5px;
 }
 
-/* ヘッダーデザイン */
-header {
-    background-color: #3f51b5; 
-    color: white;
-    padding: 25px 0 15px;
-    margin-bottom: 35px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-header h1 {
-    font-size: 2.5em;
-    margin: 0 auto;
-    color: white; 
-    border-bottom: none;
-    display: inline-block;
-    padding-bottom: 0;
-}
-
-/* メインコンテナ */
+/* コンテナの基本設定 */
 .container {
-    background-color: transparent; 
-    padding: 0 15px; 
-    max-width: 1050px;
-    margin: 0 auto 30px;
-    box-shadow: none;
-    border-radius: 0;
+background-color: white;
+padding: 30px;
+border-radius: 15px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+max-width: 800px;
+margin: 30px auto;
 }
 
 /* ======================================== */
-/* ホーム画面専用: グループと配置 (PDF準拠) */
-/* ======================================== */
-
-/* グループのコンテナ */
-.menu-group {
-    background-color: #e0e7ff; 
-    border: 3px solid #3f51b5;
-    border-radius: 18px; 
-    padding: 25px 30px;
-    margin-bottom: 35px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
-
-/* グループのタイトル (h2) */
-.menu-group h2 {
-    text-align: center;
-    color: #ff6f61;
-    font-size: 2.0em;
-    font-weight: bold;
-    border-bottom: 3px solid #ffcc5c;
-    display: inline-block;
-    padding-bottom: 5px;
-    margin-bottom: 30px;
-}
-
-/* ボタンのグリッド配置 (PDFのデザインに準拠) */
-.menu-buttons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
-    justify-content: center;
-}
-
 /* ボタンデザイン（共通） */
-.menu-card-button {
-    border: 2px solid #ffcc5c;
-    padding: 10px;
-    margin: 0;
-    border-radius: 15px;
-    font-size: 1.1em;
-    font-weight: bold;
-    text-decoration: none;
-    text-align: center;
-    
-    width: 100%;
-    height: 100px;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
+/* ======================================== */
+.menu-buttons-grid {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 30px;
+margin-top: 20px;
 }
 
-/* menu-group内のボタンの基本スタイル */
+.menu-card-button {
+border: 2px solid #ffcc5c;
+padding: 20px;
+margin: 0;
+border-radius: 15px;
+font-size: 1.3em;
+font-weight: bold;
+text-decoration: none;
+text-align: center;
+width: 200px;
+height: 150px;
+display: inline-flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+transition: all 0.3s ease;
+cursor: pointer;
+}
+
 button.menu-card-reset,
 a.menu-card-reset {
-    background-color: white !important;
-    color: #333 !important;
-    border: 2px solid #3f51b5 !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+background-color: white !important;
+color: #333 !important;
+border: 2px solid #ffcc5c !important;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .menu-card-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
-    background-color: #f0f8ff !important; 
+transform: translateY(-5px);
+box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+background-color: #fff8e1;
 }
 
 /* リンク要素の色とカーソルを調整 */
 a.menu-card-button {
-    color: #333;
+color: #333;
 }
 
 /* ======================================== */
-/* ★ クイズ選択肢の横並び設定 (ゲーム画面) ★ */
+/* 共通ボタンスタイル（ゲーム中） */
 /* ======================================== */
-
-/* 選択肢ボタン全体を囲むコンテナに適用 */
-#choice-buttons-area { 
-    display: flex; /* ★ 横並びを保証 ★ */
-    justify-content: center; /* 中央に寄せる */
-    flex-wrap: wrap; 
-    gap: 20px; /* ボタン間の間隔 */
-    margin-top: 20px;
-    padding: 10px;
+.control-button {
+border: none;
+border-radius: 8px;
+padding: 10px 16px;
+font-size: 16px;
+cursor: pointer;
+color: white;
+transition: opacity 0.2s;
 }
 
-/* 個別の選択肢ボタンの基本デザイン */
-#choice-buttons-area button {
-    /* サイズを固定し、横に3つ並びやすくする */
-    flex-grow: 1; /* スペースを均等に分け合う */
-    min-width: 180px; /* ボタンの最小幅を確保 */
-    max-width: 250px;
-    
-    padding: 15px 10px;
-    font-size: 1.5em;
-    border-radius: 10px;
-    border: 2px solid #3f51b5;
-    background-color: white;
-    color: #333;
-    transition: all 0.2s;
-    cursor: pointer;
-    box-shadow: 0 3px 0 #3f51b5; 
-    font-weight: bold;
+.control-button:hover {
+opacity: 0.85;
 }
-
-#choice-buttons-area button:hover:not(:disabled) {
-    background-color: #e0e7ff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 0 #3f51b5;
-}
-
-#choice-buttons-area button:active:not(:disabled) {
-    transform: translateY(3px);
-    box-shadow: 0 0 0 #3f51b5;
-}
-
-/* 正解/不正解時のスタイル */
-#choice-buttons-area button.correct-answer {
-    background-color: #4CAF50 !important; /* 緑 */
-    color: white !important;
-    border-color: #28a745 !important;
-    box-shadow: 0 3px 0 #28a745; 
-}
-#choice-buttons-area button:disabled:not(.correct-answer) {
-    background-color: #f8d7da !important; /* 薄い赤 */
-    color: #721c24 !important;
-    border-color: #ff6f61 !important;
-    box-shadow: 0 3px 0 #ff6f61; 
-}
-
 
 /* ======================================== */
-/* メディアクエリ（モバイル対応） */
+/* 画像やカード共通設定 */
 /* ======================================== */
-
-@media (max-width: 800px) {
-    .menu-buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 15px;
-    }
-    .menu-group {
-        padding: 20px;
-    }
+.menu-card-button img,
+.choice-card img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+border-radius: 5px;
+box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
-    /* 選択肢が横に並びきらない場合、ボタンを縦に並べる（1列または2列） */
-    #choice-buttons-area button {
-        min-width: 45%; /* 2列にするための調整 */
-        max-width: none;
-        font-size: 1.4em;
-    }
+#image-area img,
+#game-area img {
+width: 150px;
+height: 150px;
+object-fit: contain;
+display: block;
+margin: 0 auto 15px;
+border-radius: 10px;
 }
 
-@media (max-width: 500px) {
-    .menu-buttons-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
-    }
-    .menu-card-button {
-        height: 85px;
-        font-size: 1.0em;
-    }
+/* --- ひらがなゲームの選択肢 --- */
+#choice-buttons-area {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 20px;
+margin-top: 30px;
+}
+
+.choice-card {
+width: 150px !important;
+height: 150px !important;
+padding: 10px !important;
+margin: 0 !important;
+display: flex !important;
+flex-direction: column !important;
+justify-content: space-around !important;
+/* その他、ひらがな単語クイズで使われるスタイルを維持 */
+}
+
+
+/* ======================================== */
+/* しりとり2 専用スタイル */
+/* ======================================== */
+header {
+background-color: white;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+padding: 10px 20px;
+margin-bottom: 20px;
+}
+
+.header-container {
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.header-container h1 {
+margin: 0;
+font-size: 1.5em;
+border-bottom: none;
+color: #333;
+}
+
+.back-button {
+text-decoration: none;
+color: #3f51b5;
+font-weight: bold;
+padding: 8px 15px;
+border: 1px solid #3f51b5;
+border-radius: 5px;
+transition: background-color 0.2s;
+}
+
+.back-button:hover {
+background-color: #e0e7ff;
+}
+
+/* --- しりとり2：レイアウト（左右配置） --- */
+.shiritori2-container {
+display: flex;
+justify-content: center;
+align-items: flex-start;
+gap: 20px; /* ギャップを調整 */
+flex-wrap: nowrap;
+max-width: 1000px; /* 最大幅を少し調整 */
+margin: 20px auto;
+}
+
+/* --- 左側：カードリストエリア（ドラッグ元） --- */
+.card-area {
+flex: 1; /* リストエリアは柔軟に幅を取る */
+min-width: 250px;
+max-height: 500px; /* グリッドに高さを合わせる */
+overflow-y: auto;
+border: 2px solid #ccc;
+border-radius: 10px;
+padding: 10px;
+background-color: #fafafa;
+text-align: center;
+}
+
+/* --- 右側：グリッドエリア（ドロップ先） --- */
+.grid-area {
+flex: 2; /* グリッドエリアはリストエリアより広く取る */
+text-align: center;
+padding: 10px;
+border: 2px solid #3f51b5;
+border-radius: 10px;
+background-color: #eef2f8;
+}
+
+/* --- 4x4のグリッド設定 --- */
+.shiritori-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr); /* 4列に均等分割 */
+gap: 8px;
+padding: 10px;
+background: #f5f5f5;
+border-radius: 12px;
+margin: 10px auto;
+max-width: 480px; /* グリッドの最大幅を制限して中央に寄せる */
+}
+
+/* スクロールバーを非表示（横並びで使っていた名残を削除） */
+.shiritori-grid::-webkit-scrollbar {
+display: none;
+}
+
+/* --- 1マス（セル）の設定 --- */
+.grid-cell {
+/* width/heightの絶対指定を削除し、グリッドに任せる */
+aspect-ratio: 1 / 1; /* 正方形を維持 */
+border: 2px dashed #3f51b5;
+border-radius: 10px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-color: white;
+transition: border 0.3s, background-color 0.2s;
+overflow: hidden;
+padding: 2px;
+}
+
+.grid-cell.filled {
+border: 2px solid #4CAF50;
+background-color: #e8f5e9;
+}
+
+.grid-cell:hover:not(.filled) {
+background-color: #e0e7ff;
+border-color: #3f51b5;
+}
+
+/* マス内の単語 */
+.word-text {
+font-size: 1.2em;
+font-weight: bold;
+white-space: nowrap; /* 1行表示を維持 */
+}
+
+/* しりとり開始マス */
+.shiritori-start {
+background-color: #fffae6;
+border: 2px solid #ffb74d;
+}
+
+/* --- 残り単語カード --- */
+.word-card {
+display: flex;
+align-items: center;
+border: 1px solid #ffcc5c;
+border-radius: 8px;
+margin-bottom: 10px;
+padding: 5px;
+background-color: white;
+cursor: grab;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+transition: transform 0.2s, opacity 0.3s;
+}
+
+.word-card:hover {
+transform: translateY(-2px);
+}
+
+.word-card.dragging {
+opacity: 0.5;
+}
+
+.card-image {
+width: 45px;
+height: 45px;
+object-fit: contain;
+border-radius: 4px;
+margin-right: 8px;
+}
+
+.card-label {
+font-size: 1.1em;
+font-weight: bold;
+}
+
+/* ======================================== */
+/* メッセージとボタン配置 */
+/* ======================================== */
+.feedback-message {
+margin-top: 15px;
+font-weight: bold;
+color: #3f51b5;
+}
+
+#return-card-area {
+margin-top: 10px;
+text-align: center;
+}
+
+#returnCardButton {
+background-color: #f0a000;
+}
+
+/* ======================================== */
+/* 下部ボタン（リセット・メニュー） */
+/* ======================================== */
+.game-controls-area {
+margin-top: 25px;
+display: flex;
+justify-content: center;
+gap: 20px;
 }
