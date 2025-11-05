@@ -1,5 +1,5 @@
 /* ======================================== */
-/* 基本設定 */
+/* サイト全体の基本設定 */
 /* ======================================== */
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
@@ -10,143 +10,149 @@ body {
     text-align: center;
 }
 
+/* ======================================== */
+/* ヘッダーデザイン（PDF準拠） */
+/* ======================================== */
 header {
     background-color: #3f51b5; /* 濃い青 */
     color: white;
     padding: 25px 0 15px;
-    margin-bottom: 30px;
+    margin-bottom: 35px; /* メインコンテンツとの余白 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 header h1 {
     font-size: 2.5em;
-    margin: 0 0 5px;
-}
-
-header p {
-    margin: 0;
-    font-size: 1.1em;
-}
-
-.home-main {
-    max-width: 1000px;
     margin: 0 auto;
-    padding: 0 15px 30px;
+    color: white; /* ヘッダー内のh1は白 */
+    border-bottom: none;
+    display: inline-block;
+    padding-bottom: 0;
 }
 
-/* ----------------------------------------- */
-/* 共通スタイル: タイトルとグリッド */
-/* ----------------------------------------- */
-section h2 {
-    color: #ff6f61; /* 赤系 */
-    font-size: 1.8em;
+/* メインコンテナ */
+.container {
+    background-color: transparent; /* メニュー全体を囲むコンテナは透明に */
+    padding: 0 15px; /* 左右の余白 */
+    max-width: 1050px;
+    margin: 0 auto 30px;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* ======================================== */
+/* ホーム画面専用: グループと配置 */
+/* ======================================== */
+
+/* グループのコンテナ (きそ・リスト / あそぶ) */
+.menu-group {
+    background-color: #e0e7ff; /* 薄い青の背景 */
+    border: 3px solid #3f51b5;  /* 濃い青の枠線 */
+    border-radius: 18px; 
+    padding: 25px 30px;
+    margin-bottom: 35px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* グループのタイトル (h2) */
+.menu-group h2 {
+    text-align: center;
+    color: #ff6f61; /* タイトルは赤系 */
+    font-size: 2.0em;
+    font-weight: bold;
     border-bottom: 3px solid #ffcc5c;
     display: inline-block;
     padding-bottom: 5px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
-.card-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+/* ボタンのグリッド配置 (PDFのデザインに準拠) */
+.menu-buttons-grid {
+    display: grid;
+    /* 画面幅に応じて4列を自動調整 */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
+    justify-content: center;
 }
 
-/* ----------------------------------------- */
-/* 単体ボタン (小さな四角) */
-/* ----------------------------------------- */
-.single-card-button {
-    /* サイズとデザインの指定 */
-    width: 200px; 
-    height: 100px;
-    background-color: white;
-    border: 2px solid #3f51b5;
-    border-radius: 10px;
-    padding: 15px;
-    
-    /* 文字の配置 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* ======================================== */
+/* ボタンデザイン（共通） */
+/* ======================================== */
+.menu-card-button {
+    /* PDFの縦長カード型 */
+    border: 2px solid #ffcc5c;
+    padding: 10px; /* 内部のパディング */
+    margin: 0;
+    border-radius: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-decoration: none;
     text-align: center;
     
-    /* 文字スタイルと装飾 */
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.1em;
-    color: #333;
+    width: 100%; /* グリッドに合わせて幅を調整 */
+    height: 100px; /* PDFの縦横比に合わせた高さ */
     
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-}
-
-.single-card-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-    background-color: #e0e7ff; /* ホバーで少し青く */
-}
-
-/* ----------------------------------------- */
-/* 下部エリア: 大きな四角（カテゴリ） */
-/* ----------------------------------------- */
-
-.section-bottom {
-    margin-top: 40px;
-}
-
-.category-grid {
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+    
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.large-card-container {
-    /* 大きな四角の枠線と背景 */
-    flex: 1;
-    min-width: 380px;
-    padding: 20px;
-    border: 4px solid #ff6f61; /* 赤系の太い枠線 */
-    border-radius: 15px;
-    background-color: #fff0f0; /* 薄い赤の背景 */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+/* menu-group内のボタンの基本スタイル */
+button.menu-card-reset,
+a.menu-card-reset {
+    background-color: white !important;
+    color: #333 !important;
+    border: 2px solid #3f51b5 !important; /* グループの色に合わせる */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
-.large-card-container h2 {
-    /* 内部のタイトル調整 */
-    color: #3f51b5; 
-    border-bottom: 2px solid #3f51b5;
-    padding-bottom: 5px;
-    margin-bottom: 20px;
-    font-size: 1.5em;
+.menu-card-button:hover {
+    transform: translateY(-3px); /* 持ち上がる高さを調整 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+    background-color: #f0f8ff !important; 
 }
 
-/* ----------------------------------------- */
+/* リンク要素の色とカーソルを調整 */
+a.menu-card-button {
+    color: #333;
+}
+
+
+/* ======================================== */
+/* その他 (ゲーム画面で使われる古いスタイルは削除) */
+/* ======================================== */
+
+/* ここに記述のない共通スタイル（control-button, 画像など）は、
+   元のコードから変更なしと見なし、このファイルには含みません。
+   もし必要であれば、元の完全な style.css ファイルを提供してください。 */
+
+
+/* ======================================== */
 /* メディアクエリ（モバイル対応） */
-/* ----------------------------------------- */
-@media (max-width: 850px) {
-    .category-grid {
-        flex-direction: column;
-        align-items: center;
+/* ======================================== */
+
+@media (max-width: 800px) {
+    .menu-buttons-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
     }
-    .large-card-container {
-        min-width: 90%;
-        max-width: 450px;
-    }
-    .single-card-button {
-        width: 100%; /* モバイルではボタンを幅いっぱいに広げる */
-        max-width: 250px;
-        height: 80px;
+    .menu-group {
+        padding: 20px;
     }
 }
 
-@media (max-width: 400px) {
-    header h1 {
-        font-size: 2em;
+@media (max-width: 500px) {
+    .menu-buttons-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
     }
-    .single-card-button {
-        font-size: 1em;
-        padding: 10px;
+    .menu-card-button {
+        height: 85px;
+        font-size: 1.0em;
     }
 }
