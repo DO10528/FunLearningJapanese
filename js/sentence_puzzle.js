@@ -113,23 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pool && pool.length > 0) {
                     const randomItem = pool[Math.floor(Math.random() * pool.length)]; // ランダムな単語オブジェクトを取得
                     
-                    // ★★★ 修正箇所: japaneseプロパティから単語を取得する ★★★
+                    // 1. 日本語の単語を取得
                     japaneseParts.push(randomItem.japanese);
 
-                    // 英文を置換 (例: N_FOOD -> [FOOD])
-                    // プレースホルダーのパターンを正しく設定
-                    const englishPlaceholder = new RegExp(`\\(P_PERSON\\)|\\(N_[^\\)]+\\)|\\(A_[^\\)]+\\)|\\(V_[^\\)]+\\)`, 'g');
+                    // 2. 英文のプレースホルダーを置換
+                    // プレースホルダーのパターンを正しく設定し、一致する部分のみを置換
+                    const englishPlaceholder = new RegExp(`\\(${partKey}\\)`, 'g');
                     
-                    // englishText内の対応するプレースホルダーを置換
-                    // 例: "A person eats (N_FOOD_E)." の (N_FOOD_E) を randomItem.english に置換
-                    englishText = englishText.replace(englishPlaceholder, match => {
-                        // 複数のプレースホルダーがある場合、正しいものだけを置換
-                        if (match === `(${partKey})`) {
-                            return randomItem.english;
-                        } else {
-                            return match; // 一致しないプレースホルダーはそのまま残す
-                        }
-                    });
+                    englishText = englishText.replace(englishPlaceholder, randomItem.english);
 
                 } else {
                     japaneseParts.push("[エラー]"); // プールが空の場合
@@ -140,8 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 最後に残っているプレースホルダー（まだ置換されていないもの）を削除
-        englishText = englishText.replace(/\(P_PERSON\)|\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)/g, '');
+        // 念のため、置換されずに残った汎用的なプレースホルダーを削除
+        englishText = englishText.replace(/\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)/g, '');
 
         return { japaneseParts, englishText };
     }
