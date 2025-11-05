@@ -2,51 +2,47 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>単語パズルメーカー (文法並び替えゲーム)</title>
-    <link rel="stylesheet" href="css/puzzle_style.css">
+    <title>文法並び替えゲーム</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <script src="js/sentence_puzzle.js" defer></script>
 </head>
 <body>
-
-    <header>
-        <h1>単語パズルメーカー</h1>
-    </header>
-
-    <main>
+    
+    <h1>文法並び替えパズル</h1>
+    
+    <div id="game-main-container" class="container">
         
-        <div id="game-container">
-            
-            <div id="status-area">
-                <p id="question-text">文を正しく並び替えて完成させよう！</p>
-                <p id="score-display">正解数: 0 / 0 問</p>
-            </div>
-
-            <div id="puzzle-area">
-                
-                <div id="drop-zone-container">
-                    <div id="puzzle-drop-zone">
-                        </div>
-                    
-                    <div id="action-buttons">
-                        <button id="check-button" class="action-button primary">答え合わせ</button>
-                        <button id="reset-button" class="action-button secondary">リセット</button>
-                    </div>
-                </div>
-
-                <div id="card-selection-area">
-                    <h2>使うカード</h2>
-                    <div id="card-container">
-                        </div>
-                </div>
-            </div>
-            
-            <div id="feedback-area">
-                <p id="feedback-message" class="hidden">ヒントや結果メッセージが表示されます。</p>
-            </div>
-
+        <div id="status-area">
+            <p id="score-display">正解数: 0 / 0 問</p>
+            <h3 id="question-text" class="quiz-hint-text">文を正しく並び替えて完成させよう！</h3>
         </div>
-    </main>
 
-    <script src="js/sentence_puzzle.js"></script>
+        <div id="puzzle-area">
+            
+            <div id="drop-zone-container">
+                <p class="area-title">【答えを作る場所】</p>
+                <div id="puzzle-drop-zone">
+                    </div>
+            </div>
+
+            <div id="card-selection-area">
+                <p class="area-title">【使うカード】</p>
+                <div id="card-container">
+                    </div>
+            </div>
+            
+            <p id="feedback-message" class="quiz-feedback-message hidden">ヒントや結果メッセージが表示されます。</p>
+
+            <div id="action-buttons" class="game-controls-area">
+                <button id="check-button" class="action-button primary">答え合わせ</button>
+                <button id="reset-button" class="action-button secondary">リセット</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+             <a href="index.html" class="action-button tertiary">ホームに戻る</a>
+        </div>
+    </div>
+    
 </body>
 </html>
