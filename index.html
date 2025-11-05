@@ -3,26 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>Fun Learning Japanese</title> 
+    <title>Fun Learning Japanese - メニュー</title> 
     <link rel="stylesheet" href="css/style.css"> 
     
     <style>
-        /* メインコンテナ（白）の中のグループ分け */
+        /* メインコンテナの幅を広げます */
+        .container {
+            max-width: 1000px;
+        }
+
+        /* 2つの大きなグループを定義 */
         .menu-group {
-            background-color: #f0f8ff; /* 薄い青色の背景 */
-            border: 2px solid #5c7aff;  /* kiso.html と色を合わせる */
-            border-radius: 15px;
-            padding: 15px 20px;
-            margin-bottom: 25px; /* 2つのグループ間の余白 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #e0e7ff; /* 薄い青の背景 */
+            border: 3px solid #3f51b5;  /* 濃い青の枠線 */
+            border-radius: 18px; /* 角を丸く */
+            padding: 25px 30px;
+            margin-bottom: 35px; /* グループ間の余白 */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         }
         
-        /* グループのタイトル (h2) */
+        /* グループのタイトル (h2) の強調 */
         .menu-group h2 {
             text-align: center;
-            color: #5c7aff; /* 青色 */
-            font-size: 1.5em;
-            margin-bottom: 20px;
+            color: #ff6f61; /* タイトルは目立つ赤系 */
+            font-size: 2.0em;
+            font-weight: bold;
+            border-bottom: 3px solid #ffcc5c;
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-bottom: 30px;
+        }
+        
+        /* ボタンのレイアウトを調整（より多くのボタンを収容するため） */
+        .menu-buttons-grid {
+            display: grid;
+            /* 画面幅に応じてボタンを並べる（例: 4列または3列） */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        /* ボタンのアイコンとテキストのレイアウトを調整 */
+        .menu-card-button {
+            height: 120px; /* 高さを少し低く調整 */
+            font-size: 1.1em;
+            line-height: 1.4;
+            display: flex; /* アイコンとテキストを中央に配置 */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* モバイル対応 */
+        @media (max-width: 600px) {
+            .menu-group {
+                padding: 15px;
+            }
+            .menu-group h2 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+            /* モバイルでは2列にする */
+            .menu-buttons-grid {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                gap: 15px;
+            }
+            .menu-card-button {
+                height: 100px;
+                font-size: 1.0em;
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -33,7 +83,7 @@
     <div id="main-menu" class="container">
         
         <div class="menu-group">
-            <h2>きそ・たんごリスト</h2>
+            <h2>📚 きそ・たんごリスト</h2>
             
             <div class="menu-buttons-grid">
                 
@@ -41,8 +91,8 @@
                     📝<br>ひらがな・カタカナ基礎
                 </a>
 
-                <a href="hiragana_video_list.html" class="menu-card-button menu-card-reset">
-                    🎥<br>ひらがな練習
+                <a href="hiragana_practice.html" class="menu-card-button menu-card-reset">
+                    🎥<br>ひらがな練習 (動画リスト)
                 </a>
                 
                 <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset">
@@ -57,20 +107,24 @@
         </div>
 
         <div class="menu-group">
-            <h2>なにをしてあそぶ?</h2>
+            <h2>🎮 なにをしてあそぶ?</h2>
 
             <div class="menu-buttons-grid">
             
                 <a href="hiragana.html" class="menu-card-button menu-card-reset">
-                    🎮<br>ひらがな単語ゲーム
+                    🌟<br>ひらがな単語ゲーム (選択式)
                 </a>
                 
                 <a href="hiragana2.html" class="menu-card-button menu-card-reset">
-                    ⭐<br>ひらがなゲーム2 (並び替え)
+                    🧩<br>ひらがな並び替えゲーム
                 </a>
                 
                 <a href="shiritori.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>しりとりゲーム
+                    🗣️<br>しりとりゲーム (通常)
+                </a>
+                
+                <a href="shiritori2.html" class="menu-card-button menu-card-reset">
+                    🗣️<br>しりとりゲーム2 (配置)
                 </a>
                 
                 <a href="keiyoshi.html" class="menu-card-button menu-card-reset">
@@ -82,15 +136,11 @@
                 </a>
                 
                 <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>挨拶クイズ (10秒制限)
-                </a>
-
-                <a href="shiritori2.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>しりとりゲーム2
+                    ⏰<br>挨拶クイズ (10秒制限)
                 </a>
 
                 <a href="sentence_puzzle.html" class="menu-card-button menu-card-reset">
-                    🗣️<br>文法並び替えゲーム
+                    ✂️<br>文法並び替えパズル
                 </a>
                 
             </div>
@@ -98,9 +148,5 @@
         
     </div>
     
-    <div id="game-area" class="container" style="display:none;">
-        <p>ゲームを読み込んでいます...</p>
-    </div>
-    
-</body>
+    </body>
 </html>
