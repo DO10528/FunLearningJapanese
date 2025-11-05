@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ゲーム定数と状態
     // ----------------------------------------------------
     const INITIAL_LIFE = 3;
-    const METEOR_INTERVAL = 7500; // ★修正: 1500ms(1.5秒)から7500ms(7.5秒)に変更 (約5分の1の頻度)
+    const METEOR_INTERVAL = 5000; // ★修正: 1500ms(1.5秒)から5000ms(5秒)に変更 (約3分の1の頻度)
     let gameInterval = null;
     let meteorSpeed = 1; 
     let score = 0;
