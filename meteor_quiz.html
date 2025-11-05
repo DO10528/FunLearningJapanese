@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隕石英単語クイズ</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <script src="js/meteor_quiz.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>隕石英単語クイズ</h1>
+    </header>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="index.html" class="back-button">ホームに戻る</a>
+    </div>
+
+    <div id="game-container">
+        <div id="sky-area">
+            </div>
+
+        <div id="ground-area">
+            <p>地面に落ちるとライフが減る！</p>
+        </div>
+
+        <div id="info-bar">
+            <p>スコア: <span id="score">0</span></p>
+            <p>ライフ: <span id="life">3</span></p>
+        </div>
+    </div>
+
+    <div id="quiz-modal" class="hidden">
+        <div id="quiz-box">
+            <p id="question-text"></p>
+            
+            <div id="quiz-image-area">
+                </div>
+
+            <div id="choice-buttons-area">
+                </div>
+            
+            <p id="quiz-feedback" class="feedback-message"></p>
+        </div>
+    </div>
+
+    <div id="explosion-template" class="explosion hidden"></div>
+
+</body>
+</html>
