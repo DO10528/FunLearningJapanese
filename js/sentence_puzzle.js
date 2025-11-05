@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback-message');
     const questionText = document.getElementById('question-text');
     const scoreDisplay = document.getElementById('score-display');
+
+    // ★★★ 音声ファイルのパス設定 (修正済み) ★★★
+    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
+    // ★★★★★★★★★★★★★★★★★★★★★
     
     let allSentences = [];         // JSONから読み込んだ全ての問題
     let currentSentence = null;    // 現在の問題オブジェクト
