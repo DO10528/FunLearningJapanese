@@ -21,17 +21,17 @@ h1 {
 
 /* ヘッダーデザイン */
 header {
-    background-color: #3f51b5; /* 濃い青 */
+    background-color: #3f51b5; 
     color: white;
     padding: 25px 0 15px;
-    margin-bottom: 35px; /* メインコンテンツとの余白 */
+    margin-bottom: 35px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 header h1 {
     font-size: 2.5em;
     margin: 0 auto;
-    color: white; /* ヘッダー内のh1は白 */
+    color: white; 
     border-bottom: none;
     display: inline-block;
     padding-bottom: 0;
@@ -126,62 +126,63 @@ a.menu-card-button {
 }
 
 /* ======================================== */
-/* ★ クイズ選択肢の横並び設定 (新規追加/修正) ★ */
+/* ★ クイズ選択肢の横並び設定 (ゲーム画面) ★ */
 /* ======================================== */
 
 /* 選択肢ボタン全体を囲むコンテナに適用 */
-#choices-container,
-#hiragana-choices,
-.choice-buttons-area { 
-    display: flex; /* Flexboxを有効にする */
-    justify-content: center; /* 選択肢を中央に寄せる */
-    flex-wrap: wrap; /* 画面が狭くなった場合に折り返す */
-    gap: 20px; /* ボタン間の間隔を空ける */
+#choice-buttons-area { 
+    display: flex; /* ★ 横並びを保証 ★ */
+    justify-content: center; /* 中央に寄せる */
+    flex-wrap: wrap; 
+    gap: 20px; /* ボタン間の間隔 */
     margin-top: 20px;
     padding: 10px;
 }
 
 /* 個別の選択肢ボタンの基本デザイン */
-#choices-container button,
-#hiragana-choices button {
-    /* 共通のボタンデザインをクイズ用に調整 */
-    padding: 15px 30px;
+#choice-buttons-area button {
+    /* サイズを固定し、横に3つ並びやすくする */
+    flex-grow: 1; /* スペースを均等に分け合う */
+    min-width: 180px; /* ボタンの最小幅を確保 */
+    max-width: 250px;
+    
+    padding: 15px 10px;
     font-size: 1.5em;
     border-radius: 10px;
     border: 2px solid #3f51b5;
     background-color: white;
     color: #333;
     transition: all 0.2s;
-    min-width: 150px; 
     cursor: pointer;
-    box-shadow: 0 3px 0 #3f51b5; /* 立体的なデザイン */
+    box-shadow: 0 3px 0 #3f51b5; 
+    font-weight: bold;
 }
 
-#choices-container button:hover:not(:disabled) {
+#choice-buttons-area button:hover:not(:disabled) {
     background-color: #e0e7ff;
     transform: translateY(-1px);
     box-shadow: 0 4px 0 #3f51b5;
 }
 
-#choices-container button:active:not(:disabled) {
+#choice-buttons-area button:active:not(:disabled) {
     transform: translateY(3px);
-    box-shadow: 0 0 0 #3f51b5; /* 押し込み時の影を消す */
+    box-shadow: 0 0 0 #3f51b5;
 }
 
-
 /* 正解/不正解時のスタイル */
-#choices-container button.correct-answer {
+#choice-buttons-area button.correct-answer {
     background-color: #4CAF50 !important; /* 緑 */
     color: white !important;
     border-color: #28a745 !important;
     box-shadow: 0 3px 0 #28a745; 
 }
-#choices-container button:disabled:not(.correct-answer) {
+#choice-buttons-area button:disabled:not(.correct-answer) {
     background-color: #f8d7da !important; /* 薄い赤 */
     color: #721c24 !important;
     border-color: #ff6f61 !important;
     box-shadow: 0 3px 0 #ff6f61; 
 }
+
 
 /* ======================================== */
 /* メディアクエリ（モバイル対応） */
@@ -198,13 +199,14 @@ a.menu-card-button {
 }
 
 @media (max-width: 600px) {
-    /* 選択肢が横に並びきらない場合、ボタンを縦に伸ばす */
-    #choices-container button {
-        min-width: 90%; 
-        font-size: 1.2em;
-        margin-bottom: 10px;
+    /* 選択肢が横に並びきらない場合、ボタンを縦に並べる（1列または2列） */
+    #choice-buttons-area button {
+        min-width: 45%; /* 2列にするための調整 */
+        max-width: none;
+        font-size: 1.4em;
     }
 }
+
 @media (max-width: 500px) {
     .menu-buttons-grid {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
