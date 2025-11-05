@@ -3,198 +3,111 @@
 /* ======================================== */
 body {
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-    background-color: #f7f9fc;
+    background-color: #f7f9fc; /* 全体の背景色 */
     color: #333;
     margin: 0;
-    padding: 20px;
+    padding: 0; /* paddingをリセット */
     text-align: center;
 }
 
-/* タイトル設定 */
+/* タイトル設定 (このゲームではヘッダー内で上書き) */
 h1 {
-    color: #ff6f61;
-    font-size: 2.5em;
-    border-bottom: 4px solid #ffcc5c;
+    color: white; /* ヘッダー内のh1は白に */
+    font-size: 1.8em;
+    border-bottom: none;
     display: inline-block;
-    padding-bottom: 5px;
-}
-
-/* コンテナの基本設定 */
-.container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 30px auto;
-}
-
-/* ======================================== */
-/* ボタンデザイン（共通） */
-/* ======================================== */
-.menu-buttons-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 30px;
-    margin-top: 20px;
-}
-
-.menu-card-button {
-    border: 2px solid #ffcc5c;
-    padding: 20px;
+    padding-bottom: 0;
     margin: 0;
-    border-radius: 15px;
-    font-size: 1.3em;
-    font-weight: bold;
-    text-decoration: none;
-    text-align: center;
-    width: 200px;
-    height: 150px;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-button.menu-card-reset,
-a.menu-card-reset {
-    background-color: white !important;
-    color: #333 !important;
-    border: 2px solid #ffcc5c !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.menu-card-button:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    background-color: #fff8e1;
-}
-
-/* リンク要素の色とカーソルを調整 */
-a.menu-card-button {
-    color: #333;
 }
 
 /* ======================================== */
-/* 共通ボタンスタイル（ゲーム中） */
+/* ヘッダーデザイン（統一） */
 /* ======================================== */
-
-/* control-buttonはアクションボタンとして再定義 */
-.control-button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    color: white;
-    transition: opacity 0.2s;
-}
-
-.control-button:hover {
-    opacity: 0.85;
-}
-
-/* ======================================== */
-/* 画像やカード共通設定 */
-/* ======================================== */
-.menu-card-button img,
-.choice-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-/* ★ shirotori2の不要なスタイルは削除または上書き ★ */
-
-/* ======================================== */
-/* 単語パズルメーカー（文法並び替えゲーム）専用スタイル */
-/* ======================================== */
-
 header {
-    /* 既存のヘッダー色を継承し、パズルゲーム用の色に上書き */
-    background-color: #3f51b5; 
+    background-color: #3f51b5; /* 青系に統一 */
     color: white;
     padding: 15px 0;
-    margin-bottom: 20px;
-    box-shadow: none; /* 影をリセット */
+    margin-bottom: 25px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* メインコンテンツエリアの幅調整 */
 main {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 0 10px;
+    padding: 0 15px;
 }
 
-/* --- 状態表示エリア --- */
+/* ======================================== */
+/* 状態表示エリア */
+/* ======================================== */
 #status-area {
     background-color: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
 }
 
 #question-text {
-    font-size: 1.5em;
+    font-size: 1.6em;
     font-weight: bold;
-    color: #3f51b5; /* 問題のテーマカラー */
+    color: #ff6f61; /* ヒントの色 */
     margin-bottom: 5px;
 }
 
 #score-display {
     font-size: 1.1em;
     color: #555;
+    margin-top: 5px;
 }
 
-/* --- メインレイアウト (ドロップエリアとカードエリアを縦に配置) --- */
+/* ======================================== */
+/* メインレイアウト (上下配置) */
+/* ======================================== */
 #puzzle-area {
     display: flex;
     flex-direction: column; 
     gap: 25px;
 }
 
-/* --- 上部: ドロップゾーン（解答を作成する場所） --- */
+/* --- 上部: ドロップゾーン（解答エリア） --- */
 #drop-zone-container {
-    background-color: #e0e7ff;
+    background-color: #eef2f8; /* 薄い青 */
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 #puzzle-drop-zone {
     min-height: 80px;
-    border: 3px dashed #3f51b5;
+    border: 3px dashed #3f51b5; /* 目立つ点線 */
     background-color: white;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-start; /* 左寄せ */
-    gap: 10px;
-    padding: 10px;
+    justify-content: flex-start;
+    gap: 12px; /* カード間のスペースを確保 */
+    padding: 15px;
     transition: border-color 0.2s;
 }
 
 /* --- 下部: カード選択エリア (ドラッグ元) --- */
 #card-selection-area {
-    background-color: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fffde7; /* 薄い黄色でカードの背景を強調 */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ffcc5c;
 }
 
 #card-selection-area h2 {
     font-size: 1.2em;
-    color: #ff6f61; /* カードエリアのテーマカラー */
+    color: #3f51b5;
     margin-top: 0;
+    border-bottom: 2px solid #ffcc5c;
+    display: inline-block;
+    padding-bottom: 5px;
 }
 
 #card-container {
@@ -203,74 +116,81 @@ main {
     justify-content: center;
     gap: 10px;
     min-height: 50px;
+    padding-top: 10px;
 }
 
 /* ======================================== */
 /* 単語カードのデザイン */
 /* ======================================== */
 .word-card {
-    background-color: #ffcc5c; /* 明るい黄色 */
+    background-color: #ffcc5c; 
     color: #333;
-    padding: 15px 20px;
+    padding: 12px 18px; /* パディングを調整 */
     border-radius: 8px;
-    font-size: 1.2em;
+    font-size: 1.3em; /* 文字を少し大きく */
     font-weight: bold;
     cursor: grab;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.1s, opacity 0.1s, background-color 0.3s;
-    user-select: none;
+    box-shadow: 0 4px 0 #f0a000; /* 立体的な影 */
     border: 1px solid #f0a000;
+    transition: transform 0.1s, opacity 0.1s, background-color 0.3s, box-shadow 0.1s;
+    user-select: none;
+}
+
+.word-card:active {
+    transform: translateY(4px); /* クリック時/ドラッグ開始時に沈む */
+    box-shadow: 0 0 0 #f0a000;
 }
 
 .word-card.dragging {
-    opacity: 0.5;
-    transform: scale(0.95);
+    opacity: 0.7;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* カードがドロップエリアにあるとき */
-#puzzle-drop-zone .word-card {
-    background-color: #fff8e1; 
-    border-color: #ff6f61;
-}
-
-/* カードが解答確定したとき */
+/* 正誤判定後のカード */
 .word-card.correct-slot {
     background-color: #4CAF50; /* 緑 */
     color: white;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     border-color: #28a745;
+    box-shadow: 0 3px 0 #28a745; 
 }
 
 .word-card.wrong-slot {
     background-color: #ff6f61; /* 赤 */
     color: white;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     border-color: #dc3545;
+    box-shadow: 0 3px 0 #dc3545;
 }
 
+
 /* ======================================== */
-/* アクションボタンとフィードバック */
+/* アクションボタン（答え合わせ/リセット） */
 /* ======================================== */
 #action-buttons {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .action-button {
-    /* control-buttonのスタイルを継承しつつ色を調整 */
-    padding: 10px 20px;
-    font-size: 1.1em;
+    padding: 12px 25px;
+    font-size: 1.2em;
     font-weight: bold;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.1s;
+}
+
+.action-button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
 }
 
 .primary {
-    background-color: #3f51b5; /* 答え合わせボタン */
+    background-color: #3f51b5; /* 青 */
     color: white;
 }
 
@@ -279,26 +199,31 @@ main {
 }
 
 .secondary {
-    background-color: #ccc; /* リセットボタン */
-    color: #333;
+    background-color: #ff6f61; /* リセットは赤系 */
+    color: white;
 }
 
 .secondary:hover {
-    background-color: #aaa;
+    background-color: #ff8c82;
 }
 
+
+/* ======================================== */
+/* フィードバックメッセージ */
+/* ======================================== */
 #feedback-area {
-    margin-top: 20px;
+    margin-top: 25px;
     min-height: 40px;
 }
 
 #feedback-message {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 15px;
+    border-radius: 10px;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.3em;
     margin: 0 auto;
     max-width: 90%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .hidden {
@@ -318,16 +243,26 @@ main {
 }
 
 /* ======================================== */
-/* 下部ボタン（リセット・メニュー） */
+/* メディアクエリ（モバイル対応） */
 /* ======================================== */
-/* 今回のゲームには不要なため、デフォルトのスタイルは省略 */
-
-/* メディアクエリ（画面が小さい時） */
 @media (max-width: 600px) {
-    #puzzle-area {
-        flex-direction: column;
+    body {
+        padding: 0;
     }
-    main {
-        padding: 0 5px;
+    header {
+        margin-bottom: 15px;
+    }
+    #status-area,
+    #drop-zone-container,
+    #card-selection-area {
+        padding: 15px;
+    }
+    .word-card {
+        padding: 10px 15px;
+        font-size: 1.1em;
+    }
+    .action-button {
+        padding: 10px 18px;
+        font-size: 1.1em;
     }
 }
