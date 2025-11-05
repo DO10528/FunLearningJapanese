@@ -101,11 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * 文型テンプレートと単語プールからランダムな文と英文を生成する
+     * * @param {Object} template - 現在の問題テンプレート
+     * @returns {Object} - 生成された日本語の単語配列 (japaneseParts) と英文 (englishText)
      */
     function generateRandomSentence(template) {
         const japaneseParts = [];
         let englishText = template.english; 
         
+        // 置き換えられた単語とプレースホルダーを保存する配列
+        const replacements = [];
+
         template.pattern.forEach(partKey => {
             if (partKey.startsWith('P_PERSON') || partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_')) {
                 const pool = wordPool[partKey];
@@ -115,26 +120,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // 1. 日本語の単語を取得
                     japaneseParts.push(randomItem.japanese);
-
-                    // 2. 英文のプレースホルダーを置換
-                    // (PARTKEY) という文字列を安全に置換します
-                    const placeholderString = `(${partKey})`;
                     
-                    // 文字列置換を使用し、該当するプレースホルダーを置換
-                    // 注意: replaceは最初に見つかったものしか置換しないため、グローバル検索が必要な場合は正規表現を使うのが確実ですが、
-                    // ここではパターンごとに処理しているため、テンプレートに同じプレースホルダーが連続していない限り問題ありません。
-                    englishText = englishText.replace(placeholderString, randomItem.english);
+                    // 2. 置き換えの情報を保存
+                    replacements.push({ 
+                        placeholder: `(${partKey})`, 
+                        replacement: randomItem.english 
+                    });
 
                 } else {
                     japaneseParts.push("[エラー]"); 
                 }
             } else {
-                // 助詞や助動詞などの固定語彙 (は、が、を、へ、です)
+                // 助詞や助動詞などの固定語彙
                 japaneseParts.push(partKey);
             }
         });
         
-        // 最終チェック: 置き換えられずに残ったプレースホルダーを空文字列に置換（フォールバック）
+        // 3. 英文のプレースホルダーを保存された情報を使って、一つずつ確実に置換する
+        replacements.forEach(item => {
+            // 文字列置換を使用し、該当するプレースホルダーを置換
+            // ★ポイント: replace() は最初に見つかったものだけを置換するため、
+            // テンプレートパターン順に処理することで、先頭のプレースホルダーから順に処理することを保証します。
+            englishText = englishText.replace(item.placeholder, item.replacement);
+        });
+        
+        // 最終チェック: 置き換えられずに残ったプレースホルダーを削除
+        // 万が一漏れた場合のために、汎用的なプレースホルダーパターンを削除します。
         englishText = englishText.replace(/\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)|\(P_[^\)]+\)/g, '');
         
         // 句読点を追加（文末にピリオドがない場合）
