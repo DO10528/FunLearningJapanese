@@ -12,13 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionText = document.getElementById('question-text');
     const scoreDisplay = document.getElementById('score-display');
 
-    // ★★★ 音声ファイルのパス設定 ★★★
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
-    // ★★★★★★★★★★★★★★★★★★★★★
     
-    let allSentences = [];         
-    let currentSentence = null;    
+    let allTemplates = [];         // JSONから読み込んだ全問題テンプレート
+    let wordPool = {};             // JSONから読み込んだ単語プール
+    let currentCorrectParts = [];  // ★現在の問題の正しい単語の配列 (動的に生成される)★
     let score = 0;
     let totalQuestions = 0;
     let currentQuestionIndex = 0;
@@ -31,11 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(DATA_PATH);
             const data = await response.json();
-            allSentences = shuffleArray(data.sentences); 
-            totalQuestions = allSentences.length;
+            
+            // テンプレートと単語プールを分離
+            allTemplates = shuffleArray(data.templates); 
+            wordPool = data.word_pool;
+
+            totalQuestions = allTemplates.length;
 
             if (totalQuestions === 0) {
-                questionText.textContent = "エラー: 問題データがありません。";
+                questionText.textContent = "エラー: 問題テンプレートがありません。";
                 return;
             }
 
@@ -43,18 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
             checkButton.addEventListener('click', checkAnswer);
             resetButton.addEventListener('click', resetPuzzle);
             
-            // ドロップゾーンのドラッグイベントを設定
             setupDropZoneEvents();
-
+            
             startNewQuestion();
         } catch (error) {
             console.error("データの読み込みまたはゲーム初期化に失敗しました:", error);
-            questionText.textContent = "エラー: ゲームを開始できませんでした。";
+            questionText.textContent = "エラー: ゲームを開始できませんでした。ファイルパスを確認してください。";
         }
     }
 
     /**
-     * 新しい問題を出題する
+     * 新しい問題を出題する (ランダム生成ロジックを含む)
      */
     function startNewQuestion() {
         if (currentQuestionIndex >= totalQuestions) {
@@ -62,30 +64,35 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        currentSentence = allSentences[currentQuestionIndex];
+        const template = allTemplates[currentQuestionIndex];
         
+        // ★★★ 1. 問題の動的生成 ★★★
+        const newSentenceParts = generateRandomSentence(template);
+        currentCorrectParts = newSentenceParts; // 正解の順序を保存
+        // ★★★★★★★★★★★★★★★★
+
         // 1. UIをリセット
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         feedbackMessage.classList.add('hidden');
-        feedbackMessage.className = 'quiz-feedback-message'; // クラスをリセット
+        feedbackMessage.className = 'quiz-feedback-message'; 
         checkButton.disabled = false;
         resetButton.disabled = false;
         
         // 2. 問題情報を表示
-        questionText.textContent = `ヒント: ${currentSentence.hint}`;
+        questionText.textContent = `ヒント: ${template.hint}`;
         updateScoreDisplay();
 
         // 3. カードを生成し、シャッフルして配置
-        const shuffledParts = shuffleArray([...currentSentence.parts]);
+        const shuffledParts = shuffleArray([...newSentenceParts]);
         
         shuffledParts.forEach((part, index) => {
             const card = document.createElement('div');
-            card.textContent = part.word;
+            card.textContent = part; // 単語のみ
             card.classList.add('word-card');
             card.draggable = true;
-            card.dataset.correctIndex = currentSentence.parts.findIndex(p => p.word === part.word);
-            card.dataset.id = `${part.word}-${index}`; 
+            // 正解インデックスは不要になるが、識別のためユニークIDを付与
+            card.dataset.id = `${part}-${index}-${currentQuestionIndex}`; 
             
             cardContainer.appendChild(card);
         });
@@ -94,8 +101,31 @@ document.addEventListener('DOMContentLoaded', () => {
         setupCardEvents();
     }
 
+    /**
+     * 文型テンプレートと単語プールからランダムな文を生成する
+     */
+    function generateRandomSentence(template) {
+        const parts = [];
+        
+        template.pattern.forEach(partKey => {
+            if (partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_') || partKey.startsWith('P_')) {
+                // 単語プールからランダムに選択
+                const pool = wordPool[partKey];
+                if (pool && pool.length > 0) {
+                    const randomWord = pool[Math.floor(Math.random() * pool.length)];
+                    parts.push(randomWord);
+                }
+            } else {
+                // 助詞や助動詞などの固定語彙
+                parts.push(partKey);
+            }
+        });
+        
+        return parts;
+    }
+
     // ----------------------------------------------------
-    // イベント設定とドラッグ＆ドロップ処理
+    // イベント設定とドラッグ＆ドロップ処理 (変更なし)
     // ----------------------------------------------------
 
     function setupCardEvents() {
@@ -127,12 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleDragOver(e) {
-        e.preventDefault();
+        e.preventDefault(); 
     }
 
-    function handleDragLeave(e) {
-        // スタイルリセット処理があればここに
-    }
+    function handleDragLeave(e) {}
 
     function handleDrop(e) {
         e.preventDefault();
@@ -142,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!card) return;
 
-        // ドロップ位置を調整するためのヘルパー関数を呼び出す
         const afterElement = getDragAfterElement(dropZone, e.clientX, e.clientY);
         if (afterElement == null) {
             dropZone.appendChild(card);
@@ -168,9 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
     
-    /**
-     * ドロップエリアのカードをクリックでカードコンテナに戻す
-     */
     function handleCardClick(e) {
         const clickedCard = e.target.closest('.word-card');
         if (!clickedCard) return;
@@ -184,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // 正誤判定とゲーム制御
+    // 正誤判定とゲーム制御 (ロジック修正)
     // ----------------------------------------------------
 
     /**
@@ -196,8 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const droppedCards = [...dropZone.querySelectorAll('.word-card')];
         
-        if (droppedCards.length !== currentSentence.parts.length) {
-            displayFeedback(false, `❌ カードの数が違います。（${currentSentence.parts.length}枚必要です）`);
+        if (droppedCards.length !== currentCorrectParts.length) {
+            displayFeedback(false, `❌ カードの数が違います。（${currentCorrectParts.length}枚必要です）`);
             checkButton.disabled = false;
             resetButton.disabled = false;
             return;
@@ -206,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let isCorrect = true;
         
         droppedCards.forEach((card, index) => {
-            const correctWord = currentSentence.parts[index].word;
+            const correctWord = currentCorrectParts[index]; // ★修正: 正解配列と比較★
             
             if (card.textContent === correctWord) {
                 card.classList.add('correct-slot');
@@ -221,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isCorrect) {
             // ★★★ 全て正解 ★★★
-            playSound(SOUND_CORRECT_PATH); // ★追加★
+            playSound(SOUND_CORRECT_PATH); 
             score++;
             currentQuestionIndex++;
             displayFeedback(true, `🎉 素晴らしい！正解です。`);
@@ -230,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } else {
             // ★★★ 不正解 ★★★
-            playSound(SOUND_INCORRECT_PATH); // ★追加★
+            playSound(SOUND_INCORRECT_PATH); 
             displayFeedback(false, `🤔 残念、並び順が違います。カードをリセットして再挑戦！`);
             checkButton.disabled = false;
             resetButton.disabled = false;
@@ -261,7 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function displayFeedback(isCorrect, message) {
         feedbackMessage.textContent = message;
-        feedbackMessage.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect');
+        // feedbackMessage.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect'); // クラス名を quiz-feedback-message に合わせる
+        feedbackMessage.classList.remove('hidden'); 
+        
+        // CSSクラス名が 'quiz-feedback-message' に依存しているため、ここで追加し直す
+        feedbackMessage.classList.add('quiz-feedback-message'); 
+        feedbackMessage.classList.remove('feedback-correct', 'feedback-incorrect');
         
         if (isCorrect) {
             feedbackMessage.classList.add('feedback-correct');
@@ -281,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * ゲーム終了処理
      */
     function endGame() {
-        playSound(SOUND_CORRECT_PATH); // ★追加★
+        playSound(SOUND_CORRECT_PATH); 
         questionText.textContent = `🎉 ゲームクリア！`;
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
@@ -291,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // ユーティリティ (playSound 関数を追加)
+    // ユーティリティ
     // ----------------------------------------------------
     
     /**
