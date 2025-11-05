@@ -117,10 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     japaneseParts.push(randomItem.japanese);
 
                     // 2. 英文のプレースホルダーを置換
-                    // (PARTKEY) という文字列をそのまま置換します (正規表現を使わず安全に置換)
+                    // (PARTKEY) という文字列を安全に置換します
                     const placeholderString = `(${partKey})`;
                     
-                    // 文字列置換を使用
+                    // 文字列置換を使用し、該当するプレースホルダーを置換
+                    // 注意: replaceは最初に見つかったものしか置換しないため、グローバル検索が必要な場合は正規表現を使うのが確実ですが、
+                    // ここではパターンごとに処理しているため、テンプレートに同じプレースホルダーが連続していない限り問題ありません。
                     englishText = englishText.replace(placeholderString, randomItem.english);
 
                 } else {
@@ -132,8 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 念のため、残ってしまったプレースホルダーを削除
+        // 最終チェック: 置き換えられずに残ったプレースホルダーを空文字列に置換（フォールバック）
         englishText = englishText.replace(/\(N_[^\)]+\)|\(A_[^\)]+\)|\(V_[^\)]+\)|\(P_[^\)]+\)/g, '');
+        
         // 句読点を追加（文末にピリオドがない場合）
         if (!englishText.match(/[.!?]$/)) {
             englishText += '.';
