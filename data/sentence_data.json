@@ -1,0 +1,54 @@
+{
+  "sentences": [
+    {
+      "id": 1,
+      "type": "NはAです",
+      "hint": "動物（主語）の状態を表す文です。",
+      "parts": [
+        {"word": "いぬ", "type": "名詞N"},
+        {"word": "は", "type": "助詞P"},
+        {"word": "かわいい", "type": "形容詞A"},
+        {"word": "です", "type": "助動詞V"}
+      ],
+      "image": "animal_cute.png"
+    },
+    {
+      "id": 2,
+      "type": "NはVます",
+      "hint": "人物（主語）の動作を表す文です。",
+      "parts": [
+        {"word": "わたし", "type": "名詞N"},
+        {"word": "は", "type": "助詞P"},
+        {"word": "がっこう", "type": "名詞N"},
+        {"word": "へ", "type": "助詞P"},
+        {"word": "いきます", "type": "動詞V"}
+      ],
+      "image": "go_to_school.png"
+    },
+    {
+      "id": 3,
+      "type": "NをVます",
+      "hint": "食べ物（目的語）に対する動作を表す文です。",
+      "parts": [
+        {"word": "ねこ", "type": "名詞N"},
+        {"word": "が", "type": "助詞P"},
+        {"word": "ごはん", "type": "名詞N"},
+        {"word": "を", "type": "助詞P"},
+        {"word": "たべます", "type": "動詞V"}
+      ],
+      "image": "cat_eating.png"
+    },
+    {
+      "id": 4,
+      "type": "NはAです",
+      "hint": "場所の状態を表す文です。",
+      "parts": [
+        {"word": "こうえん", "type": "名詞N"},
+        {"word": "は", "type": "助詞P"},
+        {"word": "ひろい", "type": "形容詞A"},
+        {"word": "です", "type": "助動詞V"}
+      ],
+      "image": "park_wide.png"
+    }   
+  ]
+}
