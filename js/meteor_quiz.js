@@ -169,10 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function showQuizModal(data) {
         // 問題文: 隕石の日本語単語を表示
-        questionTextElement.textContent = `${data.word} の英語は？`;
-        
-        // 画像エリア: 画像を表示
-        document.getElementById('quiz-image-area').innerHTML = `<img src="assets/images/${data.image}" alt="${data.word}">`;
+        questionTextElement.textContent = `この単語の英語は？`; // 日本語単語は別途大きく表示
+
+        // ★修正箇所: 画像の代わりに日本語単語を大きく表示する★
+        document.getElementById('quiz-image-area').innerHTML = 
+            `<p style="font-size: 3em; color: #ff6f61; font-weight: bold; margin-bottom: 20px;">${data.word}</p>`;
 
         // 選択肢の準備: 正解1つ + 不正解1つ
         choiceButtonsArea.innerHTML = '';
@@ -182,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const uniqueChoices = [];
         uniqueChoices.push(data.english); // 正解
         
+        // 不正解な選択肢をランダムに1つ選ぶ
         if (incorrects.length > 0) {
-             // 不正解な選択肢をランダムに1つ選ぶ
              const randomIncorrect = incorrects[Math.floor(Math.random() * incorrects.length)];
              uniqueChoices.push(randomIncorrect);
         }
