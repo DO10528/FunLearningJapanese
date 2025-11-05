@@ -11,13 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback-message');
     const questionText = document.getElementById('question-text');
     const scoreDisplay = document.getElementById('score-display');
+    const englishTranslation = document.getElementById('english-translation'); // ★新規追加★
 
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
     
-    let allTemplates = [];         // JSONから読み込んだ全問題テンプレート
-    let wordPool = {};             // JSONから読み込んだ単語プール
-    let currentCorrectParts = [];  // ★現在の問題の正しい単語の配列 (動的に生成される)★
+    let allTemplates = [];         
+    let wordPool = {};             
+    let currentCorrectParts = [];  // 現在の問題の正しい単語の配列
     let score = 0;
     let totalQuestions = 0;
     let currentQuestionIndex = 0;
@@ -31,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(DATA_PATH);
             const data = await response.json();
             
-            // テンプレートと単語プールを分離
             allTemplates = shuffleArray(data.templates); 
             wordPool = data.word_pool;
 
@@ -42,10 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // イベントリスナー設定
             checkButton.addEventListener('click', checkAnswer);
             resetButton.addEventListener('click', resetPuzzle);
-            
             setupDropZoneEvents();
             
             startNewQuestion();
@@ -66,32 +64,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const template = allTemplates[currentQuestionIndex];
         
-        // ★★★ 1. 問題の動的生成 ★★★
-        const newSentenceParts = generateRandomSentence(template);
-        currentCorrectParts = newSentenceParts; // 正解の順序を保存
+        // ★★★ 1. 問題の動的生成と英語訳の生成 ★★★
+        const { japaneseParts, englishText } = generateRandomSentence(template);
+        currentCorrectParts = japaneseParts; // 正解の順序を保存
         // ★★★★★★★★★★★★★★★★
 
         // 1. UIをリセット
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         feedbackMessage.classList.add('hidden');
-        feedbackMessage.className = 'quiz-feedback-message'; 
+        feedbackMessage.className = 'quiz-feedback-message';
         checkButton.disabled = false;
         resetButton.disabled = false;
         
         // 2. 問題情報を表示
         questionText.textContent = `ヒント: ${template.hint}`;
+        englishTranslation.textContent = englishText; // ★英文を表示★
         updateScoreDisplay();
 
         // 3. カードを生成し、シャッフルして配置
-        const shuffledParts = shuffleArray([...newSentenceParts]);
+        const shuffledParts = shuffleArray([...japaneseParts]);
         
         shuffledParts.forEach((part, index) => {
             const card = document.createElement('div');
-            card.textContent = part; // 単語のみ
+            card.textContent = part; 
             card.classList.add('word-card');
             card.draggable = true;
-            // 正解インデックスは不要になるが、識別のためユニークIDを付与
             card.dataset.id = `${part}-${index}-${currentQuestionIndex}`; 
             
             cardContainer.appendChild(card);
@@ -102,31 +100,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 文型テンプレートと単語プールからランダムな文を生成する
+     * 文型テンプレートと単語プールからランダムな文と英文を生成する
      */
     function generateRandomSentence(template) {
-        const parts = [];
+        const japaneseParts = [];
+        let englishText = template.english; // 英文テンプレートを取得
         
         template.pattern.forEach(partKey => {
-            if (partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_') || partKey.startsWith('P_')) {
+            if (partKey.startsWith('P_PERSON') || partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_')) {
                 // 単語プールからランダムに選択
                 const pool = wordPool[partKey];
                 if (pool && pool.length > 0) {
                     const randomWord = pool[Math.floor(Math.random() * pool.length)];
-                    parts.push(randomWord);
+                    japaneseParts.push(randomWord.japanese);
+
+                    // 英文を置換 (例: N_FOOD -> [FOOD])
+                    const englishPlaceholder = `(${partKey.replace(/N_|P_|A_|V_/g, '')})`;
+                    englishText = englishText.replace(englishPlaceholder, randomWord.english);
+
+                } else {
+                    japaneseParts.push("[エラー]"); // プールが空の場合
                 }
             } else {
-                // 助詞や助動詞などの固定語彙
-                parts.push(partKey);
+                // 助詞や助動詞などの固定語彙 (は、が、を、へ、です)
+                japaneseParts.push(partKey);
             }
         });
         
-        return parts;
+        return { japaneseParts, englishText };
     }
+
 
     // ----------------------------------------------------
     // イベント設定とドラッグ＆ドロップ処理 (変更なし)
     // ----------------------------------------------------
+    
+    // ... (setupCardEvents, setupDropZoneEvents, handleDragStart, handleDragEnd, handleDragOver, handleDragLeave, handleDrop, getDragAfterElement, handleCardClick は前回のコードと同じ)
 
     function setupCardEvents() {
         document.querySelectorAll('.word-card').forEach(card => {
@@ -208,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // 正誤判定とゲーム制御 (ロジック修正)
+    // 正誤判定とゲーム制御 (変更なし)
     // ----------------------------------------------------
 
     /**
@@ -230,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let isCorrect = true;
         
         droppedCards.forEach((card, index) => {
-            const correctWord = currentCorrectParts[index]; // ★修正: 正解配列と比較★
+            const correctWord = currentCorrectParts[index];
             
             if (card.textContent === correctWord) {
                 card.classList.add('correct-slot');
@@ -285,11 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function displayFeedback(isCorrect, message) {
         feedbackMessage.textContent = message;
-        // feedbackMessage.classList.remove('hidden', 'feedback-correct', 'feedback-incorrect'); // クラス名を quiz-feedback-message に合わせる
         feedbackMessage.classList.remove('hidden'); 
         
-        // CSSクラス名が 'quiz-feedback-message' に依存しているため、ここで追加し直す
-        feedbackMessage.classList.add('quiz-feedback-message'); 
         feedbackMessage.classList.remove('feedback-correct', 'feedback-incorrect');
         
         if (isCorrect) {
@@ -312,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame() {
         playSound(SOUND_CORRECT_PATH); 
         questionText.textContent = `🎉 ゲームクリア！`;
+        englishTranslation.textContent = `おめでとうございます！` // 英文エリアをクリア
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         checkButton.disabled = true;
