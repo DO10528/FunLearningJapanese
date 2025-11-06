@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_LIFE = 3;
     const METEOR_INTERVAL = 4000; // ★修正: 1500ms(1.5秒)から4000ms(4秒)に変更 (約2.67倍の頻度)
     let gameInterval = null;
-    let meteorSpeed = 10.0; 
+    let meteorSpeed = 3.0; 
     let score = 0;
     let life = INITIAL_LIFE;
     let isModalOpen = false;
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         score = 0;
         life = INITIAL_LIFE;
-        meteorSpeed = 1;
+        meteorSpeed = 3.0;
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
         skyArea.innerHTML = ''; 
