@@ -669,7 +669,7 @@ gap: 20px;
 }
 
 /* ======================================== */
-/* ★ 隕石クイズゲーム専用スタイル (改善版) ★ */
+/* ★ 隕石クイズゲーム専用スタイル (改善版 - 選択肢ポップアップ対応) ★ */
 /* ======================================== */
 
 /* --- ゲームエリアのコンテナ設定 --- */
@@ -689,7 +689,6 @@ gap: 20px;
     border-radius: 15px;
 }
 
-/* ★★★ ここから修正 ★★★ */
 #sky-area {
     width: 100%;
     height: 90%; 
@@ -697,66 +696,63 @@ gap: 20px;
     top: 0;
     background-color: #000; /* 念のため、背景は黒を明示 */
 
-    /* ★★★ 修正点: 無効な drop-shadow() を削除し、サイズを調整 ★★★ */
+    /* ★★★ 修正点: 星の数を増やし、サイズを大きく、影を追加 ★★★ */
     background-image: 
-        /* 大きめの星 (5px) */
-        radial-gradient(5px 5px at 10% 20%, #fff, transparent),
-        radial-gradient(5px 5px at 30% 70%, #fff, transparent),
-        radial-gradient(5px 5px at 80% 40%, #fff, transparent),
-        radial-gradient(5px 5px at 50% 10%, #fff, transparent),
-        radial-gradient(5px 5px at 70% 85%, #fff, transparent),
-        radial-gradient(5px 5px at 5% 50%, #fff, transparent),
-        radial-gradient(5px 5px at 90% 60%, #fff, transparent),
-        radial-gradient(5px 5px at 25% 95%, #fff, transparent),
+        /* 大きめの星 (3px) */
+        radial-gradient(3px 3px at 10% 20%, #fff, transparent),
+        radial-gradient(3px 3px at 30% 70%, #fff, transparent),
+        radial-gradient(3px 3px at 80% 40%, #fff, transparent),
+        radial-gradient(3px 3px at 50% 10%, #fff, transparent),
+        radial-gradient(3px 3px at 70% 85%, #fff, transparent),
+        radial-gradient(3px 3px at 5% 50%, #fff, transparent),
+        radial-gradient(3px 3px at 90% 60%, #fff, transparent),
+        radial-gradient(3px 3px at 25% 95%, #fff, transparent),
 
-        /* 中くらいの星 (3px) */
-        radial-gradient(3px 3px at 15% 45%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 40% 25%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 60% 75%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 85% 15%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 75% 50%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 20% 80%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 95% 30%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 55% 60%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 35% 5%, #e0e0ff, transparent),
-        radial-gradient(3px 3px at 45% 90%, #e0e0ff, transparent),
-
-        /* 小さな星 (2px) */
-        radial-gradient(2px 2px at 5% 5%, white, transparent),
-        radial-gradient(2px 2px at 10% 80%, white, transparent),
-        radial-gradient(2px 2px at 20% 10%, white, transparent),
-        radial-gradient(2px 2px at 25% 60%, white, transparent),
-        radial-gradient(2px 2px at 30% 30%, white, transparent),
-        radial-gradient(2px 2px at 35% 85%, white, transparent),
-        radial-gradient(2px 2px at 40% 50%, white, transparent),
-        radial-gradient(2px 2px at 45% 5%, white, transparent),
-        radial-gradient(2px 2px at 50% 70%, white, transparent),
-        radial-gradient(2px 2px at 55% 20%, white, transparent),
-        radial-gradient(2px 2px at 60% 90%, white, transparent),
-        radial-gradient(2px 2px at 65% 35%, white, transparent),
-        radial-gradient(2px 2px at 70% 5%, white, transparent),
-        radial-gradient(2px 2px at 75% 80%, white, transparent),
-        radial-gradient(2px 2px at 80% 25%, white, transparent),
-        radial-gradient(2px 2px at 85% 70%, white, transparent),
-        radial-gradient(2px 2px at 90% 10%, white, transparent),
-        radial-gradient(2px 2px at 95% 40%, white, transparent),
-        radial-gradient(2px 2px at 98% 95%, white, transparent),
-        radial-gradient(2px 2px at 3% 30%, white, transparent);
+        /* 中くらいの星 (2px) */
+        radial-gradient(2px 2px at 15% 45%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 40% 25%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 60% 75%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 85% 15%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 75% 50%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 20% 80%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 95% 30%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 55% 60%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 35% 5%, #e0e0ff, transparent),
+        radial-gradient(2px 2px at 45% 90%, #e0e0ff, transparent),
+        
+        /* 小さな星 (1px) */
+        radial-gradient(1px 1px at 5% 5%, white, transparent),
+        radial-gradient(1px 1px at 10% 80%, white, transparent),
+        radial-gradient(1px 1px at 20% 10%, white, transparent),
+        radial-gradient(1px 1px at 25% 60%, white, transparent),
+        radial-gradient(1px 1px at 30% 30%, white, transparent),
+        radial-gradient(1px 1px at 35% 85%, white, transparent),
+        radial-gradient(1px 1px at 40% 50%, white, transparent),
+        radial-gradient(1px 1px at 45% 5%, white, transparent),
+        radial-gradient(1px 1px at 50% 70%, white, transparent),
+        radial-gradient(1px 1px at 55% 20%, white, transparent),
+        radial-gradient(1px 1px at 60% 90%, white, transparent),
+        radial-gradient(1px 1px at 65% 35%, white, transparent),
+        radial-gradient(1px 1px at 70% 5%, white, transparent),
+        radial-gradient(1px 1px at 75% 80%, white, transparent),
+        radial-gradient(1px 1px at 80% 25%, white, transparent),
+        radial-gradient(1px 1px at 85% 70%, white, transparent),
+        radial-gradient(1px 1px at 90% 10%, white, transparent),
+        radial-gradient(1px 1px at 95% 40%, white, transparent),
+        radial-gradient(1px 1px at 98% 95%, white, transparent),
+        radial-gradient(1px 1px at 3% 30%, white, transparent);
 
     /* 星が点滅するアニメーション */
     animation: twinkle 5s infinite linear;
 }
 
 /* ★追加★ 星を点滅させるアニメーション */
-/* ★★★ 修正点: background-position を削除 ★★★ */
 @keyframes twinkle {
     0%, 100% { opacity: 0.8; }
     25% { opacity: 0.95; }
     50% { opacity: 1; }
     75% { opacity: 0.95; }
 }
-/* ★★★ ここまで修正 ★★★ */
-
 
 #ground-area {
     position: absolute;
@@ -834,7 +830,7 @@ gap: 20px;
 /* ★追加★ 隕石をゆっくり回転させる */
 @keyframes rotateMeteor {
     from { transform: rotate(0deg); }
-    to { { transform: rotate(360deg); }
+    to { transform: rotate(360deg); }
 }
 
 .meteor:hover {
@@ -847,77 +843,57 @@ gap: 20px;
 }
 
 /* --- クイズモーダルのスタイル --- */
+/* ★変更★ クイズモーダルは完全に非表示に */
 #quiz-modal {
+    display: none !important; 
+}
+
+
+/* ★追加★ 隕石から出てくる選択肢ボタンのスタイル */
+.quiz-choice-button {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    
-    /* ★変更★ 背景を少し明るく */
-    background-color: rgba(0, 0, 0, 0.6); 
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
+    /* CSS変数で位置が調整されます */
+    top: var(--button-start-top);
+    left: var(--button-start-left);
+    transform: translate(-50%, -50%) scale(0.5); /* 初期サイズを小さく、中央寄せ */
+    opacity: 0; /* 初期状態で非表示 */
 
-#quiz-box {
-    /* ★変更★ 宇宙船のパネル風に */
-    background-color: #e0f7fa; /* 明るい水色 */
-    border: 5px solid #00bcd4; /* 枠線 */
-
-    padding: 30px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 450px;
-    text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 200, 255, 0.5); /* ★変更★ 影の色 */
-}
-
-#question-text {
-    font-size: 1.8em;
-    color: #00796b; /* ★変更★ 濃い青緑 */
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-#quiz-image-area img {
-    max-width: 100px;
-    max-height: 100px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 3px solid #00bcd4; /* ★変更★ 枠線の色 */
-}
-
-/* ★変更★ 選択肢ボタンをポップでカラフルに */
-#choice-buttons-area button {
-    padding: 15px 10px;
-    font-size: 1.2em;
-    
-    /* ★変更★ ボタンの色 */
-    border: none; /* 枠線を消す */
-    border-bottom: 4px solid #00796b; /* 影を濃い色で */
-    border-radius: 12px; /* ★変更★ 丸くする */
     background-color: #00bcd4; /* ボタンの色 */
     color: white; /* 文字の色 */
-
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
-    min-width: 130px;
+    padding: 12px 18px; /* パディング */
+    border-radius: 25px; /* 丸みを強く */
+    font-size: 1.5em; /* 選択肢の文字サイズ */
     font-weight: bold;
-    box-shadow: 0 3px 0 #00796b; /* ★変更★ 影の色 */
+    box-shadow: 0 4px 0 #00796b; /* 影 */
+    cursor: pointer;
+    z-index: 95; /* 隕石より手前 */
+    white-space: nowrap; /* 複数行にならないように */
+    user-select: none; /* テキスト選択防止 */
+    border: none;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
 }
 
-#choice-buttons-area button:hover:not(:disabled) {
-    background-color: #0097a7; /* ★変更★ ホバー色 */
-    transform: translateY(-2px); /* ★変更★ 浮き上がりを大きく */
-    box-shadow: 0 5px 0 #00796b; /* ★変更★ 影も動かす */
+.quiz-choice-button:hover:not(:disabled) {
+    background-color: #0097a7; /* ホバー色 */
+    transform: translate(-50%, -50%) scale(1.05) translateY(-2px); /* 浮き上がりを大きく */
+    box-shadow: 0 6px 0 #00796b; /* 影も動かす */
+}
+
+/* ★追加★ 選択肢ボタンが出てくるアニメーション */
+@keyframes choiceButtonPopUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        top: var(--button-start-top);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1); /* 拡大 */
+        opacity: 1;
+        top: var(--button-end-top); /* 最終位置 */
+    }
 }
 
 /* --- 爆発エフェクト --- */
-/* @keyframes explode はグローバルですが、問題ありません */
 @keyframes explode {
     0% { transform: scale(1); opacity: 1; }
     50% { transform: scale(3); opacity: 0.5; background-color: orange; }
@@ -936,43 +912,4 @@ gap: 20px;
 /* --- 汎用ユーティリティ --- */
 .hidden {
     display: none !important;
-}
-
-/* --- 隕石から出てくる答えのスタイル (新しく追加) --- */
-.animated-answer {
-    position: absolute;
-    /* initial state: 隕石の真上、少し見えない位置 */
-    top: calc(var(--meteor-top) + (var(--meteor-height) / 2)); /* 隕石の中央Y */
-    left: calc(var(--meteor-left) + (var(--meteor-width) / 2)); /* 隕石の中央X */
-    transform: translate(-50%, -50%) scale(0.5); /* 初期サイズを小さく、中央寄せ */
-    opacity: 0; /* 初期状態で非表示 */
-
-    background-color: #ffd700; /* 黄金色 */
-    color: #333;
-    padding: 10px 15px;
-    border-radius: 20px; /* 丸みを強く */
-    font-size: 1.8em; /* 答えの文字サイズ */
-    font-weight: bold;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); /* 光る影 */
-    cursor: pointer;
-    z-index: 95; /* 隕石より手前 */
-    white-space: nowrap; /* 複数行にならないように */
-    user-select: none; /* テキスト選択防止 */
-
-    /* アニメーションの定義 */
-    animation: answerPopUp 0.5s ease-out forwards;
-}
-
-/* 答えが出てくるアニメーション */
-@keyframes answerPopUp {
-    0% {
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0;
-        top: calc(var(--meteor-top) + (var(--meteor-height) / 2));
-    }
-    100% {
-        transform: translate(-50%, -150%) scale(1); /* 隕石の上へ移動し、拡大 */
-        opacity: 1;
-        top: calc(var(--meteor-top) - 20px); /* 隕石の少し上 */
-    }
 }

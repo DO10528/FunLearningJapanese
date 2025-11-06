@@ -3,12 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM要素の定義
     // ----------------------------------------------------
     const skyArea = document.getElementById('sky-area');
-    const quizModal = document.getElementById('quiz-modal'); // ★使わないが、残しておく
-    const questionTextElement = document.getElementById('question-text'); // ★使わないが、残しておく
-    const choiceButtonsArea = document.getElementById('choice-buttons-area'); // ★使わないが、残しておく
+    // クイズモーダル関連のDOM要素は、HTMLから完全に削除するか、
+    // CSSで display: none !important; を設定してJSからは操作しない
+    // const quizModal = document.getElementById('quiz-modal'); 
+    // const questionTextElement = document.getElementById('question-text'); 
+    // const choiceButtonsArea = document.getElementById('choice-buttons-area'); 
+    // const quizFeedback = document.getElementById('quiz-feedback'); 
     const scoreDisplay = document.getElementById('score');
     const lifeDisplay = document.getElementById('life');
-    const quizFeedback = document.getElementById('quiz-feedback'); // ★使わないが、残しておく
     const explosionTemplate = document.getElementById('explosion-template');
 
     // ----------------------------------------------------
@@ -20,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let meteorSpeed = 3.33; 
     let score = 0;
     let life = INITIAL_LIFE;
-    let isModalOpen = false; // モーダルは使わないが、クリック判定のフラグとして残す
+    let isQuestionActive = false; // ★変更★ `isModalOpen`から`isQuestionActive`に変更し、問題表示中を示す
     let currentMeteorElement = null; // クリックされた隕石
     let currentQuizData = null; // クリックされた隕石の問題データ
-    let currentAnimatedAnswerElement = null; // ★追加★ 表示されたアニメーション答え要素
+    let currentChoiceButtons = []; // ★変更★ 表示された選択肢ボタンの配列
 
     // ★★★ 問題データ ★★★
     const QUIZ_DATA = [
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
 
     /**
-     * 配列をシャッフルする (今回は使わない)
+     * 配列をシャッフルする
      */
     function shuffleArray(array) {
         return array.sort(() => Math.random() - 0.5);
@@ -113,17 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
-            // isModalOpenはクリックされたらtrueになるので、その間は落下停止
-            if (isModalOpen && meteor === currentMeteorElement) return;
-            // クリック済みでアニメーション中、かつ現在の隕石でなければ落下継続
-            if (isModalOpen && meteor !== currentMeteorElement) {
+            // ★変更★ `isModalOpen`を`isQuestionActive`に変更
+            // 問題表示中は、クリックされた隕石の落下は停止
+            if (isQuestionActive && meteor === currentMeteorElement) return;
+            // 問題表示中だが、クリックされていない他の隕石は落下継続
+            if (isQuestionActive && meteor !== currentMeteorElement) {
                 let currentY = parseFloat(meteor.style.top);
                 currentY += meteorSpeed;
                 meteor.style.top = `${currentY}px`;
             }
 
-            // クリックされていない隕石は普通に落下
-            if (!isModalOpen) {
+            // 問題が表示されていなければ、全ての隕石が落下
+            if (!isQuestionActive) {
                 let currentY = parseFloat(meteor.style.top);
                 currentY += meteorSpeed;
                 meteor.style.top = `${currentY}px`;
@@ -151,106 +154,129 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * 隕石がクリックされたときの処理
      */
-    /* ★★★ 順序変更 ★★★ */
     function handleMeteorClick(e) {
-        if (isModalOpen) return; // 既に問題が表示されていたら何もしない
+        // ★変更★ `isModalOpen`を`isQuestionActive`に変更
+        if (isQuestionActive) return; // 既に問題が表示されていたら何もしない
         
-        isModalOpen = true; // 問題表示中フラグを立てる
+        isQuestionActive = true; // ★変更★ 問題表示中フラグを立てる
         currentMeteorElement = e.target; // クリックされた隕石を保持
         
         const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
         currentQuizData = quizData; // 問題データを保持
 
-        // ★修正点 1/2★ 
-        //先にアニメーションする答えを生成（ここで隕石の位置情報を取得）
-        createAnimatedAnswer(currentMeteorElement, currentQuizData.english);
+        // ★★★ 2つの選択肢ボタンを生成してアニメーション表示 ★★★
+        createAnimatedChoiceButtons(currentMeteorElement, currentQuizData);
 
-        // ★修正点 2/2★ 
         // 答えを生成した後に、隕石を非表示にする
         currentMeteorElement.style.display = 'none';
     }
 
     /**
-     * ★追加★ アニメーションする答えの要素を生成し表示する
+     * ★追加★ 2つの選択肢ボタンを生成し、アニメーション表示する
      */
-    function createAnimatedAnswer(meteorElement, answerText) {
-        const answerDiv = document.createElement('div');
-        answerDiv.classList.add('animated-answer');
-        answerDiv.textContent = answerText;
-        answerDiv.dataset.answer = answerText; // 正解判定のためにデータ属性に保存
+    function createAnimatedChoiceButtons(meteorElement, quizData) {
+        const correctChoice = quizData.english;
+        const incorrects = quizData.choices.filter(c => c !== correctChoice);
+        const wrongChoice = shuffleArray(incorrects)[0] || "None"; // 不正解がなければ適当な文字列
 
-        // 隕石の位置情報をCSS変数として渡す
-        // これにより、CSSアニメーションが隕石の位置を基準に動く
-        answerDiv.style.setProperty('--meteor-top', `${meteorElement.offsetTop}px`);
-        answerDiv.style.setProperty('--meteor-left', `${meteorElement.offsetLeft}px`);
-        answerDiv.style.setProperty('--meteor-width', `${meteorElement.offsetWidth}px`);
-        answerDiv.style.setProperty('--meteor-height', `${meteorElement.offsetHeight}px`);
-        
-        skyArea.appendChild(answerDiv);
-        currentAnimatedAnswerElement = answerDiv; // 表示した答え要素を保持
+        const choices = shuffleArray([correctChoice, wrongChoice]); // 正解と不正解をシャッフル
 
-        // 答えがクリックされたときの処理
-        answerDiv.addEventListener('click', handleAnswerClick);
+        currentChoiceButtons = []; // ボタン配列をリセット
+
+        choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.classList.add('quiz-choice-button');
+            button.textContent = choice;
+            button.dataset.answer = choice; // 正解判定のためにデータ属性に保存
+            button.dataset.correct = (choice === correctChoice) ? 'true' : 'false'; // 正解かどうか
+
+            // 隕石の中心位置
+            const meteorCenterX = meteorElement.offsetLeft + meteorElement.offsetWidth / 2;
+            const meteorCenterY = meteorElement.offsetTop + meteorElement.offsetHeight / 2;
+            
+            // ボタンの初期位置（隕石の中心）
+            button.style.setProperty('--button-start-top', `${meteorCenterY}px`);
+            button.style.setProperty('--button-start-left', `${meteorCenterX}px`);
+
+            // 最終的なボタンの位置を調整
+            let endTopOffset = 0;
+            if (index === 0) { // 1つ目のボタン
+                endTopOffset = -150; // 隕石より上
+            } else { // 2つ目のボタン
+                endTopOffset = -50; // 隕石の少し上
+            }
+            button.style.setProperty('--button-end-top', `${meteorCenterY + endTopOffset}px`);
+            
+            // アニメーションの遅延 (順番にポップアップ)
+            button.style.animationDelay = `${index * 0.1}s`;
+            button.style.animation = `choiceButtonPopUp 0.4s ease-out forwards ${index * 0.1}s`;
+
+            skyArea.appendChild(button);
+            currentChoiceButtons.push(button);
+
+            button.addEventListener('click', handleChoiceButtonClick);
+        });
     }
 
     /**
-     * ★追加★ アニメーションする答えがクリックされたときの処理
+     * ★追加★ 選択肢ボタンがクリックされたときの処理
      */
-    function handleAnswerClick(e) {
-        if (!isModalOpen) return; // クリック判定フラグが立ってなければ何もしない
+    function handleChoiceButtonClick(e) {
+        // ★変更★ `isModalOpen`を`isQuestionActive`に変更
+        if (!isQuestionActive) return; 
 
         const selectedAnswer = e.target.dataset.answer;
-        
-        // 答え要素を一時的に無効化 (連続クリック防止)
-        e.target.style.pointerEvents = 'none';
+        const isCorrect = e.target.dataset.correct === 'true';
+
+        // すべてのボタンを無効化し、クリックできないようにする
+        currentChoiceButtons.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            if (btn.dataset.correct === 'true') {
+                btn.style.backgroundColor = 'lightgreen'; // 正解は緑色にする
+            } else if (btn.dataset.answer === selectedAnswer && !isCorrect) {
+                btn.style.backgroundColor = 'red'; // 間違った選択肢は赤色にする
+            }
+        });
 
         const meteorX = currentMeteorElement.offsetLeft + currentMeteorElement.offsetWidth / 2;
         const meteorY = currentMeteorElement.offsetTop + currentMeteorElement.offsetHeight / 2;
 
-        if (selectedAnswer === currentQuizData.english) {
-            // 正解
-            e.target.style.backgroundColor = 'lightgreen';
-            e.target.textContent = '⭕ Correct!'; // フィードバックを答えに表示
+        if (isCorrect) {
             updateScore(10);
-            
             triggerExplosion(meteorX, meteorY, false); // 黄色い爆発
-            
         } else {
-            // 不正解
-            e.target.style.backgroundColor = 'red';
-            e.target.textContent = '❌ Wrong!'; // フィードバックを答えに表示
             updateLife(-1);
-            
             triggerExplosion(meteorX, meteorY, true); // 赤い爆発
         }
 
-        // 答えの要素を少し遅れて削除し、ゲームを再開
+        // 選択肢ボタンと隕石の要素を少し遅れて削除し、ゲームを再開
         setTimeout(() => {
-            if (currentAnimatedAnswerElement) {
-                currentAnimatedAnswerElement.remove();
-                currentAnimatedAnswerElement = null;
+            // 選択肢ボタンを全て削除
+            currentChoiceButtons.forEach(btn => btn.remove());
+            currentChoiceButtons = [];
+
+            // クリックされた隕石を削除
+            if (currentMeteorElement) {
+                currentMeteorElement.remove();
+                currentMeteorElement = null;
             }
-            isModalOpen = false; // フラグをリセット
-            currentMeteorElement = null; // 隕石参照をリセット
+
+            // ★変更★ フラグをリセット
+            isQuestionActive = false; 
             currentQuizData = null; // 問題データ参照をリセット
         }, 1000); // 1秒後に削除
     }
 
 
     /**
-     * クイズモーダルを表示し、問題を設定する (★今回は使わないので、中身は空にするか削除しても良い)
+     * クイズモーダルを表示し、問題を設定する (★削除)
      */
-    function showQuizModal(data) {
-        // この関数は使われない
-        // quizModal.classList.add('hidden'); // 非表示にする
-    }
+    // function showQuizModal(data) { /* 削除 */ }
     
     /**
-     * 選択肢がクリックされたときの処理 (★今回は使わないので、中身は空にするか削除しても良い)
+     * 選択肢がクリックされたときの処理 (★削除)
      */
-    function handleChoiceClick(e) {
-        // この関数は使われない
-    }
+    // function handleChoiceClick(e) { /* 削除 */ }
 
 
     // ----------------------------------------------------
@@ -292,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function endGame() {
         clearInterval(gameInterval);
-        isModalOpen = true; 
+        isQuestionActive = true; // ★変更★ ゲームオーバー中は問題を出さない
         alert(`ゲームオーバー！あなたのスコアは ${score} 点です。`);
     }
 
