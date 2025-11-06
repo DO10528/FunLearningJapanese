@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_LIFE = 3;
     const METEOR_INTERVAL = 4000; // ★修正: 1500ms(1.5秒)から4000ms(4秒)に変更 (約2.67倍の頻度)
     let gameInterval = null;
-    let meteorSpeed = 3.0; 
+    let meteorSpeed = 10.0; // ← 10.0 に設定
     let score = 0;
     let life = INITIAL_LIFE;
     let isModalOpen = false;
@@ -128,7 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        meteorSpeed = Math.min(4, 1 + score / 500); 
+        /* ★★★ 修正点 2/2 ★★★ */
+        // スコアによる速度変更を無効化（コメントアウト）
+        // meteorSpeed = Math.min(4, 1 + score / 500); 
         
         requestAnimationFrame(fallLoop);
     }
@@ -254,7 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         score = 0;
         life = INITIAL_LIFE;
-        meteorSpeed = 3.0;
+        /* ★★★ 修正点 1/2 ★★★ */
+        meteorSpeed = 10.0; // ← 10.0 に変更
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
         skyArea.innerHTML = ''; 
