@@ -699,49 +699,49 @@ gap: 20px;
 
     /* ★★★ 修正点: 無効な drop-shadow() を削除し、サイズを調整 ★★★ */
     background-image: 
-        /* 大きめの星 (3px) */
-        radial-gradient(3px 3px at 10% 20%, #fff, transparent),
-        radial-gradient(3px 3px at 30% 70%, #fff, transparent),
-        radial-gradient(3px 3px at 80% 40%, #fff, transparent),
-        radial-gradient(3px 3px at 50% 10%, #fff, transparent),
-        radial-gradient(3px 3px at 70% 85%, #fff, transparent),
-        radial-gradient(3px 3px at 5% 50%, #fff, transparent),
-        radial-gradient(3px 3px at 90% 60%, #fff, transparent),
-        radial-gradient(3px 3px at 25% 95%, #fff, transparent),
+        /* 大きめの星 (5px) */
+        radial-gradient(5px 5px at 10% 20%, #fff, transparent),
+        radial-gradient(5px 5px at 30% 70%, #fff, transparent),
+        radial-gradient(5px 5px at 80% 40%, #fff, transparent),
+        radial-gradient(5px 5px at 50% 10%, #fff, transparent),
+        radial-gradient(5px 5px at 70% 85%, #fff, transparent),
+        radial-gradient(5px 5px at 5% 50%, #fff, transparent),
+        radial-gradient(5px 5px at 90% 60%, #fff, transparent),
+        radial-gradient(5px 5px at 25% 95%, #fff, transparent),
 
-        /* 中くらいの星 (2px) */
-        radial-gradient(2px 2px at 15% 45%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 40% 25%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 60% 75%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 85% 15%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 75% 50%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 20% 80%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 95% 30%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 55% 60%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 35% 5%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 45% 90%, #e0e0ff, transparent),
-        
-        /* 小さな星 (1px) */
-        radial-gradient(1px 1px at 5% 5%, white, transparent),
-        radial-gradient(1px 1px at 10% 80%, white, transparent),
-        radial-gradient(1px 1px at 20% 10%, white, transparent),
-        radial-gradient(1px 1px at 25% 60%, white, transparent),
-        radial-gradient(1px 1px at 30% 30%, white, transparent),
-        radial-gradient(1px 1px at 35% 85%, white, transparent),
-        radial-gradient(1px 1px at 40% 50%, white, transparent),
-        radial-gradient(1px 1px at 45% 5%, white, transparent),
-        radial-gradient(1px 1px at 50% 70%, white, transparent),
-        radial-gradient(1px 1px at 55% 20%, white, transparent),
-        radial-gradient(1px 1px at 60% 90%, white, transparent),
-        radial-gradient(1px 1px at 65% 35%, white, transparent),
-        radial-gradient(1px 1px at 70% 5%, white, transparent),
-        radial-gradient(1px 1px at 75% 80%, white, transparent),
-        radial-gradient(1px 1px at 80% 25%, white, transparent),
-        radial-gradient(1px 1px at 85% 70%, white, transparent),
-        radial-gradient(1px 1px at 90% 10%, white, transparent),
-        radial-gradient(1px 1px at 95% 40%, white, transparent),
-        radial-gradient(1px 1px at 98% 95%, white, transparent),
-        radial-gradient(1px 1px at 3% 30%, white, transparent);
+        /* 中くらいの星 (3px) */
+        radial-gradient(3px 3px at 15% 45%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 40% 25%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 60% 75%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 85% 15%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 75% 50%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 20% 80%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 95% 30%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 55% 60%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 35% 5%, #e0e0ff, transparent),
+        radial-gradient(3px 3px at 45% 90%, #e0e0ff, transparent),
+
+        /* 小さな星 (2px) */
+        radial-gradient(2px 2px at 5% 5%, white, transparent),
+        radial-gradient(2px 2px at 10% 80%, white, transparent),
+        radial-gradient(2px 2px at 20% 10%, white, transparent),
+        radial-gradient(2px 2px at 25% 60%, white, transparent),
+        radial-gradient(2px 2px at 30% 30%, white, transparent),
+        radial-gradient(2px 2px at 35% 85%, white, transparent),
+        radial-gradient(2px 2px at 40% 50%, white, transparent),
+        radial-gradient(2px 2px at 45% 5%, white, transparent),
+        radial-gradient(2px 2px at 50% 70%, white, transparent),
+        radial-gradient(2px 2px at 55% 20%, white, transparent),
+        radial-gradient(2px 2px at 60% 90%, white, transparent),
+        radial-gradient(2px 2px at 65% 35%, white, transparent),
+        radial-gradient(2px 2px at 70% 5%, white, transparent),
+        radial-gradient(2px 2px at 75% 80%, white, transparent),
+        radial-gradient(2px 2px at 80% 25%, white, transparent),
+        radial-gradient(2px 2px at 85% 70%, white, transparent),
+        radial-gradient(2px 2px at 90% 10%, white, transparent),
+        radial-gradient(2px 2px at 95% 40%, white, transparent),
+        radial-gradient(2px 2px at 98% 95%, white, transparent),
+        radial-gradient(2px 2px at 3% 30%, white, transparent);
 
     /* 星が点滅するアニメーション */
     animation: twinkle 5s infinite linear;
