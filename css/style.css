@@ -881,3 +881,31 @@ gap: 20px;
 .hidden {
     display: none !important;
 }
+
+/* ★追加★ 
+   隕石がイラストの場合のスタイル */
+.meteor.meteor-image {
+    /* 隕石の岩の色（茶色）を消す */
+    background-color: transparent; 
+    
+    /* 画像が枠内に収まるようにする */
+    background-size: contain; 
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* 文字を非表示にする（画像だけにする） */
+    color: transparent; 
+    
+    /* オーラ（影）の色を、イラストの邪魔にならないよう調整 */
+    box-shadow: 0 0 15px 5px rgba(0, 188, 212, 0.7), 
+                0 0 5px 2px rgba(255, 255, 255, 0.8), 
+                inset 0 0 10px rgba(0, 188, 212, 0.5);
+}
+
+.meteor.meteor-image:hover {
+    background-color: transparent; /* ホバー時も茶色にしない */
+    /* ホバー時のオーラ */
+    box-shadow: 0 0 25px 10px rgba(0, 188, 212, 1), 
+                0 0 10px 5px rgba(255, 255, 255, 1), 
+                inset 0 0 10px rgba(0, 188, 212, 0.7);
+}

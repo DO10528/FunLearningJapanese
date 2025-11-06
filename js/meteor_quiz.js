@@ -3,12 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM要素の定義
     // ----------------------------------------------------
     const skyArea = document.getElementById('sky-area');
-    // クイズモーダル関連のDOM要素は、HTMLから完全に削除するか、
-    // CSSで display: none !important; を設定してJSからは操作しない
-    // const quizModal = document.getElementById('quiz-modal'); 
-    // const questionTextElement = document.getElementById('question-text'); 
-    // const choiceButtonsArea = document.getElementById('choice-buttons-area'); 
-    // const quizFeedback = document.getElementById('quiz-feedback'); 
     const scoreDisplay = document.getElementById('score');
     const lifeDisplay = document.getElementById('life');
     const explosionTemplate = document.getElementById('explosion-template');
@@ -22,12 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let meteorSpeed = 3.33; 
     let score = 0;
     let life = INITIAL_LIFE;
-    let isQuestionActive = false; // ★変更★ `isModalOpen`から`isQuestionActive`に変更し、問題表示中を示す
-    let currentMeteorElement = null; // クリックされた隕石
-    let currentQuizData = null; // クリックされた隕石の問題データ
-    let currentChoiceButtons = []; // ★変更★ 表示された選択肢ボタンの配列
+    let isQuestionActive = false; 
+    let currentMeteorElement = null; 
+    let currentQuizData = null; 
+    let currentChoiceButtons = []; 
 
     // ★★★ 問題データ ★★★
+    // ★修正★
+    // imagesフォルダにあるイラストのデータを追加してください。
+    // 例として「すし」を追加しました。
     const QUIZ_DATA = [
         { word: "いぬ", english: "Dog", image: "inu.png", choices: ["Dog", "Cat", "Bird", "Mouse"] },
         { word: "ねこ", english: "Cat", image: "neko.png", choices: ["Cat", "Rabbit", "Fox", "Wolf"] },
@@ -41,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
         { word: "めがね", english: "Glasses", image: "megane.png", choices: ["Glasses", "Watch", "Ring", "Hat"] },
         { word: "やま", english: "Mountain", image: "yama.png", choices: ["Mountain", "River", "Forest", "Sea"] },
         { word: "ゆき", english: "Snow", image: "yuki.png", choices: ["Snow", "Rain", "Ice", "Cloud"] },
+        
+        // ★追加例★ assets/images/sushi.png がある場合
+        { word: "すし", english: "Sushi", image: "sushi.png", choices: ["Sushi", "Steak", "Curry", "Pizza"] }
+        
+        // ★★★ assets/images フォルダにある他の画像もここに追加してください ★★★
+        // { word: "すいか", english: "Watermelon", image: "suika.png", choices: ["Watermelon", "Apple", "Orange", "Grape"] },
+        // { word: "たいこ", english: "Drum", image: "taiko.png", choices: ["Drum", "Piano", "Guitar", "Flute"] },
     ];
     
     // ----------------------------------------------------
@@ -51,7 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
      * 配列をシャッフルする
      */
     function shuffleArray(array) {
-        return array.sort(() => Math.random() - 0.5);
+        // 配列のコピーを作成してからシャッフルする
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
     }
 
     /**
@@ -62,9 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         explosion.classList.remove('hidden');
         explosion.id = '';
 
-        // 地面ヒットや不正解は赤/オレンジ、正解は黄色の爆発
         explosion.style.backgroundColor = isMiss ? 'red' : 'yellow'; 
-
         explosion.style.left = `${x - 25}px`;
         explosion.style.top = `${y - 25}px`;
         explosion.style.animation = 'explode 0.5s forwards';
@@ -82,22 +90,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * 新しい隕石を生成する
+     * ★★★ 大幅に修正 ★★★
      */
     function createMeteor() {
         const meteor = document.createElement('div');
         meteor.classList.add('meteor');
         
-        // CSSで隕石のサイズを100pxに設定しているので、それに合わせて調整
-        const meteorSize = 100; // CSSと同期させる
+        const meteorSize = 100; // CSSと同期
         const startX = Math.random() * (skyArea.offsetWidth - meteorSize); 
         meteor.style.left = `${startX}px`;
-        meteor.style.top = `-${meteorSize}px`; // 画面外からスタート
+        meteor.style.top = `-${meteorSize}px`; 
         
         const quizIndex = Math.floor(Math.random() * QUIZ_DATA.length);
+        const quizData = QUIZ_DATA[quizIndex];
         meteor.dataset.quizIndex = quizIndex;
         
-        // 隕石に問題の日本語単語を表示
-        meteor.textContent = QUIZ_DATA[quizIndex].word;
+        // ★ランダムで「言葉」か「イラスト」かを決める★
+        const quizType = Math.random() < 0.5 ? 'word' : 'image'; 
+        meteor.dataset.quizType = quizType; // クイズの種類を隕石に保存
+
+        if (quizType === 'word') {
+            // タイプ1: 隕石に日本語の「言葉」を表示
+            meteor.textContent = quizData.word;
+        } else {
+            // タイプ2: 隕石に「イラスト」を表示
+            meteor.classList.add('meteor-image'); // CSSスタイルを適用
+            // HTML(index.html)から見た画像パスを指定
+            meteor.style.backgroundImage = `url('assets/images/${quizData.image}')`; 
+        }
 
         meteor.addEventListener('click', handleMeteorClick);
         skyArea.appendChild(meteor);
@@ -116,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         allMeteors.forEach(meteor => {
             
-            // ★修正★
             // 停止条件：問題表示中で、かつ、それが「クリックされた隕石」である場合
             if (isQuestionActive && meteor === currentMeteorElement) {
                 return; // この隕石の処理だけをスキップ（落下停止）
@@ -147,31 +166,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * 隕石がクリックされたときの処理
+     * ★★★ 修正 ★★★
      */
     function handleMeteorClick(e) {
-        // ★変更★ `isModalOpen`を`isQuestionActive`に変更
-        if (isQuestionActive) return; // 既に問題が表示されていたら何もしない
+        if (isQuestionActive) return; 
         
-        isQuestionActive = true; // ★変更★ 問題表示中フラグを立てる
-        currentMeteorElement = e.target; // クリックされた隕石を保持
+        isQuestionActive = true; 
+        currentMeteorElement = e.target; 
         
         const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
-        currentQuizData = quizData; // 問題データを保持
+        const quizType = currentMeteorElement.dataset.quizType; // 隕石からクイズタイプを取得
+        currentQuizData = quizData; 
 
-        // ★★★ 2つの選択肢ボタンを生成してアニメーション表示 ★★★
-        createAnimatedChoiceButtons(currentMeteorElement, currentQuizData);
+        // ★クイズタイプを渡すように変更★
+        createAnimatedChoiceButtons(currentMeteorElement, currentQuizData, quizType);
 
         // 答えを生成した後に、隕石を非表示にする
         currentMeteorElement.style.display = 'none';
     }
 
     /**
-     * ★追加★ 2つの選択肢ボタンを生成し、アニメーション表示する
+     * 2つの選択肢ボタンを生成し、アニメーション表示する
+     * ★★★ 大幅に修正 ★★★
      */
-    function createAnimatedChoiceButtons(meteorElement, quizData) {
-        const correctChoice = quizData.english;
-        const incorrects = quizData.choices.filter(c => c !== correctChoice);
-        const wrongChoice = shuffleArray(incorrects)[0] || "None"; // 不正解がなければ適当な文字列
+    function createAnimatedChoiceButtons(meteorElement, quizData, quizType) {
+        let correctChoice = '';
+        let wrongChoice = '';
+        
+        if (quizType === 'word') {
+            // タイプ1: 隕石が「言葉」の場合 -> 答えは「英語」
+            correctChoice = quizData.english;
+            
+            // 不正解の「英語」をランダムで1つ選ぶ
+            const incorrects = quizData.choices.filter(c => c !== correctChoice);
+            wrongChoice = shuffleArray(incorrects)[0] || "Wrong"; 
+
+        } else {
+            // タイプ2: 隕石が「イラスト」の場合 -> 答えは「日本語」
+            correctChoice = quizData.word; // 正解は "いぬ", "すし" など
+
+            // 不正解の「日本語」を QUIZ_DATA 全体からランダムで1つ選ぶ
+            const allJapaneseWords = QUIZ_DATA.map(q => q.word);
+            const incorrects = allJapaneseWords.filter(w => w !== correctChoice);
+            wrongChoice = shuffleArray(incorrects)[0] || "ちがう";
+        }
 
         const choices = shuffleArray([correctChoice, wrongChoice]); // 正解と不正解をシャッフル
 
@@ -181,27 +219,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.classList.add('quiz-choice-button');
             button.textContent = choice;
-            button.dataset.answer = choice; // 正解判定のためにデータ属性に保存
-            button.dataset.correct = (choice === correctChoice) ? 'true' : 'false'; // 正解かどうか
+            button.dataset.answer = choice; 
+            button.dataset.correct = (choice === correctChoice) ? 'true' : 'false'; 
 
-            // 隕石の中心位置
             const meteorCenterX = meteorElement.offsetLeft + meteorElement.offsetWidth / 2;
             const meteorCenterY = meteorElement.offsetTop + meteorElement.offsetHeight / 2;
             
-            // ボタンの初期位置（隕石の中心）
             button.style.setProperty('--button-start-top', `${meteorCenterY}px`);
             button.style.setProperty('--button-start-left', `${meteorCenterX}px`);
 
-            // 最終的なボタンの位置を調整
             let endTopOffset = 0;
-            if (index === 0) { // 1つ目のボタン
+            if (index === 0) { 
                 endTopOffset = -150; // 隕石より上
-            } else { // 2つ目のボタン
+            } else { 
                 endTopOffset = -50; // 隕石の少し上
             }
             button.style.setProperty('--button-end-top', `${meteorCenterY + endTopOffset}px`);
             
-            // アニメーションの遅延 (順番にポップアップ)
             button.style.animationDelay = `${index * 0.1}s`;
             button.style.animation = `choiceButtonPopUp 0.4s ease-out forwards ${index * 0.1}s`;
 
@@ -213,22 +247,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * ★追加★ 選択肢ボタンがクリックされたときの処理
+     * 選択肢ボタンがクリックされたときの処理 (変更なし)
      */
     function handleChoiceButtonClick(e) {
-        // ★変更★ `isModalOpen`を`isQuestionActive`に変更
         if (!isQuestionActive) return; 
 
         const selectedAnswer = e.target.dataset.answer;
         const isCorrect = e.target.dataset.correct === 'true';
 
-        // すべてのボタンを無効化し、クリックできないようにする
         currentChoiceButtons.forEach(btn => {
             btn.style.pointerEvents = 'none';
             if (btn.dataset.correct === 'true') {
-                btn.style.backgroundColor = 'lightgreen'; // 正解は緑色にする
+                btn.style.backgroundColor = 'lightgreen'; 
             } else if (btn.dataset.answer === selectedAnswer && !isCorrect) {
-                btn.style.backgroundColor = 'red'; // 間違った選択肢は赤色にする
+                btn.style.backgroundColor = 'red'; 
             }
         });
 
@@ -243,35 +275,19 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerExplosion(meteorX, meteorY, true); // 赤い爆発
         }
 
-        // 選択肢ボタンと隕石の要素を少し遅れて削除し、ゲームを再開
         setTimeout(() => {
-            // 選択肢ボタンを全て削除
             currentChoiceButtons.forEach(btn => btn.remove());
             currentChoiceButtons = [];
 
-            // クリックされた隕石を削除
             if (currentMeteorElement) {
                 currentMeteorElement.remove();
                 currentMeteorElement = null;
             }
 
-            // ★変更★ フラグをリセット
             isQuestionActive = false; 
-            currentQuizData = null; // 問題データ参照をリセット
-        }, 1000); // 1秒後に削除
+            currentQuizData = null; 
+        }, 1000); 
     }
-
-
-    /**
-     * クイズモーダルを表示し、問題を設定する (★削除)
-     */
-    // function showQuizModal(data) { /* 削除 */ }
-    
-    /**
-     * 選択肢がクリックされたときの処理 (★削除)
-     */
-    // function handleChoiceClick(e) { /* 削除 */ }
-
 
     // ----------------------------------------------------
     // スコアとライフの更新
@@ -303,16 +319,14 @@ document.addEventListener('DOMContentLoaded', () => {
         lifeDisplay.textContent = life;
         skyArea.innerHTML = ''; 
 
-        // 隕石生成インターバルを開始
         gameInterval = setInterval(createMeteor, METEOR_INTERVAL);
         
-        // 落下ループを開始
         requestAnimationFrame(fallLoop);
     }
 
     function endGame() {
         clearInterval(gameInterval);
-        isQuestionActive = true; // ★変更★ ゲームオーバー中は問題を出さない
+        isQuestionActive = true; 
         alert(`ゲームオーバー！あなたのスコアは ${score} 点です。`);
     }
 
