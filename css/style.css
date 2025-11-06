@@ -689,116 +689,30 @@ gap: 20px;
     border-radius: 15px;
 }
 
-/* ★★★ ここから修正/追加 ★★★ */
+/* ★★★ ここに置き換え ★★★ */
+
 #sky-area {
     width: 100%;
     height: 90%; 
     position: absolute;
     top: 0;
 
-    /* ★変更★ 全体的な背景色を濃い青に変更 */
-    background-color: #1a0033; /* 暗めの紫がかった青 */
-
-    /* ★追加★ 複数のグラデーションを重ねて宇宙空間を表現 */
-    background-image: 
-        /* 遠くの銀河や星雲のようなぼんやりとした光 */
-        radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 30% 80%, rgba(150, 150, 255, 0.05) 0%, transparent 30%),
-        radial-gradient(circle at 50% 50%, rgba(200, 200, 255, 0.03) 0%, transparent 50%),
-
-        /* 大きめの輝く星 (画像のような形ではないが、存在感を出す) */
-        radial-gradient(3px 3px at 10% 20%, #ffc, transparent),
-        radial-gradient(3px 3px at 30% 70%, #ffc, transparent),
-        radial-gradient(3px 3px at 80% 40%, #ffc, transparent),
-        radial-gradient(3px 3px at 50% 10%, #ffc, transparent),
-        radial-gradient(3px 3px at 70% 85%, #ffc, transparent),
-        radial-gradient(3px 3px at 5% 50%, #ffc, transparent),
-        radial-gradient(3px 3px at 90% 60%, #ffc, transparent),
-        radial-gradient(3px 3px at 25% 95%, #ffc, transparent),
-
-        /* 中くらいの星 */
-        radial-gradient(2px 2px at 15% 45%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 40% 25%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 60% 75%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 85% 15%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 75% 50%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 20% 80%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 95% 30%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 55% 60%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 35% 5%, #e0e0ff, transparent),
-        radial-gradient(2px 2px at 45% 90%, #e0e0ff, transparent),
-        
-        /* 小さな星 (散りばめる) */
-        radial-gradient(1px 1px at 5% 5%, white, transparent),
-        radial-gradient(1px 1px at 10% 80%, white, transparent),
-        radial-gradient(1px 1px at 20% 10%, white, transparent),
-        radial-gradient(1px 1px at 25% 60%, white, transparent),
-        radial-gradient(1px 1px at 30% 30%, white, transparent),
-        radial-gradient(1px 1px at 35% 85%, white, transparent),
-        radial-gradient(1px 1px at 40% 50%, white, transparent),
-        radial-gradient(1px 1px at 45% 5%, white, transparent),
-        radial-gradient(1px 1px at 50% 70%, white, transparent),
-        radial-gradient(1px 1px at 55% 20%, white, transparent),
-        radial-gradient(1px 1px at 60% 90%, white, transparent),
-        radial-gradient(1px 1px at 65% 35%, white, transparent),
-        radial-gradient(1px 1px at 70% 5%, white, transparent),
-        radial-gradient(1px 1px at 75% 80%, white, transparent),
-        radial-gradient(1px 1px at 80% 25%, white, transparent),
-        radial-gradient(1px 1px at 85% 70%, white, transparent),
-        radial-gradient(1px 1px at 90% 10%, white, transparent),
-        radial-gradient(1px 1px at 95% 40%, white, transparent),
-        radial-gradient(1px 1px at 98% 95%, white, transparent),
-        radial-gradient(1px 1px at 3% 30%, white, transparent);
-
-    /* 星が点滅するアニメーション */
-    animation: twinkle 5s infinite linear;
-
-    /* ★追加★ 惑星のダミー要素 (雰囲気出し用) */
-    /* これらは背景画像として、sky-area内に固定で配置されます */
-    /* イメージ画像の惑星のような色合いでいくつか追加 */
-    &::before {
-        content: '';
-        position: absolute;
-        width: 120px;
-        height: 120px;
-        background: radial-gradient(circle at 30% 30%, #ffd7a0, #ff8c00 70%); /* オレンジ系の惑星 */
-        border-radius: 50%;
-        top: 50px;
-        left: 50px;
-        opacity: 0.7;
-        box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
-        animation: planetRotate 60s linear infinite; /* ゆっくり回転 */
-    }
-
-    &::after {
-        content: '';
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        background: radial-gradient(circle at 40% 40%, #a0e0ff, #007bff 70%); /* 青系の惑星 */
-        border-radius: 50%;
-        bottom: 100px;
-        right: 80px;
-        opacity: 0.6;
-        box-shadow: 0 0 25px rgba(0, 123, 255, 0.5);
-        animation: planetRotate 70s linear infinite reverse; /* ゆっくり逆回転 */
-    }
+    /* * 以前の background-color, background-image, animation などは
+     * すべて削除し、以下に差し替えます。
+     */
+    
+    /* 保存した画像ファイル名に合わせてください */
+    background-image: url('ChatGPT Image Nov 6, 2025 at 11_58_32 AM.png'); 
+    
+    /* 画像がエリア全体を覆うように設定 (引き伸ばされます) */
+    background-size: cover; 
+    
+    /* 画像を中央に配置 */
+    background-position: center center; 
+    
+    /* 画像を繰り返さない */
+    background-repeat: no-repeat; 
 }
-
-/* ★追加★ 惑星の回転アニメーション */
-@keyframes planetRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ★追加★ 星を点滅させるアニメーション */
-@keyframes twinkle {
-    0%, 100% { opacity: 0.8; }
-    25% { opacity: 0.95; }
-    50% { opacity: 1; }
-    75% { opacity: 0.95; }
-}
-/* ★★★ ここまで修正/追加 ★★★ */
 
 
 #ground-area {
