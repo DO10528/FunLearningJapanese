@@ -692,25 +692,14 @@ gap: 20px;
 /* ★★★ ここに置き換え ★★★ */
 
 #sky-area {
-    width: 100%;
-    height: 90%; 
-    position: absolute;
-    top: 0;
-
-    /* * 以前の background-color, background-image, animation などは
-     * すべて削除し、以下に差し替えます。
-     */
+    /* ...省略... */
     
-    /* 保存した画像ファイル名に合わせてください */
-    background-image: url('space_bg.png'); 
+    /* ★修正★
+       CSSフォルダから一度上に出て、imagesフォルダを指定 */
+    background-image: url('../images/space_bg.png'); 
     
-    /* 画像がエリア全体を覆うように設定 (引き伸ばされます) */
     background-size: cover; 
-    
-    /* 画像を中央に配置 */
     background-position: center center; 
-    
-    /* 画像を繰り返さない */
     background-repeat: no-repeat; 
 }
 
