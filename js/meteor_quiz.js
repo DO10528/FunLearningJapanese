@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM要素の定義
     // ----------------------------------------------------
     const skyArea = document.getElementById('sky-area');
-    const quizModal = document.getElementById('quiz-modal');
-    const questionTextElement = document.getElementById('question-text');
-    const choiceButtonsArea = document.getElementById('choice-buttons-area');
+    const quizModal = document.getElementById('quiz-modal'); // ★使わないが、残しておく
+    const questionTextElement = document.getElementById('question-text'); // ★使わないが、残しておく
+    const choiceButtonsArea = document.getElementById('choice-buttons-area'); // ★使わないが、残しておく
     const scoreDisplay = document.getElementById('score');
     const lifeDisplay = document.getElementById('life');
-    const quizFeedback = document.getElementById('quiz-feedback');
+    const quizFeedback = document.getElementById('quiz-feedback'); // ★使わないが、残しておく
     const explosionTemplate = document.getElementById('explosion-template');
 
     // ----------------------------------------------------
@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_LIFE = 3;
     const METEOR_INTERVAL = 4000; 
     let gameInterval = null;
-    /* ★★★ 修正点 1/2 ★★★ */
-    let meteorSpeed = 3.33; // ← 10.0 から 3.33 (10.0 / 3) に変更
+    let meteorSpeed = 3.33; 
     let score = 0;
     let life = INITIAL_LIFE;
-    let isModalOpen = false;
-    let currentMeteorElement = null;
-    let currentQuizData = null;
+    let isModalOpen = false; // モーダルは使わないが、クリック判定のフラグとして残す
+    let currentMeteorElement = null; // クリックされた隕石
+    let currentQuizData = null; // クリックされた隕石の問題データ
+    let currentAnimatedAnswerElement = null; // ★追加★ 表示されたアニメーション答え要素
 
     // ★★★ 問題データ ★★★
     const QUIZ_DATA = [
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
 
     /**
-     * 配列をシャッフルする
+     * 配列をシャッフルする (今回は使わない)
      */
     function shuffleArray(array) {
         return array.sort(() => Math.random() - 0.5);
@@ -85,9 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const meteor = document.createElement('div');
         meteor.classList.add('meteor');
         
-        const startX = Math.random() * (skyArea.offsetWidth - 50);
+        // CSSで隕石のサイズを100pxに設定しているので、それに合わせて調整
+        const meteorSize = 100; // CSSと同期させる
+        const startX = Math.random() * (skyArea.offsetWidth - meteorSize); 
         meteor.style.left = `${startX}px`;
-        meteor.style.top = `-50px`;
+        meteor.style.top = `-${meteorSize}px`; // 画面外からスタート
         
         const quizIndex = Math.floor(Math.random() * QUIZ_DATA.length);
         meteor.dataset.quizIndex = quizIndex;
@@ -100,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 落下アニメーションループ (修正済み)
+     * 落下アニメーションループ
      */
     function fallLoop() {
         if (life <= 0) return;
@@ -111,14 +113,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
-            if (isModalOpen) return;
+            // isModalOpenはクリックされたらtrueになるので、その間は落下停止
+            if (isModalOpen && meteor === currentMeteorElement) return;
+            // クリック済みでアニメーション中、かつ現在の隕石でなければ落下継続
+            if (isModalOpen && meteor !== currentMeteorElement) {
+                let currentY = parseFloat(meteor.style.top);
+                currentY += meteorSpeed;
+                meteor.style.top = `${currentY}px`;
+            }
 
-            let currentY = parseFloat(meteor.style.top);
-            currentY += meteorSpeed;
-            meteor.style.top = `${currentY}px`;
+            // クリックされていない隕石は普通に落下
+            if (!isModalOpen) {
+                let currentY = parseFloat(meteor.style.top);
+                currentY += meteorSpeed;
+                meteor.style.top = `${currentY}px`;
+            }
+
 
             // 地面に到達したら
-            if (currentY + meteor.offsetHeight >= groundY) {
+            if (parseFloat(meteor.style.top) + meteor.offsetHeight >= groundY) {
                 const meteorX = meteor.offsetLeft + meteor.offsetWidth / 2;
                 triggerExplosion(meteorX, groundY, true); // 地面ヒット爆発
                 
@@ -127,9 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // スコアによる速度変更は無効化（コメントアウト）されたまま
-        // meteorSpeed = Math.min(4, 1 + score / 500); 
-        
         requestAnimationFrame(fallLoop);
     }
 
@@ -142,90 +152,101 @@ document.addEventListener('DOMContentLoaded', () => {
      * 隕石がクリックされたときの処理
      */
     function handleMeteorClick(e) {
-        if (isModalOpen) return;
+        if (isModalOpen) return; // 既に問題が表示されていたら何もしない
         
-        isModalOpen = true;
-        currentMeteorElement = e.target;
+        isModalOpen = true; // 問題表示中フラグを立てる
+        currentMeteorElement = e.target; // クリックされた隕石を保持
         
         const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
-        currentQuizData = quizData;
+        currentQuizData = quizData; // 問題データを保持
 
+        // 隕石を一時的に非表示にする
         currentMeteorElement.style.display = 'none';
 
-        showQuizModal(currentQuizData);
+        // ★★★ モーダルを表示する代わりにアニメーションする答えを生成 ★★★
+        createAnimatedAnswer(currentMeteorElement, currentQuizData.english);
     }
 
     /**
-     * クイズモーダルを表示し、問題を設定する
+     * ★追加★ アニメーションする答えの要素を生成し表示する
      */
-    function showQuizModal(data) {
-        // 質問文エリアを空にする
-        questionTextElement.textContent = ``; 
+    function createAnimatedAnswer(meteorElement, answerText) {
+        const answerDiv = document.createElement('div');
+        answerDiv.classList.add('animated-answer');
+        answerDiv.textContent = answerText;
+        answerDiv.dataset.answer = answerText; // 正解判定のためにデータ属性に保存
 
-        // 画像/大きな日本語表示エリアを空にする
-        document.getElementById('quiz-image-area').innerHTML = ''; 
+        // 隕石の位置情報をCSS変数として渡す
+        // これにより、CSSアニメーションが隕石の位置を基準に動く
+        answerDiv.style.setProperty('--meteor-top', `${meteorElement.offsetTop}px`);
+        answerDiv.style.setProperty('--meteor-left', `${meteorElement.offsetLeft}px`);
+        answerDiv.style.setProperty('--meteor-width', `${meteorElement.offsetWidth}px`);
+        answerDiv.style.setProperty('--meteor-height', `${meteorElement.offsetHeight}px`);
+        
+        skyArea.appendChild(answerDiv);
+        currentAnimatedAnswerElement = answerDiv; // 表示した答え要素を保持
 
-        // 選択肢の準備: 正解1つ + 不正解1つ
-        choiceButtonsArea.innerHTML = '';
-        
-        const correct = data.english; 
-        const incorrects = data.choices.filter(c => c !== correct);
-        
-        const finalChoices = [correct]; 
-        
-        if (incorrects.length > 0) {
-             const randomIndex = Math.floor(Math.random() * incorrects.length);
-             finalChoices.push(incorrects[randomIndex]);
-        }
-        
-        // 最終選択肢をシャッフルしてボタンを生成
-        shuffleArray(finalChoices).forEach(choice => {
-            const button = document.createElement('button');
-            button.textContent = choice;
-            button.dataset.answer = choice;
-            button.addEventListener('click', handleChoiceClick);
-            choiceButtonsArea.appendChild(button);
-        });
-        
-        quizFeedback.textContent = '答えを選んでください。';
-        quizModal.classList.remove('hidden');
+        // 答えがクリックされたときの処理
+        answerDiv.addEventListener('click', handleAnswerClick);
     }
-    
+
     /**
-     * 選択肢がクリックされたときの処理
+     * ★追加★ アニメーションする答えがクリックされたときの処理
      */
-    function handleChoiceClick(e) {
+    function handleAnswerClick(e) {
+        if (!isModalOpen) return; // クリック判定フラグが立ってなければ何もしない
+
         const selectedAnswer = e.target.dataset.answer;
         
-        document.querySelectorAll('#choice-buttons-area button').forEach(btn => btn.disabled = true);
+        // 答え要素を一時的に無効化 (連続クリック防止)
+        e.target.style.pointerEvents = 'none';
 
         const meteorX = currentMeteorElement.offsetLeft + currentMeteorElement.offsetWidth / 2;
         const meteorY = currentMeteorElement.offsetTop + currentMeteorElement.offsetHeight / 2;
 
         if (selectedAnswer === currentQuizData.english) {
             // 正解
-            quizFeedback.textContent = '⭕ 正解！隕石破壊！';
             e.target.style.backgroundColor = 'lightgreen';
+            e.target.textContent = '⭕ Correct!'; // フィードバックを答えに表示
             updateScore(10);
             
             triggerExplosion(meteorX, meteorY, false); // 黄色い爆発
-            currentMeteorElement.remove();
-
+            
         } else {
             // 不正解
-            quizFeedback.textContent = '❌ 不正解... 隕石が爆発！';
             e.target.style.backgroundColor = 'red';
+            e.target.textContent = '❌ Wrong!'; // フィードバックを答えに表示
             updateLife(-1);
             
             triggerExplosion(meteorX, meteorY, true); // 赤い爆発
-            currentMeteorElement.remove();
         }
 
-        // モーダルを閉じる
+        // 答えの要素を少し遅れて削除し、ゲームを再開
         setTimeout(() => {
-            quizModal.classList.add('hidden');
-            isModalOpen = false;
-        }, 1000);
+            if (currentAnimatedAnswerElement) {
+                currentAnimatedAnswerElement.remove();
+                currentAnimatedAnswerElement = null;
+            }
+            isModalOpen = false; // フラグをリセット
+            currentMeteorElement = null; // 隕石参照をリセット
+            currentQuizData = null; // 問題データ参照をリセット
+        }, 1000); // 1秒後に削除
+    }
+
+
+    /**
+     * クイズモーダルを表示し、問題を設定する (★今回は使わないので、中身は空にするか削除しても良い)
+     */
+    function showQuizModal(data) {
+        // この関数は使われない
+        // quizModal.classList.add('hidden'); // 非表示にする
+    }
+    
+    /**
+     * 選択肢がクリックされたときの処理 (★今回は使わないので、中身は空にするか削除しても良い)
+     */
+    function handleChoiceClick(e) {
+        // この関数は使われない
     }
 
 
@@ -254,8 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         score = 0;
         life = INITIAL_LIFE;
-        /* ★★★ 修正点 2/2 ★★★ */
-        meteorSpeed = 3.33; // ← 10.0 から 3.33 (10.0 / 3) に変更
+        meteorSpeed = 3.33; 
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
         skyArea.innerHTML = ''; 

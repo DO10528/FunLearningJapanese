@@ -937,3 +937,42 @@ gap: 20px;
 .hidden {
     display: none !important;
 }
+
+/* --- 隕石から出てくる答えのスタイル (新しく追加) --- */
+.animated-answer {
+    position: absolute;
+    /* initial state: 隕石の真上、少し見えない位置 */
+    top: calc(var(--meteor-top) + (var(--meteor-height) / 2)); /* 隕石の中央Y */
+    left: calc(var(--meteor-left) + (var(--meteor-width) / 2)); /* 隕石の中央X */
+    transform: translate(-50%, -50%) scale(0.5); /* 初期サイズを小さく、中央寄せ */
+    opacity: 0; /* 初期状態で非表示 */
+
+    background-color: #ffd700; /* 黄金色 */
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 20px; /* 丸みを強く */
+    font-size: 1.8em; /* 答えの文字サイズ */
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); /* 光る影 */
+    cursor: pointer;
+    z-index: 95; /* 隕石より手前 */
+    white-space: nowrap; /* 複数行にならないように */
+    user-select: none; /* テキスト選択防止 */
+
+    /* アニメーションの定義 */
+    animation: answerPopUp 0.5s ease-out forwards;
+}
+
+/* 答えが出てくるアニメーション */
+@keyframes answerPopUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        top: calc(var(--meteor-top) + (var(--meteor-height) / 2));
+    }
+    100% {
+        transform: translate(-50%, -150%) scale(1); /* 隕石の上へ移動し、拡大 */
+        opacity: 1;
+        top: calc(var(--meteor-top) - 20px); /* 隕石の少し上 */
+    }
+}
