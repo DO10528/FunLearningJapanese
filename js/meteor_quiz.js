@@ -151,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * 隕石がクリックされたときの処理
      */
+    /* ★★★ 順序変更 ★★★ */
     function handleMeteorClick(e) {
         if (isModalOpen) return; // 既に問題が表示されていたら何もしない
         
@@ -160,11 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
         currentQuizData = quizData; // 問題データを保持
 
-        // 隕石を一時的に非表示にする
-        currentMeteorElement.style.display = 'none';
-
-        // ★★★ モーダルを表示する代わりにアニメーションする答えを生成 ★★★
+        // ★修正点 1/2★ 
+        //先にアニメーションする答えを生成（ここで隕石の位置情報を取得）
         createAnimatedAnswer(currentMeteorElement, currentQuizData.english);
+
+        // ★修正点 2/2★ 
+        // 答えを生成した後に、隕石を非表示にする
+        currentMeteorElement.style.display = 'none';
     }
 
     /**
