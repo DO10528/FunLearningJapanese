@@ -669,21 +669,23 @@ gap: 20px;
 }
 
 /* ======================================== */
-/* ★ 隕石クイズゲーム専用スタイル (meteor_quiz.html用) ★ */
+/* ★ 隕石クイズゲーム専用スタイル (改善版) ★ */
 /* ======================================== */
 
 /* --- ゲームエリアのコンテナ設定 --- */
-/* 共通の.containerに影響しないよう、IDで指定 */
 #game-container {
     position: relative;
     width: 100%;
     max-width: 900px;
     height: 700px; /* ゲームエリアの高さを固定 */
     margin: 30px auto;
-    border: 3px solid #333;
-    background-color: #000033; /* 夜空 */
+    border: 3px solid #7c7cff; /* ★変更★ 枠の色を明るく */
+    
+    /* ★変更★ 真っ暗な宇宙に変更 */
+    background-color: #000; 
+
     overflow: hidden; 
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(100, 100, 255, 0.5); /* ★変更★ 影の色を青っぽく */
     border-radius: 15px;
 }
 
@@ -692,6 +694,27 @@ gap: 20px;
     height: 90%; 
     position: absolute;
     top: 0;
+
+    /* ★★★ CSSで星空を追加 ★★★ */
+    /* 小さな白い星を多数配置 */
+    background-image: radial-gradient(1px 1px at 20px 30px, white, transparent),
+                      radial-gradient(1px 1px at 40px 60px, white, transparent),
+                      radial-gradient(1px 1px at 150px 120px, white, transparent),
+                      radial-gradient(2px 2px at 300px 80px, white, transparent),
+                      radial-gradient(1px 1px at 400px 200px, white, transparent),
+                      radial-gradient(2px 2px at 500px 350px, white, transparent),
+                      radial-gradient(1px 1px at 600px 250px, white, transparent),
+                      radial-gradient(1px 1px at 750px 100px, white, transparent),
+                      radial-gradient(2px 2px at 800px 300px, white, transparent);
+    /* 星が点滅するアニメーション */
+    animation: twinkle 5s infinite linear;
+}
+
+/* ★追加★ 星を点滅させるアニメーション */
+@keyframes twinkle {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
 }
 
 #ground-area {
@@ -699,13 +722,16 @@ gap: 20px;
     bottom: 0;
     width: 100%;
     height: 10%;
-    background-color: #4CAF50; /* 地面の色 */
+    
+    /* ★変更★ 地面を「月面」風の灰色に変更 */
+    background-color: #777; 
+    border-top: 5px solid #aaa; /* ★追加★ 月の地平線 */
+
     color: white;
     text-align: center;
-    line-height: 70px;
+    line-height: 70px; /* 高さに合わせて調整 */
     font-size: 1.5em;
     z-index: 10;
-    /* 地面が揺れるなどのアニメーションを追加する場合はここに */
 }
 
 #info-bar {
@@ -718,9 +744,13 @@ gap: 20px;
     z-index: 20;
     display: flex;
     gap: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
+    
+    /* ★変更★ 宇宙船のコンソール風に */
+    background-color: rgba(0, 150, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 8px; /* ★変更★ 少し丸く */
 }
 
 /* --- 隕石 (メテオ) のスタイル --- */
@@ -729,12 +759,24 @@ gap: 20px;
     top: -50px; 
     width: 100px; 
     height: 100px;
-    background-color: #9c27b0; /* 紫色 */
-    border-radius: 50%;
-    box-shadow: 0 0 10px #ffcc5c, inset 0 0 5px #fff;
+    
+    /* ★変更★ 隕石の色をゴツゴツした岩風に */
+    background-color: #a0522d; /* 茶色 */
+    
+    /* ★変更★ border-radiusをいじってゴツゴツした形に */
+    border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+
+    /* ★変更★ 燃えるオーラを追加 */
+    box-shadow: 0 0 15px 5px #ff8c00, /* オレンジの光 */
+                0 0 5px 2px #ffeb3b,   /* 黄色い中心光 */
+                inset 0 0 10px #ff4500; /* 内側の影（赤） */
+    
     cursor: pointer;
     z-index: 5;
-    transition: background-color 0.1s;
+    
+    /* ★変更★ ホバーでオーラが強くなる */
+    transition: box-shadow 0.2s, transform 0.2s;
+
     /* 隕石内の文字を中央に配置 */
     display: flex;
     justify-content: center;
@@ -743,10 +785,24 @@ gap: 20px;
     font-size: 2em;
     font-weight: bold;
     user-select: none; /* テキスト選択防止 */
+    
+    /* ★追加★ 隕石を少し回転させる */
+    animation: rotateMeteor 10s infinite linear;
+}
+
+/* ★追加★ 隕石をゆっくり回転させる */
+@keyframes rotateMeteor {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .meteor:hover {
-    background-color: #e91e63; /* ホバーでピンク */
+    /* ★変更★ ホバーでオーラを強く、少し大きくする */
+    box-shadow: 0 0 25px 10px #ff4500, /* 赤い光を強く */
+                0 0 10px 5px #ffeb3b,
+                inset 0 0 10px #ff4500;
+    transform: scale(1.1); /* 少し大きく */
+    background-color: #a0522d; /* ホバーで色が変わらないように固定 */
 }
 
 /* --- クイズモーダルのスタイル --- */
@@ -756,7 +812,10 @@ gap: 20px;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    
+    /* ★変更★ 背景を少し明るく */
+    background-color: rgba(0, 0, 0, 0.6); 
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -764,18 +823,21 @@ gap: 20px;
 }
 
 #quiz-box {
-    background-color: white;
+    /* ★変更★ 宇宙船のパネル風に */
+    background-color: #e0f7fa; /* 明るい水色 */
+    border: 5px solid #00bcd4; /* 枠線 */
+
     padding: 30px;
     border-radius: 15px;
     width: 80%;
     max-width: 450px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 5px 20px rgba(0, 200, 255, 0.5); /* ★変更★ 影の色 */
 }
 
 #question-text {
     font-size: 1.8em;
-    color: #3f51b5;
+    color: #00796b; /* ★変更★ 濃い青緑 */
     margin-bottom: 20px;
     font-weight: bold;
 }
@@ -785,28 +847,32 @@ gap: 20px;
     max-height: 100px;
     margin-bottom: 20px;
     border-radius: 8px;
-    border: 3px solid #ffcc5c;
+    border: 3px solid #00bcd4; /* ★変更★ 枠線の色 */
 }
 
-/* 共通の #choice-buttons-area を利用しつつ、ボタンをカスタマイズ */
+/* ★変更★ 選択肢ボタンをポップでカラフルに */
 #choice-buttons-area button {
     padding: 15px 10px;
     font-size: 1.2em;
-    border: 2px solid #ff6f61;
-    border-radius: 8px;
-    background-color: #fff;
+    
+    /* ★変更★ ボタンの色 */
+    border: none; /* 枠線を消す */
+    border-bottom: 4px solid #00796b; /* 影を濃い色で */
+    border-radius: 12px; /* ★変更★ 丸くする */
+    background-color: #00bcd4; /* ボタンの色 */
+    color: white; /* 文字の色 */
+
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
     min-width: 130px;
     font-weight: bold;
-    box-shadow: 0 3px 0 #ff6f61;
-    /* 既存の .control-button や .action-button とは独立させる */
+    box-shadow: 0 3px 0 #00796b; /* ★変更★ 影の色 */
 }
 
 #choice-buttons-area button:hover:not(:disabled) {
-    background-color: #fff8e1;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 0 #ff6f61;
+    background-color: #0097a7; /* ★変更★ ホバー色 */
+    transform: translateY(-2px); /* ★変更★ 浮き上がりを大きく */
+    box-shadow: 0 5px 0 #00796b; /* ★変更★ 影も動かす */
 }
 
 /* --- 爆発エフェクト --- */
