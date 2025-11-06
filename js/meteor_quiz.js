@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 落下アニメーションループ
+     * 落下アニメーションループ (★ロジック修正版★)
      */
     function fallLoop() {
         if (life <= 0) return;
@@ -115,24 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
-            // ★変更★ `isModalOpen`を`isQuestionActive`に変更
-            // 問題表示中は、クリックされた隕石の落下は停止
-            if (isQuestionActive && meteor === currentMeteorElement) return;
-            // 問題表示中だが、クリックされていない他の隕石は落下継続
-            if (isQuestionActive && meteor !== currentMeteorElement) {
-                let currentY = parseFloat(meteor.style.top);
-                currentY += meteorSpeed;
-                meteor.style.top = `${currentY}px`;
+            
+            // ★修正★
+            // 停止条件：問題表示中で、かつ、それが「クリックされた隕石」である場合
+            if (isQuestionActive && meteor === currentMeteorElement) {
+                return; // この隕石の処理だけをスキップ（落下停止）
             }
 
-            // 問題が表示されていなければ、全ての隕石が落下
-            if (!isQuestionActive) {
-                let currentY = parseFloat(meteor.style.top);
-                currentY += meteorSpeed;
-                meteor.style.top = `${currentY}px`;
-            }
-
-
+            // 上記以外（問題が表示されていない、または、他の隕石）の場合は落下させる
+            let currentY = parseFloat(meteor.style.top);
+            currentY += meteorSpeed;
+            meteor.style.top = `${currentY}px`;
+            
             // 地面に到達したら
             if (parseFloat(meteor.style.top) + meteor.offsetHeight >= groundY) {
                 const meteorX = meteor.offsetLeft + meteor.offsetWidth / 2;

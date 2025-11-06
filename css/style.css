@@ -696,23 +696,19 @@ gap: 20px;
     height: 90%; 
     position: absolute;
     top: 0;
-
-    /* ★修正★
-       /css フォルダから見て、
-       /assets/images/ にある画像を指定します
+    
+    /* ★追加★ 
+       z-index を 1 に設定し、
+       隕石(z-index: 5)や他の要素より奥に配置します
     */
+    z-index: 1; 
+
+    /* 背景画像（これは変更なし）*/
     background-image: url('../assets/images/space_bg.png'); 
-    
-    /* 画像がエリア全体を覆うように設定 (引き伸ばされます) */
     background-size: cover; 
-    
-    /* 画像を中央に配置 */
     background-position: center center; 
-    
-    /* 画像を繰り返さない */
     background-repeat: no-repeat; 
 }
-
 
 #ground-area {
     position: absolute;
