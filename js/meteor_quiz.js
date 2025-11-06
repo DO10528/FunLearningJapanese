@@ -15,9 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ゲーム定数と状態
     // ----------------------------------------------------
     const INITIAL_LIFE = 3;
-    const METEOR_INTERVAL = 4000; // ★修正: 1500ms(1.5秒)から4000ms(4秒)に変更 (約2.67倍の頻度)
+    const METEOR_INTERVAL = 4000; 
     let gameInterval = null;
-    let meteorSpeed = 10.0; // ← 10.0 に設定
+    /* ★★★ 修正点 1/2 ★★★ */
+    let meteorSpeed = 3.33; // ← 10.0 から 3.33 (10.0 / 3) に変更
     let score = 0;
     let life = INITIAL_LIFE;
     let isModalOpen = false;
@@ -106,9 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const allMeteors = document.querySelectorAll('.meteor');
         
-        // ★修正ポイント: game-containerの高さを取得し、地面の位置を安定させる★
         const gameContainer = document.getElementById('game-container');
-        // 地面の位置: ゲームコンテナの高さの90%（CSS設定に基づく）
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
@@ -128,8 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        /* ★★★ 修正点 2/2 ★★★ */
-        // スコアによる速度変更を無効化（コメントアウト）
+        // スコアによる速度変更は無効化（コメントアウト）されたまま
         // meteorSpeed = Math.min(4, 1 + score / 500); 
         
         requestAnimationFrame(fallLoop);
@@ -256,8 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         score = 0;
         life = INITIAL_LIFE;
-        /* ★★★ 修正点 1/2 ★★★ */
-        meteorSpeed = 10.0; // ← 10.0 に変更
+        /* ★★★ 修正点 2/2 ★★★ */
+        meteorSpeed = 3.33; // ← 10.0 から 3.33 (10.0 / 3) に変更
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
         skyArea.innerHTML = ''; 
