@@ -668,6 +668,29 @@ gap: 20px;
     box-shadow: 0 4px 0 #1a237e;
 }
 
+/* ======================================== */
+/* ★ 隕石クイズゲーム専用スタイル (改善版 - 宇宙背景) ★ */
+/* ======================================== */
+
+/* --- ゲームエリアのコンテナ設定 --- */
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 700px; /* ゲームエリアの高さを固定 */
+    margin: 30px auto;
+    border: 3px solid #7c7cff; /* ★変更★ 枠の色を明るく */
+    
+    /* ★変更★ 真っ暗な宇宙に変更 */
+    background-color: #000; /* これはそのまま残し、sky-areaで背景色を制御 */
+
+    overflow: hidden; 
+    box-shadow: 0 0 20px rgba(100, 100, 255, 0.5); /* ★変更★ 影の色を青っぽく */
+    border-radius: 15px;
+}
+
+/* ★★★ ここを修正 ★★★ */
+
 #sky-area {
     width: 100%;
     height: 90%; 
@@ -688,4 +711,177 @@ gap: 20px;
     
     /* 画像を繰り返さない */
     background-repeat: no-repeat; 
+}
+
+
+#ground-area {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10%;
+    
+    /* ★変更★ イラストの背景色に近い濃い青色に変更 */
+    background-color: #1d2c5d; 
+    
+    /* ★削除★ 砂粒テクスチャは不要なので削除します */
+    /* background-image: ... */
+    
+    /* ★削除★ 地平線の border を削除 */
+    border-top: none;
+    
+    /* ★削除★ 内側の影を削除 */
+    box-shadow: none;
+
+    /* ★変更★ 文字を非表示にする */
+    color: transparent; /* 文字の色を透明に */
+    user-select: none; /* テキスト選択も不可に */
+    
+    /* --- レイアウト用の古いスタイル（動作のために残す） --- */
+    text-align: center;
+    line-height: 70px; 
+    font-size: 1.5em;
+    z-index: 10;
+}
+
+#info-bar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 20;
+    display: flex;
+    gap: 20px;
+    
+    /* ★変更★ 宇宙船のコンソール風に */
+    background-color: rgba(0, 150, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+
+    padding: 5px 10px;
+    border-radius: 8px; /* ★変更★ 少し丸く */
+}
+
+/* --- 隕石 (メテオ) のスタイル --- */
+.meteor {
+    position: absolute;
+    top: -50px; 
+    width: 100px; 
+    height: 100px;
+    
+    /* ★変更★ 隕石の色をゴツゴツした岩風に */
+    background-color: #a0522d; /* 茶色 */
+    
+    /* ★変更★ border-radiusをいじってゴツゴツした形に */
+    border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+
+    /* ★変更★ 燃えるオーラを追加 */
+    box-shadow: 0 0 15px 5px #ff8c00, /* オレンジの光 */
+                0 0 5px 2px #ffeb3b,   /* 黄色い中心光 */
+                inset 0 0 10px #ff4500; /* 内側の影（赤） */
+    
+    cursor: pointer;
+    z-index: 5;
+    
+    /* ★変更★ ホバーでオーラが強くなる */
+    transition: box-shadow 0.2s, transform 0.2s;
+
+    /* 隕石内の文字を中央に配置 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2em;
+    font-weight: bold;
+    user-select: none; /* テキスト選択防止 */
+    
+    /* ★追加★ 隕石を少し回転させる */
+    animation: rotateMeteor 10s infinite linear;
+}
+
+/* ★追加★ 隕石をゆっくり回転させる */
+@keyframes rotateMeteor {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.meteor:hover {
+    /* ★変更★ ホバーでオーラを強く、少し大きくする */
+    box-shadow: 0 0 25px 10px #ff4500, /* 赤い光を強く */
+                0 0 10px 5px #ffeb3b,
+                inset 0 0 10px #ff4500;
+    transform: scale(1.1); /* 少し大きく */
+    background-color: #a0522d; /* ホバーで色が変わらないように固定 */
+}
+
+/* --- クイズモーダルのスタイル --- */
+/* ★変更★ クイズモーダルは完全に非表示に */
+#quiz-modal {
+    display: none !important; 
+}
+
+
+/* ★追加★ 隕石から出てくる選択肢ボタンのスタイル */
+.quiz-choice-button {
+    position: absolute;
+    /* CSS変数で位置が調整されます */
+    top: var(--button-start-top);
+    left: var(--button-start-left);
+    transform: translate(-50%, -50%) scale(0.5); /* 初期サイズを小さく、中央寄せ */
+    opacity: 0; /* 初期状態で非表示 */
+
+    background-color: #00bcd4; /* ボタンの色 */
+    color: white; /* 文字の色 */
+    padding: 12px 18px; /* パディング */
+    border-radius: 25px; /* 丸みを強く */
+    font-size: 1.5em; /* 選択肢の文字サイズ */
+    font-weight: bold;
+    box-shadow: 0 4px 0 #00796b; /* 影 */
+    cursor: pointer;
+    z-index: 95; /* 隕石より手前 */
+    white-space: nowrap; /* 複数行にならないように */
+    user-select: none; /* テキスト選択防止 */
+    border: none;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+.quiz-choice-button:hover:not(:disabled) {
+    background-color: #0097a7; /* ホバー色 */
+    transform: translate(-50%, -50%) scale(1.05) translateY(-2px); /* 浮き上がりを大きく */
+    box-shadow: 0 6px 0 #00796b; /* 影も動かす */
+}
+
+/* ★追加★ 選択肢ボタンが出てくるアニメーション */
+@keyframes choiceButtonPopUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        top: var(--button-start-top);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1); /* 拡大 */
+        opacity: 1;
+        top: var(--button-end-top); /* 最終位置 */
+    }
+}
+
+/* --- 爆発エフェクト --- */
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(3); opacity: 0.5; background-color: orange; }
+    100% { transform: scale(5); opacity: 0; }
+}
+
+.explosion {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    border-radius: 50%;
+    z-index: 90;
+}
+
+/* --- 汎用ユーティリティ --- */
+.hidden {
+    display: none !important;
 }
