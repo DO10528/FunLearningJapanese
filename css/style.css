@@ -702,7 +702,7 @@ gap: 20px;
      */
     
     /* 保存した画像ファイル名に合わせてください */
-    background-image: url('ChatGPT Image Nov 6, 2025 at 11_58_32 AM.png'); 
+    background-image: url('space_bg.png'); 
     
     /* 画像がエリア全体を覆うように設定 (引き伸ばされます) */
     background-size: cover; 
