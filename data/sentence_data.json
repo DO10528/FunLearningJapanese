@@ -143,8 +143,6 @@
       { "japanese": "ひこうき", "english": "airplane" }
     ],
 
-    // ★★★ ここから下が不足していたキーです ★★★
-
     "N_NATURE_T": [
       { "japanese": "てんき", "english": "weather" }
     ],
