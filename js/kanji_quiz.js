@@ -3,7 +3,7 @@ const DATA_PATH = 'data/kanji.json';
 const IMAGE_PATHS = [
     'assets/images/keiyoshi_quiz_1.png', 
     'assets/images/keiyoshi_quiz_2.jpg',
-    'assets/images/keiyoshi_quiz_3.gif' 
+    'assets.images/keiyoshi_quiz_3.gif' 
 ];
 
 // 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください)
@@ -57,6 +57,7 @@ function shuffleArray(array) {
 
 /**
  * データを読み込み、クイズの準備を開始する関数
+ * ★★★ 修正 ★★★
  */
 async function initializeQuiz() {
     try {
@@ -73,15 +74,21 @@ async function initializeQuiz() {
         homeButton.addEventListener('click', () => {
             window.location.href = 'index.html'; 
         });
+        
+        // ★修正 1★
+        // リスタートボタンは startNewQuiz を呼ぶ
         restartButton.addEventListener('click', startNewQuiz);
 
-        // ★修正点1: モード切り替え時にhandleModeSwitchを呼び出すように変更
+        // ★修正 2★
+        // モード切り替えラジオボタンは handleModeSwitch を呼ぶ
         modeSelectionRadios.forEach(radio => {
             radio.addEventListener('change', (event) => {
                 handleModeSwitch(event.target.value); 
             });
         });
 
+        // ★修正 3★
+        // 最初に呼ぶのは startNewQuiz
         startNewQuiz(); 
         
     } catch (error) {
@@ -92,74 +99,72 @@ async function initializeQuiz() {
 }
 
 /**
- * 新しいクイズセッションを開始する（再スタートボタン用）
+ * ★修正 4★
+ * 新しいクイズセッションを開始する（リスタートボタン・初回読み込み用）
  */
 function startNewQuiz() {
-    // 現在チェックされているモードを取得
-    const selectedMode = document.querySelector('input[name="readingMode"]:checked').value || 'kun';
-    
-    // modeSwitchフラグを立てずにhandleModeSwitchを呼び出すことで、最初の問題から純粋な新規クイズとして開始
-    handleModeSwitch(selectedMode, false); 
-}
-
-/**
- * 読みモードを切り替え、現在の漢字を維持したままクイズを再開する
- * @param {string} newMode - 新しい読みモード ('on' or 'kun')
- * @param {boolean} isSwitching - モード切り替えイベントかどうか (デフォルト: true)
- */
-function handleModeSwitch(newMode, isSwitching = true) {
-    let targetKanji = null;
-    
-    // モード切り替え時、かつ、クイズが既に開始されている場合
-    if (isSwitching && quizQuestions.length > 0 && currentQuestionIndex < quizQuestions.length) {
-        // 現在表示されている漢字をターゲットとして記憶
-        targetKanji = quizQuestions[currentQuestionIndex].kanji;
-    }
-
-    // 1. 状態のリセットとモード更新
+    // 状態を完全にリセット
     currentQuestionIndex = 0;
-    
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ★ 修正点 ★
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    //
-    // モード切り替え(isSwitching = true)の時はスコアをリセットせず、
-    // リスタートボタン(isSwitching = false)の時だけスコアをリセットします。
-    //
-    // 元のコード:
-    // score = 0;
-    //
-    // 修正後のコード:
-    if (!isSwitching) {
-        score = 0; // リスタートの時だけスコアを0に戻す
-    }
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    
+    score = 0;
     wrongAnswerCount = 0; 
-    currentMode = newMode;
     
-    // 2. 新しいモードで全問題セットを生成
-    const newQuizQuestions = generateQuizQuestions();
-    quizQuestions = newQuizQuestions;
-
-    // 3. ターゲット漢字が見つかり、新しい質問セットに含まれている場合、それをセットの先頭に移動する
-    if (targetKanji) {
-        const targetIndex = quizQuestions.findIndex(q => q.kanji === targetKanji);
-        
-        if (targetIndex !== -1) {
-            // 見つかった質問を切り取り、セットの先頭に挿入
-            const targetQuestion = quizQuestions.splice(targetIndex, 1)[0];
-            quizQuestions.unshift(targetQuestion);
-        }
-    }
+    // 現在のモードをUIから取得
+    currentMode = document.querySelector('input[name="readingMode"]:checked').value || 'kun';
     
-    // 4. UIの表示設定
+    // 問題リストを生成
+    quizQuestions = generateQuizQuestions();
+    
+    // UIをリセット
     resultMessageElement.style.display = 'none';
     finalScoreElement.style.display = 'none';
     restartButton.style.display = 'none';
     choicesContainer.style.display = 'grid'; 
     homeButton.style.display = 'inline-block'; 
 
+    // 1問目を表示
+    displayQuestion();
+}
+
+/**
+ * ★修正 5★
+ * 読みモードを切り替える（クイズの進行状況は維持）
+ * @param {string} newMode - 新しい読みモード ('on' or 'kun')
+ */
+function handleModeSwitch(newMode) {
+    
+    // 0. ゲームオーバー中やクリア後は何もしない
+    if (currentQuestionIndex >= quizQuestions.length || wrongAnswerCount >= MAX_WRONG_ANSWERS) {
+        // モードが視覚的に切り替わらないように、UIを元に戻す
+        const oldModeRadio = document.getElementById(currentMode === 'kun' ? 'mode_kun' : 'mode_on');
+        if(oldModeRadio) oldModeRadio.checked = true;
+        return;
+    }
+
+    // 1. 現在表示中の漢字を記憶
+    const currentKanji = quizQuestions[currentQuestionIndex].kanji;
+    
+    // 2. モードを更新
+    currentMode = newMode;
+    
+    // 3. 新しいモードで全問題セットを再生成
+    quizQuestions = generateQuizQuestions();
+
+    // 4. 記憶した漢字が新しいセットのどこにあるか探す
+    const targetIndex = quizQuestions.findIndex(q => q.kanji === currentKanji);
+    
+    if (targetIndex !== -1) {
+        // 5a. 見つかった場合：その問題番号にジャンプ（点数や間違い回数は維持）
+        currentQuestionIndex = targetIndex;
+    } else {
+        // 5b. 見つからなかった場合（例：訓読み専用漢字→音読みモード）：
+        //     現在の問題番号（例：5問目）をそのまま使う。
+        //     もしリストの長さを超えたら、0に戻す。
+        if (currentQuestionIndex >= quizQuestions.length) {
+            currentQuestionIndex = 0; 
+        }
+    }
+    
+    // 6. 画面を再表示（点数や間違い回数は引き継がれる）
     displayQuestion();
 }
 
@@ -380,7 +385,8 @@ function endQuiz(isGameOver) {
         finalScoreElement.style.color = '#dc3545';
     } else {
         questionNumberElement.textContent = "クイズクリア！";
-        questionTextElement.textContent = "全問正解しました！おめでとうございます！";
+        // ★修正★ 全問正解とは限らないため、メッセージを変更
+        questionTextElement.textContent = "クイズ終了です！お疲れさまでした！";
         finalScoreElement.style.color = '#28a745';
     }
 
