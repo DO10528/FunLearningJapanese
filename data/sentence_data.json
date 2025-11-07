@@ -9,7 +9,7 @@
     { "id": "B1", "type": "NをVます", "hint": "（人物）が（食べ物）を食べる動作を表します。", "pattern": ["P_CHILD", "は", "N_FOOD_E", "を", "V_EAT"], "english": "(P_CHILD) eats (N_FOOD_E)." },
     { "id": "B2", "type": "NをVます", "hint": "（動物）が（食べ物）を食べる動作を表します。", "pattern": ["N_ANIMAL_H", "は", "N_FOOD_ANIMAL", "を", "V_EAT"], "english": "The (N_ANIMAL_H) eats (N_FOOD_ANIMAL)." },
     { "id": "B3", "type": "NをVます", "hint": "（人物）が（飲み物）を飲む動作を表します。", "pattern": ["P_CHILD", "は", "N_DRINK_OK", "を", "V_DRINK"], "english": "(P_CHILD) drinks (N_DRINK_OK)." },
-    { "id": "B4", "type": "NをVます", "hint": "（人物）が（道具）を捜す動作を表します。", "pattern": ["P_CHILD", "は", "N_OBJECT_U", "を", "V_LOOK"], "english": "(P_CHILD) looks for (N_OBJECT_U)." },
+    { "id": "B4", "type": "NをVます", "hint": "（人物）が（道具）を捜す動作を表します。", "pattern": ["P_CHILD", "は", "N_OBJECT_U", "を", "V_USE_LOOK"], "english": "(P_CHILD) looks for (N_OBJECT_U)." }
     { "id": "B5", "type": "NをVます", "hint": "（人物）が（乗り物）に乗る動作を表します。", "pattern": ["P_CHILD", "は", "N_VEHICLE_R", "に", "V_RIDE"], "english": "(P_CHILD) rides (N_VEHICLE_R)." },
 
     { "id": "C1", "type": "NへVます", "hint": "（人物）が（場所）へ行く文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_GO"], "english": "(P_CHILD) goes to (N_PLACE_G)." },
@@ -142,5 +142,8 @@
     "V_ACTION_T": [
       { "japanese": "あそびます", "english": "plays" }, { "japanese": "やすみます", "english": "rests" }, { "japanese": "さんぽします", "english": "walks" }
     ]
+    "V_USE_LOOK": [
+  { "japanese": "さがします", "english": "looks for" }
+    ],
   }
 }
