@@ -3,34 +3,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // クイズデータ
     // ----------------------------------------------------
-    // ★重要★: imagesフォルダに、対応する画像ファイル（ame.png, kuruma.pngなど）を入れてください。
+    // ★重要★: assets/imagesフォルダに対応する画像ファイルを入れてください。
     const quizData = [
         {
-            image: "images/ame.png",
+            image: "assets/images/ame.png",
             options: ["あまい", "にぎやか", "かんたん"],
             correct: "あまい",
             english: "Sweet"
         },
         {
-            image: "images/kuruma.png",
+            image: "assets/images/kuruma.png",
             options: ["あおい", "おもい", "すずしい"],
             correct: "あおい",
             english: "Blue"
         },
         {
-            image: "images/zou.png",
+            image: "assets/images/zou.png",
             options: ["ちいさい", "おおきい", "かるい"],
             correct: "おおきい",
             english: "Big"
         },
         {
-            image: "images/taiyo.png",
+            image: "assets/images/taiyo.png",
             options: ["くらい", "さむい", "あかるい"],
             correct: "あかるい",
             english: "Bright"
         },
         {
-            image: "images/koori.png",
+            image: "assets/images/koori.png",
             options: ["あたたかい", "つめたい", "やさしい"],
             correct: "つめたい",
             english: "Cold"
