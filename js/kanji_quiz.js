@@ -3,7 +3,7 @@ const DATA_PATH = 'data/kanji.json';
 const IMAGE_PATHS = [
     'assets/images/keiyoshi_quiz_1.png', 
     'assets/images/keiyoshi_quiz_2.jpg',
-    'assets.images/keiyoshi_quiz_3.gif' 
+    'assets/images/keiyoshi_quiz_3.gif' 
 ];
 
 // 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください)
@@ -57,7 +57,6 @@ function shuffleArray(array) {
 
 /**
  * データを読み込み、クイズの準備を開始する関数
- * ★★★ 修正 ★★★
  */
 async function initializeQuiz() {
     try {
@@ -74,21 +73,14 @@ async function initializeQuiz() {
         homeButton.addEventListener('click', () => {
             window.location.href = 'index.html'; 
         });
-        
-        // ★修正 1★
-        // リスタートボタンは startNewQuiz を呼ぶ
         restartButton.addEventListener('click', startNewQuiz);
 
-        // ★修正 2★
-        // モード切り替えラジオボタンは handleModeSwitch を呼ぶ
         modeSelectionRadios.forEach(radio => {
             radio.addEventListener('change', (event) => {
                 handleModeSwitch(event.target.value); 
             });
         });
 
-        // ★修正 3★
-        // 最初に呼ぶのは startNewQuiz
         startNewQuiz(); 
         
     } catch (error) {
@@ -99,72 +91,75 @@ async function initializeQuiz() {
 }
 
 /**
- * ★修正 4★
- * 新しいクイズセッションを開始する（リスタートボタン・初回読み込み用）
+ * 新しいクイズセッションを開始する（再スタートボタン用）
  */
 function startNewQuiz() {
-    // 状態を完全にリセット
-    currentQuestionIndex = 0;
-    score = 0;
-    wrongAnswerCount = 0; 
+    // 現在チェックされているモードを取得
+    const selectedMode = document.querySelector('input[name="readingMode"]:checked').value || 'kun';
     
-    // 現在のモードをUIから取得
-    currentMode = document.querySelector('input[name="readingMode"]:checked').value || 'kun';
+    // ★ isSwitching = false で呼び出すことで、全リセットが実行される
+    handleModeSwitch(selectedMode, false); 
+}
+
+/**
+ * 読みモードを切り替え、現在の漢字を維持したままクイズを再開する
+ * @param {string} newMode - 新しい読みモード ('on' or 'kun')
+ * @param {boolean} isSwitching - モード切り替えイベントかどうか (デフォルト: true)
+ */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* ★ 修正 ★ この関数を丸ごと変更しました ★ */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+function handleModeSwitch(newMode, isSwitching = true) {
+    let targetKanji = null;
     
-    // 問題リストを生成
-    quizQuestions = generateQuizQuestions();
+    // モード切り替え時(isSwitching=true)のみ、現在の漢字を記憶
+    if (isSwitching && quizQuestions.length > 0 && currentQuestionIndex < quizQuestions.length) {
+        targetKanji = quizQuestions[currentQuestionIndex].kanji;
+    }
+
+    // 1. 状態のリセットとモード更新
     
-    // UIをリセット
+    // ★修正★
+    // リスタート(isSwitching=false)の時だけ、すべての進行状況をリセットする
+    if (!isSwitching) {
+        currentQuestionIndex = 0;
+        score = 0;
+        wrongAnswerCount = 0; 
+    }
+    // モード切り替え(isSwitching=true)の時は、↑ 3行をスキップするので、
+    // score, wrongAnswerCount, currentQuestionIndex が維持されます。
+
+    currentMode = newMode;
+    
+    // 2. 新しいモードで全問題セットを生成
+    const newQuizQuestions = generateQuizQuestions();
+    quizQuestions = newQuizQuestions;
+
+    // 3. ターゲット漢字が見つかり、新しい質問セットに含まれている場合、
+    //    currentQuestionIndex をその漢字のインデックスに更新
+    if (targetKanji) {
+        const targetIndex = quizQuestions.findIndex(q => q.kanji === targetKanji);
+        
+        if (targetIndex !== -1) {
+            // ★修正★
+            // 0 にリセットするのではなく、見つかったインデックスに設定
+            currentQuestionIndex = targetIndex; 
+        }
+        // もし見つからなかった場合 (例: 音読みに切り替えたらその漢字がリストにない)
+        // currentQuestionIndex は変更されない (前の問題番号が維持される)
+        // ただし、リストの長さを超える可能性があるのでチェック
+        if (currentQuestionIndex >= quizQuestions.length) {
+            currentQuestionIndex = 0; // 安全策
+        }
+    }
+    
+    // 4. UIの表示設定
     resultMessageElement.style.display = 'none';
     finalScoreElement.style.display = 'none';
     restartButton.style.display = 'none';
     choicesContainer.style.display = 'grid'; 
     homeButton.style.display = 'inline-block'; 
 
-    // 1問目を表示
-    displayQuestion();
-}
-
-/**
- * ★修正 5★
- * 読みモードを切り替える（クイズの進行状況は維持）
- * @param {string} newMode - 新しい読みモード ('on' or 'kun')
- */
-function handleModeSwitch(newMode) {
-    
-    // 0. ゲームオーバー中やクリア後は何もしない
-    if (currentQuestionIndex >= quizQuestions.length || wrongAnswerCount >= MAX_WRONG_ANSWERS) {
-        // モードが視覚的に切り替わらないように、UIを元に戻す
-        const oldModeRadio = document.getElementById(currentMode === 'kun' ? 'mode_kun' : 'mode_on');
-        if(oldModeRadio) oldModeRadio.checked = true;
-        return;
-    }
-
-    // 1. 現在表示中の漢字を記憶
-    const currentKanji = quizQuestions[currentQuestionIndex].kanji;
-    
-    // 2. モードを更新
-    currentMode = newMode;
-    
-    // 3. 新しいモードで全問題セットを再生成
-    quizQuestions = generateQuizQuestions();
-
-    // 4. 記憶した漢字が新しいセットのどこにあるか探す
-    const targetIndex = quizQuestions.findIndex(q => q.kanji === currentKanji);
-    
-    if (targetIndex !== -1) {
-        // 5a. 見つかった場合：その問題番号にジャンプ（点数や間違い回数は維持）
-        currentQuestionIndex = targetIndex;
-    } else {
-        // 5b. 見つからなかった場合（例：訓読み専用漢字→音読みモード）：
-        //     現在の問題番号（例：5問目）をそのまま使う。
-        //     もしリストの長さを超えたら、0に戻す。
-        if (currentQuestionIndex >= quizQuestions.length) {
-            currentQuestionIndex = 0; 
-        }
-    }
-    
-    // 6. 画面を再表示（点数や間違い回数は引き継がれる）
     displayQuestion();
 }
 
