@@ -111,14 +111,30 @@ function handleModeSwitch(newMode, isSwitching = true) {
     let targetKanji = null;
     
     // モード切り替え時、かつ、クイズが既に開始されている場合
-    if (isSwitching && quizQuestions.length > 0) {
+    if (isSwitching && quizQuestions.length > 0 && currentQuestionIndex < quizQuestions.length) {
         // 現在表示されている漢字をターゲットとして記憶
         targetKanji = quizQuestions[currentQuestionIndex].kanji;
     }
 
     // 1. 状態のリセットとモード更新
     currentQuestionIndex = 0;
-    score = 0;
+    
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    // ★ 修正点 ★
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    //
+    // モード切り替え(isSwitching = true)の時はスコアをリセットせず、
+    // リスタートボタン(isSwitching = false)の時だけスコアをリセットします。
+    //
+    // 元のコード:
+    // score = 0;
+    //
+    // 修正後のコード:
+    if (!isSwitching) {
+        score = 0; // リスタートの時だけスコアを0に戻す
+    }
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    
     wrongAnswerCount = 0; 
     currentMode = newMode;
     
