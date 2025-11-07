@@ -909,3 +909,73 @@ gap: 20px;
                 0 0 10px 5px rgba(255, 255, 255, 1), 
                 inset 0 0 10px rgba(0, 188, 212, 0.7);
 }
+
+/* ------------------------------------ */
+/* イラスト形容詞クイズ用のスタイル        */
+/* ------------------------------------ */
+
+/* クイズコンテナ */
+#adjective-quiz-container {
+    text-align: center;
+}
+
+/* 1. イラストエリア */
+#quiz-image-area {
+    width: 100%;
+    max-width: 400px; /* 画像の最大幅 */
+    height: 250px;    /* 高さを固定 */
+    margin: 20px auto;
+    border: 3px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+}
+
+#quiz-image {
+    max-width: 90%;  /* エリアの90%まで */
+    max-height: 90%; /* エリアの90%まで */
+    object-fit: contain; /* アスペクト比を保つ */
+}
+
+/* 2. 選択肢ボタンのエリア */
+#quiz-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* ボタン同士の間隔 */
+    margin-top: 20px;
+    flex-wrap: wrap; /* 画面が狭い時に折り返す */
+}
+
+/* 選択肢ボタン */
+.option-button {
+    font-size: 1.2em;
+    padding: 15px 30px;
+}
+
+/* 4. フィードバックエリアの共通スタイル */
+#quiz-feedback {
+    margin-top: 20px;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* 5. 選択結果のスタイル */
+
+/* 正解したボタンのスタイル */
+.correct-selection {
+    background-color: #4CAF50 !important; /* 緑 */
+    color: white !important;
+    border-color: #4CAF50 !important;
+}
+
+/* 間違えたボタンのスタイル */
+.wrong-selection {
+    background-color: #f44336 !important; /* 赤 */
+    color: white !important;
+    border-color: #f44336 !important;
+    opacity: 0.7; /* 少し薄くする */
+}
