@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const replacements = [];
 
         template.pattern.forEach(partKey => {
-            if (partKey.startsWith('P_PERSON') || partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_')) {
+            if (partKey.startsWith('P_') || partKey.startsWith('N_') || partKey.startsWith('A_') || partKey.startsWith('V_')) {
                 const pool = wordPool[partKey];
                 
                 if (pool && pool.length > 0) {
