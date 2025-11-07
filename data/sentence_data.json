@@ -45,20 +45,17 @@
       { "japanese": "おんなのこ", "english": "girl" },
       { "japanese": "のびた", "english": "Nobita" }
     ],
-
     "P_ADULT": [
       { "japanese": "せんせい", "english": "teacher" },
       { "japanese": "まりお", "english": "Mario" },
       { "japanese": "ごくう", "english": "Goku" }
     ],
-
     "N_ANIMAL_P": [
       { "japanese": "いぬ", "english": "dog" },
       { "japanese": "ねこ", "english": "cat" },
       { "japanese": "うさぎ", "english": "rabbit" },
       { "japanese": "ひよこ", "english": "chick" }
     ],
-
     "N_ANIMAL_H": [
       { "japanese": "いぬ", "english": "dog" },
       { "japanese": "ねこ", "english": "cat" },
@@ -66,7 +63,6 @@
       { "japanese": "うし", "english": "cow" },
       { "japanese": "くま", "english": "bear" }
     ],
-
     "N_ANIMAL_A": [
       { "japanese": "いるか", "english": "dolphin" },
       { "japanese": "くじら", "english": "whale" },
@@ -74,7 +70,6 @@
       { "japanese": "すずめ", "english": "sparrow" },
       { "japanese": "へび", "english": "snake" }
     ],
-
     "N_FOOD_T": [
       { "japanese": "りんご", "english": "apple" },
       { "japanese": "すし", "english": "sushi" },
@@ -83,7 +78,6 @@
       { "japanese": "とうふ", "english": "tofu" },
       { "japanese": "あんこ", "english": "anko" }
     ],
-
     "N_FOOD_E": [
       { "japanese": "ごはん", "english": "rice" },
       { "japanese": "たまご", "english": "egg" },
@@ -91,19 +85,16 @@
       { "japanese": "とうふ", "english": "tofu" },
       { "japanese": "ぎょうざ", "english": "gyoza" }
     ],
-
     "N_FOOD_ANIMAL": [
       { "japanese": "ごはん", "english": "rice" },
       { "japanese": "にく", "english": "meat" }
     ],
-
     "N_DRINK_OK": [
       { "japanese": "みず", "english": "water" },
       { "japanese": "こうちゃ", "english": "black tea" },
       { "japanese": "こーら", "english": "cola" },
       { "japanese": "コーヒー", "english": "coffee" }
     ],
-
     "N_PLACE_S": [
       { "japanese": "がっこう", "english": "school" },
       { "japanese": "うみ", "english": "sea" },
@@ -111,7 +102,6 @@
       { "japanese": "みずうみ", "english": "lake" },
       { "japanese": "やま", "english": "mountain" }
     ],
-
     "N_PLACE_G": [
       { "japanese": "がっこう", "english": "school" },
       { "japanese": "うみ", "english": "sea" },
@@ -120,7 +110,6 @@
       { "japanese": "こんびに", "english": "convenience store" },
       { "japanese": "おてら", "english": "temple" }
     ],
-
     "N_PLACE_T": [
       { "japanese": "がっこう", "english": "school" },
       { "japanese": "こうえん", "english": "park" },
@@ -128,7 +117,6 @@
       { "japanese": "やま", "english": "mountain" },
       { "japanese": "ぎんこう", "english": "bank" }
     ],
-
     "N_OBJECT_C": [
       { "japanese": "いす", "english": "chair" },
       { "japanese": "えほん", "english": "picture book" },
@@ -136,7 +124,6 @@
       { "japanese": "ぬいぐるみ", "english": "stuffed toy" },
       { "japanese": "ろけっと", "english": "rocket" }
     ],
-
     "N_OBJECT_U": [
       { "japanese": "めがね", "english": "glasses" },
       { "japanese": "さいふ", "english": "wallet" },
@@ -144,15 +131,82 @@
       { "japanese": "てぶくろ", "english": "gloves" },
       { "japanese": "マイク", "english": "microphone" }
     ],
-
     "N_VEHICLE_R": [
       { "japanese": "くるま", "english": "car" },
       { "japanese": "でんしゃ", "english": "train" },
       { "japanese": "じてんしゃ", "english": "bicycle" }
     ],
-
     "N_VEHICLE_M": [
       { "japanese": "くるま", "english": "car" },
       { "japanese": "でんしゃ", "english": "train" },
       { "japanese": "トラック", "english": "truck" },
       { "japanese": "ひこうき", "english": "airplane" }
+    ],
+
+    // ★★★ ここから下が不足していたキーです ★★★
+
+    "N_NATURE_T": [
+      { "japanese": "てんき", "english": "weather" }
+    ],
+    "N_BODY": [
+      { "japanese": "あし", "english": "leg" },
+      { "japanese": "て", "english": "hand" }
+    ],
+    "N_NATURE_S": [
+      { "japanese": "き", "english": "tree" },
+      { "japanese": "はな", "english": "flower" }
+    ],
+
+    "A_I_GOOD": [
+      { "japanese": "いい", "english": "good" },
+      { "japanese": "かわいい", "english": "cute" }
+    ],
+    "A_I_TASTE": [
+      { "japanese": "おいしい", "english": "delicious" },
+      { "japanese": "あまい", "english": "sweet" }
+    ],
+    "A_I_SIZE_P": [
+      { "japanese": "おおきい", "english": "big" },
+      { "japanese": "ちいさい", "english": "small" }
+    ],
+    "A_I_TEMP": [
+      { "japanese": "あつい", "english": "hot" },
+      { "japanese": "さむい", "english": "cold" }
+    ],
+    "A_I_SIZE": [
+      { "japanese": "おおきい", "english": "big" },
+      { "japanese": "ちいさい", "english": "small" }
+    ],
+
+    "V_EAT": [
+      { "japanese": "たべます", "english": "eat" }
+    ],
+    "V_DRINK": [
+      { "japanese": "のみます", "english": "drink" }
+    ],
+    "V_USE_LOOK": [
+      { "japanese": "さがします", "english": "look for" }
+    ],
+    "V_RIDE": [
+      { "japanese": "のります", "english": "ride" }
+    ],
+    "V_GO": [
+      { "japanese": "いきます", "english": "go" }
+    ],
+    "V_RETURN": [
+      { "japanese": "かえります", "english": "return" }
+    ],
+    "V_ANIMAL_A": [
+      { "japanese": "とびます", "english": "fly" },
+      { "japanese": "およぎます", "english": "swim" }
+    ],
+    "V_MOVE_M": [
+      { "japanese": "はしります", "english": "run" },
+      { "japanese": "とびます", "english": "fly" }
+    ],
+    "V_ACTION_T": [
+      { "japanese": "べんきょうします", "english": "study" },
+      { "japanese": "あそびます", "english": "play" }
+    ]
+  }
+}
