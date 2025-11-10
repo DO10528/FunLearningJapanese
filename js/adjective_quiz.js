@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             image: "assets/images/kuruma.png",
-            options: ["あおい", "おもい", "すずしい"],
-            correct: "あおい",
-            english: "Blue"
+            options: ["あかい", "おもい", "すずしい"],
+            correct: "あかい",
+            english: "Red"
         },
         {
             image: "assets/images/zou.png",
