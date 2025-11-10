@@ -116,7 +116,16 @@
         /* 画像エリアは構造上残しますが、今回のクイズでは非表示を維持 */
         .image-box { display:none; }
     </style>
-</head>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-0BX3DD42C1');
+    </script>
+    </head>
 <body>
 
     <h1>あいさつ クイズ (10びょうせいげん)</h1>
@@ -141,7 +150,7 @@
         <div id="final-score" style="display: none;">
             </div>
 
-        <div class="navigation-buttons">
+        <div classs="navigation-buttons">
             <button id="home-button">ホームにもどる</button>
             <button id="restart-button" style="display: none;">もういちど あそぶ</button>
         </div>
