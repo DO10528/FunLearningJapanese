@@ -498,4 +498,42 @@
                 }
             }
 
-            // --- 7. レベルクリアのチェック --- (
+            // --- 7. レベルクリアのチェック --- (変更なし)
+            function checkLevelComplete() {
+                if (correctMatches !== currentLevelWords.length) {
+                    return; 
+                }
+                feedbackEl.textContent = 'レベルクリア！';
+                feedbackEl.classList.add('success');
+                resetPlacedButton.style.display = 'none'; 
+                const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
+                const nextLevelIndex = currentLevelIndex + 1;
+                if (nextLevelIndex < gameLevels.length) {
+                    const nextLevelData = gameLevels[nextLevelIndex];
+                    levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
+                    setTimeout(() => {
+                        loadLevel(nextLevelData);
+                    }, 2000);
+                } else {
+                    levelTitleEl.textContent = 'ぜんぶクリア！';
+                    feedbackEl.textContent = '全レベル おめでとうございます！';
+                }
+            }
+
+            // --- 8. ユーティリティ (配列シャッフル) --- (変更なし)
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // --- 9. ゲーム開始 ---
+            initGame();
+
+        });
+    </script>
+
+</body>
+</html>
