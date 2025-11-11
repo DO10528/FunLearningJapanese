@@ -313,7 +313,7 @@
             const gameLevels = [
                 { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
                 { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'き', file: 'き' },{ hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
-                { level: 3, words: [ { hira: 'しか', file: 'しか' }, { hira: 'さる', file: 'さる' }, { hira: 'すし', file: 'すし' }, { hira: 'せみ', file: 'せみ' }, { hira: 'そば', file: 'そば' } ] },
+                { level: 3, words: [ { hira: 'さる', file: 'さる' }, { hira: 'しか', file: 'しか' }, { hira: 'すし', file: 'すし' }, { hira: 'せみ', file: 'せみ' }, { hira: 'そば', file: 'そば' } ] },
                 { level: 4, words: [ { hira: 'たこ', file: 'たこ' }, { hira: 'はち', file: 'はち' },{ hira: 'つき', file: 'つき' }, { hira: 'てれび', file: 'てれび' }, { hira: 'とり', file: 'とり' } ] },
                 { level: 5, words: [ { hira: 'なす', file: 'なす' }, { hira: 'にほん', file: 'にほん' }, { hira: 'ぬの', file: 'ぬの' }, { hira: 'ねこ', file: 'ねこ' }, { hira: 'のり', file: 'のり' } ] },
                 { level: 6, words: [ { hira: 'はし', file: 'はし' }, { hira: 'ひとで', file: 'ひとで' }, { hira: 'ふく', file: 'ふく' }, { hira: 'へび', file: 'へび' }, { hira: 'ほし', file: 'ほし' } ] },
@@ -347,7 +347,9 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                homeButton.onclick = showLevelSelect;
+                // ★★★ ここを修正しました！ ★★★
+                // 「ホームにもどる」ボタンが index.html に戻るように修正
+                homeButton.onclick = () => window.location.href = 'index.html';
             }
             
             // レベル選択画面を表示する関数
@@ -357,7 +359,7 @@
                 feedbackEl.textContent = '';
                 resetPlacedButton.style.display = 'none';
                 
-                // ★改善点：CSSで 'grid' が指定されているため、 'grid' に戻す
+                // CSSで 'grid' が指定されているため、 'grid' に戻す
                 levelSelectionEl.style.display = 'grid'; 
                 mainTitleEl.style.display = 'block';
             }
@@ -411,7 +413,7 @@
                     img.alt = wordData.hira;
                     img.draggable = false; 
                     item.appendChild(img);
-                    illustPoolEl.appendChild(item); // ★変更なし：JSはillustPoolに入れるだけ
+                    illustPoolEl.appendChild(item); 
                 });
 
                 // 4-3. イベントリスナーを設定

@@ -337,7 +337,9 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                homeButton.onclick = showLevelSelect;
+                // ★★★ ここを修正しました！ ★★★
+                // 「ホームにもどる」ボタンが index.html に戻るように修正
+                homeButton.onclick = () => window.location.href = 'index.html';
             }
             
             // レベル選択画面を表示する関数
