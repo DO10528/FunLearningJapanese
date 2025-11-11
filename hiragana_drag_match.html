@@ -307,7 +307,9 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            const ILLUSTRATION_PATH_PREFIX = '/assets/images/hiragana_words/';
+            // ★★★ 修正箇所 ★★★
+            // ルートスラッシュ (/) を削除し、相対パス 'assets/images/hiragana_words/' に変更
+            const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/'; 
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
             const gameLevels = [
@@ -347,9 +349,7 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                // ★★★ ここを修正しました！ ★★★
-                // 「ホームにもどる」ボタンが index.html に戻るように修正
-                homeButton.onclick = () => window.location.href = 'index.html';
+                homeButton.onclick = () => showLevelSelect(); // ホームに戻るボタンはレベル選択画面に戻るように修正
             }
             
             // レベル選択画面を表示する関数
@@ -409,6 +409,7 @@
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
                     const img = document.createElement('img');
+                    // ★★★ 修正後のパスを使用 ★★★
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     img.draggable = false; 
