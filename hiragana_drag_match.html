@@ -243,23 +243,23 @@
 
             // --- 1. データ定義 ---
             
-            // ★★★ ここを修正しました！ ★★★
-            // 'assets/...' から '/assets/...' に変更（先頭に / を追加）
-            // これでサーバーのルートから画像を探しに行きます。
+            // ★修正点1：パスをルートからの絶対パスに
             const ILLUSTRATION_PATH_PREFIX = '/assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
+            // ★修正点2：ファイル名(file)を、ローマ字から「かな」に戻しました！
+            // (あなたのPCに保存されているファイル名に合わせました)
             const gameLevels = [
-                { level: 1, words: [ { hira: 'あめ', file: 'ame' }, { hira: 'いぬ', file: 'inu' }, { hira: 'うし', file: 'ushi' }, { hira: 'えび', file: 'ebi' }, { hira: 'おに', file: 'oni' } ] },
-                { level: 2, words: [ { hira: 'かに', file: 'kani' }, { hira: 'くるま', file: 'kuruma' }, { hira: 'けむし', file: 'kemushi' }, { hira: 'こま', file: 'koma' } ] },
-                { level: 3, words: [ { hira: 'しか', file: 'shika' }, { hira: 'さる', file: 'saru' }, { hira: 'すし', file: 'sushi' }, { hira: 'せみ', file: 'semi' }, { hira: 'そば', file: 'soba' } ] },
-                { level: 4, words: [ { hira: 'たこ', file: 'tako' }, { hira: 'つき', file: 'tsuki' }, { hira: 'てれび', file: 'terebi' }, { hira: 'とり', file: 'tori' } ] },
-                { level: 5, words: [ { hira: 'なす', file: 'nasu' }, { hira: 'にほん', file: 'nihon' }, { hira: 'ぬの', file: 'nuno' }, { hira: 'ねこ', file: 'neko' }, { hira: 'のり', file: 'nori' } ] },
-                { level: 6, words: [ { hira: 'はち', file: 'hachi' }, { hira: 'はし', file: 'hashi' }, { hira: 'ひと', file: 'hito' }, { hira: 'ふく', file: 'fuku' }, { hira: 'へび', file: 'hebi' }, { hira: 'ほし', file: 'hoshi' } ] },
-                { level: 7, words: [ { hira: 'まくら', file: 'makura' }, { hira: 'みかん', file: 'mikan' }, { hira: 'むぎ', file: 'mugi' }, { hira: 'めだか', file: 'medaka' }, { hira: 'もも', file: 'momo' } ] },
-                { level: 8, words: [ { hira: 'らくだ', file: 'rakuda' }, { hira: 'りんご', file: 'ringo' }, { hira: 'るんば', file: 'rumba' }, { hira: 'れもん', file: 'remon' }, { hira: 'ろば', file: 'roba' } ] },
-                { level: 9, words: [ { hira: 'やぎ', file: 'yagi' }, { hira: 'ゆかた', file: 'yukata' }, { hira: 'ようかい', file: 'youkai' } ] },
-                { level: 10, words: [ { hira: 'わに', file: 'wani' }, { hira: 'かばん', file: 'kaban' } ] }
+                { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
+                { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
+                { level: 3, words: [ { hira: 'しか', file: 'しか' }, { hira: 'さる', file: 'さる' }, { hira: 'すし', file: 'すし' }, { hira: 'せみ', file: 'せみ' }, { hira: 'そば', file: 'そば' } ] },
+                { level: 4, words: [ { hira: 'たこ', file: 'たこ' }, { hira: 'つき', file: 'つき' }, { hira: 'てれび', file: 'てれび' }, { hira: 'とり', file: 'とり' } ] },
+                { level: 5, words: [ { hira: 'なす', file: 'なす' }, { hira: 'にほん', file: 'にほん' }, { hira: 'ぬの', file: 'ぬの' }, { hira: 'ねこ', file: 'ねこ' }, { hira: 'のり', file: 'のり' } ] },
+                { level: 6, words: [ { hira: 'はち', file: 'はち' }, { hira: 'はし', file: 'はし' }, { hira: 'ひと', file: 'ひと' }, { hira: 'ふく', file: 'ふく' }, { hira: 'へび', file: 'へび' }, { hira: 'ほし', file: 'ほし' } ] },
+                { level: 7, words: [ { hira: 'まくら', file: 'まくら' }, { hira: 'みかん', file: 'みかん' }, { hira: 'むぎ', file: 'むぎ' }, { hira: 'めだか', file: 'めだか' }, { hira: 'もも', file: 'もも' } ] },
+                { level: 8, words: [ { hira: 'らくだ', file: 'らくだ' }, { hira: 'りんご', file: 'りんご' }, { hira: 'るんば', file: 'るんば' }, { hira: 'れもん', file: 'れもん' }, { hira: 'ろば', file: 'ろば' } ] },
+                { level: 9, words: [ { hira: 'やぎ', file: 'やぎ' }, { hira: 'ゆかた', file: 'ゆかた' }, { hira: 'ようかい', file: 'ようかい' } ] },
+                { level: 10, words: [ { hira: 'わに', file: 'わに' }, { hira: 'かばん', file: 'かばん' } ] }
             ];
 
             // --- 2. HTML要素の取得 ---
@@ -329,8 +329,8 @@
 
                     const img = document.createElement('img');
                     
-                    // ここで /assets/images/hiragana_words/ame.png のように
-                    // ルートからの絶対パスが生成されます
+                    // ここで /assets/images/hiragana_words/あめ.png のように
+                    // 正しいパスが生成されます
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     
@@ -346,11 +346,11 @@
             }
 
             // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
+            // (前回のバグ修正済み、変更なし)
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.dm-drag-item');
                 const dropTargets = document.querySelectorAll('.dm-drop-target');
 
-                // ドラッグするアイテム側の設定
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
                         if (item.classList.contains('matched')) {
@@ -366,7 +366,6 @@
                     });
                 });
 
-                // ドロップ先エリア側の設定
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
                         if (target.classList.contains('correct')) {
@@ -391,16 +390,15 @@
                         const droppedWord = e.dataTransfer.getData('text/plain');
                         const targetWord = target.dataset.word;
 
-                        // 答えチェック
                         checkMatch(droppedWord, targetWord, target);
                     });
                 });
             }
 
             // --- 6. 答えのチェック ---
+            // (変更なし)
             function checkMatch(droppedWord, targetWord, targetElement) {
                 if (droppedWord === targetWord) {
-                    // --- 正解 ---
                     feedbackEl.textContent = 'せいかい！';
                     feedbackEl.classList.add('success');
                     
@@ -418,13 +416,13 @@
                     checkLevelComplete();
 
                 } else {
-                    // --- 不正解 ---
                     feedbackEl.textContent = 'ちがうよ、もういちど！';
                     feedbackEl.classList.remove('success');
                 }
             }
 
             // --- 7. レベルクリアのチェック ---
+            // (変更なし)
             function checkLevelComplete() {
                 if (correctMatches === currentLevelWords.length) {
                     levelTitleEl.textContent = `レベルクリア！おめでとう！`;
@@ -434,6 +432,7 @@
             }
 
             // --- 8. ユーティリティ (配列シャッフル) ---
+            // (変更なし)
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
