@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* ★改善点：全体に丸いフォントと、優しい背景グラデーションを設定 */
+        /* 全体に丸いフォントと、優しい背景グラデーションを設定 */
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
             background: linear-gradient(180deg, #f0f8ff 0%, #cce7ff 100%);
@@ -22,24 +22,24 @@
             box-sizing: border-box;
         }
 
-        /* ★改善点：コンテナをより丸く、柔らかい影に変更 */
+        /* コンテナをより丸く、柔らかい影に変更 */
         #dm-container {
             width: 100%;
             max-width: 800px;
             margin: 20px auto;
-            padding: 30px; /* パディングを少し増やす */
+            padding: 30px; 
             background-color: #ffffff;
-            box-shadow: 0 8px 24px rgba(0, 91, 179, 0.15); /* 影を柔らかく */
-            border-radius: 20px; /* 角をより丸く */
-            border: none; /* 枠線を削除 */
+            box-shadow: 0 8px 24px rgba(0, 91, 179, 0.15); 
+            border-radius: 20px; 
+            border: none; 
         }
 
-        /* ★改善点：タイトルを大きく、太く */
+        /* タイトルを大きく、太く */
         #dm-container h1 {
             text-align: center;
             color: #005bb5;
-            font-weight: 800; /* とても太く */
-            font-size: 2.5em; /* 大きく */
+            font-weight: 800; 
+            font-size: 2.5em; 
             margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
@@ -49,15 +49,15 @@
             color: #5c7aff;
         }
 
-        /* --- ★改善点：レベル選択を3列のグリッドに変更 --- */
+        /* --- レベル選択を3列のグリッドに変更 --- */
         #dm-level-selection {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3列に配置 */
-            gap: 20px; /* ボタン間の余白を増やす */
+            gap: 20px; 
             margin-bottom: 30px;
         }
 
-        /* ★改善点：カラフルで「押したくなる」ボタンデザイン */
+        /* カラフルで「押したくなる」ボタンデザイン */
         #dm-level-selection button {
             padding: 20px;
             font-size: 1.5em;
@@ -68,7 +68,6 @@
             cursor: pointer;
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            /* 3Dボタン風の底面 */
             border-bottom: 5px solid rgba(0,0,0,0.15);
         }
 
@@ -83,26 +82,58 @@
             border-bottom-width: 2px;
         }
 
-        /* ★改善点：ボタンをカラフルに色分け */
+        /* ボタンをカラフルに色分け */
         #dm-level-selection button:nth-child(5n+1) { background-color: #ff6b6b; } /* 赤 */
         #dm-level-selection button:nth-child(5n+2) { background-color: #feca57; } /* 黄 */
         #dm-level-selection button:nth-child(5n+3) { background-color: #48dbfb; } /* 水色 */
         #dm-level-selection button:nth-child(5n+4) { background-color: #1dd1a1; } /* 緑 */
         #dm-level-selection button:nth-child(5n+5) { background-color: #ff9f43; } /* オレンジ */
         
-        /* --- ゲームエリア (変更なし) --- */
+        /* --- ★改善点：ゲームエリアのレイアウト --- */
         #dm-game-area {
             display: flex;
-            flex-direction: column; 
+            flex-direction: row; /* 常に横並び (左/右) */
             gap: 20px;
         }
+
         #dm-illust-area, #dm-word-area {
-            padding: 15px; border-radius: 8px; background-color: #f9f9f9;
-            border: 2px dashed #ccc; min-height: 150px;
+            padding: 15px; 
+            border-radius: 8px; 
+            background-color: #f9f9f9;
+            border: 2px dashed #ccc; 
+            min-height: 150px;
         }
+
+        /* ★改善点：イラストエリア(左側) */
+        #dm-illust-area {
+            flex: 1; /* 幅を自動調整 (50%目安) */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 中のh3とプールを中央揃え */
+            gap: 15px;
+        }
+        
+        /* ★改善点：単語エリア(右側) */
+        #dm-word-area {
+            flex: 1; /* 幅を自動調整 (50%目安) */
+        }
+
+        /* ★改善点：イラストを縦一列に並べるためのコンテナ */
+        #dm-illust-pool {
+            display: flex;
+            flex-direction: column; /* 縦一列 */
+            align-items: center;
+            gap: 10px; /* イラスト間の隙間 */
+            width: 100%; /* 親要素に合わせる */
+        }
+        
         #dm-illust-area h3, #dm-word-area h3 {
-            text-align: center; margin-top: 0; color: #555;
+            text-align: center; 
+            margin-top: 0; 
+            color: #555;
+            width: 100%;
         }
+
         .dm-drag-item {
             width: 100px; height: 100px; background-color: #fff;
             border: 2px solid #ddd; border-radius: 8px;
@@ -187,10 +218,14 @@
             border-bottom-color: #c69500; /* 濃い黄色 */
         }
 
-        /* --- スマホ（小さい画面）用の調整 --- */
+        /* --- ★改善点：スマホ（小さい画面）用の調整 --- */
         @media (max-width: 600px) {
+            #dm-container {
+                padding: 15px; /* スマホではパディングを減らす */
+            }
             #dm-container h1 {
-                font-size: 2em; /* スマホでは少し小さく */
+                font-size: 1.8em; /* スマホではタイトルを小さく */
+                margin-bottom: 20px;
             }
             #dm-level-selection {
                 grid-template-columns: repeat(2, 1fr); /* 2列に配置 */
@@ -200,12 +235,35 @@
                 font-size: 1.2em;
                 padding: 15px;
             }
+
+            /* ★改善点：スマホでも横並びを維持するが、文字やパディングを調整 */
             #dm-game-area {
-                flex-direction: column;
+                flex-direction: row; /* 横並びを維持 */
+                gap: 10px; /* 隙間を減らす */
             }
             #dm-illust-area, #dm-word-area {
-                width: 100%;
-                box-sizing: border-box; /* はみ出し防止 */
+                padding: 5px; /* パディングを減らす */
+                min-height: 100px; /* 高さを調整 */
+            }
+            #dm-illust-area h3, #dm-word-area h3 {
+                font-size: 0.8em; /* タイトルを小さく */
+                margin-bottom: 5px;
+            }
+            
+            /* イラストと単語のサイズを小さくする */
+            .dm-drag-item {
+                width: 60px; height: 60px; margin: 2px;
+            }
+            .dm-drop-target {
+                width: 60px; height: 60px; margin-right: 5px;
+            }
+            .dm-word-label {
+                font-size: 1.0em; /* 単語を小さく */
+            }
+            
+            .dm-button {
+                padding: 10px 15px;
+                font-size: 1em;
             }
         }
     </style>
@@ -249,7 +307,6 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            // (かなのファイル名、ルートパス、両方に対応済み)
             const ILLUSTRATION_PATH_PREFIX = '/assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
@@ -267,7 +324,7 @@
             ];
 
             // --- 2. HTML要素の取得 ---
-            const mainTitleEl = document.getElementById('dm-main-title'); // ★追加
+            const mainTitleEl = document.getElementById('dm-main-title'); 
             const levelSelectionEl = document.getElementById('dm-level-selection');
             const levelTitleEl = document.getElementById('dm-level-title');
             const gameAreaEl = document.getElementById('dm-game-area');
@@ -275,7 +332,7 @@
             const wordListEl = document.getElementById('dm-word-list');
             const feedbackEl = document.getElementById('dm-feedback');
             const resetPlacedButton = document.getElementById('dm-reset-placed-button');
-            const homeButton = document.getElementById('dm-home-button'); // ★追加
+            const homeButton = document.getElementById('dm-home-button'); 
 
             let currentLevelData = null; 
             let currentLevelWords = [];
@@ -283,7 +340,6 @@
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
-                // レベルボタンを生成
                 gameLevels.forEach(levelData => {
                     const button = document.createElement('button');
                     button.textContent = `レベル ${levelData.level}`;
@@ -291,38 +347,26 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                // ★追加：ホームボタンのクリックイベント
                 homeButton.onclick = showLevelSelect;
             }
             
-            // ★追加：レベル選択画面を表示する関数
+            // レベル選択画面を表示する関数
             function showLevelSelect() {
-                // ゲーム画面を隠す
                 gameAreaEl.style.display = 'none';
                 levelTitleEl.textContent = '';
                 feedbackEl.textContent = '';
                 resetPlacedButton.style.display = 'none';
                 
-                // レベル選択画面を表示する
-                // ★修正：スマホでは 'grid' ではなく 'flex' になるため、
-                // displayプロパティを削除してデフォルト(CSSのgrid)に戻す
-                levelSelectionEl.style.display = ''; 
+                // ★改善点：CSSで 'grid' が指定されているため、 'grid' に戻す
+                levelSelectionEl.style.display = 'grid'; 
                 mainTitleEl.style.display = 'block';
-                
-                // ★追加：ホームボタンを index.html に戻るように変更
-                // （もし、このページ内で完結させたいならこの行を削除）
-                // homeButton.onclick = () => window.location.href = 'index.html'; 
-                // → やはり「ホームにもどる」はレベル選択に戻る方が自然なので、
-                //   上記の「index.htmlに戻る」ロジックはやめておきます。
             }
 
             // --- 4. レベル読み込み ---
             function loadLevel(levelData) {
-                // ★追加：レベル選択画面を隠す
                 levelSelectionEl.style.display = 'none';
                 mainTitleEl.style.display = 'none';
                 
-                // (↓ここから下は既存のロジック)
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
                 correctMatches = 0;
@@ -367,7 +411,7 @@
                     img.alt = wordData.hira;
                     img.draggable = false; 
                     item.appendChild(img);
-                    illustPoolEl.appendChild(item);
+                    illustPoolEl.appendChild(item); // ★変更なし：JSはillustPoolに入れるだけ
                 });
 
                 // 4-3. イベントリスナーを設定
@@ -454,42 +498,4 @@
                 }
             }
 
-            // --- 7. レベルクリアのチェック --- (変更なし)
-            function checkLevelComplete() {
-                if (correctMatches !== currentLevelWords.length) {
-                    return; 
-                }
-                feedbackEl.textContent = 'レベルクリア！';
-                feedbackEl.classList.add('success');
-                resetPlacedButton.style.display = 'none'; 
-                const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
-                const nextLevelIndex = currentLevelIndex + 1;
-                if (nextLevelIndex < gameLevels.length) {
-                    const nextLevelData = gameLevels[nextLevelIndex];
-                    levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
-                    setTimeout(() => {
-                        loadLevel(nextLevelData);
-                    }, 2000);
-                } else {
-                    levelTitleEl.textContent = 'ぜんぶクリア！';
-                    feedbackEl.textContent = '全レベル おめでとうございます！';
-                }
-            }
-
-            // --- 8. ユーティリティ (配列シャッフル) --- (変更なし)
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-
-            // --- 9. ゲーム開始 ---
-            initGame();
-
-        });
-    </script>
-
-</body>
-</html>
+            // --- 7. レベルクリアのチェック --- (
