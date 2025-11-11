@@ -242,8 +242,11 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            // ★修正点：ひらがな(hira)とファイル名(file)を分けて定義します
-            const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/';
+            
+            // ★★★ ここを修正しました！ ★★★
+            // 'assets/...' から '/assets/...' に変更（先頭に / を追加）
+            // これでサーバーのルートから画像を探しに行きます。
+            const ILLUSTRATION_PATH_PREFIX = '/assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
             const gameLevels = [
@@ -325,10 +328,12 @@
                     item.dataset.word = wordData.hira;
 
                     const img = document.createElement('img');
+                    
+                    // ここで /assets/images/hiragana_words/ame.png のように
+                    // ルートからの絶対パスが生成されます
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     
-                    // ★★★ バグ修正点 ★★★
                     // ドラッグ操作を妨害しないよう、画像自体はドラッグ不可にする
                     img.draggable = false; 
 
