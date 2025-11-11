@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ひらがな単語あわせゲーム</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* ★改善点：全体に丸いフォントと、優しい背景グラデーションを設定 */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff;
+            font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #f0f8ff 0%, #cce7ff 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,222 +22,192 @@
             box-sizing: border-box;
         }
 
+        /* ★改善点：コンテナをより丸く、柔らかい影に変更 */
         #dm-container {
             width: 100%;
             max-width: 800px;
             margin: 20px auto;
-            padding: 25px;
+            padding: 30px; /* パディングを少し増やす */
             background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 12px;
-            border: 3px solid #5c7aff;
+            box-shadow: 0 8px 24px rgba(0, 91, 179, 0.15); /* 影を柔らかく */
+            border-radius: 20px; /* 角をより丸く */
+            border: none; /* 枠線を削除 */
         }
 
-        #dm-container h1, #dm-container h2 {
+        /* ★改善点：タイトルを大きく、太く */
+        #dm-container h1 {
+            text-align: center;
+            color: #005bb5;
+            font-weight: 800; /* とても太く */
+            font-size: 2.5em; /* 大きく */
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #dm-container h2 {
             text-align: center;
             color: #5c7aff;
         }
 
-        /* --- レベル選択 --- */
+        /* --- ★改善点：レベル選択を3列のグリッドに変更 --- */
         #dm-level-selection {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3列に配置 */
+            gap: 20px; /* ボタン間の余白を増やす */
+            margin-bottom: 30px;
         }
 
+        /* ★改善点：カラフルで「押したくなる」ボタンデザイン */
         #dm-level-selection button {
-            padding: 10px 15px;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
             color: #fff;
-            background-color: #5c7aff;
             border: none;
-            border-radius: 8px;
+            border-radius: 15px; /* 丸み */
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            /* 3Dボタン風の底面 */
+            border-bottom: 5px solid rgba(0,0,0,0.15);
         }
 
         #dm-level-selection button:hover {
-            background-color: #4a65d1;
+            transform: scale(1.05) translateY(-2px); /* 少し浮き上がる */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
 
-        /* --- ゲームエリア --- */
+        #dm-level-selection button:active {
+            transform: scale(1.0) translateY(2px); /* 押した感じ */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom-width: 2px;
+        }
+
+        /* ★改善点：ボタンをカラフルに色分け */
+        #dm-level-selection button:nth-child(5n+1) { background-color: #ff6b6b; } /* 赤 */
+        #dm-level-selection button:nth-child(5n+2) { background-color: #feca57; } /* 黄 */
+        #dm-level-selection button:nth-child(5n+3) { background-color: #48dbfb; } /* 水色 */
+        #dm-level-selection button:nth-child(5n+4) { background-color: #1dd1a1; } /* 緑 */
+        #dm-level-selection button:nth-child(5n+5) { background-color: #ff9f43; } /* オレンジ */
+        
+        /* --- ゲームエリア (変更なし) --- */
         #dm-game-area {
             display: flex;
-            flex-direction: column; /* スマホ用に縦並びをデフォルトに */
+            flex-direction: column; 
             gap: 20px;
         }
-
         #dm-illust-area, #dm-word-area {
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            border: 2px dashed #ccc;
-            min-height: 150px;
+            padding: 15px; border-radius: 8px; background-color: #f9f9f9;
+            border: 2px dashed #ccc; min-height: 150px;
         }
-
         #dm-illust-area h3, #dm-word-area h3 {
-            text-align: center;
-            margin-top: 0;
-            color: #555;
+            text-align: center; margin-top: 0; color: #555;
         }
-
-        /* --- イラスト（ドラッグアイテム） --- */
         .dm-drag-item {
-            width: 100px;
-            height: 100px;
-            background-color: #fff;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            width: 100px; height: 100px; background-color: #fff;
+            border: 2px solid #ddd; border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            cursor: grab;
-            margin: 5px;
-            display: inline-flex; /* 中央揃えのため */
-            justify-content: center;
-            align-items: center;
+            cursor: grab; margin: 5px; display: inline-flex;
+            justify-content: center; align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
         .dm-drag-item:active {
-            cursor: grabbing;
-            transform: scale(1.05);
+            cursor: grabbing; transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-
         .dm-drag-item img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
+            width: 90%; height: 90%; object-fit: contain;
         }
-
-        /* --- 単語（ドロップ先） --- */
         .dm-word-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            padding: 5px;
+            display: flex; align-items: center; margin-bottom: 10px;
+            background-color: #fff; border-radius: 8px;
+            border: 1px solid #ccc; padding: 5px;
         }
-
         .dm-drop-target {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed #aaa;
-            border-radius: 8px;
-            background-color: #f0f8ff;
-            margin-right: 15px;
-            transition: background-color 0.2s, border-color 0.2s;
-            /* ★改善点：中身を中央に配置 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100px; height: 100px; border: 2px dashed #aaa;
+            border-radius: 8px; background-color: #f0f8ff;
+            margin-right: 15px; transition: background-color 0.2s, border-color 0.2s;
+            display: flex; justify-content: center; align-items: center;
         }
-
         .dm-word-label {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #333;
+            font-size: 1.8em; font-weight: bold; color: #333;
         }
-        
-        /* --- ドラッグ＆ドロップの視覚フィードバック --- */
         .dm-drop-target.drag-over {
-            background-color: #e6f7ff;
-            border-color: #5c7aff;
-            border-style: solid;
+            background-color: #e6f7ff; border-color: #5c7aff; border-style: solid;
         }
-        
-        /* ★改善点：正解のスタイルを調整 */
         .dm-drop-target.correct {
-            border: 3px solid #28a745; /* 緑色 */
-            background-color: #e6ffed;
-            padding: 0; /* パディングを0にして... */
+            border: 3px solid #28a745; background-color: #e6ffed; padding: 0;
         }
-        
-        /* ★改善点：ドロップされたアイテムをマスにピッタリはめる */
         .dm-drop-target.correct .dm-drag-item {
-            width: 100%;       /* 幅を100%に */
-            height: 100%;      /* 高さを100%に */
-            margin: 0;         /* マージンをリセット */
-            box-shadow: none;  /* 影を消す */
-            border: none;      /* 枠線を消す */
-            opacity: 1 !important; /* 透明度を完全に戻す */
-            cursor: not-allowed;
+            width: 100%; height: 100%; margin: 0; box-shadow: none;
+            border: none; opacity: 1 !important; cursor: not-allowed;
         }
-
         #dm-feedback {
-            text-align: center;
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-top: 20px;
-            min-height: 1.3em;
-            color: #d9534f;
+            text-align: center; font-size: 1.3em; font-weight: bold;
+            margin-top: 20px; min-height: 1.3em; color: #d9534f;
         }
-        
-        #dm-feedback.success {
-            color: #28a745;
-        }
+        #dm-feedback.success { color: #28a745; }
 
-        /* --- ボタンエリア --- */
+        /* --- ★改善点：ボタンエリアとボタンのスタイルを調整 --- */
         .dm-button-area {
             text-align: center;
             margin-top: 25px;
         }
-
-        /* --- ホームに戻るボタン・リセットボタン --- */
         .dm-button {
             display: inline-block;
             margin: 0 5px;
-            padding: 12px 25px;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 15px 30px; /* ボタンを大きく */
+            font-size: 1.1em;
+            font-weight: 700;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px; /* 丸みを持たせる */
             text-decoration: none;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-bottom: 4px solid rgba(0,0,0,0.15); /* 3D風 */
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
-        
+        .dm-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .dm-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom-width: 2px;
+        }
         .dm-button-home {
-            background-color: #6c757d; /* グレー */
+            background-color: #6c757d;
+            border-bottom-color: #4a4e52; /* 濃いグレー */
         }
-        .dm-button-home:hover {
-            background-color: #5a6268;
-        }
-        
         .dm-button-reset {
-            background-color: #ffc107; /* 黄色 */
+            background-color: #ffc107;
             color: #333;
-        }
-        .dm-button-reset:hover {
-            background-color: #e0a800;
+            border-bottom-color: #c69500; /* 濃い黄色 */
         }
 
-
-        /* --- 
-          中サイズ以上の画面 (タブレット, PC) 
-          イラストと単語を横並びにする 
-        --- */
-        @media (min-width: 600px) {
+        /* --- ★改善点：スマホ（小さい画面）用の調整 --- */
+        @media (max-width: 600px) {
+            #dm-container h1 {
+                font-size: 2em; /* スマホでは少し小さく */
+            }
+            #dm-level-selection {
+                grid-template-columns: repeat(2, 1fr); /* 2列に配置 */
+                gap: 15px;
+            }
+            #dm-level-selection button {
+                font-size: 1.2em;
+                padding: 15px;
+            }
             #dm-game-area {
-                flex-direction: row; /* 横並びにする */
+                flex-direction: column;
             }
-            #dm-illust-area {
-                width: 40%;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                align-content: flex-start;
-            }
-            #dm-word-area {
-                width: 60%;
+            #dm-illust-area, #dm-word-area {
+                width: 100%;
+                box-sizing: border-box; /* はみ出し防止 */
             }
         }
-
     </style>
 </head>
 <body>
@@ -298,16 +273,14 @@
             const illustPoolEl = document.getElementById('dm-illust-pool');
             const wordListEl = document.getElementById('dm-word-list');
             const feedbackEl = document.getElementById('dm-feedback');
-            // ★改善点：リセットボタンを取得
             const resetPlacedButton = document.getElementById('dm-reset-placed-button');
 
-            let currentLevelData = null; // ★改善点：現在のレベル情報を保持
+            let currentLevelData = null; 
             let currentLevelWords = [];
             let correctMatches = 0;
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
-                // レベルボタンを生成
                 gameLevels.forEach(levelData => {
                     const button = document.createElement('button');
                     button.textContent = `レベル ${levelData.level}`;
@@ -318,7 +291,7 @@
 
             // --- 4. レベル読み込み ---
             function loadLevel(levelData) {
-                currentLevelData = levelData; // ★改善点：現在のレベル情報を保存
+                currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
                 correctMatches = 0;
 
@@ -327,9 +300,8 @@
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
                 
-                // ★改善点：リセットボタンを表示
                 resetPlacedButton.style.display = 'inline-block';
-                resetPlacedButton.onclick = resetPlacedItems; // クリックイベントを設定
+                resetPlacedButton.onclick = resetPlacedItems; 
 
                 // エリアをリセット
                 illustPoolEl.innerHTML = '';
@@ -366,8 +338,6 @@
                     const img = document.createElement('img');
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
-                    
-                    // (前回のバグ修正)
                     img.draggable = false; 
 
                     item.appendChild(img);
@@ -378,28 +348,23 @@
                 addDragDropListeners();
             }
             
-            // ★改善点：置いたイラストを元に戻す関数
+            // 置いたイラストを元に戻す関数
             function resetPlacedItems() {
-                // 1. マッチしたアイテムをすべて探す
                 const matchedItems = document.querySelectorAll('.dm-drag-item');
-                // 2. 正解したドロップ先をすべて探す
                 const correctDropZones = document.querySelectorAll('.dm-drop-target.correct');
 
                 matchedItems.forEach(item => {
-                    // ドロップ先(correct)に入っているアイテムだけを元に戻す
                     if (item.parentElement.classList.contains('dm-drop-target')) {
                         item.draggable = true;
-                        illustPoolEl.appendChild(item); // イラストプールに戻す
+                        illustPoolEl.appendChild(item); 
                     }
                 });
 
-                // 3. ドロップ先の状態をリセット
                 correctDropZones.forEach(zone => {
                     zone.classList.remove('correct');
-                    zone.innerHTML = ''; // 中身を空にする
+                    zone.innerHTML = ''; 
                 });
                 
-                // 4. カウンターとフィードバックをリセット
                 correctMatches = 0;
                 feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
@@ -407,14 +372,13 @@
 
 
             // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
-            // (前回のバグ修正済み)
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.dm-drag-item');
                 const dropTargets = document.querySelectorAll('.dm-drop-target');
 
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
-                        if (!item.draggable) { // draggable=false で判定
+                        if (!item.draggable) { 
                             e.preventDefault();
                             return;
                         }
@@ -468,26 +432,21 @@
                     
                     const matchingDragItem = document.querySelector(`.dm-drag-item[data-word="${droppedWord}"]`);
                     if (matchingDragItem) {
-                        // ★改善点： 'matched' クラスは不要
                         matchingDragItem.draggable = false;
                         targetElement.appendChild(matchingDragItem);
                     }
                     
                     correctMatches++;
-                    checkLevelComplete(); // ★改善点：毎回レベルクリアかチェック
+                    checkLevelComplete(); 
 
                 } else {
                     // --- 不正解 ---
                     feedbackEl.textContent = 'ちがうよ、もういちど！';
                     feedbackEl.classList.remove('success');
-                    
-                    // 「1問でも間違えていれば合うまでする」
-                    // → アイテムを戻さないので、これでOK
                 }
             }
 
             // --- 7. レベルクリアのチェック ---
-            // ★改善点：自動で次のレベルに進むロジック
             function checkLevelComplete() {
                 if (correctMatches !== currentLevelWords.length) {
                     return; // まだ全部正解していない
