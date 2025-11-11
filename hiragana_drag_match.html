@@ -148,7 +148,7 @@
         }
         #dm-feedback.success { color: #28a745; }
 
-        /* --- ★改善点：ボタンエリアとボタンのスタイルを調整 --- */
+        /* --- ボタンエリアとボタンのスタイルを調整 --- */
         .dm-button-area {
             text-align: center;
             margin-top: 25px;
@@ -187,7 +187,7 @@
             border-bottom-color: #c69500; /* 濃い黄色 */
         }
 
-        /* --- ★改善点：スマホ（小さい画面）用の調整 --- */
+        /* --- スマホ（小さい画面）用の調整 --- */
         @media (max-width: 600px) {
             #dm-container h1 {
                 font-size: 2em; /* スマホでは少し小さく */
@@ -213,7 +213,7 @@
 <body>
 
     <div id="dm-container">
-        <h1>ひらがな単語あわせゲーム</h1>
+        <h1 id="dm-main-title">ひらがな単語あわせゲーム</h1>
         
         <div id="dm-level-selection">
             </div>
@@ -240,7 +240,7 @@
             <button id="dm-reset-placed-button" class="dm-button dm-button-reset" style="display: none;">
                 イラストをもどす
             </button>
-            <a href="index.html" class="dm-button dm-button-home">ホームにもどる</a>
+            <button id="dm-home-button" class="dm-button dm-button-home">ホームにもどる</button>
         </div>
     </div>
 
@@ -267,6 +267,7 @@
             ];
 
             // --- 2. HTML要素の取得 ---
+            const mainTitleEl = document.getElementById('dm-main-title'); // ★追加
             const levelSelectionEl = document.getElementById('dm-level-selection');
             const levelTitleEl = document.getElementById('dm-level-title');
             const gameAreaEl = document.getElementById('dm-game-area');
@@ -274,6 +275,7 @@
             const wordListEl = document.getElementById('dm-word-list');
             const feedbackEl = document.getElementById('dm-feedback');
             const resetPlacedButton = document.getElementById('dm-reset-placed-button');
+            const homeButton = document.getElementById('dm-home-button'); // ★追加
 
             let currentLevelData = null; 
             let currentLevelWords = [];
@@ -281,16 +283,46 @@
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
+                // レベルボタンを生成
                 gameLevels.forEach(levelData => {
                     const button = document.createElement('button');
                     button.textContent = `レベル ${levelData.level}`;
                     button.onclick = () => loadLevel(levelData);
                     levelSelectionEl.appendChild(button);
                 });
+                
+                // ★追加：ホームボタンのクリックイベント
+                homeButton.onclick = showLevelSelect;
+            }
+            
+            // ★追加：レベル選択画面を表示する関数
+            function showLevelSelect() {
+                // ゲーム画面を隠す
+                gameAreaEl.style.display = 'none';
+                levelTitleEl.textContent = '';
+                feedbackEl.textContent = '';
+                resetPlacedButton.style.display = 'none';
+                
+                // レベル選択画面を表示する
+                // ★修正：スマホでは 'grid' ではなく 'flex' になるため、
+                // displayプロパティを削除してデフォルト(CSSのgrid)に戻す
+                levelSelectionEl.style.display = ''; 
+                mainTitleEl.style.display = 'block';
+                
+                // ★追加：ホームボタンを index.html に戻るように変更
+                // （もし、このページ内で完結させたいならこの行を削除）
+                // homeButton.onclick = () => window.location.href = 'index.html'; 
+                // → やはり「ホームにもどる」はレベル選択に戻る方が自然なので、
+                //   上記の「index.htmlに戻る」ロジックはやめておきます。
             }
 
             // --- 4. レベル読み込み ---
             function loadLevel(levelData) {
+                // ★追加：レベル選択画面を隠す
+                levelSelectionEl.style.display = 'none';
+                mainTitleEl.style.display = 'none';
+                
+                // (↓ここから下は既存のロジック)
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
                 correctMatches = 0;
@@ -303,7 +335,6 @@
                 resetPlacedButton.style.display = 'inline-block';
                 resetPlacedButton.onclick = resetPlacedItems; 
 
-                // エリアをリセット
                 illustPoolEl.innerHTML = '';
                 wordListEl.innerHTML = '';
 
@@ -314,15 +345,12 @@
                 shuffledWords.forEach(wordData => {
                     const row = document.createElement('div');
                     row.className = 'dm-word-row';
-
                     const dropTarget = document.createElement('div');
                     dropTarget.className = 'dm-drop-target';
                     dropTarget.dataset.word = wordData.hira; 
-
                     const label = document.createElement('span');
                     label.className = 'dm-word-label';
                     label.textContent = wordData.hira;
-
                     row.appendChild(dropTarget);
                     row.appendChild(label);
                     wordListEl.appendChild(row);
@@ -334,12 +362,10 @@
                     item.className = 'dm-drag-item';
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
-
                     const img = document.createElement('img');
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     img.draggable = false; 
-
                     item.appendChild(img);
                     illustPoolEl.appendChild(item);
                 });
@@ -348,49 +374,42 @@
                 addDragDropListeners();
             }
             
-            // 置いたイラストを元に戻す関数
+            // 置いたイラストを元に戻す関数 (変更なし)
             function resetPlacedItems() {
                 const matchedItems = document.querySelectorAll('.dm-drag-item');
                 const correctDropZones = document.querySelectorAll('.dm-drop-target.correct');
-
                 matchedItems.forEach(item => {
                     if (item.parentElement.classList.contains('dm-drop-target')) {
                         item.draggable = true;
                         illustPoolEl.appendChild(item); 
                     }
                 });
-
                 correctDropZones.forEach(zone => {
                     zone.classList.remove('correct');
                     zone.innerHTML = ''; 
                 });
-                
                 correctMatches = 0;
                 feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
             }
 
 
-            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
+            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 --- (変更なし)
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.dm-drag-item');
                 const dropTargets = document.querySelectorAll('.dm-drop-target');
-
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
                         if (!item.draggable) { 
-                            e.preventDefault();
-                            return;
+                            e.preventDefault(); return;
                         }
                         e.dataTransfer.setData('text/plain', item.dataset.word);
                         setTimeout(() => item.style.opacity = '0.5', 0);
                     });
-
                     item.addEventListener('dragend', (e) => {
                         item.style.opacity = '1';
                     });
                 });
-
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
                         if (target.classList.contains('correct')) {
@@ -399,86 +418,65 @@
                         e.preventDefault();
                         target.classList.add('drag-over');
                     });
-
                     target.addEventListener('dragleave', () => {
                         target.classList.remove('drag-over');
                     });
-
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
                         target.classList.remove('drag-over');
-
                         if (target.classList.contains('correct')) {
                             return;
                         }
-
                         const droppedWord = e.dataTransfer.getData('text/plain');
                         const targetWord = target.dataset.word;
-
                         checkMatch(droppedWord, targetWord, target);
                     });
                 });
             }
 
-            // --- 6. 答えのチェック ---
+            // --- 6. 答えのチェック --- (変更なし)
             function checkMatch(droppedWord, targetWord, targetElement) {
                 if (droppedWord === targetWord) {
-                    // --- 正解 ---
                     feedbackEl.textContent = 'せいかい！';
                     feedbackEl.classList.add('success');
-                    
                     targetElement.classList.add('correct');
                     targetElement.innerHTML = ''; 
-                    
                     const matchingDragItem = document.querySelector(`.dm-drag-item[data-word="${droppedWord}"]`);
                     if (matchingDragItem) {
                         matchingDragItem.draggable = false;
                         targetElement.appendChild(matchingDragItem);
                     }
-                    
                     correctMatches++;
                     checkLevelComplete(); 
-
                 } else {
-                    // --- 不正解 ---
                     feedbackEl.textContent = 'ちがうよ、もういちど！';
                     feedbackEl.classList.remove('success');
                 }
             }
 
-            // --- 7. レベルクリアのチェック ---
+            // --- 7. レベルクリアのチェック --- (変更なし)
             function checkLevelComplete() {
                 if (correctMatches !== currentLevelWords.length) {
-                    return; // まだ全部正解していない
+                    return; 
                 }
-
-                // 全問正解！
                 feedbackEl.textContent = 'レベルクリア！';
                 feedbackEl.classList.add('success');
-                resetPlacedButton.style.display = 'none'; // リセットボタンを隠す
-
-                // 次のレベルを探す
+                resetPlacedButton.style.display = 'none'; 
                 const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
                 const nextLevelIndex = currentLevelIndex + 1;
-
                 if (nextLevelIndex < gameLevels.length) {
-                    // 次のレベルがある
                     const nextLevelData = gameLevels[nextLevelIndex];
                     levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
-                    
-                    // 2秒待ってから次のレベルを読み込む
                     setTimeout(() => {
                         loadLevel(nextLevelData);
                     }, 2000);
-
                 } else {
-                    // 最終レベルをクリア
                     levelTitleEl.textContent = 'ぜんぶクリア！';
                     feedbackEl.textContent = '全レベル おめでとうございます！';
                 }
             }
 
-            // --- 8. ユーティリティ (配列シャッフル) ---
+            // --- 8. ユーティリティ (配列シャッフル) --- (変更なし)
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
