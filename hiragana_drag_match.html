@@ -126,6 +126,10 @@
             background-color: #f0f8ff;
             margin-right: 15px;
             transition: background-color 0.2s, border-color 0.2s;
+            /* ★改善点：中身を中央に配置 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .dm-word-label {
@@ -141,16 +145,22 @@
             border-style: solid;
         }
         
-        /* --- 正解・不正解のスタイル --- */
+        /* ★改善点：正解のスタイルを調整 */
         .dm-drop-target.correct {
             border: 3px solid #28a745; /* 緑色 */
             background-color: #e6ffed;
+            padding: 0; /* パディングを0にして... */
         }
         
-        .dm-drag-item.matched {
-            opacity: 0.3;
+        /* ★改善点：ドロップされたアイテムをマスにピッタリはめる */
+        .dm-drop-target.correct .dm-drag-item {
+            width: 100%;       /* 幅を100%に */
+            height: 100%;      /* 高さを100%に */
+            margin: 0;         /* マージンをリセット */
+            box-shadow: none;  /* 影を消す */
+            border: none;      /* 枠線を消す */
+            opacity: 1 !important; /* 透明度を完全に戻す */
             cursor: not-allowed;
-            border-color: #28a745;
         }
 
         #dm-feedback {
@@ -158,6 +168,7 @@
             font-size: 1.3em;
             font-weight: bold;
             margin-top: 20px;
+            min-height: 1.3em;
             color: #d9534f;
         }
         
@@ -165,24 +176,42 @@
             color: #28a745;
         }
 
-        /* --- ホームに戻るボタン --- */
-        .dm-home-button {
-            display: inline-block;
+        /* --- ボタンエリア --- */
+        .dm-button-area {
+            text-align: center;
             margin-top: 25px;
+        }
+
+        /* --- ホームに戻るボタン・リセットボタン --- */
+        .dm-button {
+            display: inline-block;
+            margin: 0 5px;
             padding: 12px 25px;
             font-size: 1em;
             font-weight: bold;
             color: #fff;
-            background-color: #6c757d; /* グレー */
             border: none;
             border-radius: 8px;
             text-decoration: none;
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .dm-home-button:hover {
+        
+        .dm-button-home {
+            background-color: #6c757d; /* グレー */
+        }
+        .dm-button-home:hover {
             background-color: #5a6268;
         }
+        
+        .dm-button-reset {
+            background-color: #ffc107; /* 黄色 */
+            color: #333;
+        }
+        .dm-button-reset:hover {
+            background-color: #e0a800;
+        }
+
 
         /* --- 
           中サイズ以上の画面 (タブレット, PC) 
@@ -232,8 +261,11 @@
 
         <div id="dm-feedback"></div>
 
-        <div style="text-align: center;">
-            <a href="index.html" class="dm-home-button">ホームにもどる</a>
+        <div class="dm-button-area">
+            <button id="dm-reset-placed-button" class="dm-button dm-button-reset" style="display: none;">
+                イラストをもどす
+            </button>
+            <a href="index.html" class="dm-button dm-button-home">ホームにもどる</a>
         </div>
     </div>
 
@@ -242,13 +274,10 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            
-            // ★修正点1：パスをルートからの絶対パスに
+            // (かなのファイル名、ルートパス、両方に対応済み)
             const ILLUSTRATION_PATH_PREFIX = '/assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
-            // ★修正点2：ファイル名(file)を、ローマ字から「かな」に戻しました！
-            // (あなたのPCに保存されているファイル名に合わせました)
             const gameLevels = [
                 { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
                 { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
@@ -269,7 +298,10 @@
             const illustPoolEl = document.getElementById('dm-illust-pool');
             const wordListEl = document.getElementById('dm-word-list');
             const feedbackEl = document.getElementById('dm-feedback');
+            // ★改善点：リセットボタンを取得
+            const resetPlacedButton = document.getElementById('dm-reset-placed-button');
 
+            let currentLevelData = null; // ★改善点：現在のレベル情報を保持
             let currentLevelWords = [];
             let correctMatches = 0;
 
@@ -286,6 +318,7 @@
 
             // --- 4. レベル読み込み ---
             function loadLevel(levelData) {
+                currentLevelData = levelData; // ★改善点：現在のレベル情報を保存
                 currentLevelWords = levelData.words;
                 correctMatches = 0;
 
@@ -293,12 +326,15 @@
                 feedbackEl.textContent = '';
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
+                
+                // ★改善点：リセットボタンを表示
+                resetPlacedButton.style.display = 'inline-block';
+                resetPlacedButton.onclick = resetPlacedItems; // クリックイベントを設定
 
                 // エリアをリセット
                 illustPoolEl.innerHTML = '';
                 wordListEl.innerHTML = '';
 
-                // 配列をシャッフルしてランダムに表示する
                 const shuffledWords = shuffleArray([...currentLevelWords]);
                 const shuffledIllusts = shuffleArray([...currentLevelWords]);
 
@@ -328,13 +364,10 @@
                     item.dataset.word = wordData.hira;
 
                     const img = document.createElement('img');
-                    
-                    // ここで /assets/images/hiragana_words/あめ.png のように
-                    // 正しいパスが生成されます
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     
-                    // ドラッグ操作を妨害しないよう、画像自体はドラッグ不可にする
+                    // (前回のバグ修正)
                     img.draggable = false; 
 
                     item.appendChild(img);
@@ -344,16 +377,44 @@
                 // 4-3. イベントリスナーを設定
                 addDragDropListeners();
             }
+            
+            // ★改善点：置いたイラストを元に戻す関数
+            function resetPlacedItems() {
+                // 1. マッチしたアイテムをすべて探す
+                const matchedItems = document.querySelectorAll('.dm-drag-item');
+                // 2. 正解したドロップ先をすべて探す
+                const correctDropZones = document.querySelectorAll('.dm-drop-target.correct');
+
+                matchedItems.forEach(item => {
+                    // ドロップ先(correct)に入っているアイテムだけを元に戻す
+                    if (item.parentElement.classList.contains('dm-drop-target')) {
+                        item.draggable = true;
+                        illustPoolEl.appendChild(item); // イラストプールに戻す
+                    }
+                });
+
+                // 3. ドロップ先の状態をリセット
+                correctDropZones.forEach(zone => {
+                    zone.classList.remove('correct');
+                    zone.innerHTML = ''; // 中身を空にする
+                });
+                
+                // 4. カウンターとフィードバックをリセット
+                correctMatches = 0;
+                feedbackEl.textContent = 'イラストをもどしました。';
+                feedbackEl.classList.remove('success');
+            }
+
 
             // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
-            // (前回のバグ修正済み、変更なし)
+            // (前回のバグ修正済み)
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.dm-drag-item');
                 const dropTargets = document.querySelectorAll('.dm-drop-target');
 
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
-                        if (item.classList.contains('matched')) {
+                        if (!item.draggable) { // draggable=false で判定
                             e.preventDefault();
                             return;
                         }
@@ -396,9 +457,9 @@
             }
 
             // --- 6. 答えのチェック ---
-            // (変更なし)
             function checkMatch(droppedWord, targetWord, targetElement) {
                 if (droppedWord === targetWord) {
+                    // --- 正解 ---
                     feedbackEl.textContent = 'せいかい！';
                     feedbackEl.classList.add('success');
                     
@@ -407,32 +468,58 @@
                     
                     const matchingDragItem = document.querySelector(`.dm-drag-item[data-word="${droppedWord}"]`);
                     if (matchingDragItem) {
-                        matchingDragItem.classList.add('matched');
+                        // ★改善点： 'matched' クラスは不要
                         matchingDragItem.draggable = false;
                         targetElement.appendChild(matchingDragItem);
                     }
                     
                     correctMatches++;
-                    checkLevelComplete();
+                    checkLevelComplete(); // ★改善点：毎回レベルクリアかチェック
 
                 } else {
+                    // --- 不正解 ---
                     feedbackEl.textContent = 'ちがうよ、もういちど！';
                     feedbackEl.classList.remove('success');
+                    
+                    // 「1問でも間違えていれば合うまでする」
+                    // → アイテムを戻さないので、これでOK
                 }
             }
 
             // --- 7. レベルクリアのチェック ---
-            // (変更なし)
+            // ★改善点：自動で次のレベルに進むロジック
             function checkLevelComplete() {
-                if (correctMatches === currentLevelWords.length) {
-                    levelTitleEl.textContent = `レベルクリア！おめでとう！`;
-                    feedbackEl.textContent = 'すべて かんぺき！';
-                    feedbackEl.classList.add('success');
+                if (correctMatches !== currentLevelWords.length) {
+                    return; // まだ全部正解していない
+                }
+
+                // 全問正解！
+                feedbackEl.textContent = 'レベルクリア！';
+                feedbackEl.classList.add('success');
+                resetPlacedButton.style.display = 'none'; // リセットボタンを隠す
+
+                // 次のレベルを探す
+                const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
+                const nextLevelIndex = currentLevelIndex + 1;
+
+                if (nextLevelIndex < gameLevels.length) {
+                    // 次のレベルがある
+                    const nextLevelData = gameLevels[nextLevelIndex];
+                    levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
+                    
+                    // 2秒待ってから次のレベルを読み込む
+                    setTimeout(() => {
+                        loadLevel(nextLevelData);
+                    }, 2000);
+
+                } else {
+                    // 最終レベルをクリア
+                    levelTitleEl.textContent = 'ぜんぶクリア！';
+                    feedbackEl.textContent = '全レベル おめでとうございます！';
                 }
             }
 
             // --- 8. ユーティリティ (配列シャッフル) ---
-            // (変更なし)
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
