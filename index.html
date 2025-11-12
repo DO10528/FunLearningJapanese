@@ -6,6 +6,13 @@
 <title>Fun Learning Japanese - Free Games for Beginners</title>
 <meta name="description" content="Learn Hiragana, Katakana, Kanji, and grammar with fun, free Japanese learning games! Perfect for beginners.">
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5c7aff">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FunLearnJP">
+<link rel="apple-touch-icon" href="images/icons/icon-192x192.png"> 
 <link rel="stylesheet" href="css/style.css">
 <style>
 /* メインコンテナ（白）の中のグループ分け */
@@ -107,5 +114,20 @@ margin-bottom: 20px;
 <div id="game-area" class="container" style="display:none;">
 <p>ゲームを読み込んでいます...</p>
 </div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('ServiceWorker registered: ', registration);
+        })
+        .catch(registrationError => {
+          console.log('ServiceWorker registration failed: ', registrationError);
+        });
+    });
+  }
+</script>
+
 </body>
 </html>
