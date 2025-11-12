@@ -292,9 +292,9 @@
 
             // --- 1. データ定義 ---
             
-            // ★変更点：カタカナ用のイラストパスを仮定
-            // (もしフォルダ名が違えば、ここを修正してください)
-            const ILLUSTRATION_PATH_PREFIX = '/assets/images/katakana_words/';
+            // ★★★ 修正箇所 ★★★
+            // ルートスラッシュ (/) を削除し、相対パス 'assets/images/katakana_words/' に変更
+            const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
             // ★変更点：PDF からカタカナの単語リストを作成
@@ -337,9 +337,8 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                // ★★★ ここを修正しました！ ★★★
-                // 「ホームにもどる」ボタンが index.html に戻るように修正
-                homeButton.onclick = () => window.location.href = 'index.html';
+                // 「ホームにもどる」ボタンが レベル選択画面 に戻るように修正
+                homeButton.onclick = () => showLevelSelect();
             }
             
             // レベル選択画面を表示する関数
@@ -398,6 +397,7 @@
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
                     const img = document.createElement('img');
+                    // ★★★ 修正後のパスを使用 ★★★
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     img.draggable = false; 
@@ -454,7 +454,7 @@
                         target.classList.add('drag-over');
                     });
                     target.addEventListener('dragleave', () => {
-                        target.classList.remove('drag-leave');
+                        target.classList.remove('drag-over');
                     });
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
