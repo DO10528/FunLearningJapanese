@@ -1,0 +1,10 @@
+# Node.js
+/node_modules/
+*.log
+
+# Capacitor
+/ios/
+/android/
+
+# macOS
+.DS_Store
