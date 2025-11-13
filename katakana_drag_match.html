@@ -10,10 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* * スタイルは ひらがな版(dm-) と全く同じですが、
-         * IDとクラス名を カタカナ版(km-) に変更し、
-         * コードが衝突しないようにしています。
-         */
+        /* (スタイルシートは変更なしのため省略) */
         
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
@@ -286,19 +283,18 @@
         </div>
     </div>
 
+    <audio id="km-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
+    <audio id="km-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
             
-            // ★★★ 修正箇所 ★★★
-            // ルートスラッシュ (/) を削除し、相対パス 'assets/images/katakana_words/' に変更
             const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
-            // ★変更点：PDF からカタカナの単語リストを作成
-            // (ファイル名もカタカナ「アイス.png」を仮定しています)
             const gameLevels = [
                 { level: 1, words: [ { hira: 'アイス', file: 'アイス' }, { hira: 'イヤホン', file: 'イヤホン' }, { hira: 'ウインナー', file: 'ウインナー' }, { hira: 'エプロン', file: 'エプロン' }, { hira: 'オムライス', file: 'オムライス' } ] },
                 { level: 2, words: [ { hira: 'カレンダー', file: 'カレンダー' }, { hira: 'キャベツ', file: 'キャベツ' }, { hira: 'クレヨン', file: 'クレヨン' }, { hira: 'ケーキ', file: 'ケーキ' }, { hira: 'コップ', file: 'コップ' } ] },
@@ -312,7 +308,6 @@
             ];
 
             // --- 2. HTML要素の取得 ---
-            // (すべて 'km-' プレフィックスに変更)
             const mainTitleEl = document.getElementById('km-main-title'); 
             const levelSelectionEl = document.getElementById('km-level-selection');
             const levelTitleEl = document.getElementById('km-level-title');
@@ -323,25 +318,27 @@
             const resetPlacedButton = document.getElementById('km-reset-placed-button');
             const homeButton = document.getElementById('km-home-button'); 
 
+            // ★★★ 修正箇所: サウンド要素を取得 ★★★
+            const soundCorrect = document.getElementById('km-sound-correct');
+            const soundIncorrect = document.getElementById('km-sound-incorrect');
+
+
             let currentLevelData = null; 
             let currentLevelWords = [];
-            let correctMatches = 0;
+            let correctMatches = 0; // すべてのレベルチェックに使用するため、ドロップ判定では使わない
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
                 gameLevels.forEach(levelData => {
                     const button = document.createElement('button');
-                    // ★変更点：レベル9までしかない場合に対応
                     button.textContent = `レベル ${levelData.level}`;
                     button.onclick = () => loadLevel(levelData);
                     levelSelectionEl.appendChild(button);
                 });
                 
-                // 「ホームにもどる」ボタンが レベル選択画面 に戻るように修正
                 homeButton.onclick = () => showLevelSelect();
             }
             
-            // レベル選択画面を表示する関数
             function showLevelSelect() {
                 gameAreaEl.style.display = 'none';
                 levelTitleEl.textContent = '';
@@ -382,6 +379,10 @@
                     const dropTarget = document.createElement('div');
                     dropTarget.className = 'km-drop-target';
                     dropTarget.dataset.word = wordData.hira; // hiraプロパティ（カタカナ単語）を使用
+                    
+                    // ★修正箇所: ドロップターゲットに固有IDを追加し、元の位置に戻すときに使えるようにする
+                    dropTarget.id = `km-target-${wordData.hira}`; 
+                    
                     const label = document.createElement('span');
                     label.className = 'km-word-label';
                     label.textContent = wordData.hira;
@@ -396,8 +397,12 @@
                     item.className = 'km-drag-item';
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
+                    
+                    // ★修正箇所: ドラッグアイテムに固有IDと初期位置（プール）情報を持たせる
+                    item.id = `km-item-${wordData.hira}`; 
+                    item.dataset.initialParentId = 'km-illust-pool';
+                    
                     const img = document.createElement('img');
-                    // ★★★ 修正後のパスを使用 ★★★
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     img.draggable = false; 
@@ -411,19 +416,19 @@
             
             // 置いたイラストを元に戻す関数
             function resetPlacedItems() {
-                const matchedItems = document.querySelectorAll('.km-drag-item');
-                const correctDropZones = document.querySelectorAll('.km-drop-target.correct');
-                matchedItems.forEach(item => {
-                    if (item.parentElement.classList.contains('km-drop-target')) {
-                        item.draggable = true;
-                        illustPoolEl.appendChild(item); 
+                const dropTargets = document.querySelectorAll('.km-drop-target');
+                dropTargets.forEach(zone => {
+                    // ドロップゾーン内のイラストアイテムを探す
+                    const placedItem = zone.querySelector('.km-drag-item');
+                    if (placedItem) {
+                        // プールに戻す
+                        illustPoolEl.appendChild(placedItem); 
+                        placedItem.draggable = true;
                     }
-                });
-                correctDropZones.forEach(zone => {
                     zone.classList.remove('correct');
-                    zone.innerHTML = ''; 
+                    zone.innerHTML = ''; // HTMLをクリアすることでドロップゾーンから完全に削除
                 });
-                correctMatches = 0;
+                // correctMatches = 0; // この変数も全体チェックのために不要に
                 feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
             }
@@ -433,21 +438,30 @@
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.km-drag-item');
                 const dropTargets = document.querySelectorAll('.km-drop-target');
+                
+                // ドロップ時のアニメーション制御用変数
+                let currentDragItem = null;
+
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
                         if (!item.draggable) { 
                             e.preventDefault(); return;
                         }
                         e.dataTransfer.setData('text/plain', item.dataset.word);
+                        // ★修正箇所: ドロップ時に元の場所から消えるのではなく、半透明にする
+                        currentDragItem = item; 
                         setTimeout(() => item.style.opacity = '0.5', 0);
                     });
                     item.addEventListener('dragend', (e) => {
-                        item.style.opacity = '1';
+                        // ドロップが成功したかどうかに関わらず、ドラッグ終了時に不透明度を元に戻す
+                        e.target.style.opacity = '1';
                     });
                 });
+
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
-                        if (target.classList.contains('correct')) {
+                        // すでにドロップされている場合はドロップを拒否
+                        if (target.querySelector('.km-drag-item')) {
                             return;
                         }
                         e.preventDefault();
@@ -459,55 +473,113 @@
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
                         target.classList.remove('drag-over');
-                        if (target.classList.contains('correct')) {
+                        
+                        // すでにドロップされている場合はドロップを拒否
+                        if (target.querySelector('.km-drag-item')) {
                             return;
                         }
+                        
                         const droppedWord = e.dataTransfer.getData('text/plain');
                         const targetWord = target.dataset.word;
-                        checkMatch(droppedWord, targetWord, target);
+                        const matchingDragItem = document.getElementById(`km-item-${droppedWord}`);
+
+                        if (matchingDragItem) {
+                            checkMatch(droppedWord, targetWord, target, matchingDragItem);
+                        }
                     });
                 });
             }
 
-            // --- 6. 答えのチェック ---
-            function checkMatch(droppedWord, targetWord, targetElement) {
+            // --- 6. 答えのチェック (ドロップ時) ---
+            function checkMatch(droppedWord, targetWord, targetElement, dragItem) {
                 if (droppedWord === targetWord) {
+                    // ★★★ 修正箇所: 正解音を再生 ★★★
+                    soundCorrect.currentTime = 0;
+                    soundCorrect.play();
+                    
                     feedbackEl.textContent = 'せいかい！';
                     feedbackEl.classList.add('success');
+                    
+                    // 配置を確定
                     targetElement.classList.add('correct');
                     targetElement.innerHTML = ''; 
-                    const matchingDragItem = document.querySelector(`.km-drag-item[data-word="${droppedWord}"]`);
-                    if (matchingDragItem) {
-                        matchingDragItem.draggable = false;
-                        targetElement.appendChild(matchingDragItem);
-                    }
-                    correctMatches++;
+                    dragItem.draggable = false; // 正しく置かれたアイテムはもう動かせない
+                    targetElement.appendChild(dragItem);
+                    
+                    // ★★★ 修正箇所: ドロップが成功したら全体のクリアチェックへ進む ★★★
                     checkLevelComplete(); 
                 } else {
+                    // ★★★ 修正箇所: 不正解音を再生 ★★★
+                    soundIncorrect.currentTime = 0;
+                    soundIncorrect.play();
+                    
                     feedbackEl.textContent = 'ちがうよ、もういちど！';
                     feedbackEl.classList.remove('success');
+                    
+                    // 不正解の場合は、アイテムは元の場所に戻る（dragend で opacity が 1 に戻る）
+                    // 何もドロップゾーンに追加しないことで、元の場所（プール）に残ったままになる
                 }
             }
 
-            // --- 7. レベルクリアのチェック ---
+            // --- 7. レベルクリアのチェック (全問正解までリトライ) ---
             function checkLevelComplete() {
-                if (correctMatches !== currentLevelWords.length) {
+                const totalWords = currentLevelWords.length;
+                let correctCount = 0;
+                
+                // 全てのドロップターゲットをチェック
+                const dropTargets = document.querySelectorAll('.km-drop-target');
+                
+                // ドロップターゲットの数と単語の数が一致することを前提とする
+                if (dropTargets.length !== totalWords) {
+                    // 通常起こりえないが、念のため
                     return; 
                 }
-                feedbackEl.textContent = 'レベルクリア！';
-                feedbackEl.classList.add('success');
-                resetPlacedButton.style.display = 'none'; 
-                const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
-                const nextLevelIndex = currentLevelIndex + 1;
-                if (nextLevelIndex < gameLevels.length) {
-                    const nextLevelData = gameLevels[nextLevelIndex];
-                    levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
-                    setTimeout(() => {
-                        loadLevel(nextLevelData);
-                    }, 2000);
+                
+                dropTargets.forEach(target => {
+                    const placedItem = target.querySelector('.km-drag-item');
+                    
+                    // 1. まずドロップされているかチェック
+                    if (placedItem) {
+                        const targetWord = target.dataset.word;
+                        const placedWord = placedItem.dataset.word;
+                        
+                        // 2. 正しいイラストが置かれているかチェック
+                        if (targetWord === placedWord) {
+                            correctCount++;
+                        } else {
+                            // 正しい場所に置かれていないイラストがある場合は即座にリターン
+                            // ただし、このコードではcheckMatchで不正解ならドロップが完了しないため、
+                            // placedItemがある＝正しいイラストが置かれている、となるはず
+                            // 念のためこのロジックは残さない
+                        }
+                    }
+                });
+
+                // ★★★ 修正箇所: 全てのイラストが正しく配置された場合のみクリア ★★★
+                if (correctCount === totalWords) {
+                    // 全問正解時の処理
+                    levelTitleEl.textContent = 'レベルクリア！';
+                    feedbackEl.textContent = 'おめでとうございます！ぜんぶせいかい！';
+                    feedbackEl.classList.add('success');
+                    resetPlacedButton.style.display = 'none'; 
+                    
+                    // 次のレベルへ自動で進む処理
+                    const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
+                    const nextLevelIndex = currentLevelIndex + 1;
+                    if (nextLevelIndex < gameLevels.length) {
+                        const nextLevelData = gameLevels[nextLevelIndex];
+                        levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
+                        setTimeout(() => {
+                            loadLevel(nextLevelData);
+                        }, 2000); // 2秒後に次のレベルへ
+                    } else {
+                        levelTitleEl.textContent = 'ぜんぶクリア！';
+                        feedbackEl.textContent = '全レベル おめでとうございます！';
+                    }
                 } else {
-                    levelTitleEl.textContent = 'ぜんぶクリア！';
-                    feedbackEl.textContent = '全レベル おめでとうございます！';
+                    // まだ全部置かれていない、またはリトライが必要な状態
+                    feedbackEl.textContent = `あと${totalWords - correctCount}こだよ。`;
+                    feedbackEl.classList.remove('success');
                 }
             }
 
