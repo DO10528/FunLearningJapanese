@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* (スタイルシートは変更なしのため省略) */
+        /* (基本スタイルは変更なし) */
         
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
@@ -152,13 +152,23 @@
         .km-drop-target.drag-over {
             background-color: #e6f7ff; border-color: #5c7aff; border-style: solid;
         }
+        
+        /* ★★★ 修正箇所: 正解/不正解のスタイルを定義 ★★★ */
         .km-drop-target.correct {
             border: 3px solid #28a745; background-color: #e6ffed; padding: 0;
         }
-        .km-drop-target.correct .km-drag-item {
+        /* ★★★ 追加: 間違ったスロットのスタイル ★★★ */
+        .km-drop-target.wrong {
+            border: 3px solid #d9534f; background-color: #ffe6e6; padding: 0;
+        }
+
+        /* 配置されたアイテムの共通スタイル */
+        .km-drop-target.correct .km-drag-item,
+        .km-drop-target.wrong .km-drag-item {
             width: 100%; height: 100%; margin: 0; box-shadow: none;
             border: none; opacity: 1 !important; cursor: not-allowed;
         }
+
         #km-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
             margin-top: 20px; min-height: 1.3em; color: #d9534f;
@@ -275,7 +285,7 @@
 
         <div id="km-feedback"></div>
 
-        <div class="km-button-area">
+        <div classs="km-button-area">
             <button id="km-reset-placed-button" class="km-button km-button-reset" style="display: none;">
                 イラストをもどす
             </button>
@@ -318,14 +328,12 @@
             const resetPlacedButton = document.getElementById('km-reset-placed-button');
             const homeButton = document.getElementById('km-home-button'); 
 
-            // ★★★ 修正箇所: サウンド要素を取得 ★★★
             const soundCorrect = document.getElementById('km-sound-correct');
             const soundIncorrect = document.getElementById('km-sound-incorrect');
 
 
             let currentLevelData = null; 
             let currentLevelWords = [];
-            let correctMatches = 0; // すべてのレベルチェックに使用するため、ドロップ判定では使わない
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
@@ -356,7 +364,6 @@
                 
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
-                correctMatches = 0;
 
                 levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
                 feedbackEl.textContent = '';
@@ -378,9 +385,7 @@
                     row.className = 'km-word-row';
                     const dropTarget = document.createElement('div');
                     dropTarget.className = 'km-drop-target';
-                    dropTarget.dataset.word = wordData.hira; // hiraプロパティ（カタカナ単語）を使用
-                    
-                    // ★修正箇所: ドロップターゲットに固有IDを追加し、元の位置に戻すときに使えるようにする
+                    dropTarget.dataset.word = wordData.hira; 
                     dropTarget.id = `km-target-${wordData.hira}`; 
                     
                     const label = document.createElement('span');
@@ -397,8 +402,6 @@
                     item.className = 'km-drag-item';
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
-                    
-                    // ★修正箇所: ドラッグアイテムに固有IDと初期位置（プール）情報を持たせる
                     item.id = `km-item-${wordData.hira}`; 
                     item.dataset.initialParentId = 'km-illust-pool';
                     
@@ -414,22 +417,25 @@
                 addDragDropListeners();
             }
             
+            // ★★★ 修正箇所: 「もどす」ボタンのロジック ★★★
             // 置いたイラストを元に戻す関数
             function resetPlacedItems() {
                 const dropTargets = document.querySelectorAll('.km-drop-target');
                 dropTargets.forEach(zone => {
-                    // ドロップゾーン内のイラストアイテムを探す
+                    // スロット内のアイテムを探す
                     const placedItem = zone.querySelector('.km-drag-item');
                     if (placedItem) {
                         // プールに戻す
                         illustPoolEl.appendChild(placedItem); 
+                        // ★★★ 修正箇所: 再度ドラッグできるようにする ★★★
                         placedItem.draggable = true;
                     }
+                    // スタイルのリセット
                     zone.classList.remove('correct');
-                    zone.innerHTML = ''; // HTMLをクリアすることでドロップゾーンから完全に削除
+                    zone.classList.remove('wrong'); // wrongスタイルも削除
+                    zone.innerHTML = ''; 
                 });
-                // correctMatches = 0; // この変数も全体チェックのために不要に
-                feedbackEl.textContent = 'イラストをもどしました。';
+                feedbackEl.textContent = 'イラストをもどしました。やりなおしてね。';
                 feedbackEl.classList.remove('success');
             }
 
@@ -439,28 +445,23 @@
                 const dragItems = document.querySelectorAll('.km-drag-item');
                 const dropTargets = document.querySelectorAll('.km-drop-target');
                 
-                // ドロップ時のアニメーション制御用変数
-                let currentDragItem = null;
-
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
                         if (!item.draggable) { 
                             e.preventDefault(); return;
                         }
-                        e.dataTransfer.setData('text/plain', item.dataset.word);
-                        // ★修正箇所: ドロップ時に元の場所から消えるのではなく、半透明にする
-                        currentDragItem = item; 
+                        // ★修正箇所: IDを渡すように変更（単語が重複しても大丈夫なように）
+                        e.dataTransfer.setData('text/plain', item.id);
                         setTimeout(() => item.style.opacity = '0.5', 0);
                     });
                     item.addEventListener('dragend', (e) => {
-                        // ドロップが成功したかどうかに関わらず、ドラッグ終了時に不透明度を元に戻す
                         e.target.style.opacity = '1';
                     });
                 });
 
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
-                        // すでにドロップされている場合はドロップを拒否
+                        // スロットが空の場合のみドロップを許可
                         if (target.querySelector('.km-drag-item')) {
                             return;
                         }
@@ -470,102 +471,92 @@
                     target.addEventListener('dragleave', () => {
                         target.classList.remove('drag-over');
                     });
+                    
+                    // ★★★ 修正箇所: ドロップ時のロジック (checkMatchを廃止) ★★★
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
                         target.classList.remove('drag-over');
                         
-                        // すでにドロップされている場合はドロップを拒否
+                        // スロットが空でない場合はドロップを拒否
                         if (target.querySelector('.km-drag-item')) {
                             return;
                         }
                         
-                        const droppedWord = e.dataTransfer.getData('text/plain');
-                        const targetWord = target.dataset.word;
-                        const matchingDragItem = document.getElementById(`km-item-${droppedWord}`);
+                        const dragItemId = e.dataTransfer.getData('text/plain');
+                        const dragItem = document.getElementById(dragItemId);
 
-                        if (matchingDragItem) {
-                            checkMatch(droppedWord, targetWord, target, matchingDragItem);
+                        if (dragItem) {
+                            // 正解/不正解に関わらず、アイテムをスロットに配置する
+                            target.innerHTML = ''; // 念のためクリア
+                            target.appendChild(dragItem);
+                            dragItem.draggable = false; // 配置したら動かせなくする
+                            
+                            // ★★★ 修正箇所: 音は鳴らさず、最終チェックのみ呼び出す ★★★
+                            checkFinalAnswers();
                         }
                     });
                 });
             }
 
-            // --- 6. 答えのチェック (ドロップ時) ---
-            function checkMatch(droppedWord, targetWord, targetElement, dragItem) {
-                if (droppedWord === targetWord) {
-                    // ★★★ 修正箇所: 正解音を再生 ★★★
-                    soundCorrect.currentTime = 0;
-                    soundCorrect.play();
-                    
-                    feedbackEl.textContent = 'せいかい！';
-                    feedbackEl.classList.add('success');
-                    
-                    // 配置を確定
-                    targetElement.classList.add('correct');
-                    targetElement.innerHTML = ''; 
-                    dragItem.draggable = false; // 正しく置かれたアイテムはもう動かせない
-                    targetElement.appendChild(dragItem);
-                    
-                    // ★★★ 修正箇所: ドロップが成功したら全体のクリアチェックへ進む ★★★
-                    checkLevelComplete(); 
-                } else {
-                    // ★★★ 修正箇所: 不正解音を再生 ★★★
-                    soundIncorrect.currentTime = 0;
-                    soundIncorrect.play();
-                    
-                    feedbackEl.textContent = 'ちがうよ、もういちど！';
-                    feedbackEl.classList.remove('success');
-                    
-                    // 不正解の場合は、アイテムは元の場所に戻る（dragend で opacity が 1 に戻る）
-                    // 何もドロップゾーンに追加しないことで、元の場所（プール）に残ったままになる
-                }
-            }
+            // --- 6. (checkMatch() は削除) ---
 
+            // ★★★ 修正箇所: 最終判定ロジックを新設 ★★★
             // --- 7. レベルクリアのチェック (全問正解までリトライ) ---
-            function checkLevelComplete() {
-                const totalWords = currentLevelWords.length;
-                let correctCount = 0;
-                
-                // 全てのドロップターゲットをチェック
+            function checkFinalAnswers() {
                 const dropTargets = document.querySelectorAll('.km-drop-target');
-                
-                // ドロップターゲットの数と単語の数が一致することを前提とする
-                if (dropTargets.length !== totalWords) {
-                    // 通常起こりえないが、念のため
-                    return; 
-                }
-                
+                const totalTargets = currentLevelWords.length;
+                let filledCount = 0;
+                let allCorrect = true;
+
+                // 1. まず、すべてのスロットが埋まっているか確認
                 dropTargets.forEach(target => {
-                    const placedItem = target.querySelector('.km-drag-item');
-                    
-                    // 1. まずドロップされているかチェック
-                    if (placedItem) {
-                        const targetWord = target.dataset.word;
-                        const placedWord = placedItem.dataset.word;
-                        
-                        // 2. 正しいイラストが置かれているかチェック
-                        if (targetWord === placedWord) {
-                            correctCount++;
-                        } else {
-                            // 正しい場所に置かれていないイラストがある場合は即座にリターン
-                            // ただし、このコードではcheckMatchで不正解ならドロップが完了しないため、
-                            // placedItemがある＝正しいイラストが置かれている、となるはず
-                            // 念のためこのロジックは残さない
-                        }
+                    if (target.querySelector('.km-drag-item')) {
+                        filledCount++;
                     }
                 });
 
-                // ★★★ 修正箇所: 全てのイラストが正しく配置された場合のみクリア ★★★
-                if (correctCount === totalWords) {
-                    // 全問正解時の処理
+                // 2. スロットがすべて埋まっていない場合（5枚目が置かれていない）は、何もせず終了
+                if (filledCount < totalTargets) {
+                    feedbackEl.textContent = `あと ${totalTargets - filledCount} こ。`;
+                    feedbackEl.classList.remove('success');
+                    return; 
+                }
+
+                // 3. スロットがすべて埋まった場合 (filledCount === totalTargets)
+                //    ここですべての答え合わせを実行
+                
+                dropTargets.forEach(target => {
+                    const placedItem = target.querySelector('.km-drag-item');
+                    const targetWord = target.dataset.word;
+                    const placedWord = placedItem.dataset.word;
+                    
+                    if (targetWord === placedWord) {
+                        // 正解スロットのスタイル
+                        target.classList.add('correct');
+                        target.classList.remove('wrong');
+                    } else {
+                        // 不正解スロットのスタイル
+                        target.classList.add('wrong');
+                        target.classList.remove('correct');
+                        allCorrect = false; // 1つでも間違っていればフラグをfalseに
+                    }
+                });
+
+                // 4. 最終判定結果に基づいて音とフィードバックを出す
+                if (allCorrect) {
+                    // ★ 全問正解
+                    soundCorrect.currentTime = 0;
+                    soundCorrect.play();
+                    
                     levelTitleEl.textContent = 'レベルクリア！';
                     feedbackEl.textContent = 'おめでとうございます！ぜんぶせいかい！';
                     feedbackEl.classList.add('success');
-                    resetPlacedButton.style.display = 'none'; 
+                    resetPlacedButton.style.display = 'none'; // やり直しボタンを隠す
                     
-                    // 次のレベルへ自動で進む処理
+                    // 次のレベルへ進む処理
                     const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
                     const nextLevelIndex = currentLevelIndex + 1;
+                    
                     if (nextLevelIndex < gameLevels.length) {
                         const nextLevelData = gameLevels[nextLevelIndex];
                         levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
@@ -576,10 +567,15 @@
                         levelTitleEl.textContent = 'ぜんぶクリア！';
                         feedbackEl.textContent = '全レベル おめでとうございます！';
                     }
+                    
                 } else {
-                    // まだ全部置かれていない、またはリトライが必要な状態
-                    feedbackEl.textContent = `あと${totalWords - correctCount}こだよ。`;
+                    // ★ 1つでも間違いがある
+                    soundIncorrect.currentTime = 0;
+                    soundIncorrect.play();
+                    
+                    feedbackEl.textContent = 'ちがうところがあるよ。ボタンでもどして、やりなおしてね。';
                     feedbackEl.classList.remove('success');
+                    // この状態では「イラストをもどす」ボタンが押されるのを待つ
                 }
             }
 
