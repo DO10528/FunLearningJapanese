@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* (基本スタイルは変更なし) */
+        /* (スタイルは変更なしのため省略) */
         
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
@@ -153,26 +153,27 @@
             background-color: #e6f7ff; border-color: #5c7aff; border-style: solid;
         }
         
-        /* ★★★ 修正箇所: 正解時のスタイルのみ定義 ★★★ */
         .km-drop-target.correct {
             border: 3px solid #28a745; background-color: #e6ffed; padding: 0;
         }
         
-        /* ★★★ 修正箇所: .wrong のスタイルを削除 ★★★ */
-        /* ( .wrong の定義は削除されました ) */
-
-        /* 配置されたアイテムのスタイル (正解時のみ適用) */
+        /* 配置されたアイテムのスタイル (正解時) */
         .km-drop-target.correct .km-drag-item {
             width: 100%; height: 100%; margin: 0; box-shadow: none;
             border: none; opacity: 1 !important; cursor: not-allowed;
         }
         
-        /* ★★★ 追加: 不正解時（まだ正解していない）に配置されたアイテムのスタイル ★★★ */
+        /* 配置されたアイテムのスタイル (未判定時) */
         .km-drop-target .km-drag-item {
              width: 100%; height: 100%; margin: 0; box-shadow: none;
-            border: none; opacity: 1 !important; cursor: not-allowed;
+            border: none; opacity: 1 !important; 
+            /* ★★★ 修正箇所 2-1: 配置されたアイテムをクリックできるようにカーソルを変更 ★★★ */
+            cursor: pointer; 
         }
-
+        /* ドラッグ中のアイテムはクリックできないようにする */
+        .km-drag-item:active {
+            cursor: grabbing;
+        }
 
         #km-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
@@ -349,7 +350,11 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                homeButton.onclick = () => showLevelSelect();
+                // ★★★ 修正箇所 1-1: 初期状態（レベル選択画面）のホームボタンの動作 ★★★
+                // 'index.html' は、ひらがな/カタカナを選ぶメインページを想定しています
+                homeButton.onclick = () => {
+                    window.location.href = 'index.html'; 
+                };
             }
             
             function showLevelSelect() {
@@ -360,6 +365,11 @@
                 
                 levelSelectionEl.style.display = 'grid'; 
                 mainTitleEl.style.display = 'block';
+
+                // ★★★ 修正箇所 1-2: レベル選択画面に戻った際、ホームボタンの動作をメインページに戻るように設定 ★★★
+                homeButton.onclick = () => {
+                    window.location.href = 'index.html';
+                };
             }
 
             // --- 4. レベル読み込み ---
@@ -375,8 +385,12 @@
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
                 
-                resetPlacedButton.style.display = 'inline-block';
-                resetPlacedButton.onclick = resetPlacedItems; 
+                // ★★★ 修正箇所 2: 「イラストをもどす」ボタンは使わないので非表示のまま ★★★
+                resetPlacedButton.style.display = 'none';
+                // resetPlacedButton.onclick = resetPlacedItems; // ← この行を削除
+
+                // ★★★ 修正箇所 1-3: ゲーム中のホームボタンは「レベル選択」に戻るように設定 ★★★
+                homeButton.onclick = () => showLevelSelect();
 
                 illustPoolEl.innerHTML = '';
                 wordListEl.innerHTML = '';
@@ -422,21 +436,38 @@
                 addDragDropListeners();
             }
             
-            // 「もどす」ボタンのロジック
-            function resetPlacedItems() {
-                const dropTargets = document.querySelectorAll('.km-drop-target');
-                dropTargets.forEach(zone => {
-                    const placedItem = zone.querySelector('.km-drag-item');
-                    if (placedItem) {
-                        illustPoolEl.appendChild(placedItem); 
-                        placedItem.draggable = true;
-                    }
-                    // ★★★ 修正箇所: .correct スタイルのみリセット ★★★
-                    zone.classList.remove('correct'); 
-                    zone.innerHTML = ''; 
-                });
-                feedbackEl.textContent = 'イラストをもどしました。やりなおしてね。';
+            // ★★★ 修正箇所 2: 「resetPlacedItems」関数は不要になったため削除 ★★★
+            // (関数全体を削除)
+
+            // ★★★ 修正箇所 2: 新しい関数 (クリックでアイテムをプールに戻す) ★★★
+            function returnItemToPool(event) {
+                // event.currentTarget はクリックされた .km-drag-item
+                const itemToReturn = event.currentTarget; 
+                const parentTarget = itemToReturn.parentElement;
+
+                // 1. プール（km-illust-pool）に戻す
+                illustPoolEl.appendChild(itemToReturn);
+                
+                // 2. 再度ドラッグできるようにする
+                itemToReturn.draggable = true;
+                
+                // 3. スロットに配置された時に追加したクリックイベントを削除
+                itemToReturn.removeEventListener('click', returnItemToPool);
+                
+                // 4. 親スロット（ドロップターゲット）のスタイルをリセット
+                if (parentTarget && parentTarget.classList.contains('km-drop-target')) {
+                    parentTarget.classList.remove('correct');
+                    // アイテムが移動したので、スロットは自動的に空になる
+                }
+
+                // 5. 判定をリセットし、フィードバックを更新
+                // （5枚揃っていない状態に戻る）
+                feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
+                
+                // 6. 「もどす」操作は不正解（リセット）扱いとして音を鳴らす
+                soundIncorrect.currentTime = 0;
+                soundIncorrect.play();
             }
 
 
@@ -484,8 +515,12 @@
                         if (dragItem) {
                             target.innerHTML = ''; 
                             target.appendChild(dragItem);
-                            dragItem.draggable = false; 
+                            dragItem.draggable = false; // 配置したらドラッグ不可
                             
+                            // ★★★ 修正箇所 2: 配置したアイテムに「クリックで戻る」機能を追加 ★★★
+                            dragItem.addEventListener('click', returnItemToPool);
+                            
+                            // 5枚揃ったかどうかの最終チェック
                             checkFinalAnswers();
                         }
                     });
@@ -494,8 +529,7 @@
 
             // --- 6. (checkMatch() は削除) ---
 
-            // ★★★ 修正箇所: 最終判定ロジック ★★★
-            // --- 7. レベルクリアのチェック (全問正解までリトライ) ---
+            // --- 7. 最終判定ロジック (変更なし) ---
             function checkFinalAnswers() {
                 const dropTargets = document.querySelectorAll('.km-drop-target');
                 const totalTargets = currentLevelWords.length;
@@ -509,7 +543,7 @@
                     }
                 });
 
-                // 2. スロットがすべて埋まっていない場合（5枚目が置かれていない）は、何もせず終了
+                // 2. スロットがすべて埋まっていない場合は終了
                 if (filledCount < totalTargets) {
                     feedbackEl.textContent = `あと ${totalTargets - filledCount} こ。`;
                     feedbackEl.classList.remove('success');
@@ -517,27 +551,31 @@
                 }
 
                 // 3. スロットがすべて埋まった場合 (filledCount === totalTargets)
-                //    答え合わせを実行（ただし、見た目はまだ変えない）
-                
+                //    答え合わせを実行
                 dropTargets.forEach(target => {
                     const placedItem = target.querySelector('.km-drag-item');
                     const targetWord = target.dataset.word;
                     const placedWord = placedItem.dataset.word;
                     
                     if (targetWord !== placedWord) {
-                        allCorrect = false; // 1つでも間違っていればフラグをfalseに
+                        allCorrect = false; 
                     }
                 });
 
-                // 4. 最終判定結果に基づいて音とフィードバックを出す
+                // 4. 最終判定結果
                 if (allCorrect) {
                     // ★ 全問正解
                     soundCorrect.currentTime = 0;
                     soundCorrect.play();
                     
-                    // ★ この時点で初めて、すべてのスロットを「正解」の見た目にする
                     dropTargets.forEach(target => {
                          target.classList.add('correct');
+                         // ★★★ 修正箇所 2: 正解確定後、もうクリックで戻せないようにイベント削除 ★★★
+                         const placedItem = target.querySelector('.km-drag-item');
+                         if (placedItem) {
+                             placedItem.removeEventListener('click', returnItemToPool);
+                             placedItem.style.cursor = 'not-allowed'; // カーソルも変更
+                         }
                     });
                     
                     levelTitleEl.textContent = 'レベルクリア！';
@@ -545,7 +583,7 @@
                     feedbackEl.classList.add('success');
                     resetPlacedButton.style.display = 'none'; 
                     
-                    // 次のレベルへ進む処理
+                    // 次のレベルへ
                     const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
                     const nextLevelIndex = currentLevelIndex + 1;
                     
@@ -565,8 +603,7 @@
                     soundIncorrect.currentTime = 0;
                     soundIncorrect.play();
                     
-                    // ★ 見た目は一切変更しない
-                    feedbackEl.textContent = 'ちがうところがあるよ。ボタンでもどして、やりなおしてね。';
+                    feedbackEl.textContent = 'ちがうところがあるよ。まちがっているイラストをクリックして、もどしてね。';
                     feedbackEl.classList.remove('success');
                 }
             }
