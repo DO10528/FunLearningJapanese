@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* 全体に丸いフォントと、優しい背景グラデーションを設定 */
+        /* (スタイルは変更なしのため省略) */
+        
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
             background: linear-gradient(180deg, #f0f8ff 0%, #cce7ff 100%);
@@ -22,8 +23,8 @@
             box-sizing: border-box;
         }
 
-        /* コンテナをより丸く、柔らかい影に変更 */
-        #dm-container {
+        /* IDとクラス名を km- から hg- に変更 */
+        #hg-container {
             width: 100%;
             max-width: 800px;
             margin: 20px auto;
@@ -34,8 +35,7 @@
             border: none; 
         }
 
-        /* タイトルを大きく、太く */
-        #dm-container h1 {
+        #hg-container h1 {
             text-align: center;
             color: #005bb5;
             font-weight: 800; 
@@ -44,97 +44,84 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
         
-        #dm-container h2 {
+        #hg-container h2 {
             text-align: center;
             color: #5c7aff;
         }
 
-        /* --- レベル選択を3列のグリッドに変更 --- */
-        #dm-level-selection {
+        /* --- レベル選択 --- */
+        #hg-level-selection {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3列に配置 */
+            grid-template-columns: repeat(3, 1fr); 
             gap: 20px; 
             margin-bottom: 30px;
         }
 
-        /* カラフルで「押したくなる」ボタンデザイン */
-        #dm-level-selection button {
+        /* レベルボタン */
+        #hg-level-selection button {
             padding: 20px;
             font-size: 1.5em;
             font-weight: 700;
             color: #fff;
             border: none;
-            border-radius: 15px; /* 丸み */
+            border-radius: 15px;
             cursor: pointer;
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-bottom: 5px solid rgba(0,0,0,0.15);
         }
-
-        #dm-level-selection button:hover {
-            transform: scale(1.05) translateY(-2px); /* 少し浮き上がる */
+        #hg-level-selection button:hover {
+            transform: scale(1.05) translateY(-2px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-
-        #dm-level-selection button:active {
-            transform: scale(1.0) translateY(2px); /* 押した感じ */
+        #hg-level-selection button:active {
+            transform: scale(1.0) translateY(2px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-bottom-width: 2px;
         }
-
-        /* ボタンをカラフルに色分け */
-        #dm-level-selection button:nth-child(5n+1) { background-color: #ff6b6b; } /* 赤 */
-        #dm-level-selection button:nth-child(5n+2) { background-color: #feca57; } /* 黄 */
-        #dm-level-selection button:nth-child(5n+3) { background-color: #48dbfb; } /* 水色 */
-        #dm-level-selection button:nth-child(5n+4) { background-color: #1dd1a1; } /* 緑 */
-        #dm-level-selection button:nth-child(5n+5) { background-color: #ff9f43; } /* オレンジ */
+        #hg-level-selection button:nth-child(5n+1) { background-color: #ff6b6b; } /* 赤 */
+        #hg-level-selection button:nth-child(5n+2) { background-color: #feca57; } /* 黄 */
+        #hg-level-selection button:nth-child(5n+3) { background-color: #48dbfb; } /* 水色 */
+        #hg-level-selection button:nth-child(5n+4) { background-color: #1dd1a1; } /* 緑 */
+        #hg-level-selection button:nth-child(5n+5) { background-color: #ff9f43; } /* オレンジ */
         
-        /* --- ★改善点：ゲームエリアのレイアウト --- */
-        #dm-game-area {
+        /* --- ゲームエリア (縦一列デザイン) --- */
+        #hg-game-area {
             display: flex;
-            flex-direction: row; /* 常に横並び (左/右) */
+            flex-direction: row; 
             gap: 20px;
         }
-
-        #dm-illust-area, #dm-word-area {
+        #hg-illust-area, #hg-word-area {
             padding: 15px; 
             border-radius: 8px; 
             background-color: #f9f9f9;
             border: 2px dashed #ccc; 
             min-height: 150px;
         }
-
-        /* ★改善点：イラストエリア(左側) */
-        #dm-illust-area {
-            flex: 1; /* 幅を自動調整 (50%目安) */
+        #hg-illust-area {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center; /* 中のh3とプールを中央揃え */
+            align-items: center;
             gap: 15px;
         }
-        
-        /* ★改善点：単語エリア(右側) */
-        #dm-word-area {
-            flex: 1; /* 幅を自動調整 (50%目安) */
+        #hg-word-area {
+            flex: 1;
         }
-
-        /* ★改善点：イラストを縦一列に並べるためのコンテナ */
-        #dm-illust-pool {
+        #hg-illust-pool {
             display: flex;
-            flex-direction: column; /* 縦一列 */
+            flex-direction: column; 
             align-items: center;
-            gap: 10px; /* イラスト間の隙間 */
-            width: 100%; /* 親要素に合わせる */
+            gap: 10px;
+            width: 100%;
         }
-        
-        #dm-illust-area h3, #dm-word-area h3 {
+        #hg-illust-area h3, #hg-word-area h3 {
             text-align: center; 
             margin-top: 0; 
             color: #555;
             width: 100%;
         }
-
-        .dm-drag-item {
+        .hg-drag-item {
             width: 100px; height: 100px; background-color: #fff;
             border: 2px solid #ddd; border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -142,126 +129,136 @@
             justify-content: center; align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .dm-drag-item:active {
+        .hg-drag-item:active {
             cursor: grabbing; transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        .dm-drag-item img {
+        .hg-drag-item img {
             width: 90%; height: 90%; object-fit: contain;
         }
-        .dm-word-row {
+        .hg-word-row {
             display: flex; align-items: center; margin-bottom: 10px;
             background-color: #fff; border-radius: 8px;
             border: 1px solid #ccc; padding: 5px;
         }
-        .dm-drop-target {
+        .hg-drop-target {
             width: 100px; height: 100px; border: 2px dashed #aaa;
             border-radius: 8px; background-color: #f0f8ff;
             margin-right: 15px; transition: background-color 0.2s, border-color 0.2s;
             display: flex; justify-content: center; align-items: center;
         }
-        .dm-word-label {
+        .hg-word-label {
             font-size: 1.8em; font-weight: bold; color: #333;
         }
-        .dm-drop-target.drag-over {
+        .hg-drop-target.drag-over {
             background-color: #e6f7ff; border-color: #5c7aff; border-style: solid;
         }
-        .dm-drop-target.correct {
+        
+        .hg-drop-target.correct {
             border: 3px solid #28a745; background-color: #e6ffed; padding: 0;
         }
-        .dm-drop-target.correct .dm-drag-item {
+        
+        /* 配置されたアイテムのスタイル (正解時) */
+        .hg-drop-target.correct .hg-drag-item {
             width: 100%; height: 100%; margin: 0; box-shadow: none;
             border: none; opacity: 1 !important; cursor: not-allowed;
         }
-        #dm-feedback {
+        
+        /* 配置されたアイテムのスタイル (未判定時) */
+        .hg-drop-target .hg-drag-item {
+             width: 100%; height: 100%; margin: 0; box-shadow: none;
+            border: none; opacity: 1 !important; 
+            cursor: pointer; 
+        }
+        /* ドラッグ中のアイテムはクリックできないようにする */
+        .hg-drag-item:active {
+            cursor: grabbing;
+        }
+
+        #hg-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
             margin-top: 20px; min-height: 1.3em; color: #d9534f;
         }
-        #dm-feedback.success { color: #28a745; }
+        #hg-feedback.success { color: #28a745; }
 
-        /* --- ボタンエリアとボタンのスタイルを調整 --- */
-        .dm-button-area {
+        /* --- ボタンエリア --- */
+        .hg-button-area {
             text-align: center;
             margin-top: 25px;
         }
-        .dm-button {
+        .hg-button {
             display: inline-block;
             margin: 0 5px;
-            padding: 15px 30px; /* ボタンを大きく */
+            padding: 15px 30px;
             font-size: 1.1em;
             font-weight: 700;
             color: #fff;
             border: none;
-            border-radius: 12px; /* 丸みを持たせる */
+            border-radius: 12px;
             text-decoration: none;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-bottom: 4px solid rgba(0,0,0,0.15); /* 3D風 */
+            border-bottom: 4px solid rgba(0,0,0,0.15);
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
-        .dm-button:hover {
+        .hg-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .dm-button:active {
+        .hg-button:active {
             transform: translateY(1px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-bottom-width: 2px;
         }
-        .dm-button-home {
+        .hg-button-home {
             background-color: #6c757d;
-            border-bottom-color: #4a4e52; /* 濃いグレー */
+            border-bottom-color: #4a4e52;
         }
-        .dm-button-reset {
+        .hg-button-reset {
             background-color: #ffc107;
             color: #333;
-            border-bottom-color: #c69500; /* 濃い黄色 */
+            border-bottom-color: #c69500;
         }
 
-        /* --- ★改善点：スマホ（小さい画面）用の調整 --- */
+        /* --- スマホ用の調整 --- */
         @media (max-width: 600px) {
-            #dm-container {
-                padding: 15px; /* スマホではパディングを減らす */
+            #hg-container {
+                padding: 15px;
             }
-            #dm-container h1 {
-                font-size: 1.8em; /* スマホではタイトルを小さく */
+            #hg-container h1 {
+                font-size: 1.8em;
                 margin-bottom: 20px;
             }
-            #dm-level-selection {
-                grid-template-columns: repeat(2, 1fr); /* 2列に配置 */
+            #hg-level-selection {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
-            #dm-level-selection button {
+            #hg-level-selection button {
                 font-size: 1.2em;
                 padding: 15px;
             }
-
-            /* ★改善点：スマホでも横並びを維持するが、文字やパディングを調整 */
-            #dm-game-area {
-                flex-direction: row; /* 横並びを維持 */
-                gap: 10px; /* 隙間を減らす */
+            #hg-game-area {
+                flex-direction: row; 
+                gap: 10px;
             }
-            #dm-illust-area, #dm-word-area {
-                padding: 5px; /* パディングを減らす */
-                min-height: 100px; /* 高さを調整 */
+            #hg-illust-area, #hg-word-area {
+                padding: 5px; 
+                min-height: 100px; 
             }
-            #dm-illust-area h3, #dm-word-area h3 {
-                font-size: 0.8em; /* タイトルを小さく */
+            #hg-illust-area h3, #hg-word-area h3 {
+                font-size: 0.8em; 
                 margin-bottom: 5px;
             }
-            
-            /* イラストと単語のサイズを小さくする */
-            .dm-drag-item {
+            .hg-drag-item {
                 width: 60px; height: 60px; margin: 2px;
             }
-            .dm-drop-target {
+            .hg-drop-target {
                 width: 60px; height: 60px; margin-right: 5px;
             }
-            .dm-word-label {
-                font-size: 1.0em; /* 単語を小さく */
+            .hg-word-label {
+                font-size: 1.0em; 
             }
-            
-            .dm-button {
+            .hg-button {
                 padding: 10px 15px;
                 font-size: 1em;
             }
@@ -270,48 +267,52 @@
 </head>
 <body>
 
-    <div id="dm-container">
-        <h1 id="dm-main-title">ひらがな単語あわせゲーム</h1>
+    <div id="hg-container">
+        <h1 id="hg-main-title">ひらがな単語あわせゲーム</h1>
         
-        <div id="dm-level-selection">
+        <div id="hg-level-selection">
             </div>
 
-        <h2 id="dm-level-title"></h2>
+        <h2 id="hg-level-title"></h2>
         
-        <div id="dm-game-area" style="display: none;">
-            <div id="dm-illust-area">
+        <div id="hg-game-area" style="display: none;">
+            <div id="hg-illust-area">
                 <h3>イラスト (ドラッグしてね)</h3>
-                <div id="dm-illust-pool">
+                <div id="hg-illust-pool">
                     </div>
             </div>
             
-            <div id="dm-word-area">
+            <div id="hg-word-area">
                 <h3>ことば (ドロップするばしょ)</h3>
-                <div id="dm-word-list">
+                <div id="hg-word-list">
                     </div>
             </div>
         </div>
 
-        <div id="dm-feedback"></div>
+        <div id="hg-feedback"></div>
 
-        <div class="dm-button-area">
-            <button id="dm-reset-placed-button" class="dm-button dm-button-reset" style="display: none;">
+        <div class="hg-button-area">
+            <button id="hg-reset-placed-button" class="hg-button hg-button-reset" style="display: none;">
                 イラストをもどす
             </button>
-            <button id="dm-home-button" class="dm-button dm-button-home">ホームにもどる</button>
+            <button id="hg-home-button" class="hg-button hg-button-home">ホームにもどる</button>
         </div>
     </div>
+
+    <audio id="hg-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
+    <audio id="hg-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
 
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            // ★★★ 修正箇所 ★★★
-            // ルートスラッシュ (/) を削除し、相対パス 'assets/images/hiragana_words/' に変更
-            const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/'; 
+            
+            // ★★★ ひらがな用のパスに変更 ★★★
+            const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
+            // ★★★ ひらがな用のデータに変更 ★★★
             const gameLevels = [
                 { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
                 { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'き', file: 'き' },{ hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
@@ -325,20 +326,23 @@
                 { level: 10, words: [ { hira: 'わに', file: 'わに' }, { hira: 'かばん', file: 'かばん' } ] }
             ];
 
-            // --- 2. HTML要素の取得 ---
-            const mainTitleEl = document.getElementById('dm-main-title'); 
-            const levelSelectionEl = document.getElementById('dm-level-selection');
-            const levelTitleEl = document.getElementById('dm-level-title');
-            const gameAreaEl = document.getElementById('dm-game-area');
-            const illustPoolEl = document.getElementById('dm-illust-pool');
-            const wordListEl = document.getElementById('dm-word-list');
-            const feedbackEl = document.getElementById('dm-feedback');
-            const resetPlacedButton = document.getElementById('dm-reset-placed-button');
-            const homeButton = document.getElementById('dm-home-button'); 
+            // --- 2. HTML要素の取得 (IDを hg- に変更) ---
+            const mainTitleEl = document.getElementById('hg-main-title'); 
+            const levelSelectionEl = document.getElementById('hg-level-selection');
+            const levelTitleEl = document.getElementById('hg-level-title');
+            const gameAreaEl = document.getElementById('hg-game-area');
+            const illustPoolEl = document.getElementById('hg-illust-pool');
+            const wordListEl = document.getElementById('hg-word-list');
+            const feedbackEl = document.getElementById('hg-feedback');
+            const resetPlacedButton = document.getElementById('hg-reset-placed-button');
+            const homeButton = document.getElementById('hg-home-button'); 
+
+            const soundCorrect = document.getElementById('hg-sound-correct');
+            const soundIncorrect = document.getElementById('hg-sound-incorrect');
+
 
             let currentLevelData = null; 
             let currentLevelWords = [];
-            let correctMatches = 0;
 
             // --- 3. ゲーム初期化 ---
             function initGame() {
@@ -349,19 +353,23 @@
                     levelSelectionEl.appendChild(button);
                 });
                 
-                homeButton.onclick = () => showLevelSelect(); // ホームに戻るボタンはレベル選択画面に戻るように修正
+                homeButton.onclick = () => {
+                    window.location.href = 'index.html'; 
+                };
             }
             
-            // レベル選択画面を表示する関数
             function showLevelSelect() {
                 gameAreaEl.style.display = 'none';
                 levelTitleEl.textContent = '';
                 feedbackEl.textContent = '';
                 resetPlacedButton.style.display = 'none';
                 
-                // CSSで 'grid' が指定されているため、 'grid' に戻す
                 levelSelectionEl.style.display = 'grid'; 
                 mainTitleEl.style.display = 'block';
+
+                homeButton.onclick = () => {
+                    window.location.href = 'index.html';
+                };
             }
 
             // --- 4. レベル読み込み ---
@@ -371,15 +379,15 @@
                 
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
-                correctMatches = 0;
 
                 levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
                 feedbackEl.textContent = '';
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
                 
-                resetPlacedButton.style.display = 'inline-block';
-                resetPlacedButton.onclick = resetPlacedItems; 
+                resetPlacedButton.style.display = 'none'; // ロジック上、まだ非表示
+
+                homeButton.onclick = () => showLevelSelect();
 
                 illustPoolEl.innerHTML = '';
                 wordListEl.innerHTML = '';
@@ -390,12 +398,14 @@
                 // 4-1. 単語リスト（ドロップ先）を生成
                 shuffledWords.forEach(wordData => {
                     const row = document.createElement('div');
-                    row.className = 'dm-word-row';
+                    row.className = 'hg-word-row';
                     const dropTarget = document.createElement('div');
-                    dropTarget.className = 'dm-drop-target';
+                    dropTarget.className = 'hg-drop-target';
                     dropTarget.dataset.word = wordData.hira; 
+                    dropTarget.id = `hg-target-${wordData.hira}`; 
+                    
                     const label = document.createElement('span');
-                    label.className = 'dm-word-label';
+                    label.className = 'hg-word-label';
                     label.textContent = wordData.hira;
                     row.appendChild(dropTarget);
                     row.appendChild(label);
@@ -405,61 +415,70 @@
                 // 4-2. イラストリスト（ドラッグアイテム）を生成
                 shuffledIllusts.forEach(wordData => {
                     const item = document.createElement('div');
-                    item.className = 'dm-drag-item';
+                    item.className = 'hg-drag-item';
                     item.draggable = true;
                     item.dataset.word = wordData.hira;
+                    item.id = `hg-item-${wordData.hira}`; 
+                    item.dataset.initialParentId = 'hg-illust-pool';
+                    
                     const img = document.createElement('img');
-                    // ★★★ 修正後のパスを使用 ★★★
                     img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
                     img.alt = wordData.hira;
                     img.draggable = false; 
                     item.appendChild(img);
-                    illustPoolEl.appendChild(item); 
+                    illustPoolEl.appendChild(item);
                 });
 
                 // 4-3. イベントリスナーを設定
                 addDragDropListeners();
             }
             
-            // 置いたイラストを元に戻す関数 (変更なし)
-            function resetPlacedItems() {
-                const matchedItems = document.querySelectorAll('.dm-drag-item');
-                const correctDropZones = document.querySelectorAll('.dm-drop-target.correct');
-                matchedItems.forEach(item => {
-                    if (item.parentElement.classList.contains('dm-drop-target')) {
-                        item.draggable = true;
-                        illustPoolEl.appendChild(item); 
-                    }
-                });
-                correctDropZones.forEach(zone => {
-                    zone.classList.remove('correct');
-                    zone.innerHTML = ''; 
-                });
-                correctMatches = 0;
+            // ★★★ クリックでアイテムをプールに戻す関数 ★★★
+            function returnItemToPool(event) {
+                const itemToReturn = event.currentTarget; 
+                const parentTarget = itemToReturn.parentElement;
+
+                // 1. プールに戻す
+                illustPoolEl.appendChild(itemToReturn);
+                
+                // 2. 再度ドラッグできるようにする
+                itemToReturn.draggable = true;
+                
+                // 3. クリックイベントを削除
+                itemToReturn.removeEventListener('click', returnItemToPool);
+                
+                // 4. 親スロットのスタイルをリセット
+                if (parentTarget && parentTarget.classList.contains('hg-drop-target')) {
+                    parentTarget.classList.remove('correct'); // correctクラスがあっても削除
+                }
+
+                // 5. 判定をリセットし、フィードバックを更新
                 feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
             }
 
 
-            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 --- (変更なし)
+            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
             function addDragDropListeners() {
-                const dragItems = document.querySelectorAll('.dm-drag-item');
-                const dropTargets = document.querySelectorAll('.dm-drop-target');
+                const dragItems = document.querySelectorAll('.hg-drag-item');
+                const dropTargets = document.querySelectorAll('.hg-drop-target');
+                
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
                         if (!item.draggable) { 
                             e.preventDefault(); return;
                         }
-                        e.dataTransfer.setData('text/plain', item.dataset.word);
+                        e.dataTransfer.setData('text/plain', item.id);
                         setTimeout(() => item.style.opacity = '0.5', 0);
                     });
                     item.addEventListener('dragend', (e) => {
-                        item.style.opacity = '1';
+                        e.target.style.opacity = '1';
                     });
                 });
+
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
-                        if (target.classList.contains('correct')) {
+                        if (target.querySelector('.hg-drag-item')) {
                             return;
                         }
                         e.preventDefault();
@@ -468,62 +487,117 @@
                     target.addEventListener('dragleave', () => {
                         target.classList.remove('drag-over');
                     });
+                    
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
                         target.classList.remove('drag-over');
-                        if (target.classList.contains('correct')) {
+                        
+                        if (target.querySelector('.hg-drag-item')) {
                             return;
                         }
-                        const droppedWord = e.dataTransfer.getData('text/plain');
-                        const targetWord = target.dataset.word;
-                        checkMatch(droppedWord, targetWord, target);
+                        
+                        const dragItemId = e.dataTransfer.getData('text/plain');
+                        const dragItem = document.getElementById(dragItemId);
+
+                        if (dragItem) {
+                            target.innerHTML = ''; 
+                            target.appendChild(dragItem);
+                            dragItem.draggable = false; 
+                            
+                            // 配置したアイテムに「クリックで戻る」機能を追加
+                            dragItem.addEventListener('click', returnItemToPool);
+                            
+                            checkFinalAnswers();
+                        }
                     });
                 });
             }
 
-            // --- 6. 答えのチェック --- (変更なし)
-            function checkMatch(droppedWord, targetWord, targetElement) {
-                if (droppedWord === targetWord) {
-                    feedbackEl.textContent = 'せいかい！';
-                    feedbackEl.classList.add('success');
-                    targetElement.classList.add('correct');
-                    targetElement.innerHTML = ''; 
-                    const matchingDragItem = document.querySelector(`.dm-drag-item[data-word="${droppedWord}"]`);
-                    if (matchingDragItem) {
-                        matchingDragItem.draggable = false;
-                        targetElement.appendChild(matchingDragItem);
-                    }
-                    correctMatches++;
-                    checkLevelComplete(); 
-                } else {
-                    feedbackEl.textContent = 'ちがうよ、もういちど！';
-                    feedbackEl.classList.remove('success');
-                }
-            }
+            // --- 6. (checkMatch() は削除) ---
 
-            // --- 7. レベルクリアのチェック --- (変更なし)
-            function checkLevelComplete() {
-                if (correctMatches !== currentLevelWords.length) {
+            // --- 7. 最終判定ロジック ---
+            function checkFinalAnswers() {
+                const dropTargets = document.querySelectorAll('.hg-drop-target');
+                const totalTargets = currentLevelWords.length;
+                let filledCount = 0;
+                let allCorrect = true;
+
+                // 1. すべてのスロットが埋まっているか確認
+                dropTargets.forEach(target => {
+                    if (target.querySelector('.hg-drag-item')) {
+                        filledCount++;
+                    }
+                });
+
+                // 2. スロットがすべて埋まっていない場合は終了
+                if (filledCount < totalTargets) {
+                    feedbackEl.textContent = `あと ${totalTargets - filledCount} こ。`;
+                    feedbackEl.classList.remove('success');
                     return; 
                 }
-                feedbackEl.textContent = 'レベルクリア！';
-                feedbackEl.classList.add('success');
-                resetPlacedButton.style.display = 'none'; 
-                const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
-                const nextLevelIndex = currentLevelIndex + 1;
-                if (nextLevelIndex < gameLevels.length) {
-                    const nextLevelData = gameLevels[nextLevelIndex];
-                    levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
-                    setTimeout(() => {
-                        loadLevel(nextLevelData);
-                    }, 2000);
+
+                // 3. スロットがすべて埋まった場合 (filledCount === totalTargets)
+                //    答え合わせを実行
+                dropTargets.forEach(target => {
+                    const placedItem = target.querySelector('.hg-drag-item');
+                    const targetWord = target.dataset.word;
+                    const placedWord = placedItem.dataset.word;
+                    
+                    if (targetWord !== placedWord) {
+                        allCorrect = false; 
+                    }
+                });
+
+                // 4. 最終判定結果
+                if (allCorrect) {
+                    // ★ 全問正解
+                    soundCorrect.currentTime = 0;
+                    soundCorrect.play();
+                    
+                    dropTargets.forEach(target => {
+                         target.classList.add('correct');
+                         // 正解確定後、もうクリックで戻せないようにイベント削除
+                         const placedItem = target.querySelector('.hg-drag-item');
+                         if (placedItem) {
+                             placedItem.removeEventListener('click', returnItemToPool);
+                             placedItem.style.cursor = 'not-allowed'; 
+                         }
+                    });
+                    
+                    levelTitleEl.textContent = 'レベルクリア！';
+                    feedbackEl.textContent = 'おめでとうございます！ぜんぶせいかい！';
+                    feedbackEl.classList.add('success');
+                    resetPlacedButton.style.display = 'none'; 
+                    
+                    // 次のレベルへ
+                    const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
+                    const nextLevelIndex = currentLevelIndex + 1;
+                    
+                    if (nextLevelIndex < gameLevels.length) {
+                        const nextLevelData = gameLevels[nextLevelIndex];
+                        levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
+                        setTimeout(() => {
+                            loadLevel(nextLevelData);
+                        }, 2000); 
+                    } else {
+                        levelTitleEl.textContent = 'ぜんぶクリア！';
+                        feedbackEl.textContent = '全レベル おめでとうございます！';
+                    }
+                    
                 } else {
-                    levelTitleEl.textContent = 'ぜんぶクリア！';
-                    feedbackEl.textContent = '全レベル おめでとうございます！';
+                    // ★ 1つでも間違いがある
+                    soundIncorrect.currentTime = 0;
+                    soundIncorrect.play();
+                    
+                    feedbackEl.textContent = 'ちがうところがあるよ。まちがっているイラストをクリックして、もどしてね。';
+                    feedbackEl.classList.remove('success');
+                    
+                    // 「イラストをもどす」ボタンはここでは表示しない
+                    // (カタカナ版のロジックでは、個別にクリックして戻すため)
                 }
             }
 
-            // --- 8. ユーティリティ (配列シャッフル) --- (変更なし)
+            // --- 8. ユーティリティ (配列シャッフル) ---
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
