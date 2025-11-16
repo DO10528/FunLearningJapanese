@@ -231,6 +231,7 @@
             // オーディオ要素を動的にHTMLに追加
             const audioElements = {};
             stationeryWords.forEach(word => {
+                // ★ 相対パスに変更
                 const audio = new Audio(ASSET_PATH_SOUND + word.sound);
                 audio.preload = 'auto';
                 audioElements[word.id] = audio;
@@ -292,6 +293,7 @@
                     item.onclick = () => playWordSound(word.id);
                     
                     const img = document.createElement('img');
+                    // ★ 相対パスに変更
                     img.src = ASSET_PATH_IMG + word.image;
                     img.alt = word.name;
                     
