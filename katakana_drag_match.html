@@ -127,6 +127,15 @@
             cursor: grab; margin: 5px; display: inline-flex;
             justify-content: center; align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
+
+            /* ▼▼▼ スマホ・タブレット対応のために以下を追加 ▼▼▼ */
+            /* (1) スクロールやズームと競合するのを防ぎ、遅延をなくす */
+            touch-action: none;
+            /* (2) iOSで長押しした際のメニューを無効化 */
+            -webkit-touch-callout: none;
+            /* (3) テキストや画像を選択しようとする動作を無効化 */
+            user-select: none;
+            -webkit-user-select: none;
         }
         .km-drag-item:active {
             cursor: grabbing; transform: scale(1.05);
@@ -317,7 +326,7 @@
                 { level: 4, words: [ { hira: 'タオル', file: 'タオル' }, { hira: 'チョコ', file: 'チョコ' }, { hira: 'ツナ', file: 'ツナ' }, { hira: 'テント', file: 'テント' }, { hira: 'トナカイ', file: 'トナカイ' } ] },
                 { level: 5, words: [ { hira: 'ナマズ', file: 'ナマズ' }, { hira: 'ニワトリ', file: 'ニワトリ' }, { hira: 'ヌードル', file: 'ヌードル' }, { hira: 'ネクタイ', file: 'ネクタイ' }, { hira: 'ノート', file: 'ノート' } ] },
                 { level: 6, words: [ { hira: 'ハンガー', file: 'ハンガー' }, { hira: 'ヒトデ', file: 'ヒトデ' }, { hira: 'フグ', file: 'フグ' }, { hira: 'ヘルメット', file: 'ヘルメット' }, { hira: 'ホタテ', file: 'ホタテ' } ] },
-                { level: 7, words: [ { hira: 'マフラー', file: 'マフラー' }, { hira: 'ミミズ', file: 'ミミズ' }, { hira: 'ムササビ', file: 'ムササビ' }, { hira: 'メダカ', file: 'メダカ' }, { hira: 'メモ', file: 'メモ' } ] },
+                { level 7, words: [ { hira: 'マフラー', file: 'マフラー' }, { hira: 'ミミズ', file: 'ミミズ' }, { hira: 'ムササビ', file: 'ムササビ' }, { hira: 'メダカ', file: 'メダカ' }, { hira: 'メモ', file: 'メモ' } ] },
                 { level: 8, words: [ { hira: 'タイヤ', file: 'タイヤ' }, { hira: 'ユーフォー', file: 'ユーフォー' }, { hira: 'ヨーヨー', file: 'ヨーヨー' }, { hira: 'ワイン', file: 'ワイン' }, { hira: 'パン', file: 'パン' } ] },
                 { level: 9, words: [ { hira: 'ラーメン', file: 'ラーメン' }, { hira: 'リュック', file: 'リュック' }, { hira: 'ルビー', file: 'ルビー' }, { hira: 'レタス', file: 'レタス' }, { hira: 'ロケット', file: 'ロケット' } ] }
             ];
@@ -429,7 +438,7 @@
                 addDragDropListeners();
             }
             
-            // ★★★ 修正箇所: クリックでアイテムをプールに戻す関数 ★★★
+            // ★★★ クリックでアイテムをプールに戻す関数 ★★★
             function returnItemToPool(event) {
                 const itemToReturn = event.currentTarget; 
                 const parentTarget = itemToReturn.parentElement;
@@ -451,23 +460,23 @@
                 // 5. 判定をリセットし、フィードバックを更新
                 feedbackEl.textContent = 'イラストをもどしました。';
                 feedbackEl.classList.remove('success');
-                
-                // ★★★ 修正箇所: 音を鳴らす処理を削除 ★★★
-                // soundIncorrect.currentTime = 0; 
-                // soundIncorrect.play();
             }
 
 
-            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 ---
+            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 (★タッチ対応版に差し替え) ---
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.km-drag-item');
                 const dropTargets = document.querySelectorAll('.km-drop-target');
                 
+                // --- タッチ操作用の変数 ---
+                let ghostItem = null;      // 指に追随するゴースト（コピー）
+                let currentDragItem = null; // ドラッグ中の元のアイテム
+                let lastTouchTarget = null; // 最後に指が乗ったターゲット
+
+                // --- 1. マウス イベント (既存のロジック) ---
                 dragItems.forEach(item => {
                     item.addEventListener('dragstart', (e) => {
-                        if (!item.draggable) { 
-                            e.preventDefault(); return;
-                        }
+                        if (!item.draggable) { e.preventDefault(); return; }
                         e.dataTransfer.setData('text/plain', item.id);
                         setTimeout(() => item.style.opacity = '0.5', 0);
                     });
@@ -478,23 +487,17 @@
 
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
-                        if (target.querySelector('.km-drag-item')) {
-                            return;
-                        }
+                        if (target.querySelector('.km-drag-item')) return;
                         e.preventDefault();
                         target.classList.add('drag-over');
                     });
                     target.addEventListener('dragleave', () => {
                         target.classList.remove('drag-over');
                     });
-                    
                     target.addEventListener('drop', (e) => {
                         e.preventDefault();
                         target.classList.remove('drag-over');
-                        
-                        if (target.querySelector('.km-drag-item')) {
-                            return;
-                        }
+                        if (target.querySelector('.km-drag-item')) return;
                         
                         const dragItemId = e.dataTransfer.getData('text/plain');
                         const dragItem = document.getElementById(dragItemId);
@@ -503,15 +506,127 @@
                             target.innerHTML = ''; 
                             target.appendChild(dragItem);
                             dragItem.draggable = false; 
-                            
-                            // 配置したアイテムに「クリックで戻る」機能を追加
                             dragItem.addEventListener('click', returnItemToPool);
-                            
                             checkFinalAnswers();
                         }
                     });
                 });
+
+                // --- 2. タッチ イベント (★ここからが追加ロジック) ---
+
+                // (A) アイテムを指で押し始めた時 (touchstart)
+                dragItems.forEach(item => {
+                    item.addEventListener('touchstart', (e) => {
+                        if (!item.draggable) return;
+
+                        currentDragItem = item; // 元のアイテムを記憶
+
+                        // (1) ゴースト（指に追随するコピー）を作成
+                        ghostItem = item.cloneNode(true);
+                        ghostItem.style.position = 'absolute';
+                        ghostItem.style.pointerEvents = 'none'; // ゴースト自体がタッチを邪魔しないように
+                        ghostItem.style.zIndex = '1000';
+                        ghostItem.style.opacity = '0.8';
+                        ghostItem.style.transform = 'scale(1.1)'; // 少し大きくして掴んだ感を出す
+                        document.body.appendChild(ghostItem);
+
+                        // (2) 元のアイテムを半透明にする
+                        item.style.opacity = '0.4';
+
+                        // (3) ゴーストを指の位置に配置
+                        updateGhostPosition(e.touches[0]);
+
+                    }, { passive: true }); // passive: true で開始
+                });
+
+                // (B) 指を動かした時 (touchmove)
+                document.addEventListener('touchmove', (e) => {
+                    if (!currentDragItem || !ghostItem) return;
+
+                    // ★重要：ここで preventDefault を呼び、ドラッグ中の画面スクロールを止める
+                    e.preventDefault(); 
+                    
+                    // (1) ゴーストを指の位置に更新
+                    updateGhostPosition(e.touches[0]);
+
+                    // (2) 指の下にある要素を特定
+                    const touch = e.touches[0];
+                    ghostItem.style.display = 'none'; // 一瞬ゴーストを消して、下の要素をチェック
+                    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                    ghostItem.style.display = ''; // すぐに戻す
+
+                    let currentTouchTarget = null;
+                    if (elementUnder && elementUnder.classList.contains('km-drop-target')) {
+                        currentTouchTarget = elementUnder;
+                    }
+
+                    // (3) ドロップ先のハイライトを更新
+                    if (lastTouchTarget && lastTouchTarget !== currentTouchTarget) {
+                        lastTouchTarget.classList.remove('drag-over');
+                    }
+                    if (currentTouchTarget && !currentTouchTarget.querySelector('.km-drag-item')) {
+                        currentTouchTarget.classList.add('drag-over');
+                        lastTouchTarget = currentTouchTarget;
+                    } else {
+                        lastTouchTarget = null;
+                    }
+
+                }, { passive: false }); // ★ passive: false で preventDefault を許可
+
+                // (C) 指を離した時 (touchend)
+                document.addEventListener('touchend', (e) => {
+                    if (!currentDragItem || !ghostItem) return;
+
+                    // (1) 指を離した場所の要素を特定
+                    const touch = e.changedTouches[0];
+                    ghostItem.style.display = 'none';
+                    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                    ghostItem.style.display = '';
+
+                    let dropTarget = null;
+                    if (elementUnder && elementUnder.classList.contains('km-drop-target')) {
+                        dropTarget = elementUnder;
+                    }
+
+                    // (2) 有効なドロップ先（＝空のターゲット）か判定
+                    if (dropTarget && !dropTarget.querySelector('.km-drag-item')) {
+                        // --- ドロップ成功 ---
+                        dropTarget.innerHTML = ''; 
+                        dropTarget.appendChild(currentDragItem); // ★元のアイテムを配置
+                        currentDragItem.draggable = false;
+                        currentDragItem.style.opacity = '1'; // 透明度を戻す
+                        
+                        // 「クリックで戻る」イベントを追加
+                        currentDragItem.addEventListener('click', returnItemToPool);
+                        
+                        // 答え合わせを実行
+                        checkFinalAnswers();
+                        
+                    } else {
+                        // --- ドロップ失敗 (元の場所に戻す) ---
+                        currentDragItem.style.opacity = '1'; // 透明度を戻す
+                    }
+                    
+                    // (3) 後片付け
+                    document.body.removeChild(ghostItem);
+                    ghostItem = null;
+                    currentDragItem = null;
+                    if (lastTouchTarget) {
+                        lastTouchTarget.classList.remove('drag-over');
+                    }
+                    lastTouchTarget = null;
+                });
+
+                // --- タッチ操作用の補助関数 ---
+                function updateGhostPosition(touch) {
+                    if (!ghostItem) return;
+                    // ゴーストが指の中心に来るように調整
+                    ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
+                    ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
+                }
             }
+            // ▲▲▲ ここまでが addDragDropListeners 関数 ▲▲▲
+
 
             // --- 6. (checkMatch() は削除) ---
 
