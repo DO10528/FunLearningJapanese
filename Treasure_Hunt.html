@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ふでばこ さがしゲーム</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #fffbe6 0%, #ffeccc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #5a4a3a;
+        }
+
+        #sc-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px; 
+            background-color: #ffffff;
+            box-shadow: 0 8px 24px rgba(139, 115, 85, 0.15); 
+            border-radius: 20px; 
+            border: 3px solid #f7d899;
+        }
+        
+        /* --- 画面切り替え --- */
+        .sc-screen {
+            display: none; /* 基本は非表示 */
+        }
+        .sc-screen.active {
+            display: block; /* .active が付いたものだけ表示 */
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #d98a00;
+        }
+        h1 { font-size: 2.2em; }
+        h2 { font-size: 1.8em; }
+        p { text-align: center; font-size: 1.2em; }
+
+        /* --- ボタン共通 --- */
+        .sc-button {
+            display: block;
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #fff;
+            background-color: #ffb100;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-bottom: 5px solid #d98a00;
+        }
+        .sc-button:hover {
+            transform: scale(1.03) translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .sc-button:active {
+            transform: scale(1.0) translateY(1px);
+            border-bottom-width: 2px;
+        }
+        .sc-button-secondary {
+             background-color: #6c757d;
+             border-bottom-color: #4a4e52;
+        }
+        .sc-button-camera {
+             background-color: #e64b3c;
+             border-bottom-color: #b32a1e;
+        }
+
+        /* --- 1. 勉強スクリーン --- */
+        #sc-study-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .sc-study-item {
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .sc-study-item:hover {
+            background-color: #fffbe6;
+        }
+        .sc-study-item img {
+            width: 100%;
+            max-width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .sc-study-item p {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 5px 0 0 0;
+        }
+
+        /* --- 2. ゲームスクリーン --- */
+        #sc-play-sound-button {
+            background-color: #48dbfb;
+            border-bottom-color: #00a9d9;
+            font-size: 1.2em;
+            padding: 15px;
+        }
+
+        /* --- 3. カメラスクリーン --- */
+        #sc-camera-view-wrapper {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #sc-video-element {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        /* キャンバスは裏で描画するため非表示 */
+        #sc-canvas-element {
+            display: none;
+        }
+
+        /* --- 4. 結果スクリーン --- */
+        #sc-result-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            .sc-button { font-size: 1.2em; padding: 15px; }
+            #sc-study-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sc-container">
+
+        <div id="sc-screen-study" class="sc-screen active">
+            <h1>ことばをおぼえよう</h1>
+            <p style="text-align: left;">タップしておとを きいてね。</p>
+            <div id="sc-study-grid">
+                </div>
+            <button id="sc-start-game-button" class="sc-button">ゲームをはじめる</button>
+        </div>
+
+        <div id="sc-screen-game" class="sc-screen">
+            <h2>さがしものゲーム</h2>
+            <p id="sc-game-prompt">したのボタンをおして、きこえたものを さがしてね！</p>
+            <button id="sc-play-sound-button" class="sc-button">▶ おとを きく</button>
+            
+            <button id="sc-open-camera-button" class="sc-button sc-button-camera" style="display: none;">
+                📷 カメラを ひらく
+            </button>
+        </div>
+
+        <div id="sc-screen-camera" class="sc-screen">
+            <h2>みつけたら、しゃしんをとろう！</h2>
+            
+            <div id="sc-camera-view-wrapper">
+                <video id="sc-video-element" autoplay playsinline></video>
+                <canvas id="sc-canvas-element"></canvas>
+            </div>
+            
+            <button id="sc-take-picture-button" class="sc-button sc-button-camera">
+                📸 しゃしんをとる
+            </button>
+            <button id="sc-cancel-camera-button" class="sc-button sc-button-secondary">
+                もどる
+            </button>
+        </div>
+
+        <div id="sc-screen-result" class="sc-screen">
+            <h2>しゃしんが とれたよ！</h2>
+            <img id="sc-result-image" src="" alt="さつえいした しゃしん">
+            <p id="sc-result-message">これは「〇〇」ですか？<br>おうちのひとと こたえあわせしてね！</p>
+            
+            <button id="sc-next-problem-button" class="sc-button">
+                つぎのもんだいへ
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. データ定義 ---
+            // ※画像と音声のファイルパスは、ご自身の環境に合わせてください。
+            const ASSET_PATH_IMG = 'assets/images/stationery/';
+            const ASSET_PATH_SOUND = 'assets/sounds/stationery/';
+
+            const stationeryWords = [
+                { id: 'enpitsu', name: 'えんぴつ', image: 'enpitsu.png', sound: 'enpitsu.mp3' },
+                { id: 'keshigomu', name: 'けしゴム', image: 'keshigomu.png', sound: 'keshigomu.mp3' },
+                { id: 'pen', name: 'ペン', image: 'pen.png', sound: 'pen.mp3' },
+                { id: 'note', name: 'ノート', image: 'note.png', sound: 'note.mp3' },
+                { id: 'hasami', name: 'はさみ', image: 'hasami.png', sound: 'hasami.mp3' },
+                { id: 'nori', name: 'のり', image: 'nori.png', sound: 'nori.mp3' },
+                { id: 'hotchkiss', name: 'ホッチキス', image: 'hotchkiss.png', sound: 'hotchkiss.mp3' },
+                { id: 'jougi', name: 'じょうぎ', image: 'jougi.png', sound: 'jougi.mp3' },
+                { id: 'fudebako', name: 'ふでばこ', image: 'fudebako.png', sound: 'fudebako.mp3' },
+                { id: 'crayon', name: 'クレヨン', image: 'crayon.png', sound: 'crayon.mp3' }
+            ];
+
+            // オーディオ要素を動的にHTMLに追加
+            const audioElements = {};
+            stationeryWords.forEach(word => {
+                const audio = new Audio(ASSET_PATH_SOUND + word.sound);
+                audio.preload = 'auto';
+                audioElements[word.id] = audio;
+            });
+
+            // --- 2. HTML要素の取得 ---
+            const screens = document.querySelectorAll('.sc-screen');
+            const studyGridEl = document.getElementById('sc-study-grid');
+            
+            // 勉強スクリーン
+            const studyScreenEl = document.getElementById('sc-screen-study');
+            const startGameButton = document.getElementById('sc-start-game-button');
+            
+            // ゲームスクリーン
+            const gameScreenEl = document.getElementById('sc-screen-game');
+            const gamePromptEl = document.getElementById('sc-game-prompt');
+            const playSoundButton = document.getElementById('sc-play-sound-button');
+            const openCameraButton = document.getElementById('sc-open-camera-button');
+            
+            // カメラスクリーン
+            const cameraScreenEl = document.getElementById('sc-screen-camera');
+            const videoEl = document.getElementById('sc-video-element');
+            const canvasEl = document.getElementById('sc-canvas-element');
+            const takePictureButton = document.getElementById('sc-take-picture-button');
+            const cancelCameraButton = document.getElementById('sc-cancel-camera-button');
+            
+            // 結果スクリーン
+            const resultScreenEl = document.getElementById('sc-screen-result');
+            const resultImageEl = document.getElementById('sc-result-image');
+            const resultMessageEl = document.getElementById('sc-result-message');
+            const nextProblemButton = document.getElementById('sc-next-problem-button');
+
+            // --- 3. 状態管理変数 ---
+            let currentWord = null; // 現在のお題 (例: { id: 'enpitsu', ... })
+            let videoStream = null; // カメラのストリームを保持する変数
+
+            // --- 4. 汎用関数 ---
+
+            // 画面を切り替える関数
+            function showScreen(screenElement) {
+                screens.forEach(s => s.classList.remove('active'));
+                screenElement.classList.add('active');
+            }
+
+            // 音声を再生する関数
+            function playWordSound(wordId) {
+                if (audioElements[wordId]) {
+                    audioElements[wordId].currentTime = 0;
+                    audioElements[wordId].play();
+                }
+            }
+
+            // --- 5. 勉強スクリーンの初期化 ---
+            function initStudyScreen() {
+                studyGridEl.innerHTML = '';
+                stationeryWords.forEach(word => {
+                    const item = document.createElement('div');
+                    item.className = 'sc-study-item';
+                    item.onclick = () => playWordSound(word.id);
+                    
+                    const img = document.createElement('img');
+                    img.src = ASSET_PATH_IMG + word.image;
+                    img.alt = word.name;
+                    
+                    const p = document.createElement('p');
+                    p.textContent = word.name;
+                    
+                    item.appendChild(img);
+                    item.appendChild(p);
+                    studyGridEl.appendChild(item);
+                });
+            }
+
+            // --- 6. ゲームスクリーンのロジック ---
+            function setupNewProblem() {
+                // ランダムに単語を選ぶ
+                const randomIndex = Math.floor(Math.random() * stationeryWords.length);
+                currentWord = stationeryWords[randomIndex];
+                
+                gamePromptEl.textContent = 'したのボタンをおして、きこえたものを さがしてね！';
+                playSoundButton.style.display = 'block';
+                openCameraButton.style.display = 'none'; // カメラボタンはまだ隠す
+                
+                showScreen(gameScreenEl);
+            }
+
+            // 「おとを きく」ボタン
+            playSoundButton.onclick = () => {
+                playWordSound(currentWord.id);
+                gamePromptEl.textContent = `「${currentWord.name}」を さがしてね！`;
+                openCameraButton.style.display = 'block'; // カメラボタンを表示
+            };
+
+            // 「カメラを ひらく」ボタン
+            openCameraButton.onclick = () => {
+                startCamera();
+            };
+
+            // --- 7. カメラのロジック (最重要) ---
+
+            // カメラを起動する
+            async function startCamera() {
+                // 既に起動していたら何もしない
+                if (videoStream) {
+                    showScreen(cameraScreenEl);
+                    return;
+                }
+                
+                try {
+                    // カメラの使用許可を求める
+                    // { video: true } は背面カメラを優先しようとする (スマホの場合)
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' }, // 背面カメラを優先
+                        audio: false 
+                    });
+                    
+                    videoStream = stream; // ストリームを保持
+                    videoEl.srcObject = stream; // <video> 要素に映像を流す
+                    
+                    videoEl.onloadedmetadata = () => {
+                        // キャンバスのサイズを映像に合わせる
+                        canvasEl.width = videoEl.videoWidth;
+                        canvasEl.height = videoEl.videoHeight;
+                    };
+                    
+                    showScreen(cameraScreenEl); // カメラ画面を表示
+                    
+                } catch (err) {
+                    console.error("カメラエラー:", err);
+                    gamePromptEl.textContent = 'カメラのきょかが ありませんでした。';
+                    // 背面カメラがなければ、前面カメラで試す
+                    if (err.name === "OverconstrainedError" || err.name === "NotFoundError") {
+                         try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                            videoStream = stream;
+                            videoEl.srcObject = stream;
+                            videoEl.onloadedmetadata = () => {
+                                canvasEl.width = videoEl.videoWidth;
+                                canvasEl.height = videoEl.videoHeight;
+                            };
+                            showScreen(cameraScreenEl);
+                         } catch (err2) {
+                             gamePromptEl.textContent = 'カメラが つかえませんでした。';
+                         }
+                    }
+                }
+            }
+            
+            // カメラを停止する (重要！)
+            function stopCamera() {
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                    videoEl.srcObject = null;
+                }
+            }
+
+            // 「しゃしんをとる」ボタン
+            takePictureButton.onclick = () => {
+                // (1) キャンバスに映像の1フレームを描画
+                const context = canvasEl.getContext('2d');
+                context.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+                
+                // (2) キャンバスから画像データ(DataURL)を取得
+                const imageDataUrl = canvasEl.toDataURL('image/png');
+                
+                // (3) 結果画面の<img>に画像を設定
+                resultImageEl.src = imageDataUrl;
+                resultMessageEl.innerHTML = `これは「${currentWord.name}」ですか？<br>おうちのひとと こたえあわせしてね！`;
+                
+                // (4) カメラを停止し、結果画面を表示
+                stopCamera();
+                showScreen(resultScreenEl);
+            };
+
+            // 「もどる」ボタン（カメラキャンセル）
+            cancelCameraButton.onclick = () => {
+                stopCamera();
+                showScreen(gameScreenEl); // ゲーム画面に戻る
+            };
+
+            // --- 8. 結果スクリーンのロジック ---
+            
+            // 「つぎのもんだいへ」ボタン
+            nextProblemButton.onclick = () => {
+                resultImageEl.src = ''; // 古い写真をクリア
+                setupNewProblem(); // 次の問題へ
+            };
+
+            // --- 9. ゲームの開始 ---
+            
+            // 「ゲームをはじめる」ボタン
+            startGameButton.onclick = () => {
+                setupNewProblem();
+            };
+
+            // 最初の画面を初期化
+            initStudyScreen();
+            showScreen(studyScreenEl); // 最初に勉強スクリーンを表示
+
+        });
+    </script>
+
+</body>
+</html>
