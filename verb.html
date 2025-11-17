@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* CSSは変更ありませんので、省略します */
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
             background: linear-gradient(180deg, #e6fff7 0%, #d1f7e8 100%);
@@ -329,6 +330,7 @@
 
     <audio id="dv-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
     <audio id="dv-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -336,7 +338,6 @@
             // データ定義
             // ----------------------------------------------------
             
-            // ★★★ アセットのパス（ご自身の環境に合わせてください）★★★
             const IMG_PATH = 'assets/images/verbs/';
             const SOUND_PATH = 'assets/sounds/verbs/';
 
@@ -357,7 +358,8 @@
                   tprImg: 'tpr_read.png', animImg: 'anim_reading.gif', noun: 'ほん', nounImg: 'noun_book.png' },
                 
                 { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', english: 'write/draw', 
-                  tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' }
+                  tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' },
+                // ▲▲▲ 修正点 1: カンマ(,) を追加 ▲▲▲
             
                 { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', english: 'listen', 
                   tprImg: 'tpr_listen.png', animImg: 'anim_listening.gif', noun: 'おんがく', nounImg: 'noun_music.png' },
@@ -374,7 +376,8 @@
                 { id: 'kaerimasu', masu: 'かえります', mashita: 'かえりました', english: 'return home', 
                   tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
               
-                ];
+                // 修正点 2: ここにあった余計な '];' を削除しました
+            ];
 
             // 動的にオーディオ要素をキャッシュ
             const audioCache = {};
@@ -462,7 +465,6 @@
 
             homeButtons.forEach(btn => {
                 btn.onclick = () => {
-                    // アニメーションや音声を停止するなどのクリーンアップ処理
                     game1CharImg.src = `${IMG_PATH}char_idle.png`;
                     showScreen(menuScreen);
                 };
@@ -478,22 +480,18 @@
                 game1Feedback.textContent = '';
                 game1CharImg.src = `${IMG_PATH}char_idle.png`;
 
-                // 1. 4つのユニークな動詞を選ぶ
                 const shuffledVerbs = shuffleArray(verbData);
                 const currentOptions = shuffledVerbs.slice(0, 4);
                 
-                // 2. その中から1つを正解にする
                 const correctVerb = currentOptions[Math.floor(Math.random() * 4)];
                 game1AnswerId = correctVerb.id;
 
-                // 3. 問題の音声を再生
                 const sound = loadAudio(correctVerb.id, 'masu');
                 game1Prompt.textContent = `おとを きいて、おなじ アクション を えらぼう！`;
                 if(sound) {
                     playSound(sound);
                 }
 
-                // 4. 選択肢カードを作成
                 currentOptions.forEach(verb => {
                     const card = document.createElement('div');
                     card.className = 'dv-game1-option-card';
@@ -513,25 +511,21 @@
                 const selectedCard = e.currentTarget;
                 const chosenId = selectedCard.dataset.id;
                 
-                // 全てのカードを操作不可に
                 document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.add('disabled'));
 
                 if (chosenId === game1AnswerId) {
-                    // 正解
                     playSound(soundCorrect);
                     game1Feedback.textContent = 'せいかい！';
                     game1Feedback.className = 'dv-feedback success';
                     const correctVerb = verbData.find(v => v.id === chosenId);
-                    game1CharImg.src = `${IMG_PATH}${correctVerb.animImg}`; // 正解のアニメーション
+                    game1CharImg.src = `${IMG_PATH}${correctVerb.animImg}`;
                     
-                    setTimeout(setupGame1, 2500); // 次の問題へ
+                    setTimeout(setupGame1, 2500); 
                 } else {
-                    // 不正解
                     playSound(soundIncorrect);
                     game1Feedback.textContent = 'ちがうよ';
                     game1Feedback.className = 'dv-feedback';
                     
-                    // 2秒後にカードを元に戻す
                     setTimeout(() => {
                         game1Feedback.textContent = '';
                         document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.remove('disabled'));
@@ -542,21 +536,17 @@
             // ----------------------------------------------------
             // ゲーム2 (時制) のロジック
             // ----------------------------------------------------
-            let game2Answer = ''; // 'masu' or 'mashita'
+            let game2Answer = '';
 
             function setupGame2() {
-                // 1. ランダムな動詞を選ぶ
                 const verb = verbData[Math.floor(Math.random() * verbData.length)];
                 
-                // 2. 「ます」か「ました」かをランダムに決める
                 const isMasu = Math.random() < 0.5;
                 game2Answer = isMasu ? 'masu' : 'mashita';
 
-                // 3. UIを更新
                 game2AnimImg.src = `${IMG_PATH}${verb.animImg}`;
                 game2TenseIcon.textContent = isMasu ? '☀️' : '🌙';
                 
-                // 選択肢をランダムな順序で配置
                 if (Math.random() < 0.5) {
                     game2Option1.textContent = verb.masu;
                     game2Option1.dataset.tense = 'masu';
@@ -569,17 +559,14 @@
                     game2Option2.dataset.tense = 'masu';
                 }
 
-                // 4. イベントリスナーとスタイルをリセット
                 [game2Option1, game2Option2].forEach(btn => {
                     btn.className = 'dv-button dv-game2-option-button';
                     btn.disabled = false;
-                    // 古いリスナーを削除して新しいリスナーを設定
                     const newBtn = btn.cloneNode(true);
                     btn.parentNode.replaceChild(newBtn, btn);
                     newBtn.addEventListener('click', handleGame2Choice);
                 });
                 
-                // DOM要素を再取得
                 game2Option1 = document.getElementById('dv-game2-option1');
                 game2Option2 = document.getElementById('dv-game2-option2');
 
@@ -590,30 +577,26 @@
                 const chosenBtn = e.currentTarget;
                 const chosenTense = chosenBtn.dataset.tense;
 
-                // 両方のボタンを無効化
                 game2Option1.disabled = true;
                 game2Option2.disabled = true;
 
                 if (chosenTense === game2Answer) {
-                    // 正解
                     playSound(soundCorrect);
                     chosenBtn.classList.add('correct');
                     game2Feedback.textContent = 'せいかい！';
                     game2Feedback.className = 'dv-feedback success';
                     
-                    setTimeout(setupGame2, 2000); // 次の問題へ
+                    setTimeout(setupGame2, 2000); 
                 } else {
-                    // 不正解
                     playSound(soundIncorrect);
                     chosenBtn.classList.add('incorrect');
                     game2Feedback.textContent = 'ちがうよ';
                     game2Feedback.className = 'dv-feedback';
                     
-                    // 正解のボタンをハイライト
                     const correctBtn = (game2Option1.dataset.tense === game2Answer) ? game2Option1 : game2Option2;
                     correctBtn.classList.add('correct');
                     
-                    setTimeout(setupGame2, 2500); // 次の問題へ
+                    setTimeout(setupGame2, 2500); 
                 }
             }
 
@@ -623,9 +606,7 @@
             // ----------------------------------------------------
             let game3CorrectPair = {};
 
-            // ▼▼▼ この関数を丸ごと置き換えてください ▼▼▼
             function setupGame3() {
-                // 1. UIをリセット
                 game3SlotNoun.innerHTML = '';
                 game3SlotVerb.innerHTML = '';
                 game3ContainerNoun.innerHTML = '';
@@ -634,14 +615,10 @@
                 game3Feedback.className = 'dv-feedback';
                 game3CheckBtn.disabled = false;
 
-                // ★★★ 変更点 ★★★
-                // 2. Game3 (「〜を」) で使える動詞（noun が null でないもの）だけをフィルタリング
                 const game3Verbs = verbData.filter(v => v.noun !== null);
                 
-                // 2b. 3つのユニークな動詞・名詞ペアを選ぶ
                 const shuffledData = shuffleArray(game3Verbs);
                 
-                // ★ 足りない場合に備える (3つ未満の場合)
                 const optionsCount = Math.min(shuffledData.length, 3);
                 
                 if (optionsCount === 0) {
@@ -650,12 +627,9 @@
                      return;
                 }
                 const currentPairs = shuffledData.slice(0, optionsCount);
-                // ★★★★★★★★★★★
 
-                // 3. その中から1つを正解に設定
                 game3CorrectPair = currentPairs[0];
 
-                // 4. カードを作成
                 const nounCards = [];
                 const verbCards = [];
                 
@@ -664,18 +638,96 @@
                     verbCards.push({ text: pair.masu, id: pair.id, type: 'verb' });
                 });
 
-                // 5. シャッフルして配置
                 shuffleArray(nounCards).forEach(cardData => createGame3Card(cardData, game3ContainerNoun));
                 shuffleArray(verbCards).forEach(cardData => createGame3Card(cardData, game3ContainerVerb));
                 
-                // 6. クリックイベントを再設定
                 document.querySelectorAll('.dv-game3-card').forEach(card => {
                     card.addEventListener('click', handleGame3CardClick);
                 });
             }
-            // ▲▲▲ この関数を丸ごと置き換えました ▲▲▲
 
-            // ( これ以降の handleGame3CardClick や game3CheckBtn.onclick などの関数は変更不要です )
+            // ▼▼▼ 修正点 3: 削除されていた関数をここから追加 ▼▼▼
+            function createGame3Card(cardData, container) {
+                const card = document.createElement('div');
+                card.className = 'dv-game3-card';
+                card.textContent = cardData.text;
+                card.dataset.id = cardData.id;
+                card.dataset.type = cardData.type;
+                container.appendChild(card);
+            }
+
+            function handleGame3CardClick(e) {
+                const clickedCard = e.currentTarget;
+                const type = clickedCard.dataset.type;
+                
+                let targetSlot, targetContainer;
+
+                if (type === 'noun') {
+                    targetSlot = game3SlotNoun;
+                    targetContainer = game3ContainerNoun;
+                } else {
+                    targetSlot = game3SlotVerb;
+                    targetContainer = game3ContainerVerb;
+                }
+
+                // カードがスロットにある場合 -> コンテナに戻す
+                if (clickedCard.parentNode === targetSlot) {
+                    targetContainer.appendChild(clickedCard);
+                } 
+                // カードがコンテナにある場合 -> スロットに移動
+                else {
+                    // スロットに既にカードがあれば、それをコンテナに戻す
+                    if (targetSlot.children.length > 0) {
+                        targetContainer.appendChild(targetSlot.children[0]);
+                    }
+                    // クリックしたカードをスロットに入れる
+                    targetSlot.appendChild(clickedCard);
+                }
+            }
+            
+            // 「できた！」ボタンの処理
+            game3CheckBtn.onclick = () => {
+                const nounCard = game3SlotNoun.querySelector('.dv-game3-card');
+                const verbCard = game3SlotVerb.querySelector('.dv-game3-card');
+
+                // カードが揃っていない場合
+                if (!nounCard || !verbCard) {
+                    game3Feedback.textContent = 'カードを えらんでね';
+                    game3Feedback.className = 'dv-feedback';
+                    return;
+                }
+
+                const nounId = nounCard.dataset.id;
+                const verbId = verbCard.dataset.id;
+                
+                game3CheckBtn.disabled = true;
+
+                // 名詞と動詞のIDが一致し、それが正解のIDとも一致する場合
+                // ★修正： game3CorrectPair.id が undefined になる可能性を考慮
+                if (game3CorrectPair && nounId === verbId && nounId === game3CorrectPair.id) {
+                    // 正解
+                    playSound(soundCorrect);
+                    game3Feedback.textContent = 'せいかい！「' + game3CorrectPair.noun + ' を ' + game3CorrectPair.masu + '」';
+                    game3Feedback.className = 'dv-feedback success';
+                    
+                    setTimeout(setupGame3, 2500); // 次の問題へ
+                } else {
+                    // 不正解
+                    playSound(soundIncorrect);
+                    game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
+                    game3Feedback.className = 'dv-feedback';
+                    
+                    setTimeout(() => {
+                        game3CheckBtn.disabled = false;
+                        game3Feedback.textContent = '';
+                        // 間違ったカードをコンテナに戻す
+                        // ★修正：カードが存在するかチェック
+                        if (nounCard) game3ContainerNoun.appendChild(nounCard);
+                        if (verbCard) game3ContainerVerb.appendChild(verbCard);
+                    }, 2500);
+                }
+            };
+            // ▲▲▲ 修正点 3: 削除されていた関数をここまで追加 ▲▲▲
             
 
             // ----------------------------------------------------
@@ -684,6 +736,5 @@
             showScreen(menuScreen); // 最初にメニュー画面を表示
         });
     </script>
-
-</body>
+    </body>
 </html>
