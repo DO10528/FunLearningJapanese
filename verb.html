@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* CSSは変更ありませんので、省略します */
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
             background: linear-gradient(180deg, #e6fff7 0%, #d1f7e8 100%);
@@ -341,6 +340,7 @@
             const IMG_PATH = 'assets/images/verbs/';
             const SOUND_PATH = 'assets/sounds/verbs/';
 
+            // ★ 新しい動詞5つを含む、構文エラーが修正されたリスト
             const verbData = [
                 { id: 'tabemasu', masu: 'たべます', mashita: 'たべました', english: 'eat', 
                   tprImg: 'tpr_eat.png', animImg: 'anim_eating.gif', noun: 'ごはん', nounImg: 'noun_rice.png' },
@@ -359,7 +359,6 @@
                 
                 { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', english: 'write/draw', 
                   tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' },
-                // ▲▲▲ 修正点 1: カンマ(,) を追加 ▲▲▲
             
                 { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', english: 'listen', 
                   tprImg: 'tpr_listen.png', animImg: 'anim_listening.gif', noun: 'おんがく', nounImg: 'noun_music.png' },
@@ -375,8 +374,6 @@
                 
                 { id: 'kaerimasu', masu: 'かえります', mashita: 'かえりました', english: 'return home', 
                   tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
-              
-                // 修正点 2: ここにあった余計な '];' を削除しました
             ];
 
             // 動的にオーディオ要素をキャッシュ
@@ -604,8 +601,8 @@
             // ----------------------------------------------------
             // ゲーム3 (文づくり) のロジック
             // ----------------------------------------------------
-            let game3CorrectPair = {};
-
+            
+            // ★ setupGame3 は前回の修正（noun: null を除外）のままです
             function setupGame3() {
                 game3SlotNoun.innerHTML = '';
                 game3SlotVerb.innerHTML = '';
@@ -628,7 +625,8 @@
                 }
                 const currentPairs = shuffledData.slice(0, optionsCount);
 
-                game3CorrectPair = currentPairs[0];
+                // ★ バグ修正のため、この行は不要になりました
+                // game3CorrectPair = currentPairs[0]; 
 
                 const nounCards = [];
                 const verbCards = [];
@@ -646,7 +644,6 @@
                 });
             }
 
-            // ▼▼▼ 修正点 3: 削除されていた関数をここから追加 ▼▼▼
             function createGame3Card(cardData, container) {
                 const card = document.createElement('div');
                 card.className = 'dv-game3-card';
@@ -670,27 +667,22 @@
                     targetContainer = game3ContainerVerb;
                 }
 
-                // カードがスロットにある場合 -> コンテナに戻す
                 if (clickedCard.parentNode === targetSlot) {
                     targetContainer.appendChild(clickedCard);
                 } 
-                // カードがコンテナにある場合 -> スロットに移動
                 else {
-                    // スロットに既にカードがあれば、それをコンテナに戻す
                     if (targetSlot.children.length > 0) {
                         targetContainer.appendChild(targetSlot.children[0]);
                     }
-                    // クリックしたカードをスロットに入れる
                     targetSlot.appendChild(clickedCard);
                 }
             }
             
-            // 「できた！」ボタンの処理
+            // ▼▼▼ ここがバグ修正のメイン部分です ▼▼▼
             game3CheckBtn.onclick = () => {
                 const nounCard = game3SlotNoun.querySelector('.dv-game3-card');
                 const verbCard = game3SlotVerb.querySelector('.dv-game3-card');
 
-                // カードが揃っていない場合
                 if (!nounCard || !verbCard) {
                     game3Feedback.textContent = 'カードを えらんでね';
                     game3Feedback.className = 'dv-feedback';
@@ -702,17 +694,20 @@
                 
                 game3CheckBtn.disabled = true;
 
-                // 名詞と動詞のIDが一致し、それが正解のIDとも一致する場合
-                // ★修正： game3CorrectPair.id が undefined になる可能性を考慮
-                if (game3CorrectPair && nounId === verbId && nounId === game3CorrectPair.id) {
+                // ★ 修正 ★
+                // 「nounId」と「verbId」が一致すれば、どのペアでも正解とします
+                if (nounId === verbId) {
                     // 正解
+                    // 正解のペア情報を verbData から見つけます
+                    const correctPair = verbData.find(v => v.id === nounId);
+
                     playSound(soundCorrect);
-                    game3Feedback.textContent = 'せいかい！「' + game3CorrectPair.noun + ' を ' + game3CorrectPair.masu + '」';
+                    game3Feedback.textContent = 'せいかい！「' + correctPair.noun + ' を ' + correctPair.masu + '」';
                     game3Feedback.className = 'dv-feedback success';
                     
                     setTimeout(setupGame3, 2500); // 次の問題へ
                 } else {
-                    // 不正解
+                    // 不正解 (例: 「ごはん」と「のみます」)
                     playSound(soundIncorrect);
                     game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
                     game3Feedback.className = 'dv-feedback';
@@ -720,14 +715,12 @@
                     setTimeout(() => {
                         game3CheckBtn.disabled = false;
                         game3Feedback.textContent = '';
-                        // 間違ったカードをコンテナに戻す
-                        // ★修正：カードが存在するかチェック
                         if (nounCard) game3ContainerNoun.appendChild(nounCard);
                         if (verbCard) game3ContainerVerb.appendChild(verbCard);
                     }, 2500);
                 }
             };
-            // ▲▲▲ 修正点 3: 削除されていた関数をここまで追加 ▲▲▲
+            // ▲▲▲ バグ修正完了 ▲▲▲
             
 
             // ----------------------------------------------------
@@ -736,5 +729,6 @@
             showScreen(menuScreen); // 最初にメニュー画面を表示
         });
     </script>
-    </body>
+
+</body>
 </html>
