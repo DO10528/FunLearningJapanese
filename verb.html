@@ -358,7 +358,23 @@
                 
                 { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', english: 'write/draw', 
                   tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' }
-            ];
+            
+                { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', english: 'listen', 
+                  tprImg: 'tpr_listen.png', animImg: 'anim_listening.gif', noun: 'おんがく', nounImg: 'noun_music.png' },
+
+                { id: 'kaimasu', masu: 'かいます', mashita: 'かいました', english: 'buy', 
+                  tprImg: 'tpr_buy.png', animImg: 'anim_buying.gif', noun: 'おかし', nounImg: 'noun_snacks.png' },
+
+                { id: 'ikimasu', masu: 'いきます', mashita: 'いきました', english: 'go', 
+                  tprImg: 'tpr_go.png', animImg: 'anim_going.gif', noun: null, nounImg: null },
+
+                { id: 'kimasu', masu: 'きます', mashita: 'きました', english: 'come', 
+                  tprImg: 'tpr_come.png', animImg: 'anim_coming.gif', noun: null, nounImg: null },
+                
+                { id: 'kaerimasu', masu: 'かえります', mashita: 'かえりました', english: 'return home', 
+                  tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
+              
+                ];
 
             // 動的にオーディオ要素をキャッシュ
             const audioCache = {};
@@ -607,6 +623,7 @@
             // ----------------------------------------------------
             let game3CorrectPair = {};
 
+            // ▼▼▼ この関数を丸ごと置き換えてください ▼▼▼
             function setupGame3() {
                 // 1. UIをリセット
                 game3SlotNoun.innerHTML = '';
@@ -617,10 +634,24 @@
                 game3Feedback.className = 'dv-feedback';
                 game3CheckBtn.disabled = false;
 
-                // 2. 3つのユニークな動詞・名詞ペアを選ぶ
-                const shuffledData = shuffleArray(verbData);
-                const currentPairs = shuffledData.slice(0, 3);
+                // ★★★ 変更点 ★★★
+                // 2. Game3 (「〜を」) で使える動詞（noun が null でないもの）だけをフィルタリング
+                const game3Verbs = verbData.filter(v => v.noun !== null);
                 
+                // 2b. 3つのユニークな動詞・名詞ペアを選ぶ
+                const shuffledData = shuffleArray(game3Verbs);
+                
+                // ★ 足りない場合に備える (3つ未満の場合)
+                const optionsCount = Math.min(shuffledData.length, 3);
+                
+                if (optionsCount === 0) {
+                     game3Feedback.textContent = 'ゲーム3でつかえる ことば がありません。';
+                     game3CheckBtn.disabled = true;
+                     return;
+                }
+                const currentPairs = shuffledData.slice(0, optionsCount);
+                // ★★★★★★★★★★★
+
                 // 3. その中から1つを正解に設定
                 game3CorrectPair = currentPairs[0];
 
@@ -642,85 +673,9 @@
                     card.addEventListener('click', handleGame3CardClick);
                 });
             }
+            // ▲▲▲ この関数を丸ごと置き換えました ▲▲▲
 
-            function createGame3Card(cardData, container) {
-                const card = document.createElement('div');
-                card.className = 'dv-game3-card';
-                card.textContent = cardData.text;
-                card.dataset.id = cardData.id;
-                card.dataset.type = cardData.type;
-                container.appendChild(card);
-            }
-
-            function handleGame3CardClick(e) {
-                const clickedCard = e.currentTarget;
-                const type = clickedCard.dataset.type;
-                
-                let targetSlot, targetContainer;
-
-                if (type === 'noun') {
-                    targetSlot = game3SlotNoun;
-                    targetContainer = game3ContainerNoun;
-                } else {
-                    targetSlot = game3SlotVerb;
-                    targetContainer = game3ContainerVerb;
-                }
-
-                // カードがスロットにある場合 -> コンテナに戻す
-                if (clickedCard.parentNode === targetSlot) {
-                    targetContainer.appendChild(clickedCard);
-                } 
-                // カードがコンテナにある場合 -> スロットに移動
-                else {
-                    // スロットに既にカードがあれば、それをコンテナに戻す
-                    if (targetSlot.children.length > 0) {
-                        targetContainer.appendChild(targetSlot.children[0]);
-                    }
-                    // クリックしたカードをスロットに入れる
-                    targetSlot.appendChild(clickedCard);
-                }
-            }
-            
-            // 「できた！」ボタンの処理
-            game3CheckBtn.onclick = () => {
-                const nounCard = game3SlotNoun.querySelector('.dv-game3-card');
-                const verbCard = game3SlotVerb.querySelector('.dv-game3-card');
-
-                // カードが揃っていない場合
-                if (!nounCard || !verbCard) {
-                    game3Feedback.textContent = 'カードを えらんでね';
-                    game3Feedback.className = 'dv-feedback';
-                    return;
-                }
-
-                const nounId = nounCard.dataset.id;
-                const verbId = verbCard.dataset.id;
-                
-                game3CheckBtn.disabled = true;
-
-                // 名詞と動詞のIDが一致し、それが正解のIDとも一致する場合
-                if (nounId === verbId && nounId === game3CorrectPair.id) {
-                    // 正解
-                    playSound(soundCorrect);
-                    game3Feedback.textContent = 'せいかい！「' + game3CorrectPair.noun + ' を ' + game3CorrectPair.masu + '」';
-                    game3Feedback.className = 'dv-feedback success';
-                    
-                    setTimeout(setupGame3, 2500); // 次の問題へ
-                } else {
-                    // 不正解
-                    playSound(soundIncorrect);
-                    game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
-                    game3Feedback.className = 'dv-feedback';
-                    
-                    setTimeout(() => {
-                        game3CheckBtn.disabled = false;
-                        game3Feedback.textContent = '';
-                        // 間違ったカードをコンテナに戻す
-                        game3ContainerNoun.appendChild(nounCard);
-                        game3ContainerVerb.appendChild(verbCard);
-                    }, 2500);
-                }
-            };
+            // ( これ以降の handleGame3CardClick や game3CheckBtn.onclick などの関数は変更不要です )
             
 
             // ----------------------------------------------------
