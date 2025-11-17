@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語 動詞マスターゲーム</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
-    
-    <style>
+<style>
+        /* ▼▼▼ この <style> タグの中身を丸ごと入れ替えてください ▼▼▼ */
+        
+        /* キーフレームアニメーション (ポップアップ用) */
+        @keyframes dv-pop-in {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1.0); opacity: 1; }
+        }
+
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
-            background: linear-gradient(180deg, #e6fff7 0%, #d1f7e8 100%);
+            /* 背景を明るいイエロー系に変更 */
+            background: linear-gradient(180deg, #fffde7 0%, #fff9c4 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 10px;
             box-sizing: border-box;
-            color: #2a5a4a;
+            /* メインの文字色を濃いブルーに変更 */
+            color: #01579b; 
         }
 
         #dv-container {
@@ -28,12 +30,14 @@
             margin: 20px auto;
             padding: 20px; 
             background-color: #ffffff;
-            box-shadow: 0 8px 24px rgba(0, 100, 70, 0.15); 
-            border-radius: 20px; 
-            border: 3px solid #a6e7d0;
+            /* 影を柔らかく、青みがかったものに変更 */
+            box-shadow: 0 10px 30px rgba(41, 182, 246, 0.2); 
+            /* 角をさらに丸く */
+            border-radius: 30px; 
+            /* 枠線を太く、白にして浮き上がらせる */
+            border: 5px solid #fff; 
         }
         
-        /* --- 画面切り替え --- */
         .dv-screen {
             display: none; 
         }
@@ -43,10 +47,13 @@
 
         h1, h2 {
             text-align: center;
-            color: #008a5e;
+            /* タイトルの色を明るいブルーに変更 */
+            color: #0288d1;
+            /* 文字に白い影をつけ、ステッカーのように見せる */
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
         }
-        h1 { font-size: 2.2em; margin-bottom: 20px; }
-        h2 { font-size: 1.8em; margin-bottom: 20px; }
+        h1 { font-size: 2.5em; margin-bottom: 20px; }
+        h2 { font-size: 2em; margin-bottom: 20px; }
         p { text-align: center; font-size: 1.1em; }
 
         /* --- ボタン共通 --- */
@@ -54,40 +61,72 @@
             display: block;
             width: 90%;
             margin: 15px auto;
-            padding: 20px;
+            padding: 20px; /* パディングを調整 */
             font-size: 1.5em;
             font-weight: 700;
             color: #fff;
-            background-color: #00b87a;
-            border: none;
+            background-color: #29b6f6; /* ベースの色を明るいブルーに */
+            border: none; /* 枠線を削除 */
             border-radius: 15px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-bottom: 5px solid #008a5e;
+            /* 影で立体感を出す（「押す部分」と「厚み」） */
+            box-shadow: 0 6px 0 #0288d1; /* 濃い青で厚みを表現 */
+            transition: all 0.1s ease-out;
+            position: relative; /* :active のため */
+            top: 0;
         }
-        .dv-button:hover {
-            transform: scale(1.03) translateY(-2px);
-        }
+        
+        /* ボタンを押したときの「へこむ」表現 */
         .dv-button:active {
-            transform: scale(1.0) translateY(1px);
-            border-bottom-width: 2px;
+            top: 4px; /* 4px下にずらす */
+            box-shadow: 0 2px 0 #0288d1; /* 影を薄くする */
         }
+        
+        /* --- メニューボタンの色を個別に設定 --- */
+        #dv-menu-game1 {
+            background-color: #66bb6a; /* グリーン */
+            box-shadow: 0 6px 0 #388e3c;
+        }
+        #dv-menu-game1:active { box-shadow: 0 2px 0 #388e3c; top: 4px; }
+
+        #dv-menu-game2 {
+            background-color: #ffa726; /* オレンジ */
+            box-shadow: 0 6px 0 #f57c00;
+        }
+        #dv-menu-game2:active { box-shadow: 0 2px 0 #f57c00; top: 4px; }
+
+        #dv-menu-game3 {
+            background-color: #42a5f5; /* ブルー */
+            box-shadow: 0 6px 0 #1e88e5;
+        }
+        #dv-menu-game3:active { box-shadow: 0 2px 0 #1e88e5; top: 4px; }
+
+
         .dv-button-secondary {
-             background-color: #6c757d;
-             border-bottom-color: #4a4e52;
+             background-color: #90a4ae;
+             box-shadow: 0 6px 0 #546e7a;
              font-size: 1.1em;
              padding: 10px 15px;
              width: 150px;
              margin-top: 25px;
         }
+        .dv-button-secondary:active { box-shadow: 0 2px 0 #546e7a; top: 4px; }
+
 
         /* --- フィードバック --- */
         .dv-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
-            margin-top: 20px; min-height: 1.3em; color: #d9534f;
+            margin-top: 20px; min-height: 1.3em; color: #ef5350; /* 赤色を鮮やかに */
+            transform: scale(0); /* 最初は見えない */
+            opacity: 0;
         }
-        .dv-feedback.success { color: #00b87a; }
+        /* メッセージが表示されたらポップアップアニメ */
+        .dv-feedback:not(:empty) {
+            animation: dv-pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(1); /* アニメ後に表示を維持 */
+            opacity: 1;
+        }
+        .dv-feedback.success { color: #66bb6a; } /* 緑色を鮮やかに */
 
         /* --- 0. メインメニュー --- */
         #dv-main-menu p {
@@ -100,12 +139,13 @@
             width: 90%;
             height: 150px;
             margin: 10px auto;
-            background: #f0fdf8;
-            border: 2px dashed #a6e7d0;
+            background: #f1f8e9; /* 薄いグリーン */
+            border: 3px dashed #c5e1a5;
             border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* 画像がはみ出ないように */
         }
         #dv-game1-char-img {
             height: 140px;
@@ -118,25 +158,30 @@
             margin-top: 20px;
         }
         .dv-game1-option-card {
-            border: 3px solid #a6e7d0;
-            border-radius: 10px;
+            border: 4px solid #fff; /* 枠線を白に変更 */
+            border-radius: 15px;
             padding: 10px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: #fff;
+            /* 弾むようなトランジション */
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        /* カードが跳ねるようなホバーエフェクト */
         .dv-game1-option-card:hover {
-            background-color: #f0fdf8;
-            transform: scale(1.05);
+            background-color: #f1f8e9;
+            transform: rotate(-3deg) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
         .dv-game1-option-card img {
             width: 100%;
             height: 100px;
             object-fit: contain;
         }
-        /* -- 選択肢が押せない時のスタイル -- */
         .dv-game1-option-card.disabled {
             opacity: 0.5;
             pointer-events: none;
+            transform: rotate(0) scale(1);
         }
 
 
@@ -145,13 +190,14 @@
             width: 90%;
             height: 200px;
             margin: 10px auto;
-            background: #f0fdf8;
-            border: 2px dashed #a6e7d0;
+            background: #e3f2fd; /* 薄いブルー */
+            border: 3px dashed #90caf9;
             border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
         }
         #dv-game2-anim-img {
             height: 180px;
@@ -162,6 +208,8 @@
             top: 10px;
             right: 10px;
             font-size: 3em;
+            /* アイコンに影をつける */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
         }
         #dv-game2-options {
             display: grid;
@@ -169,19 +217,20 @@
             gap: 15px;
             margin-top: 20px;
         }
-        /* ボタンを大きく */
         .dv-game2-option-button {
             padding: 25px;
             font-size: 1.4em;
+            background-color: #29b6f6; /* 明るいブルー */
+            box-shadow: 0 6px 0 #0288d1;
         }
         .dv-game2-option-button.correct {
-            background-color: #28a745;
-            border-bottom-color: #1e7e34;
+            background-color: #66bb6a;
+            box-shadow: 0 6px 0 #388e3c;
             transform: scale(1.05);
         }
         .dv-game2-option-button.incorrect {
-            background-color: #d9534f;
-            border-bottom-color: #a73c39;
+            background-color: #ef5350;
+            box-shadow: 0 6px 0 #c62828;
         }
 
 
@@ -191,8 +240,8 @@
             justify-content: center;
             align-items: center;
             min-height: 80px;
-            background: #f0fdf8;
-            border: 2px dashed #a6e7d0;
+            background: #e3f2fd;
+            border: 3px dashed #90caf9;
             border-radius: 10px;
             padding: 10px;
             margin: 10px auto;
@@ -202,14 +251,14 @@
             font-size: 2em;
             font-weight: bold;
             margin: 0 10px;
-            color: #008a5e;
+            color: #0d47a1;
         }
         .dv-game3-slot {
             width: 150px;
             height: 70px;
-            border: 2px solid #ccc;
+            border: 3px dashed #ccc;
             border-radius: 8px;
-            background: #f9f9f9;
+            background: #f5f5f5;
         }
         .dv-game3-card-container {
             display: flex;
@@ -227,14 +276,18 @@
             font-size: 1.2em;
             font-weight: bold;
             background-color: #fff;
-            border: 2px solid #00b87a;
+            border: 3px solid #00b87a;
             color: #008a5e;
             border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+            /* 弾むようなトランジション */
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        /* カードが跳ねるようなホバーエフェクト */
         .dv-game3-card:hover {
-            background-color: #f0fdf8;
+            transform: rotate(3deg) scale(1.05);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
         /* カードがスロットに入った時のスタイル */
         .dv-game3-slot .dv-game3-card {
@@ -245,19 +298,21 @@
             align-items: center;
             padding: 0;
             margin: 0;
-            background-color: #e6fff7;
+            transform: rotate(0) scale(1);
+            box-shadow: none;
         }
         /* 名詞・動詞で色分け */
         .dv-game3-card[data-type="noun"] {
-            border-color: #48dbfb;
-            color: #00a9d9;
+            border-color: #4fc3f7;
+            color: #0288d1;
         }
         .dv-game3-card[data-type="verb"] {
-            border-color: #00b87a;
-            color: #008a5e;
+            border-color: #81c784;
+            color: #388e3c;
         }
+        
+        /* ▲▲▲ この <style> タグの中身を丸ごと入れ替えてください ▲▲▲ */
     </style>
-</head>
 <body>
 
     <div id="dv-container">
