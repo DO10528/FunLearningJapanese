@@ -101,31 +101,31 @@
             width: 200px;
             height: 200px;
             position: relative; 
-            
-            /* ★ 修正：背景画像を使う */
             background-image: url('assets/images/clocks/clock_face_base.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
         }
         .tc-hand {
-            height: 6px;
-            background: #333;
+            height: 6px; /* 針の太さは維持 */
             position: absolute;
             top: 50%; 
             left: 50%; 
             transform-origin: 0% 50%; 
             transform: translateY(-50%) rotate(-90deg); /* 12時を指す */
+            border-radius: 3px; /* 針の先端を丸く */
         }
         .tc-hour-hand {
-            width: 35%; /* 短い針 */
-            height: 8px; /* 太い針 */
-            background: #006064;
+            /* 200px (時計の直径) の4分の3短く = 25% の長さになる */
+            width: calc(200px * 0.25); 
+            height: 8px; /* 太さ維持 */
+            background: #4CAF50; /* 緑色 */
         }
         .tc-minute-hand {
-            width: 45%; /* 長い針 */
-            height: 4px; /* 細い針 */
-            background: #00bcd4;
+            /* 200px (時計の直径) の5分の4短く = 20% の長さになる */
+            width: calc(200px * 0.20); 
+            height: 4px; /* 太さ維持 */
+            background: #FF9800; /* オレンジ色 */
         }
         .tc-center-dot {
             width: 12px;
@@ -160,7 +160,6 @@
             box-shadow: 0 5px 0 #b71c1c;
             opacity: 0.8;
         }
-        /* ★ 修正：不正解で無効になった時のスタイル */
         .tc-option.disabled {
             pointer-events: none;
             opacity: 0.7;
