@@ -3,198 +3,558 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>あいさつクイズ</title>
-    <link rel="stylesheet" href="assets/css/style.css"> 
+    <title>あいさつゲーム</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* CSSスタイルはkanji_quizと統一感を持ちます */
-        body { 
-            font-family: 'Arial', sans-serif; 
-            max-width: 700px; 
-            margin: 20px auto; 
-            padding: 20px; 
-            background-color: #f4f7f6;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        h1 { 
-            text-align: center; 
-            color: #008080; /* テーマカラー */
-            margin-bottom: 30px;
-        }
-        .quiz-container { 
-            background-color: #ffffff; 
-            padding: 25px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #f3e5f5 0%, #e1bee7 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #4a148c;
         }
 
-        /* 質問エリア */
+        #aq-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px; 
+            background-color: #ffffff;
+            box-shadow: 0 8px 24px rgba(74, 20, 140, 0.15); 
+            border-radius: 20px; 
+            border: 3px solid #ce93d8;
+        }
+        
+        /* 画面切り替え */
+        .aq-screen { display: none; }
+        .aq-screen.active { display: block; }
+
+        h1, h2 { text-align: center; color: #7b1fa2; }
+        h1 { font-size: 2.2em; }
+        h2 { font-size: 1.8em; }
+        p { text-align: center; font-size: 1.1em; }
+
+        /* --- ボタン共通 --- */
+        .aq-button {
+            display: block; width: 90%; margin: 15px auto;
+            padding: 15px; font-size: 1.5em; font-weight: 700;
+            color: #fff; background-color: #9c27b0; border: none;
+            border-radius: 15px; cursor: pointer;
+            box-shadow: 0 5px 0 #6a1b9a;
+            transition: all 0.1s ease-out; position: relative; top: 0;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+        .aq-button:active { top: 3px; box-shadow: 0 2px 0 #6a1b9a; }
+        .aq-button-secondary {
+             background-color: #90a4ae;
+             box-shadow: 0 5px 0 #546e7a;
+        }
+        .aq-button-secondary:active {
+             top: 3px;
+             box-shadow: 0 2px 0 #546e7a;
+        }
+
+        /* --- 1. 勉強スクリーン --- */
+        #aq-study-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .aq-study-item {
+            border: 2px solid #e1bee7;
+            border-radius: 10px;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .aq-study-item:hover { background-color: #f3e5f5; }
+        .aq-study-item img {
+            width: 100%; max-width: 80px; height: 80px; object-fit: contain;
+        }
+        .aq-study-item p {
+            font-size: 1.1em; font-weight: bold; margin: 5px 0 0 0;
+        }
+
+        /* --- 2. クイズスクリーン --- */
         .question-area { 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
             text-align: center;
         }
-        #question-number { 
+        #aq-question-number { 
             font-size: 1.1em; 
-            color: #555; 
+            color: #6a1b9a; 
             margin-bottom: 10px;
         }
         
-        /* タイマー表示エリア */
-        #timer-box {
+        /* タイマー表示エリア (★ 修正) */
+        #aq-timer-box {
             font-size: 1.5em;
             font-weight: bold;
             color: white;
-            background-color: #ff6347; /* 目立つ色 */
-            width: 180px; /* 少し幅を広げる */
+            background-color: #ff6347; 
             margin: 15px auto;
-            padding: 5px 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* 状況説明（問題文）のスタイル */
-        #question-text { 
-            font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif; 
-            font-size: 1.4em; 
-            font-weight: bold; 
-            color: #2a2a2a;
-            padding: 15px;
-            background-color: #e6ffff;
-            border: 3px solid #008080;
+            padding: 5px 15px; /* 左右のpaddingを広げる */
             border-radius: 10px;
-            display: inline-block; 
-            margin: 0; /* ★ 修正 */
-            min-width: 60%; /* ★ 修正 */
-            text-align: left; /* ★ 修正 */
+            display: inline-block; /* 1行にするため */
         }
 
-        /* 選択肢ボタン */
+        /* 問題文エリア */
+        .question-prompt-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; 
+            margin-top: 5px;
+            padding: 15px;
+            background: #f3e5f5;
+            border-radius: 10px;
+        }
+        #aq-question-text { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            color: #4a148c;
+            margin: 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        /* 音声再生ボタン */
+        .sound-button {
+            width: 60px; height: 60px; padding: 0;
+            font-size: 2em; background-color: #9c27b0;
+            color: white; border: none; border-radius: 50%;
+            cursor: pointer; flex-shrink: 0;
+            transition: background-color 0.2s;
+        }
+        .sound-button:hover:not(:disabled) { background-color: #7b1fa2; }
+        .sound-button:disabled { background-color: #cccccc; opacity: 0.7; }
+        
+        /* 選択肢 (★ 修正) */
         .choices { 
             display: grid; 
-            grid-template-columns: 1fr; 
+            grid-template-columns: 1fr; /* 3つなので1列にする */
             gap: 12px; 
             margin-bottom: 20px;
         }
         .choices button {
             width: 100%;
             padding: 15px 20px;
-            font-size: 1.2em;
+            font-size: 1.4em; /* 少し大きく */
+            font-weight: 700;
             cursor: pointer;
-            border: 1px solid #008080;
-            background-color: #008080;
-            color: white;
-            border-radius: 25px; 
+            /* 時計ゲームのスタイルに合わせる */
+            background-color: #fff;
+            color: #7b1fa2;
+            border: 4px solid #ce93d8;
+            border-radius: 15px;
+            box-shadow: none;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             text-align: center;
         }
         .choices button:hover:not(:disabled) { 
-            background-color: #006666; 
-            border-color: #006666; 
-            transform: translateY(-2px);
+            background-color: #f3e5f5; 
+            transform: scale(1.03);
         }
-        .choices button:disabled { opacity: 0.7; cursor: not-allowed; background-color: #cccccc !important; border-color: #bbbbbb !important; color: #666666 !important; }
-        .choices button.correct-answer { background-color: #28a745; border-color: #28a745; color: white; }
+        .choices button:disabled { opacity: 0.7; cursor: not-allowed; }
+        .choices button.correct { 
+            border-color: #9c27b0;
+            background-color: #f3e5f5;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #9c27b0;
+        }
+        .choices button.incorrect {
+            border-color: #d9534f;
+            background-color: #fbe9e7;
+            opacity: 0.6;
+        }
         
         /* 結果メッセージ */
-        .result-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 1.2em; font-weight: bold; }
-        .result-message.correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .result-message.incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        
-        /* ナビゲーションボタン */
-        .navigation-buttons { text-align: center; margin-top: 30px; }
-        .navigation-buttons button { padding: 10px 25px; font-size: 1em; border: none; border-radius: 20px; cursor: pointer; margin: 0 10px; transition: background-color 0.3s; }
-        #home-button { background-color: #6c757d; color: white; }
-        #home-button:hover { background-color: #5a6268; }
-        #restart-button { background-color: #ffc107; color: #333; }
-        #restart-button:hover { background-color: #e0a800; }
+        .result-message { 
+            text-align: center; margin-top: 20px; padding: 10px; 
+            border-radius: 8px; font-size: 1.2em; font-weight: bold;
+            display: none; /* JSで制御 */
+        }
+        .result-message.correct { background-color: #d4edda; color: #155724; }
+        .result-message.incorrect { background-color: #f8d7da; color: #721c24; }
         
         /* 最終スコア */
-        #final-score { text-align: center; font-size: 1.8em; color: #008080; margin-top: 30px; background-color: #e6ffff; padding: 20px; border-radius: 8px; }
+        #aq-final-score { 
+            text-align: center; font-size: 1.8em; 
+            color: #7b1fa2; margin-top: 30px; 
+            background-color: #f3e5f5; padding: 20px; border-radius: 8px;
+            display: none; /* JSで制御 */
+        }
 
-        /* 画像エリアは構造上残しますが、今回のクイズでは非表示を維持 */
-        .image-box { display:none; }
+        .navigation-buttons { text-align: center; margin-top: 20px; }
+        .navigation-buttons button { display: none; } /* JSで制御 */
 
-        /* ▼▼▼ このCSSコードを追加 ▼▼▼ */
-        /* 問題文と再生ボタンを横並びにする */
-        .question-prompt-container {
-            display: flex;
-            align-items: center;
-            justify-content: center; /* 中央揃え */
-            gap: 15px; /* ボタンとの隙間 */
-            margin-top: 5px;
-            /* 問題文の背景などは #question-text 側で設定 */
+        @media (max-width: 400px) {
+            #aq-study-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            #aq-question-text { font-size: 1.1em; }
         }
-        
-        /* 音声再生ボタンのスタイル */
-        .sound-button {
-            width: 60px;
-            height: 60px;
-            padding: 0;
-            font-size: 2em;
-            background-color: #008080; /* テーマカラー */
-            color: white;
-            border: none;
-            border-radius: 50%; /* 丸くする */
-            cursor: pointer;
-            flex-shrink: 0; /* 縮まないように */
-            transition: background-color 0.2s;
-        }
-        .sound-button:hover {
-            background-color: #006666;
-        }
-        .sound-button:disabled {
-            background-color: #cccccc;
-            opacity: 0.7;
-        }
-        /* ▲▲▲ ここまで追加 ▲▲▲ */
-
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-0BX3DD42C1');
     </script>
-    </head>
+</head>
 <body>
 
-    <h1>あいさつ クイズ (10びょうせいげん)</h1>
+    <div id="aq-container">
 
-    <div class="quiz-container">
-        
-        <div class="question-area">
-            <p id="question-number">だい 1 もん</p>
-            <div id="timer-box">のこり 10 びょう</div> 
-            
-            <p id="question-prompt">ただしい あいさつを えらんでね：</p>
-            
-            <div class="question-prompt-container">
-                <h2 id="question-text">もんだいぶんが ひょうじされます...</h2> 
-                <button id="play-situation-sound" class="sound-button">▶</button>
-            </div>
-            </div>
-
-        <div class="choices" id="choices-container">
-            </div>
-
-        <div id="result-message" class="result-message" style="display: none;">
-            </div>
-        
-        <div id="final-score" style="display: none;">
-            </div>
-
-        <div classs="navigation-buttons">
-            <button id="home-button">ホームにもどる</button>
-            <button id="restart-button" style="display: none;">もういちど あそぶ</button>
+        <div id="aq-screen-study" class="aq-screen active">
+            <h1>あいさつ を おぼえよう</h1>
+            <p>イラストを タップ して おとを きいてね。</p>
+            <div id="aq-study-grid">
+                </div>
+            <button id="aq-start-quiz-button" class="aq-button">クイズを はじめる</button>
+            <a href="index.html" class="aq-button aq-button-secondary">ホームにもどる</a>
         </div>
-    </div>
+        <div id="aq-screen-quiz" class="aq-screen">
+            <div class="question-area">
+                <p id="aq-question-number">だい 1 もん</p>
+                <div id="aq-timer-box" style="display: none;">のこり 10 びょう</div> 
+                
+                <p>ただしい あいさつを えらんでね：</p>
+                
+                <div class="question-prompt-container">
+                    <h2 id="aq-question-text">もんだいぶんが ひょうじされます...</h2> 
+                    <button id="aq-play-sound-button" class="sound-button">▶</button>
+                </div>
+            </div>
 
-    <script src="js/aisatsu_quiz.js"></script>
+            <div class="choices" id="aq-choices-container">
+                </div>
 
-</body>
+            <div id="aq-result-message" class="result-message">
+                </div>
+            
+            <div id="aq-final-score">
+                </div>
+
+            <div classs="navigation-buttons">
+                <a href="index.html" id="aq-home-button" class="aq-button aq-button-secondary">ホームにもどる</a>
+                <button id="aq-restart-button" class="aq-button">もういちど あそぶ</button>
+            </div>
+        </div>
+        </div>
+
+    <audio id="aq-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
+    <audio id="aq-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
+
+    <script>
+        // JSは外部ファイル (js/aisatsu_quiz.js) ではなく、HTML内に直接記述します
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ----------------------------------------------------
+            // データ定義
+            // ----------------------------------------------------
+            const SOUND_PATH_AISATSU = 'assets/sounds/aisatsu/';
+            const IMAGE_PATH_AISATSU = 'assets/images/aisatsu/'; // ★ 勉強スクリーン用
+
+            // ★ 修正： image プロパティを追加
+            const greetingsData = [
+                { "id": 1, "situation": "あさ、おきたとき、または あったひとに いう あいさつは？ (朝)", "correct": "おはよう", "image": "ohayou.png", "wrongs": ["こんにちは", "こんばんは", "おやすみなさい"] },
+                { "id": 2, "situation": "ひるま、ひとに あったときの あいさつは？ (昼)", "correct": "こんにちは", "image": "konnichiwa.png", "wrongs": ["おはよう", "こんばんは", "さようなら"] },
+                { "id": 3, "situation": "ゆうがたから よるに かけて、ひとに あったときの あいさつは？ (夜)", "correct": "こんばんは", "image": "konbanwa.png", "wrongs": ["おはよう", "こんにちは", "ただいま"] },
+                { "id": 4, "situation": "ねるまえに ひとに いう あいさつは？", "correct": "おやすみなさい", "image": "oyasumi.png", "wrongs": ["さようなら", "いただきます", "いってきます"] },
+                { "id": 5, "situation": "これから いえを でかけるときの あいさつは？ (自分が)", "correct": "いってきます", "image": "ittekimasu.png", "wrongs": ["ただいま", "いってらっしゃい", "おかえりなさい"] },
+                { "id": 6, "situation": "かぞくが でかけるときに、かえす ことばは？", "correct": "いってらっしゃい", "image": "itterasshai.png", "wrongs": ["いってきます", "ただいま", "おかえりなさい"] },
+                { "id": 7, "situation": "そとから いえに かえってきたときの あいさつは？", "correct": "ただいま", "image": "tadaima.png", "wrongs": ["おかえりなさい", "いってきます", "ごちそうさま"] },
+                { "id": 8, "situation": "「ただいま」と いわれたときの かえす ことばは？", "correct": "おかえりなさい", "image": "okaeri.png", "wrongs": ["いってきます", "さようなら", "ごめんなさい"] },
+                { "id": 9, "situation": "なにかを してもらったときの、かんしゃの ことばは？", "correct": "ありがとう", "image": "arigatou.png", "wrongs": ["ごめんなさい", "いただきます", "おやすみなさい"] },
+                { "id": 10, "situation": "わるいことを してしまったときの あいさつは？", "correct": "ごめんなさい", "image": "gomen.png", "wrongs": ["ありがとう", "こんにちは", "いただきます"] },
+                { "id": 11, "situation": "ごはんを たべるまえの あいさつは？", "correct": "いただきます", "image": "itadakimasu.png", "wrongs": ["ごちそうさま", "ありがとう", "おかえりなさい"] },
+                { "id": 12, "situation": "ごはんを たべおわった あとの あいさつは？", "correct": "ごちそうさま", "image": "gochisousama.png", "wrongs": ["いただきます", "こんにちは", "おやすみなさい"] },
+                { "id": 13, "situation": "はじめて あうひとに いう、さいしょの あいさつは？", "correct": "はじめまして", "image": "hajimemashite.png", "wrongs": ["こんにちは", "さようなら", "いってきます"] },
+                { "id": 14, "situation": "かぞくや ともだちと わかれるときの あいさつは？", "correct": "さようなら", "image": "sayounara.png", "wrongs": ["こんにちは", "おかえりなさい", "おやすみなさい"] }
+            ];
+
+            // --- 音声キャッシュ ---
+            const audioCache = {};
+            function loadAudio(path) {
+                if (!audioCache[path]) {
+                    audioCache[path] = new Audio(path);
+                }
+                return audioCache[path];
+            }
+            const soundCorrect = document.getElementById('aq-sound-correct');
+            const soundIncorrect = document.getElementById('aq-sound-incorrect');
+            
+            // --- DOM取得 ---
+            const screens = document.querySelectorAll('.aq-screen');
+            const studyScreen = document.getElementById('aq-screen-study');
+            const quizScreen = document.getElementById('aq-screen-quiz');
+            
+            // 勉強スクリーン
+            const studyGridEl = document.getElementById('aq-study-grid');
+            const startQuizButton = document.getElementById('aq-start-quiz-button');
+            
+            // クイズスクリーン
+            const questionNumberEl = document.getElementById('aq-question-number');
+            const timerBoxEl = document.getElementById('aq-timer-box');
+            const questionTextEl = document.getElementById('aq-question-text');
+            const playSoundButton = document.getElementById('aq-play-sound-button');
+            const choicesContainerEl = document.getElementById('aq-choices-container');
+            const resultMessageEl = document.getElementById('aq-result-message');
+            const finalScoreEl = document.getElementById('aq-final-score');
+            const homeButton = document.getElementById('aq-home-button');
+            const restartButton = document.getElementById('aq-restart-button');
+
+            // --- ゲーム状態変数 ---
+            let allQuestions = []; 
+            let currentQuestions = []; 
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let timer;
+            let timeLeft = 10;
+            let currentSituationSound = null;
+
+            // ----------------------------------------------------
+            // 汎用関数
+            // ----------------------------------------------------
+            function showScreen(screenElement) {
+                screens.forEach(s => s.classList.remove('active'));
+                screenElement.classList.add('active');
+            }
+            function playSound(audioElement) {
+                if (audioElement) {
+                    audioElement.currentTime = 0;
+                    audioElement.play().catch(e => console.error("音声再生エラー:", e));
+                }
+            }
+            function shuffleArray(array) {
+                let newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+
+            // ----------------------------------------------------
+            // ★ 1. 勉強スクリーンのロジック (NEW)
+            // ----------------------------------------------------
+            function initStudyScreen() {
+                studyGridEl.innerHTML = '';
+                greetingsData.forEach(word => {
+                    const item = document.createElement('div');
+                    item.className = 'aq-study-item';
+                    
+                    // クリックしたら「答え」の音を再生
+                    item.onclick = () => {
+                        const answerSound = loadAudio(SOUND_PATH_AISATSU + word.correct + '.mp3');
+                        playSound(answerSound);
+                    };
+                    
+                    const img = document.createElement('img');
+                    img.src = IMAGE_PATH_AISATSU + word.image;
+                    img.alt = word.correct;
+                    
+                    const p = document.createElement('p');
+                    p.textContent = word.correct;
+                    
+                    item.appendChild(img);
+                    item.appendChild(p);
+                    studyGridEl.appendChild(item);
+                });
+            }
+
+            // ----------------------------------------------------
+            // ★ 2. クイズのメインロジック (修正)
+            // ----------------------------------------------------
+
+            function startGame() {
+                allQuestions = shuffleArray([...greetingsData]);
+                currentQuestions = allQuestions.slice(0, 10); // 10問に限定
+                currentQuestionIndex = 0;
+                score = 0;
+                
+                // UIリセット
+                finalScoreEl.style.display = 'none';
+                resultMessageEl.style.display = 'none';
+                choicesContainerEl.style.display = 'grid';
+                restartButton.style.display = 'none';
+                homeButton.style.display = 'block'; // ホームボタンは常に表示
+
+                loadQuestion();
+            }
+
+            function loadQuestion() {
+                clearInterval(timer); // 前のタイマーをクリア
+                resultMessageEl.style.display = 'none';
+                
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    endGame();
+                    return;
+                }
+
+                const problem = currentQuestions[currentQuestionIndex];
+                
+                questionNumberEl.textContent = `だい ${currentQuestionIndex + 1} もん`;
+                questionTextEl.textContent = problem.situation;
+                timerBoxEl.style.display = 'none'; // ★ タイマーを隠す
+
+                // ★ 選択肢を3つにする
+                const wrongOptions = shuffleArray(problem.wrongs).slice(0, 2); // 3つの間違いから2つ選ぶ
+                const options = shuffleArray([problem.correct, ...wrongOptions]);
+                
+                choicesContainerEl.innerHTML = '';
+                options.forEach(optionText => {
+                    const button = document.createElement('button');
+                    button.className = 'aq-option-button aq-option';
+                    button.textContent = optionText;
+                    button.onclick = (e) => checkAnswer(e, problem.correct);
+                    choicesContainerEl.appendChild(button);
+                });
+                
+                // --- ★ 修正：音声再生ロジック ---
+                const soundFile = `situation${problem.id}.mp3`;
+                currentSituationSound = loadAudio(SOUND_PATH_AISATSU + soundFile);
+                playSoundButton.onclick = () => playSound(currentSituationSound);
+                
+                // ボタンを一時的に無効化
+                disableChoices(true);
+                playSoundButton.disabled = true;
+
+                // 音声再生が終了したら、タイマーを開始
+                currentSituationSound.onended = () => {
+                    startTimer(); // ★ 音声が終わったらタイマー開始
+                    disableChoices(false); // ボタンを有効化
+                    playSoundButton.disabled = false;
+                };
+                
+                // ★ 自動再生
+                playSound(currentSituationSound);
+                // --- 音声ロジックここまで ---
+            }
+
+            // ★ 新関数：タイマーを開始する
+            function startTimer() {
+                timeLeft = 10;
+                timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
+                timerBoxEl.style.display = 'inline-block'; // ★ タイマーを表示
+                
+                clearInterval(timer); // 念のためクリア
+                timer = setInterval(updateTimer, 1000);
+            }
+
+            function updateTimer() {
+                timeLeft--;
+                timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    showResult(false, currentQuestions[currentQuestionIndex].correct);
+                }
+            }
+
+            function checkAnswer(event, correctAnswer) {
+                clearInterval(timer); // タイマー停止
+                
+                const chosenButton = event.target;
+                const chosenAnswer = chosenButton.textContent;
+                
+                // ★ 答えの音声を再生
+                const answerSound = loadAudio(SOUND_PATH_AISATSU + chosenAnswer + '.mp3');
+                playSound(answerSound);
+
+                disableChoices(true); // 全ての選択肢を無効化
+                playSoundButton.disabled = true; // 音声ボタンも無効化
+
+                if (chosenAnswer === correctAnswer) {
+                    score++;
+                    chosenButton.classList.add('correct'); // 正解ボタンをハイライト
+                    showResult(true, correctAnswer);
+                } else {
+                    chosenButton.classList.add('incorrect'); // 不正解をハイライト
+                    showResult(false, correctAnswer);
+                }
+            }
+
+            function showResult(isCorrect, correctAnswer) {
+                if (isCorrect) {
+                    resultMessageEl.textContent = 'せいかい！';
+                    resultMessageEl.className = 'result-message correct';
+                    playSound(soundCorrect);
+                } else {
+                    resultMessageEl.textContent = `ざんねん... せいかいは「${correctAnswer}」`;
+                    resultMessageEl.className = 'result-message incorrect';
+                    playSound(soundIncorrect);
+                    
+                    // 正解のボタンをハイライト
+                    Array.from(choicesContainerEl.children).forEach(button => {
+                        if (button.textContent === correctAnswer) {
+                            button.classList.add('correct');
+                        }
+                    });
+                }
+                resultMessageEl.style.display = 'block';
+
+                // 2秒後に次の問題へ
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }, 2000);
+            }
+
+            // ★ 修正：引数を取るように
+            function disableChoices(disabled) {
+                Array.from(choicesContainerEl.children).forEach(button => {
+                    button.disabled = disabled;
+                });
+            }
+
+            function endGame() {
+                finalScoreEl.innerHTML = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
+                finalScoreEl.style.display = 'block';
+                
+                questionNumberEl.textContent = 'おつかれさま';
+                questionTextEl.textContent = 'クイズしゅうりょう';
+                timerBoxEl.style.display = 'none';
+                choicesContainerEl.style.display = 'none';
+                resultMessageEl.style.display = 'none';
+                
+                restartButton.style.display = 'block'; // 再挑戦ボタン表示
+                homeButton.style.display = 'block'; // ホームボタン表示
+                playSoundButton.disabled = true;
+            }
+
+            // ----------------------------------------------------
+            // イベントリスナー
+            // ----------------------------------------------------
+            
+            // 「クイズをはじめる」ボタン（勉強スクリーン）
+            startQuizButton.onclick = () => {
+                startGame();
+                showScreen(quizScreen); // クイズ画面に切り替え
+            };
+            
+            // 「もういちど あそぶ」ボタン（クイズスクリーン）
+            restartButton.addEventListener('click', startGame);
+
+            // ----------------------------------------------------
+            // ゲーム初期化
+            // ----------------------------------------------------
+            initStudyScreen(); // 勉強スクリーンの内容を作成
+            showScreen(studyScreen); // 最初に勉強スクリーンを表示
+
+        });
+    </script>
+    </body>
 </html>
