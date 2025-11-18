@@ -103,36 +103,36 @@
             margin-bottom: 20px;
         }
         
-        /* ★ CSSで時計を動的に描画 (画像不要) ★ */
+        /* ▼▼▼ ここから時計のCSSを修正 ▼▼▼ */
         .tc-clock-face {
             width: 200px;
             height: 200px;
             border: 8px solid #00838f;
             border-radius: 50%;
-            position: relative;
+            position: relative; /* 針の基準点 */
             background: #fff;
         }
         .tc-hand {
-            width: 50%;
             height: 6px;
             background: #333;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform-origin: 0% 50%;
-            transform: translate(0, -50%) rotate(90deg);
+            top: 50%; /* 垂直中央 */
+            left: 50%; /* 水平中央 (ここがバグでした) */
+            transform-origin: 0% 50%; /* 根元(左端)を回転の中心にする */
+            /* まずY軸を-50%(3px)ずらして中心に合わせ、-90度回転して「上(12時)」を向かせる */
+            transform: translateY(-50%) rotate(-90deg);
         }
         .tc-hour-hand {
-            width: 35%;
-            height: 8px;
+            width: 35%; /* 短い針 */
+            height: 8px; /* 太い針 */
             background: #006064;
-            left: 15%; /* (50% - 35%) */
+            /* left: 50% を継承する (バグ修正) */
         }
         .tc-minute-hand {
-            width: 45%;
-            height: 4px;
+            width: 45%; /* 長い針 */
+            height: 4px; /* 細い針 */
             background: #00bcd4;
-            left: 5%; /* (50% - 45%) */
+            /* left: 50% を継承する (バグ修正) */
         }
         .tc-center-dot {
             width: 12px;
@@ -146,6 +146,7 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+        /* ▲▲▲ ここまで時計のCSSを修正 ▲▲▲ */
 
         /* クイズの選択肢 */
         #tc-quiz-options {
@@ -209,7 +210,7 @@
     <audio id="tc-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
     <audio id="tc-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
 
-    <script>
+   <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
@@ -219,7 +220,6 @@
             const SOUND_PATH_HOURS = 'assets/sounds/hours/';
             const SOUND_PATH_MINUTES = 'assets/sounds/minutes/';
 
-            // 「〜時」のデータ (レベル1から)
             const hourData = [
                 { hour: 1, text: 'いちじ', sound: '1ji.mp3' },
                 { hour: 2, text: 'にじ', sound: '2ji.mp3' },
@@ -235,7 +235,6 @@
                 { hour: 12, text: 'じゅうにじ', sound: '12ji.mp3' }
             ];
 
-            // 「〜分」のデータ (5分おき)
             const minuteData = [
                 { min: 5, text: 'ごふん', sound: '5fun.mp3', type: 'fun' },
                 { min: 10, text: 'じゅっぷん', sound: '10pun.mp3', type: 'pun' },
@@ -248,10 +247,8 @@
                 { min: 45, text: 'よんじゅうごふん', sound: '45fun.mp3', type: 'fun' },
                 { min: 50, text: 'ごじゅっぷん', sound: '50pun.mp3', type: 'pun' },
                 { min: 55, text: 'ごじゅうごふん', sound: '55fun.mp3', type: 'fun' }
-                // 60分 (0分) は除外
             ];
             
-            // 「〜半」のデータ
             const hanData = { min: 30, text: 'はん', sound: 'han.mp3', type: 'han' };
 
             const audioCache = {};
@@ -282,7 +279,7 @@
             const nextQuizButton = document.getElementById('tc-next-quiz-button');
             const backToStudyButton = document.getElementById('tc-back-to-study-button');
             
-            let currentCorrectText = ""; // クイズの正解 (文字列) を保持
+            let currentCorrectText = ""; 
 
             // ----------------------------------------------------
             // 汎用関数
@@ -313,7 +310,6 @@
             function setupStudyScreen() {
                 studyGrid.innerHTML = '';
                 
-                // 「〜ふん」「〜ぷん」を作成
                 minuteData.forEach(min => {
                     const item = document.createElement('div');
                     item.className = `tc-study-item type-${min.type}`;
@@ -325,7 +321,6 @@
                     studyGrid.appendChild(item);
                 });
                 
-                // 「〜じはん」を特別に追加
                 const hanItem = document.createElement('div');
                 hanItem.className = 'tc-study-item type-han';
                 hanItem.innerHTML = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
@@ -363,20 +358,30 @@
                 let correctMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 let correctMinuteText = correctMinute.text;
 
-                // 3. ★ 30分の時、50%の確率で「はん」を正解にする
+                // 3. 30分の時、50%の確率で「はん」を正解にする
                 if (correctMinute.min === 30 && Math.random() < 0.5) {
                     correctMinuteText = hanData.text;
                 }
                 currentCorrectText = `${correctHour.text} ${correctMinuteText}`;
 
-                // 4. 時計の針をセットする
-                // (例) 3:30 の時、時針は3と4の真ん中 (3*30 + 30*0.5 = 105度)
-                const hourDeg = (correctHour.hour % 12) * 30 + (correctMinute.min / 60) * 30;
-                // (例) 30分の時、分針は (30 * 6 = 180度)
-                const minuteDeg = correctMinute.min * 6;
+                // ▼▼▼ ここから回転の計算を修正 ▼▼▼
                 
-                hourHand.style.transform = `translate(0, -50%) rotate(${hourDeg + 90}deg)`;
-                minuteHand.style.transform = `translate(0, -50%) rotate(${minuteDeg + 90}deg)`;
+                // 4. 時計の針をセットする
+                // 12時を0時として計算 (例: 12時は0, 1時は1, 3時は3)
+                const h = correctHour.hour % 12; 
+                const m = correctMinute.min;
+                
+                // 12時=0度, 3時=90度, 6時=180度
+                const hourDeg = (h * 30) + (m * 0.5);
+                const minuteDeg = m * 6;
+                
+                // CSSの 0度 は「右(3時)」を向く
+                // 計算結果の 0度 は「上(12時)」
+                // そのため、計算結果から 90度 を引く
+                hourHand.style.transform = `translateY(-50%) rotate(${hourDeg - 90}deg)`;
+                minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg - 90}deg)`;
+                
+                // ▲▲▲ 回転の計算を修正完了 ▲▲▲
 
                 // 5. 選択肢を4つ作成
                 let options = [currentCorrectText];
@@ -399,19 +404,26 @@
                 // ダミー3: 「ふん/ぷん」または「はん」のひっかけ
                 let trapText = "";
                 if (correctMinute.min === 30) {
-                    // 正解が「はん」なら、ひっかけは「さんじゅっぷん」
-                    // 正解が「さんじゅっぷん」なら、ひっかけは「はん」
                     trapText = (correctMinuteText === hanData.text) ? minuteData.find(m => m.min === 30).text : hanData.text;
                 } else {
-                    // 「ごふん」→「ごぷん」、「じゅっぷん」→「じゅっふん」
                     trapText = (correctMinute.type === 'fun') ? 
                         correctMinute.text.replace('ふん', 'ぷん') : 
                         correctMinute.text.replace('ぷん', 'ふん');
                 }
-                options.push(`${correctHour.text} ${trapText}`);
+                // 選択肢が重複しないようにチェック
+                if (!options.includes(`${correctHour.text} ${trapText}`)) {
+                    options.push(`${correctHour.text} ${trapText}`);
+                } else {
+                    // もし重複したら(例: 30分以外でふん/ぷんを間違えた)、全く別の選択肢を入れる
+                     let extraDummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
+                     while(extraDummyMinute.min === correctMinute.min || extraDummyMinute.min === dummyMinute.min) {
+                         extraDummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
+                     }
+                     options.push(`${correctHour.text} ${extraDummyMinute.text}`);
+                }
                 
-                // 7. 選択肢ボタンをシャッフルして配置
-                shuffleArray(options).forEach(text => {
+                // 7. 選択肢ボタンをシャッフルして配置 (4つに切り詰める)
+                shuffleArray(options).slice(0, 4).forEach(text => {
                     const button = document.createElement('button');
                     button.className = 'tc-button tc-option-text-button tc-option';
                     button.textContent = text;
