@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>とけいゲーム レベル2・3</title>
+    <title>とけいゲーム レベル2</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,14 +43,13 @@
         /* --- ボタン共通 --- */
         .tc-button {
             display: block; width: 90%; margin: 15px auto;
-            padding: 20px; font-size: 1.5em; font-weight: 700;
+            padding: 15px; font-size: 1.5em; font-weight: 700;
             color: #fff; background-color: #00bcd4; border: none;
             border-radius: 15px; cursor: pointer;
             box-shadow: 0 5px 0 #00838f;
             transition: all 0.1s ease-out; position: relative; top: 0;
-            /* <a> タグ用のスタイル追加 */
             text-decoration: none;
-            box-sizing: border-box; /* 崩れ防止 */
+            box-sizing: border-box;
         }
         .tc-button:active { top: 3px; box-shadow: 0 2px 0 #00838f; }
         .tc-button-secondary { background-color: #90a4ae; box-shadow: 0 5px 0 #546e7a; }
@@ -66,7 +65,7 @@
         #tc-feedback.show { transform: scale(1); opacity: 1; }
         #tc-feedback.success { color: #00bcd4; }
 
-        /* --- 1. 勉強スクリーン --- */
+        /* --- 1. 勉強スクリーン (変更なし) --- */
         #tc-study-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -97,74 +96,107 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 20px;
+            min-height: 200px; /* 時計の高さ確保 */
         }
         
+        /* クイズA (音声) の再生ボタン */
+        #tc-play-sound-button {
+            font-size: 4em; width: 120px; height: 120px; padding: 0;
+            border-radius: 50%;
+        }
+
+        /* クイズB (アナログ時計) */
         .tc-clock-face {
-            width: 200px;
-            height: 200px;
-            position: relative; 
+            width: 200px; height: 200px; position: relative; 
             background-image: url('assets/images/clocks/clock_face_base.png');
-            background-size: contain;
-            background-repeat: no-repeat;
+            background-size: contain; background-repeat: no-repeat;
             background-position: center;
         }
         .tc-hand {
-            position: absolute;
-            top: 50%; 
-            left: 50%; 
+            position: absolute; top: 50%; left: 50%; 
             transform-origin: 0% 50%; 
             transform: translateY(-50%) rotate(-90deg); 
         }
         .tc-hour-hand {
-            width: calc(200px * 0.25); 
-            height: 8px; 
-            background: #4CAF50; 
-            border-radius: 4px; 
+            width: calc(200px * 0.25); height: 8px; 
+            background: #4CAF50; border-radius: 4px; 
         }
         .tc-minute-hand {
-            width: calc(200px * 0.40); 
-            height: 10px; 
-            background: #FF9800; 
-            border-radius: 5px; 
+            width: calc(200px * 0.40); height: 10px; 
+            background: #FF9800; border-radius: 5px; 
         }
         .tc-center-dot {
-            width: 12px;
-            height: 12px;
-            background: #d9534f;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
+            width: 12px; height: 12px; background: #d9534f;
+            border: 2px solid #fff; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 10;
         }
 
+        /* --- クイズの選択肢ボタン --- */
         #tc-quiz-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
-        .tc-option-text-button {
-            padding: 20px;
+        
+        /* ★ 修正：レベル1のスタイルに合わせる */
+        .tc-option-button {
+            padding: 15px 10px;
             font-size: 1.2em; 
+            font-weight: 700;
+            /* 白背景、水色の枠に変更 */
+            background-color: #fff;
+            color: #00838f;
+            border: 4px solid #b2ebf2;
+            border-radius: 15px;
+            box-shadow: none; /* 影を削除 */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            top: 0;
         }
-        .tc-option.correct {
-            background-color: #00bcd4;
-            box-shadow: 0 5px 0 #00838f;
+        .tc-option-button:hover {
+            background-color: #e0f7fa;
             transform: scale(1.05);
         }
+        .tc-option-button:active {
+             top: 0px; /* 押しても沈まない */
+             transform: scale(0.98);
+        }
+
+        /* クイズB (デジタル + 日本語) */
+        .tc-option-text-button span {
+            display: block;
+            font-size: 1.3em;
+            color: #006064;
+            margin-bottom: 5px;
+        }
+        
+        /* クイズA (デジタルのみ) */
+        .tc-option-digital-button {
+            font-size: 1.8em;
+            font-weight: 800;
+            padding: 25px 10px;
+        }
+
+        /* ★ 修正：レベル1の「光る」スタイルに変更 */
+        .tc-option.correct {
+            border-color: #00bcd4;
+            background-color: #e0f7fa;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00bcd4;
+        }
         .tc-option.incorrect {
-            background-color: #f44336;
-            box-shadow: 0 5px 0 #b71c1c;
-            opacity: 0.8;
+            border-color: #d9534f;
+            background-color: #fbe9e7;
+            opacity: 0.6;
         }
         .tc-option.disabled {
             pointer-events: none;
             opacity: 0.7;
         }
     </style>
-</head>
+    </head>
 <body>
 
     <div id="tc-container">
@@ -175,20 +207,14 @@
             <div id="tc-study-grid">
                 </div>
             <button id="tc-start-quiz-button" class="tc-button">クイズを はじめる</button>
-            
             <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
-            </div>
+        </div>
 
         <div id="tc-screen-quiz" class="tc-screen">
-            <h2>この とけい は なんじ？</h2>
+            <h2 id="tc-quiz-title">この とけい は なんじ？</h2>
             
             <div id="tc-quiz-prompt-area">
-                <div class="tc-clock-face">
-                    <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
-                    <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>
-                    <div class="tc-center-dot"></div>
                 </div>
-            </div>
             
             <div id="tc-quiz-options">
                 </div>
@@ -196,9 +222,8 @@
             <div id="tc-feedback"></div>
             
             <button id="tc-back-to-study-button" class="tc-button tc-button-secondary">べんきょう に もどる</button>
-            
             <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
-            </div>
+        </div>
 
     </div>
 
@@ -209,9 +234,8 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
-            // データ定義 (変更なし)
+            // データ定義
             // ----------------------------------------------------
-            
             const SOUND_PATH_HOURS = 'assets/sounds/hours/';
             const SOUND_PATH_MINUTES = 'assets/sounds/minutes/';
 
@@ -219,12 +243,12 @@
                 { hour: 1, text: 'いちじ', sound: '1ji.mp3' },
                 { hour: 2, text: 'にじ', sound: '2ji.mp3' },
                 { hour: 3, text: 'さんじ', sound: '3ji.mp3' },
-                { hour: 4, text: 'よじ', sound: '4ji_yoji.mp3' },
+                { hour: 4, text: 'よじ', sound: '4ji.mp3' }, // 注: レベル1のファイル名 '4ji.mp3' と違う場合は要修正
                 { hour: 5, text: 'ごじ', sound: '5ji.mp3' },
                 { hour: 6, text: 'ろくじ', sound: '6ji.mp3' },
-                { hour: 7, text: 'しちじ', sound: '7ji_shichiji.mp3' },
+                { hour: 7, text: 'しちじ', sound: '7ji.mp3' }, // 注: レベル1のファイル名 '7ji.mp3' と違う場合は要修正
                 { hour: 8, text: 'はちじ', sound: '8ji.mp3' },
-                { hour: 9, text: 'くじ', sound: '9ji_kuji.mp3' },
+                { hour: 9, text: 'くじ', sound: '9ji.mp3' }, // 注: レベル1のファイル名 '9ji.mp3' と違う場合は要修正
                 { hour: 10, text: 'じゅうじ', sound: '10ji.mp3' },
                 { hour: 11, text: 'じゅういちじ', sound: '11ji.mp3' },
                 { hour: 12, text: 'じゅうにじ', sound: '12ji.mp3' }
@@ -243,6 +267,7 @@
                 { min: 55, text: 'ごじゅうごふん', sound: '55fun.mp3', type: 'fun' }
             ];
             const hanData = { min: 30, text: 'はん', sound: 'han.mp3', type: 'han' };
+
             const audioCache = {};
             function loadAudio(path) {
                 if (!audioCache[path]) {
@@ -263,6 +288,7 @@
             const studyGrid = document.getElementById('tc-study-grid');
             const startQuizButton = document.getElementById('tc-start-quiz-button');
             
+            const quizTitle = document.getElementById('tc-quiz-title'); // ★ 追加
             const quizPromptArea = document.getElementById('tc-quiz-prompt-area');
             const hourHand = document.getElementById('tc-hour-hand');
             const minuteHand = document.getElementById('tc-minute-hand');
@@ -271,9 +297,11 @@
             const backToStudyButton = document.getElementById('tc-back-to-study-button');
             
             let currentCorrectText = ""; 
+            let currentHourSound = null;
+            let currentMinuteSound = null;
 
             // ----------------------------------------------------
-            // 汎用関数 (変更なし)
+            // 汎用関数
             // ----------------------------------------------------
             function showScreen(screenElement) {
                 screens.forEach(s => s.classList.remove('active'));
@@ -292,6 +320,16 @@
                     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
                 }
                 return newArray;
+            }
+
+            // ★ 新しい関数：時間を連続再生する
+            function playFullTimeSound() {
+                if (currentHourSound) {
+                    playSound(currentHourSound);
+                    currentHourSound.onended = () => {
+                        playSound(currentMinuteSound);
+                    };
+                }
             }
 
             // ----------------------------------------------------
@@ -327,13 +365,94 @@
             };
 
             // ----------------------------------------------------
-            // クイズのメインロジック (変更なし)
+            // クイズのメインロジック (★ 修正)
             // ----------------------------------------------------
             function startQuiz() {
+                quizPromptArea.innerHTML = ''; // 中身をリセット
                 quizOptions.innerHTML = '';
                 feedback.textContent = '';
                 feedback.className = '';
                 
+                // ★ 50%の確率でクイズAかBを切り替える
+                if (Math.random() < 0.5) {
+                    setupQuizA(); // 聞き取り
+                } else {
+                    setupQuizB(); // 読み取り
+                }
+            }
+
+            // ★ 新しい関数：クイズA (聞き取り)
+            function setupQuizA() {
+                quizTitle.textContent = 'きいて えらぼう！';
+                
+                // 1. 正解の時間を決定
+                const correctHour = hourData[Math.floor(Math.random() * hourData.length)];
+                let correctMinute, correctMinuteText;
+                // 30分の場合、「はん」か「さんじゅっぷん」をランダムに選ぶ
+                if (Math.random() < (1 / 12)) { // 約1/12の確率で30分を選ぶ
+                    correctMinute = minuteData.find(m => m.min === 30);
+                    correctMinuteText = (Math.random() < 0.5) ? hanData.text : correctMinute.text;
+                } else {
+                    correctMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
+                    correctMinuteText = correctMinute.text;
+                }
+                currentCorrectText = `${correctHour.text} ${correctMinuteText}`;
+                
+                // 2. 音声をキャッシュ
+                currentHourSound = loadAudio(`${SOUND_PATH_HOURS}${correctHour.sound}`);
+                currentMinuteSound = loadAudio(`${SOUND_PATH_MINUTES}${(correctMinuteText === hanData.text) ? hanData.sound : correctMinute.sound}`);
+                
+                // 3. 音声再生ボタンを作成
+                const soundButton = document.createElement('button');
+                soundButton.id = 'tc-play-sound-button';
+                soundButton.className = 'tc-button';
+                soundButton.textContent = '▶';
+                soundButton.onclick = playFullTimeSound;
+                quizPromptArea.appendChild(soundButton);
+                playFullTimeSound(); // 最初に再生
+
+                // 4. 選択肢を作成
+                let options = [{ text: currentCorrectText, digital: `${correctHour.hour}:${String(correctMinute.min).padStart(2, '0')}` }];
+
+                // 5. ダミー選択肢を作成
+                while (options.length < 4) {
+                    const dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
+                    const dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
+                    const dummyText = `${dummyHour.text} ${dummyMinute.text}`;
+                    
+                    if (!options.some(opt => opt.text === dummyText)) {
+                        options.push({ text: dummyText, digital: `${dummyHour.hour}:${String(dummyMinute.min).padStart(2, '0')}` });
+                    }
+                }
+                
+                // 6. デジタル時計の選択肢ボタンを配置
+                shuffleArray(options).forEach(opt => {
+                    const button = document.createElement('button');
+                    button.className = 'tc-option-button tc-option-digital-button tc-option';
+                    button.textContent = opt.digital;
+                    button.dataset.text = opt.text; // 答え合わせ用にテキストを保持
+                    button.onclick = handleQuizChoice;
+                    quizOptions.appendChild(button);
+                });
+            }
+
+            // ★ 修正：クイズB (読み取り)
+            function setupQuizB() {
+                quizTitle.textContent = 'この とけい は なんじ？';
+
+                // 1. アナログ時計のHTMLを作成
+                quizPromptArea.innerHTML = `
+                    <div class="tc-clock-face">
+                        <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
+                        <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>
+                        <div class="tc-center-dot"></div>
+                    </div>`;
+                
+                // 2. DOMを再取得
+                const hourHand = document.getElementById('tc-hour-hand');
+                const minuteHand = document.getElementById('tc-minute-hand');
+
+                // 3. 正解の時間を決定
                 const correctHour = hourData[Math.floor(Math.random() * hourData.length)];
                 let correctMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 let correctMinuteText = correctMinute.text;
@@ -342,6 +461,7 @@
                 }
                 currentCorrectText = `${correctHour.text} ${correctMinuteText}`;
 
+                // 4. 時計の針をセット
                 const h = correctHour.hour % 12; 
                 const m = correctMinute.min;
                 const hourDeg = (h * 30) + (m * 0.5);
@@ -349,17 +469,34 @@
                 hourHand.style.transform = `translateY(-50%) rotate(${hourDeg - 90}deg)`;
                 minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg - 90}deg)`;
 
-                let options = [currentCorrectText];
+                // 5. 選択肢を作成
+                let options = [{ 
+                    text: currentCorrectText, 
+                    digital: `${correctHour.hour}:${String(correctMinute.min).padStart(2, '0')}` 
+                }];
+
+                // 6. ダミー選択肢を作成
+                // ダミー1: 時が違う
                 let dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
                 while(dummyHour.hour === correctHour.hour) {
                     dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
                 }
-                options.push(`${dummyHour.text} ${correctMinuteText}`);
+                options.push({
+                    text: `${dummyHour.text} ${correctMinuteText}`,
+                    digital: `${dummyHour.hour}:${String(correctMinute.min).padStart(2, '0')}`
+                });
+
+                // ダミー2: 分が違う
                 let dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 while(dummyMinute.min === correctMinute.min) {
                     dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 }
-                options.push(`${correctHour.text} ${dummyMinute.text}`);
+                options.push({
+                    text: `${correctHour.text} ${dummyMinute.text}`,
+                    digital: `${correctHour.hour}:${String(dummyMinute.min).padStart(2, '0')}`
+                });
+
+                // ダミー3: 「ふん/ぷん」または「はん」のひっかけ
                 let trapText = "";
                 if (correctMinute.min === 30) {
                     trapText = (correctMinuteText === hanData.text) ? minuteData.find(m => m.min === 30).text : hanData.text;
@@ -368,37 +505,36 @@
                         correctMinute.text.replace('ふん', 'ぷん') : 
                         correctMinute.text.replace('ぷん', 'ふん');
                 }
-                if (!options.includes(`${correctHour.text} ${trapText}`)) {
-                    options.push(`${correctHour.text} ${trapText}`);
-                } else {
-                     let extraDummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
-                     while(extraDummyMinute.min === correctMinute.min || extraDummyMinute.min === dummyMinute.min) {
-                         extraDummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
-                     }
-                     options.push(`${correctHour.text} ${extraDummyMinute.text}`);
-                }
+                options.push({
+                    text: `${correctHour.text} ${trapText}`,
+                    digital: `${correctHour.hour}:${String(correctMinute.min).padStart(2, '0')}`
+                });
                 
-                shuffleArray(options).slice(0, 4).forEach(text => {
+                // 7. 選択肢ボタンをシャッフルして配置
+                shuffleArray(options).slice(0, 4).forEach(opt => {
                     const button = document.createElement('button');
-                    button.className = 'tc-button tc-option-text-button tc-option';
-                    button.textContent = text;
+                    button.className = 'tc-option-button tc-option-text-button tc-option';
+                    // ★ 改善案：デジタルと日本語を両方表示
+                    button.innerHTML = `<span>${opt.digital}</span>${opt.text}`;
+                    button.dataset.text = opt.text; // 答え合わせ用にテキストを保持
                     button.onclick = handleQuizChoice;
                     quizOptions.appendChild(button);
                 });
             }
             
-            // ----------------------------------------------------
-            // 答え合わせのロジック (変更なし)
-            // ----------------------------------------------------
+            // --- 答え合わせ (★ 修正) ---
             function handleQuizChoice(e) {
                 const chosenOption = e.currentTarget;
-                const chosenText = chosenOption.textContent;
-
+                
                 if (chosenOption.classList.contains('disabled')) {
                     return;
                 }
                 
+                // ★ 答え合わせのキーを dataset.text に変更
+                const chosenText = chosenOption.dataset.text; 
+                
                 if (chosenText === currentCorrectText) {
+                    // --- 正解の場合 ---
                     playSound(soundCorrect);
                     feedback.textContent = 'せいかい！';
                     feedback.className = 'success show';
@@ -411,6 +547,7 @@
                     setTimeout(startQuiz, 2000); 
                     
                 } else {
+                    // --- 不正解の場合 ---
                     playSound(soundIncorrect);
                     feedback.textContent = 'ちがうよ、もういちど！';
                     feedback.className = 'show';
@@ -419,13 +556,12 @@
             }
             
             // ----------------------------------------------------
-            // ゲーム開始 (変更なし)
+            // ゲーム開始
             // ----------------------------------------------------
             setupStudyScreen();
             showScreen(studyScreen); // 最初に勉強スクリーンを表示
 
         });
     </script>
-
-</body>
+    </body>
 </html>
