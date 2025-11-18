@@ -1,0 +1,206 @@
+/* ======================================== */
+/* ★ 隕石クイズゲーム専用スタイル ★ */
+/* (js/meteor_quiz.js のロジックに対応) */
+/* ======================================== */
+
+/* --- ゲームエリアのコンテナ設定 --- */
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 700px; /* ゲームエリアの高さを固定 */
+    margin: 30px auto;
+    border: 3px solid #7c7cff; 
+    
+    /* 真っ暗な宇宙 */
+    background-color: #000; 
+    overflow: hidden; 
+    box-shadow: 0 0 20px rgba(100, 100, 255, 0.5); 
+    border-radius: 15px;
+}
+
+#sky-area {
+    width: 100%;
+    height: 90%; 
+    position: absolute;
+    top: 0;
+    z-index: 1; 
+
+    /* 背景画像 */
+    /* ★画像パスが正しいか確認してください★ */
+    background-image: url('../assets/images/space_bg.png'); 
+    background-size: cover; 
+    background-position: center center; 
+    background-repeat: no-repeat; 
+}
+
+#ground-area {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10%;
+    background-color: #1d2c5d; /* 濃い青色 */
+    
+    /* JSのロジックでは文字は不要なため非表示 */
+    color: transparent; 
+    user-select: none; 
+    z-index: 10;
+}
+
+#info-bar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 20;
+    display: flex;
+    gap: 20px;
+    
+    /* 宇宙船のコンソール風 */
+    background-color: rgba(0, 150, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 8px; 
+}
+
+/* --- 隕石 (メテオ) のスタイル --- */
+.meteor {
+    position: absolute;
+    top: -50px; 
+    width: 100px; 
+    height: 100px;
+    
+    /* 隕石の色をゴツゴツした岩風に */
+    background-color: #a0522d; /* 茶色 */
+    border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+
+    /* 燃えるオーラ */
+    box-shadow: 0 0 15px 5px #ff8c00, 
+                0 0 5px 2px #ffeb3b,   
+                inset 0 0 10px #ff4500; 
+    
+    cursor: pointer;
+    z-index: 5;
+    transition: box-shadow 0.2s, transform 0.2s;
+
+    /* 隕石内の文字を中央に配置 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.5em; /* 文字サイズを調整 */
+    font-weight: bold;
+    user-select: none; 
+    padding: 5px; /* 文字がはみ出ないように */
+    box-sizing: border-box; /* paddingを含めて100px */
+    text-align: center;
+    
+    animation: rotateMeteor 10s infinite linear;
+}
+
+/* 隕石をゆっくり回転させる */
+@keyframes rotateMeteor {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.meteor:hover {
+    box-shadow: 0 0 25px 10px #ff4500, 
+                0 0 10px 5px #ffeb3b,
+                inset 0 0 10px #ff4500;
+    transform: scale(1.1); 
+    background-color: #a0522d; 
+}
+
+/* ★追加★ 隕石がイラストの場合のスタイル */
+.meteor.meteor-image {
+    background-color: transparent; /* 岩の色を消す */
+    background-size: contain; 
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    color: transparent; /* 文字を非表示に */
+    
+    /* オーラを調整 */
+    box-shadow: 0 0 15px 5px rgba(0, 188, 212, 0.7), 
+                0 0 5px 2px rgba(255, 255, 255, 0.8), 
+                inset 0 0 10px rgba(0, 188, 212, 0.5);
+}
+
+.meteor.meteor-image:hover {
+    background-color: transparent; 
+    box-shadow: 0 0 25px 10px rgba(0, 188, 212, 1), 
+                0 0 10px 5px rgba(255, 255, 255, 1), 
+                inset 0 0 10px rgba(0, 188, 212, 0.7);
+}
+
+
+/* ======================================== */
+/* ★ JSが動的に生成するボタンのスタイル ★ */
+/* ======================================== */
+
+.quiz-choice-button {
+    position: absolute;
+    /* CSS変数で位置が調整されます */
+    top: var(--button-start-top);
+    left: var(--button-start-left);
+    transform: translate(-50%, -50%) scale(0.5); /* 初期サイズを小さく、中央寄せ */
+    opacity: 0; /* 初期状態で非表示 */
+
+    background-color: #00bcd4; /* ボタンの色 */
+    color: white; /* 文字の色 */
+    padding: 12px 18px; /* パディング */
+    border-radius: 25px; /* 丸みを強く */
+    font-size: 1.5em; /* 選択肢の文字サイズ */
+    font-weight: bold;
+    box-shadow: 0 4px 0 #00796b; /* 影 */
+    cursor: pointer;
+    z-index: 95; /* 隕石より手前 */
+    white-space: nowrap; /* 複数行にならないように */
+    user-select: none; 
+    border: none;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+.quiz-choice-button:hover:not(:disabled) {
+    background-color: #0097a7; /* ホバー色 */
+    transform: translate(-50%, -50%) scale(1.05) translateY(-2px); 
+    box-shadow: 0 6px 0 #00796b; 
+}
+
+/* 選択肢ボタンが出てくるアニメーション */
+@keyframes choiceButtonPopUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+        top: var(--button-start-top);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1); /* 拡大 */
+        opacity: 1;
+        top: var(--button-end-top); /* 最終位置 */
+    }
+}
+
+/* --- 爆発エフェクト --- */
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(3); opacity: 0.5; background-color: orange; }
+    100% { transform: scale(5); opacity: 0; }
+}
+
+.explosion {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    border-radius: 50%;
+    z-index: 90;
+}
+
+/* --- 汎用ユーティリティ --- */
+.hidden {
+    display: none !important;
+}

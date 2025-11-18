@@ -7,9 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const lifeDisplay = document.getElementById('life');
     const explosionTemplate = document.getElementById('explosion-template');
     
-    // ★追加★
-    // fallLoopでも使われているgame-containerをここで取得
-    // ゲームオーバー画面を追加するために使います
     const gameContainer = document.getElementById('game-container'); 
 
     // ----------------------------------------------------
@@ -39,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { word: "はさみ", english: "scissors", image: "hasami.png" },
         { word: "ひこうき", english: "airplane", image: "hikoki.png" },
         { word: "めがね", english: "glasses", image: "megane.png" },
-        { word: "やま", english: "mountain", image: "yama.png" },
+        { word:"やま", english: "mountain", image: "yama.png" },
         { word: "ゆき", english: "snow", image: "yuki.png" },
         { word: "すし", english: "sushi", image: "sushi.png" },
         { word: "いも", english: "potato", image: "imo.png" },
@@ -277,9 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // タイプ2: 隕石に「イラスト」を表示
             meteor.classList.add('meteor-image'); // CSSスタイルを適用
-            // HTML(index.html)から見た画像パスを指定
-            // ★重要★ エクスプローラーの構成に合わせてパスを修正
-            meteor.style.backgroundImage = `url('assets/images/${quizData.image}')`; 
+            // ★重要★ 画像パスを修正
+            meteor.style.backgroundImage = `url('assets/images/hiragana/${quizData.image}')`; 
         }
 
         meteor.addEventListener('click', handleMeteorClick);
@@ -294,7 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const allMeteors = document.querySelectorAll('.meteor');
         
-        // ★修正★ gameContainer の取得を fallLoop の外（DOM定義）に移動
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
@@ -358,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // タイプ1: 隕石が「言葉」の場合 -> 答えは「英語」
             correctChoice = quizData.english;
             
-            // ★修正★
-            // 不正解の「英語」を QUIZ_DATA 全体からランダムで1つ選ぶ
             const allEnglishWords = QUIZ_DATA.map(q => q.english);
             const incorrects = allEnglishWords.filter(w => w !== correctChoice);
             wrongChoice = shuffleArray(incorrects)[0] || "Wrong"; // デフォルトの不正解
@@ -368,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // タイプ2: 隕石が「イラスト」の場合 -> 答えは「日本語」
             correctChoice = quizData.word; // 正解は "いぬ", "すし" など
 
-            // 不正解の「日本語」を QUIZ_DATA 全体からランダムで1つ選ぶ
             const allJapaneseWords = QUIZ_DATA.map(q => q.word);
             const incorrects = allJapaneseWords.filter(w => w !== correctChoice);
             wrongChoice = shuffleArray(incorrects)[0] || "ちがう";
