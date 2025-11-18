@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // タイプ2: 隕石に「イラスト」を表示
             meteor.classList.add('meteor-image'); // CSSスタイルを適用
-            // ★重要★ 画像パスを修正
+            // ★重要★ 画像パスを修正: 'assets/images/hiragana/' を追加
             meteor.style.backgroundImage = `url('assets/images/hiragana/${quizData.image}')`; 
         }
 
@@ -466,24 +466,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // ゲームの開始と終了
     // ----------------------------------------------------
 
-    /* ★★★ ここから修正 ★★★ */
-
     function startGame() {
-        // ★追加★ ゲームオーバー画面が表示されていれば削除する
+        // ゲームオーバー画面が表示されていれば削除する
         const gameOverScreen = document.getElementById('game-over-screen');
         if (gameOverScreen) {
             gameOverScreen.remove();
         }
 
-        // 元の処理
         score = 0;
         life = INITIAL_LIFE;
         meteorSpeed = 3.33; 
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
-        skyArea.innerHTML = ''; // skyArea の中身だけをクリア
+        skyArea.innerHTML = ''; 
 
-        // isQuestionActive を false に戻す
         isQuestionActive = false;
 
         gameInterval = setInterval(createMeteor, METEOR_INTERVAL);
@@ -495,11 +491,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(gameInterval);
         isQuestionActive = true; 
         
-        // ★修正★ alert() の代わりにゲームオーバー画面を生成
-
-        // 1. オーバーレイ（画面全体）の作成
         const overlay = document.createElement('div');
-        overlay.id = 'game-over-screen'; // startGameで削除するためのID
+        overlay.id = 'game-over-screen'; 
         overlay.style.position = 'absolute';
         overlay.style.top = '0';
         overlay.style.left = '0';
@@ -510,52 +503,42 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.flexDirection = 'column';
         overlay.style.justifyContent = 'center';
         overlay.style.alignItems = 'center';
-        overlay.style.zIndex = '100'; // 他より手前に表示
+        overlay.style.zIndex = '100'; 
 
-        // 2. 「ゲームオーバー」テキスト
         const gameOverText = document.createElement('h2');
         gameOverText.textContent = 'ゲームオーバー！';
         gameOverText.style.color = 'white';
         gameOverText.style.fontSize = '3em';
         gameOverText.style.marginBottom = '10px';
 
-        // 3. 最終スコア
         const scoreText = document.createElement('p');
         scoreText.textContent = `スコア: ${score}`;
         scoreText.style.color = 'white';
         scoreText.style.fontSize = '1.5em';
         scoreText.style.marginBottom = '30px';
 
-        // 4. 「もう一度プレイ」ボタン
         const restartButton = document.createElement('button');
         restartButton.textContent = 'もう一度プレイ';
         restartButton.style.padding = '12px 25px';
         restartButton.style.fontSize = '1.2em';
         restartButton.style.color = '#333';
-        restartButton.style.backgroundColor = '#ffd700'; // 目立つ色
+        restartButton.style.backgroundColor = '#ffd700'; 
         restartButton.style.border = 'none';
         restartButton.style.borderRadius = '25px';
         restartButton.style.cursor = 'pointer';
 
-        // 5. ボタンにクリックイベントを追加
-        // (押されたら startGame を呼び出す)
         restartButton.addEventListener('click', startGame);
 
-        // 6. 要素を組み立てる
         overlay.appendChild(gameOverText);
         overlay.appendChild(scoreText);
         overlay.appendChild(restartButton);
 
-        // 7. game-container に追加 (skyAreaの外)
-        // (gameContainerはDOM定義で取得済みの前提)
         if (gameContainer) {
             gameContainer.appendChild(overlay);
         } else {
-            // gameContainerが見つからない場合のフォールバック
             document.body.appendChild(overlay); 
         }
     }
-    /* ★★★ ここまで修正 ★★★ */
 
     // ゲーム開始
     startGame();
