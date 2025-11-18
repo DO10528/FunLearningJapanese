@@ -23,7 +23,6 @@
             box-sizing: border-box;
         }
 
-        /* IDとクラス名を hg- から km- に変更 */
         #km-container {
             width: 100%;
             max-width: 800px;
@@ -318,7 +317,8 @@
 
             // --- 1. データ定義 ---
             
-            const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/';
+            // ★★★ 修正点：イラストのパスをカタカナ用に修正 ★★★
+            const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/'; 
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
             const gameLevels = [
@@ -478,8 +478,8 @@ function addDragDropListeners() {
             e.target.style.opacity = '1';
         });
 
-        // ★★★ 修正箇所: ここでドラッグの可否とクリックイベントを正しく設定 ★★★
-        item.removeEventListener('click', returnItemToPool); // イベントをリセット
+        // ★★★ 修正箇所: マウスとタッチの競合を回避するロジックを追加 ★★★
+        item.removeEventListener('click', returnItemToPool); 
         
         // 既に配置されているアイテムにはクリックイベントを再設定し、PCドラッグを無効化
         if (item.parentElement && item.parentElement.classList.contains('km-drop-target')) {
