@@ -19,9 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const IMAGE_BASE_PATH = 'assets/images/'; 
     
     let gameInterval = null;
-    // ... (以下略)
-    
-    let gameInterval = null;
     let meteorSpeed = 3.33; 
     let score = 0;
     let life = INITIAL_LIFE;
