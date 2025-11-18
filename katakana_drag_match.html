@@ -23,6 +23,7 @@
             box-sizing: border-box;
         }
 
+        /* IDとクラス名を hg- から km- に変更 */
         #km-container {
             width: 100%;
             max-width: 800px;
@@ -477,7 +478,7 @@ function addDragDropListeners() {
             e.target.style.opacity = '1';
         });
 
-        // ★★★ 修正点：マウスとタッチの競合を回避するロジックを追加 ★★★
+        // ★★★ 修正箇所: ここでドラッグの可否とクリックイベントを正しく設定 ★★★
         item.removeEventListener('click', returnItemToPool); // イベントをリセット
         
         // 既に配置されているアイテムにはクリックイベントを再設定し、PCドラッグを無効化
