@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shuffledParts.forEach((part, index) => {
             const card = document.createElement('div');
             card.textContent = part; 
-            card.classList.add('word-card');
+            card.classList.add('puzzle-card');
             
             // ★変更点: card.draggable = true; を削除
             

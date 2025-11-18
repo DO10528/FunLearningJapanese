@@ -65,9 +65,10 @@
 
 /* ======================================== */
 /* ★ 3. 単語カードのデザイン (クリック版) ★ */
+/* ▼▼▼ ここを .word-card から .puzzle-card に変更 ▼▼▼ */
 /* ======================================== */
 
-.word-card {
+.puzzle-card {
     background-color: #ffcc5c; 
     color: #333;
     padding: 12px 18px; 
@@ -84,7 +85,7 @@
 }
 
 /* カードをクリックしたときのアニメーション */
-.word-card:active {
+.puzzle-card:active {
     transform: translateY(4px);
     box-shadow: 0 0 0 #f0a000;
 }
@@ -92,13 +93,13 @@
 /* (参考) .dragging クラスはクリック版JSでは使われない */
 
 /* ドロップエリアのカード (色を変える) */
-#puzzle-drop-zone .word-card {
+#puzzle-drop-zone .puzzle-card {
     background-color: #fff8e1; 
     border-color: #ff6f61;
 }
 
 /* 正解時のカード (JSの .correct-slot に対応) */
-.word-card.correct-slot {
+.puzzle-card.correct-slot {
     background-color: #4CAF50; /* 緑 */
     color: white;
     border-color: #28a745;
@@ -106,7 +107,7 @@
 }
 
 /* 不正解時のカード (JSの .wrong-slot に対応) */
-.word-card.wrong-slot {
+.puzzle-card.wrong-slot {
     background-color: #ff6f61; /* 赤 */
     color: white;
     border-color: #dc3545;
