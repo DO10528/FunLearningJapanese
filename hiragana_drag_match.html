@@ -136,7 +136,6 @@
             -webkit-user-select: none;
             /* ▲▲▲ モバイル最適化のためのCSS ▲▲▲ */
         }
-        /* :active スタイルを削除 (タッチイベントで制御するため) */
         
         .hg-drag-item img {
             width: 90%; height: 90%; object-fit: contain;
@@ -381,186 +380,246 @@
             }
 
             // --- 4. レベル読み込み ---
-function loadLevel(levelData) {
-    // ... (中略) ...
+            function loadLevel(levelData) {
+                levelSelectionEl.style.display = 'none';
+                mainTitleEl.style.display = 'none';
+                
+                currentLevelData = levelData; 
+                currentLevelWords = levelData.words;
 
-    // 4-2. イラストリスト（ドラッグアイテム）を生成
-    shuffledIllusts.forEach(wordData => {
-        const item = document.createElement('div');
-        item.className = 'hg-drag-item';
-        
-        // ★修正点1: PCでドラッグできるように 'draggable = true' に戻す
-        item.draggable = true; 
-        
-        item.dataset.word = wordData.hira;
-        item.id = `hg-item-${wordData.hira}`; 
-        item.dataset.initialParentId = 'hg-illust-pool';
-        
-        const img = document.createElement('img');
-        img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
-        img.alt = wordData.hira;
-        img.draggable = false; 
-        item.appendChild(img);
-        illustPoolEl.appendChild(item);
-    });
+                levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
+                feedbackEl.textContent = '';
+                feedbackEl.classList.remove('success');
+                gameAreaEl.style.display = 'flex';
+                
+                resetPlacedButton.style.display = 'none';
 
-    // 4-3. イベントリスナーを設定
-    addDragDropListeners();
-}
+                homeButton.onclick = () => showLevelSelect();
 
+                illustPoolEl.innerHTML = '';
+                wordListEl.innerHTML = '';
 
-// --- 5. ドラッグ＆ドロップのイベントリスナー設定 (★PC/タッチ両対応版に修正) ---
+                const shuffledWords = shuffleArray([...currentLevelWords]);
+                const shuffledIllusts = shuffleArray([...currentLevelWords]);
 
-// --- タッチ操作用の補助関数とグローバル変数 (変更なし) ---
-let ghostItem = null;      
-let currentDragItem = null; 
-let lastTouchTarget = null; 
+                // 4-1. 単語リスト（ドロップ先）を生成
+                shuffledWords.forEach(wordData => {
+                    const row = document.createElement('div');
+                    row.className = 'hg-word-row';
+                    const dropTarget = document.createElement('div');
+                    dropTarget.className = 'hg-drop-target';
+                    dropTarget.dataset.word = wordData.hira; 
+                    dropTarget.id = `hg-target-${wordData.hira}`; 
+                    
+                    const label = document.createElement('span');
+                    label.className = 'hg-word-label';
+                    label.textContent = wordData.hira;
+                    row.appendChild(dropTarget);
+                    row.appendChild(label);
+                    wordListEl.appendChild(row);
+                });
 
-function updateGhostPosition(touch) {
-    if (!ghostItem) return;
-    ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
-    ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
-}
+                // 4-2. イラストリスト（ドラッグアイテム）を生成
+                shuffledIllusts.forEach(wordData => {
+                    const item = document.createElement('div');
+                    item.className = 'hg-drag-item';
+                    
+                    // ★修正点1: PCでドラッグできるように 'draggable = true' に戻す
+                    item.draggable = true; 
+                    
+                    item.dataset.word = wordData.hira;
+                    item.id = `hg-item-${wordData.hira}`; 
+                    item.dataset.initialParentId = 'hg-illust-pool';
+                    
+                    const img = document.createElement('img');
+                    img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
+                    img.alt = wordData.hira;
+                    img.draggable = false; 
+                    item.appendChild(img);
+                    illustPoolEl.appendChild(item);
+                });
 
-function addDragDropListeners() {
-    const dragItems = document.querySelectorAll('.hg-drag-item');
-    const dropTargets = document.querySelectorAll('.hg-drop-target');
-    
-    // --- 1. PC/マウス イベント (標準の D&D API を使用) ---
-    const transparentImage = new Image();
-    transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
-    
-    dragItems.forEach(item => {
-        // PC操作の残像防止
-        item.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', item.id);
-            // ★追加★ ゴーストイメージを透明な画像に置き換える
-            if (e.dataTransfer && e.dataTransfer.setDragImage) {
-                e.dataTransfer.setDragImage(transparentImage, 0, 0);
+                // 4-3. イベントリスナーを設定
+                addDragDropListeners();
             }
-            setTimeout(() => item.style.opacity = '0.5', 0);
-        });
-        item.addEventListener('dragend', (e) => {
-            e.target.style.opacity = '1';
-        });
-
-        // クリックイベントの再設定 (ドロップ後のアイテムをプールに戻す)
-        item.removeEventListener('click', returnItemToPool);
-        if (!item.parentElement.classList.contains('hg-drop-target')) {
-             item.draggable = true; // プール内にあるものだけドラッグ可能
-        }
-    });
-
-    dropTargets.forEach(target => {
-        target.addEventListener('dragover', (e) => {
-            if (target.querySelector('.hg-drag-item')) return;
-            e.preventDefault();
-            target.classList.add('drag-over');
-        });
-        target.addEventListener('dragleave', () => {
-            target.classList.remove('drag-over');
-        });
-        target.addEventListener('drop', (e) => {
-            e.preventDefault();
-            target.classList.remove('drag-over');
-            if (target.querySelector('.hg-drag-item')) return;
             
-            const dragItemId = e.dataTransfer.getData('text/plain');
-            const dragItem = document.getElementById(dragItemId);
+            // ★★★ クリックでアイテムをプールに戻す関数 ★★★
+            function returnItemToPool(event) {
+                const itemToReturn = event.currentTarget; 
+                const parentTarget = itemToReturn.parentElement;
 
-            if (dragItem) {
-                target.innerHTML = ''; 
-                target.appendChild(dragItem);
-                dragItem.draggable = false; 
-                dragItem.addEventListener('click', returnItemToPool); // クリックで戻る機能を再設定
-                checkFinalAnswers();
+                // 1. プールに戻す
+                illustPoolEl.appendChild(itemToReturn);
+                
+                // 2. クリックイベントを削除
+                itemToReturn.removeEventListener('click', returnItemToPool);
+                
+                // 3. 親スロットのスタイルをリセット
+                if (parentTarget && parentTarget.classList.contains('hg-drop-target')) {
+                    parentTarget.classList.remove('correct');
+                }
+
+                // 4. 判定をリセットし、フィードバックを更新
+                feedbackEl.textContent = 'イラストをもどしました。';
+                feedbackEl.classList.remove('success');
             }
-        });
-    });
-
-    // --- 2. タッチ イベント (★ロジックは前回と同じ。PCマウスと併用可能) ---
-
-    // (A) アイテムを指で押し始めた時 (touchstart)
-    dragItems.forEach(item => {
-        item.addEventListener('touchstart', (e) => {
-            // 既にドラッグ中、またはPCで操作中の場合は無視
-            if (currentDragItem || item.draggable) return; 
-
-            currentDragItem = item; 
-            ghostItem = item.cloneNode(true);
-            ghostItem.classList.add('hg-touch-ghost'); 
-            document.body.appendChild(ghostItem);
-
-            item.style.opacity = '0.4';
-            updateGhostPosition(e.touches[0]);
-
-        }, { passive: true });
-    });
-
-    // (B) 指を動かした時 (touchmove)
-    document.addEventListener('touchmove', (e) => {
-        if (!currentDragItem || !ghostItem) return;
-
-        e.preventDefault(); 
-        updateGhostPosition(e.touches[0]);
-
-        const touch = e.touches[0];
-        ghostItem.style.display = 'none'; 
-        const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-        ghostItem.style.display = ''; 
-
-        let currentTouchTarget = null;
-        if (elementUnder && (elementUnder.classList.contains('hg-drop-target') || elementUnder.parentElement?.classList.contains('hg-drop-target'))) {
-             currentTouchTarget = elementUnder.classList.contains('hg-drop-target') ? elementUnder : elementUnder.parentElement;
-        }
-
-        if (lastTouchTarget && lastTouchTarget !== currentTouchTarget) {
-            lastTouchTarget.classList.remove('drag-over');
-        }
-        if (currentTouchTarget && currentTouchTarget.classList.contains('hg-drop-target') && !currentTouchTarget.querySelector('.hg-drag-item')) {
-            currentTouchTarget.classList.add('drag-over');
-            lastTouchTarget = currentTouchTarget;
-        } else {
-            if (lastTouchTarget) lastTouchTarget.classList.remove('drag-over');
-            lastTouchTarget = null;
-        }
-
-    }, { passive: false }); 
-
-    // (C) 指を離した時 (touchend)
-    document.addEventListener('touchend', (e) => {
-        if (!currentDragItem || !ghostItem) return;
-
-        let dropTarget = lastTouchTarget; 
-        
-        if (dropTarget && !dropTarget.querySelector('.hg-drag-item')) {
-            // --- ドロップ成功 ---
-            dropTarget.classList.remove('drag-over');
-            dropTarget.innerHTML = ''; 
-            dropTarget.appendChild(currentDragItem); 
-            
-            currentDragItem.style.opacity = '1'; 
-            currentDragItem.draggable = false; // 配置後はPCでもドラッグ不可にする
-            currentDragItem.addEventListener('click', returnItemToPool); 
-            
-            checkFinalAnswers();
-            
-        } else {
-            // --- ドロップ失敗 (元の場所に戻す) ---
-            currentDragItem.style.opacity = '1'; 
-        }
-        
-        // 後片付け
-        document.body.removeChild(ghostItem);
-        ghostItem = null;
-        currentDragItem = null;
-        lastTouchTarget = null;
-    });
-}
-// ▲▲▲ addDragDropListeners 関数ここまで ▲▲▲
 
 
-            // --- 6. (checkMatch() は削除) ---
+            // --- 5. ドラッグ＆ドロップのイベントリスナー設定 (★PC/タッチ両対応版に修正) ---
+
+            // --- タッチ操作用の補助関数とグローバル変数 (変更なし) ---
+            let ghostItem = null;      
+            let currentDragItem = null; 
+            let lastTouchTarget = null; 
+
+            function updateGhostPosition(touch) {
+                if (!ghostItem) return;
+                ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
+                ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
+            }
+
+            function addDragDropListeners() {
+                const dragItems = document.querySelectorAll('.hg-drag-item');
+                const dropTargets = document.querySelectorAll('.hg-drop-target');
+                
+                // --- 1. PC/マウス イベント (標準の D&D API を使用) ---
+                const transparentImage = new Image();
+                transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
+                
+                dragItems.forEach(item => {
+                    // PC操作の残像防止
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', item.id);
+                        // ★追加★ ゴーストイメージを透明な画像に置き換える
+                        if (e.dataTransfer && e.dataTransfer.setDragImage) {
+                            e.dataTransfer.setDragImage(transparentImage, 0, 0);
+                        }
+                        setTimeout(() => item.style.opacity = '0.5', 0);
+                    });
+                    item.addEventListener('dragend', (e) => {
+                        e.target.style.opacity = '1';
+                    });
+
+                    // クリックイベントの再設定 (ドロップ後のアイテムをプールに戻す)
+                    item.removeEventListener('click', returnItemToPool);
+                    // 既に配置されているアイテムにはクリックイベントを再設定
+                    if (item.parentElement && item.parentElement.classList.contains('hg-drop-target')) {
+                         item.addEventListener('click', returnItemToPool);
+                         item.draggable = false;
+                    } else {
+                         // プール内にあるものだけドラッグ可能
+                         item.draggable = true; 
+                    }
+                });
+
+                dropTargets.forEach(target => {
+                    target.addEventListener('dragover', (e) => {
+                        if (target.querySelector('.hg-drag-item')) return;
+                        e.preventDefault();
+                        target.classList.add('drag-over');
+                    });
+                    target.addEventListener('dragleave', () => {
+                        target.classList.remove('drag-over');
+                    });
+                    target.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        target.classList.remove('drag-over');
+                        if (target.querySelector('.hg-drag-item')) return;
+                        
+                        const dragItemId = e.dataTransfer.getData('text/plain');
+                        const dragItem = document.getElementById(dragItemId);
+
+                        if (dragItem) {
+                            target.innerHTML = ''; 
+                            target.appendChild(dragItem);
+                            dragItem.draggable = false; 
+                            dragItem.addEventListener('click', returnItemToPool); // クリックで戻る機能を再設定
+                            checkFinalAnswers();
+                        }
+                    });
+                });
+
+                // --- 2. タッチ イベント (★ロジックは前回と同じ。PCマウスと併用可能) ---
+
+                // (A) アイテムを指で押し始めた時 (touchstart)
+                dragItems.forEach(item => {
+                    item.addEventListener('touchstart', (e) => {
+                        // 既にドラッグ中、またはPCでドラッグが始まっている場合は無視
+                        if (currentDragItem || item.draggable) return; 
+
+                        currentDragItem = item; 
+                        ghostItem = item.cloneNode(true);
+                        ghostItem.classList.add('hg-touch-ghost'); 
+                        document.body.appendChild(ghostItem);
+
+                        item.style.opacity = '0.4';
+                        updateGhostPosition(e.touches[0]);
+
+                    }, { passive: true });
+                });
+
+                // (B) 指を動かした時 (touchmove)
+                document.addEventListener('touchmove', (e) => {
+                    if (!currentDragItem || !ghostItem) return;
+
+                    e.preventDefault(); 
+                    updateGhostPosition(e.touches[0]);
+
+                    const touch = e.touches[0];
+                    ghostItem.style.display = 'none'; 
+                    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                    ghostItem.style.display = ''; 
+
+                    let currentTouchTarget = null;
+                    if (elementUnder && (elementUnder.classList.contains('hg-drop-target') || elementUnder.parentElement?.classList.contains('hg-drop-target'))) {
+                         currentTouchTarget = elementUnder.classList.contains('hg-drop-target') ? elementUnder : elementUnder.parentElement;
+                    }
+
+                    if (lastTouchTarget && lastTouchTarget !== currentTouchTarget) {
+                        lastTouchTarget.classList.remove('drag-over');
+                    }
+                    if (currentTouchTarget && currentTouchTarget.classList.contains('hg-drop-target') && !currentTouchTarget.querySelector('.hg-drag-item')) {
+                        currentTouchTarget.classList.add('drag-over');
+                        lastTouchTarget = currentTouchTarget;
+                    } else {
+                        if (lastTouchTarget) lastTouchTarget.classList.remove('drag-over');
+                        lastTouchTarget = null;
+                    }
+
+                }, { passive: false }); 
+
+                // (C) 指を離した時 (touchend)
+                document.addEventListener('touchend', (e) => {
+                    if (!currentDragItem || !ghostItem) return;
+
+                    let dropTarget = lastTouchTarget; 
+                    
+                    if (dropTarget && !dropTarget.querySelector('.hg-drag-item')) {
+                        // --- ドロップ成功 ---
+                        dropTarget.classList.remove('drag-over');
+                        dropTarget.innerHTML = ''; 
+                        dropTarget.appendChild(currentDragItem); 
+                        
+                        currentDragItem.style.opacity = '1'; 
+                        currentDragItem.draggable = false; // 配置後はPCでもドラッグ不可にする
+                        currentDragItem.addEventListener('click', returnItemToPool); 
+                        
+                        checkFinalAnswers();
+                        
+                    } else {
+                        // --- ドロップ失敗 (元の場所に戻す) ---
+                        currentDragItem.style.opacity = '1'; 
+                    }
+                    
+                    // 後片付け
+                    document.body.removeChild(ghostItem);
+                    ghostItem = null;
+                    currentDragItem = null;
+                    lastTouchTarget = null;
+                });
+            }
+            // ▲▲▲ addDragDropListeners 関数ここまで ▲▲▲
+
 
             // --- 7. 最終判定ロジック ---
             function checkFinalAnswers() {
