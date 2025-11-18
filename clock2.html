@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>とけいゲーム レベル2</title>
+    <title>とけいゲーム レベル2・3</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +48,9 @@
             border-radius: 15px; cursor: pointer;
             box-shadow: 0 5px 0 #00838f;
             transition: all 0.1s ease-out; position: relative; top: 0;
+            /* <a> タグ用のスタイル追加 */
+            text-decoration: none;
+            box-sizing: border-box; /* 崩れ防止 */
         }
         .tc-button:active { top: 3px; box-shadow: 0 2px 0 #00838f; }
         .tc-button-secondary { background-color: #90a4ae; box-shadow: 0 5px 0 #546e7a; }
@@ -63,7 +66,7 @@
         #tc-feedback.show { transform: scale(1); opacity: 1; }
         #tc-feedback.success { color: #00bcd4; }
 
-        /* --- 1. 勉強スクリーン (変更なし) --- */
+        /* --- 1. 勉強スクリーン --- */
         #tc-study-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -110,28 +113,20 @@
             top: 50%; 
             left: 50%; 
             transform-origin: 0% 50%; 
-            transform: translateY(-50%) rotate(-90deg); /* 12時を指す */
+            transform: translateY(-50%) rotate(-90deg); 
         }
-        
-        /* 短い針 (完璧な状態) */
         .tc-hour-hand {
-            width: calc(200px * 0.25); /* 50px */
+            width: calc(200px * 0.25); 
             height: 8px; 
-            background: #4CAF50; /* 緑色 */
-            border-radius: 4px; /* 太さに合わせて調整 */
+            background: #4CAF50; 
+            border-radius: 4px; 
         }
-        
-        /* ▼▼▼ 長い針 (ここを修正) ▼▼▼ */
         .tc-minute-hand {
-            /* 長さ: 数字に届くように (40% = 80px) */
             width: calc(200px * 0.40); 
-            /* 太さ: 短い針(8px)より太く */
             height: 10px; 
-            background: #FF9800; /* オレンジ色 */
-            border-radius: 5px; /* 太さに合わせて調整 */
+            background: #FF9800; 
+            border-radius: 5px; 
         }
-        /* ▲▲▲ 修正完了 ▲▲▲ */
-
         .tc-center-dot {
             width: 12px;
             height: 12px;
@@ -180,7 +175,9 @@
             <div id="tc-study-grid">
                 </div>
             <button id="tc-start-quiz-button" class="tc-button">クイズを はじめる</button>
-        </div>
+            
+            <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+            </div>
 
         <div id="tc-screen-quiz" class="tc-screen">
             <h2>この とけい は なんじ？</h2>
@@ -199,7 +196,9 @@
             <div id="tc-feedback"></div>
             
             <button id="tc-back-to-study-button" class="tc-button tc-button-secondary">べんきょう に もどる</button>
-        </div>
+            
+            <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+            </div>
 
     </div>
 
@@ -220,12 +219,12 @@
                 { hour: 1, text: 'いちじ', sound: '1ji.mp3' },
                 { hour: 2, text: 'にじ', sound: '2ji.mp3' },
                 { hour: 3, text: 'さんじ', sound: '3ji.mp3' },
-                { hour: 4, text: 'よじ', sound: '4ji.mp3' },
+                { hour: 4, text: 'よじ', sound: '4ji_yoji.mp3' },
                 { hour: 5, text: 'ごじ', sound: '5ji.mp3' },
                 { hour: 6, text: 'ろくじ', sound: '6ji.mp3' },
-                { hour: 7, text: 'しちじ', sound: '7ji.mp3' },
+                { hour: 7, text: 'しちじ', sound: '7ji_shichiji.mp3' },
                 { hour: 8, text: 'はちじ', sound: '8ji.mp3' },
-                { hour: 9, text: 'くじ', sound: '9ji.mp3' },
+                { hour: 9, text: 'くじ', sound: '9ji_kuji.mp3' },
                 { hour: 10, text: 'じゅうじ', sound: '10ji.mp3' },
                 { hour: 11, text: 'じゅういちじ', sound: '11ji.mp3' },
                 { hour: 12, text: 'じゅうにじ', sound: '12ji.mp3' }
@@ -269,10 +268,6 @@
             const minuteHand = document.getElementById('tc-minute-hand');
             const quizOptions = document.getElementById('tc-quiz-options');
             const feedback = document.getElementById('tc-feedback');
-            
-            // ▼▼▼ 修正：「つぎへ」ボタンの参照を削除 ▼▼▼
-            // const nextQuizButton = document.getElementById('tc-next-quiz-button');
-            
             const backToStudyButton = document.getElementById('tc-back-to-study-button');
             
             let currentCorrectText = ""; 
@@ -330,23 +325,15 @@
             backToStudyButton.onclick = () => {
                 showScreen(studyScreen);
             };
-            
-            // ▼▼▼ 修正：「つぎへ」ボタンのクリックイベントを削除 ▼▼▼
-            // nextQuizButton.onclick = () => { startQuiz(); };
 
             // ----------------------------------------------------
-            // クイズのメインロジック (startQuiz を一部修正)
+            // クイズのメインロジック (変更なし)
             // ----------------------------------------------------
             function startQuiz() {
-                // 1. UIリセット
                 quizOptions.innerHTML = '';
                 feedback.textContent = '';
                 feedback.className = '';
                 
-                // ▼▼▼ 修正：「つぎへ」ボタンを隠す処理を削除 ▼▼▼
-                // nextQuizButton.style.display = 'none';
-                
-                // 2. 正解の「時」と「分」を決める (ロジック変更なし)
                 const correctHour = hourData[Math.floor(Math.random() * hourData.length)];
                 let correctMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 let correctMinuteText = correctMinute.text;
@@ -355,7 +342,6 @@
                 }
                 currentCorrectText = `${correctHour.text} ${correctMinuteText}`;
 
-                // 3. 時計の針をセットする (ロジック変更なし)
                 const h = correctHour.hour % 12; 
                 const m = correctMinute.min;
                 const hourDeg = (h * 30) + (m * 0.5);
@@ -363,7 +349,6 @@
                 hourHand.style.transform = `translateY(-50%) rotate(${hourDeg - 90}deg)`;
                 minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg - 90}deg)`;
 
-                // 4. 選択肢を4つ作成 (ロジック変更なし)
                 let options = [currentCorrectText];
                 let dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
                 while(dummyHour.hour === correctHour.hour) {
@@ -393,7 +378,6 @@
                      options.push(`${correctHour.text} ${extraDummyMinute.text}`);
                 }
                 
-                // 5. 選択肢ボタンをシャッフルして配置 (ロジック変更なし)
                 shuffleArray(options).slice(0, 4).forEach(text => {
                     const button = document.createElement('button');
                     button.className = 'tc-button tc-option-text-button tc-option';
@@ -403,49 +387,39 @@
                 });
             }
             
-            // ▼▼▼ 修正：答え合わせのロジックを大幅に変更 ▼▼▼
+            // ----------------------------------------------------
+            // 答え合わせのロジック (変更なし)
+            // ----------------------------------------------------
             function handleQuizChoice(e) {
                 const chosenOption = e.currentTarget;
                 const chosenText = chosenOption.textContent;
 
-                // 既に無効化されているボタンは無視
                 if (chosenOption.classList.contains('disabled')) {
                     return;
                 }
                 
                 if (chosenText === currentCorrectText) {
-                    // --- 正解の場合 ---
                     playSound(soundCorrect);
                     feedback.textContent = 'せいかい！';
                     feedback.className = 'success show';
                     
-                    // すべての選択肢を無効化
                     quizOptions.querySelectorAll('.tc-option').forEach(opt => {
                         opt.classList.add('disabled');
                     });
-                    // 正解のボタンを緑にする
                     chosenOption.classList.add('correct');
                     
-                    // ★ 自動で次の問題へ
                     setTimeout(startQuiz, 2000); 
                     
                 } else {
-                    // --- 不正解の場合 ---
                     playSound(soundIncorrect);
                     feedback.textContent = 'ちがうよ、もういちど！';
                     feedback.className = 'show';
-                    
-                    // ★ 間違えたボタンだけを赤くして無効化
                     chosenOption.classList.add('incorrect', 'disabled');
-                    
-                    // ★ 正解は表示しない
-                    // ★「つぎへ」ボタンも表示しない
                 }
             }
-            // ▲▲▲ 答え合わせのロジック修正完了 ▲▲▲
-
+            
             // ----------------------------------------------------
-            // ゲーム開始
+            // ゲーム開始 (変更なし)
             // ----------------------------------------------------
             setupStudyScreen();
             showScreen(studyScreen); // 最初に勉強スクリーンを表示
