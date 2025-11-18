@@ -1,312 +1,238 @@
-// データのパス
-const DATA_PATH = 'data/aisatsu.json';
+document.addEventListener('DOMContentLoaded', () => {
 
-// 音声ファイルのパス設定 (ご自身のファイル名に合わせて修正してください)
-const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
-const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+    // ----------------------------------------------------
+    // データ定義
+    // ----------------------------------------------------
+    const SOUND_PATH_AISATSU = 'assets/sounds/aisatsu/';
 
-// グローバル変数
-let greetingsList = [];     
-let quizQuestions = [];     
-let currentQuestionIndex = 0; 
-let score = 0;              
+    const greetingsData = [
+        { "id": 1, "situation": "あさ、おきたとき、または あったひとに いう あいさつは？ (朝)", "correct": "おはよう", "wrongs": ["こんにちは", "こんばんは", "おやすみなさい"] },
+        { "id": 2, "situation": "ひるま、ひとに あったときの あいさつは？ (昼)", "correct": "こんにちは", "wrongs": ["おはよう", "こんばんは", "さようなら"] },
+        { "id": 3, "situation": "ゆうがたから よるに かけて、ひとに あったときの あいさつは？ (夜)", "correct": "こんばんは", "wrongs": ["おはよう", "こんにちは", "ただいま"] },
+        { "id": 4, "situation": "ねるまえに ひとに いう あいさつは？", "correct": "おやすみなさい", "wrongs": ["さようなら", "いただきます", "いってきます"] },
+        { "id": 5, "situation": "これから いえを でかけるときの あいさつは？ (自分が)", "correct": "いってきます", "wrongs": ["ただいま", "いってらっしゃい", "おかえりなさい"] },
+        { "id": 6, "situation": "かぞくが でかけるときに、かえす ことばは？", "correct": "いってらっしゃい", "wrongs": ["いってきます", "ただいま", "おかえりなさい"] },
+        { "id": 7, "situation": "そとから いえに かえってきたときの あいさつは？", "correct": "ただいま", "wrongs": ["おかえりなさい", "いってきます", "ごちそうさま"] },
+        { "id": 8, "situation": "「ただいま」と いわれたときの かえす ことばは？", "correct": "おかえりなさい", "wrongs": ["いってきます", "さようなら", "ごめんなさい"] },
+        { "id": 9, "situation": "なにかを してもらったときの、かんしゃの ことばは？", "correct": "ありがとう", "wrongs": ["ごめんなさい", "いただきます", "おやすみなさい"] },
+        { "id": 10, "situation": "わるいことを してしまったときの あいさつは？", "correct": "ごめんなさい", "wrongs": ["ありがとう", "こんにちは", "いただきます"] },
+        { "id": 11, "situation": "ごはんを たべるまえの あいさつは？", "correct": "いただきます", "wrongs": ["ごちそうさま", "ありがとう", "おかえりなさい"] },
+        { "id": 12, "situation": "ごはんを たべおわった あとの あいさつは？", "correct": "ごちそうさま", "wrongs": ["いただきます", "こんにちは", "おやすみなさい"] },
+        { "id": 13, "situation": "はじめて あうひとに いう、さいしょの あいさつは？", "correct": "はじめまして", "wrongs": ["こんにちは", "さようなら", "いってきます"] },
+        { "id": 14, "situation": "かぞくや ともだちと わかれるときの あいさつは？", "correct": "さようなら", "wrongs": ["こんにちは", "おかえりなさい", "おやすみなさい"] }
+    ];
 
-// ★変更点★ タイマーと間違い回数の設定
-const MAX_WRONG_ANSWERS = 3;    
-let wrongAnswerCount = 0;       
-const TIME_LIMIT = 10;           // ★10秒に変更
-let timerId = null;             
-const CHOICES_COUNT = 3;        
+    // --- 音声キャッシュ ---
+    const audioCache = {};
+    function loadAudio(path) {
+        if (!audioCache[path]) {
+            audioCache[path] = new Audio(path);
+        }
+        return audioCache[path];
+    }
+    
+    // --- DOM取得 ---
+    const questionNumberEl = document.getElementById('question-number');
+    const timerBoxEl = document.getElementById('timer-box');
+    const questionTextEl = document.getElementById('question-text');
+    const playSoundButton = document.getElementById('play-situation-sound'); // ★ 追加
+    const choicesContainerEl = document.getElementById('choices-container');
+    const resultMessageEl = document.getElementById('result-message');
+    const finalScoreEl = document.getElementById('final-score');
+    const homeButton = document.getElementById('home-button');
+    const restartButton = document.getElementById('restart-button');
 
-// DOM要素の取得
-const questionNumberElement = document.getElementById('question-number');
-const questionTextElement = document.getElementById('question-text'); 
-const questionPromptElement = document.getElementById('question-prompt'); 
-const timerBoxElement = document.getElementById('timer-box'); 
-const choicesContainer = document.getElementById('choices-container');
-const resultMessageElement = document.getElementById('result-message');
-const homeButton = document.getElementById('home-button');
-const restartButton = document.getElementById('restart-button');
-const finalScoreElement = document.getElementById('final-score');
+    // --- ゲーム状態変数 ---
+    let allQuestions = []; // 全問題リスト
+    let currentQuestions = []; // 今回のクイズ10問
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 10;
+    let currentSituationSound = null; // ★ 追加
 
+    // ----------------------------------------------------
+    // メイン関数
+    // ----------------------------------------------------
 
-/**
- * 指定されたパスの音源を再生する関数
- */
-function playSound(path) {
-    const audio = new Audio(path);
-    audio.play().catch(e => console.error("おとを ならせませんでした:", e));
-}
-
-/**
- * データを読み込み、クイズの準備を開始する関数
- */
-async function initializeQuiz() {
-    try {
-        const response = await fetch(DATA_PATH);
-        const data = await response.json();
-        greetingsList = data.greetings;
+    function startGame() {
+        // 問題をシャッフルして10問選ぶ
+        allQuestions = shuffleArray([...greetingsData]);
+        currentQuestions = allQuestions.slice(0, 10);
+        currentQuestionIndex = 0;
+        score = 0;
         
-        if (greetingsList.length < CHOICES_COUNT) {
-            questionTextElement.textContent = "エラー: データがたりません。あいさつを3ついじょうよういしてください。";
-            disableAllButtons();
+        // UIリセット
+        finalScoreEl.style.display = 'none';
+        resultMessageEl.style.display = 'none';
+        choicesContainerEl.style.display = 'grid';
+        restartButton.style.display = 'none';
+        playSoundButton.disabled = false; // ★ 追加
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        // 前回のタイマーをクリア
+        clearInterval(timer);
+        
+        // 結果メッセージを隠す
+        resultMessageEl.style.display = 'none';
+        
+        if (currentQuestionIndex >= currentQuestions.length) {
+            endGame();
             return;
         }
+
+        const problem = currentQuestions[currentQuestionIndex];
         
-        homeButton.addEventListener('click', () => {
-            window.location.href = 'index.html'; 
+        // 問題文と番号を設定
+        questionNumberEl.textContent = `だい ${currentQuestionIndex + 1} もん`;
+        questionTextEl.textContent = problem.situation;
+
+        // ★ 音声再生ボタンの設定
+        const soundFile = `situation${problem.id}.mp3`;
+        currentSituationSound = loadAudio(SOUND_PATH_AISATSU + soundFile);
+        playSoundButton.onclick = () => playSound(currentSituationSound);
+        // 最初に一度だけ自動再生
+        playSound(currentSituationSound);
+
+        // 選択肢を作成
+        choicesContainerEl.innerHTML = '';
+        const options = shuffleArray([problem.correct, ...problem.wrongs]);
+        
+        options.forEach(optionText => {
+            const button = document.createElement('button');
+            button.textContent = optionText;
+            button.onclick = (e) => checkAnswer(e, problem.correct);
+            choicesContainerEl.appendChild(button);
         });
-        restartButton.addEventListener('click', startNewQuiz);
-
-        // タイマーエリアを初期化
-        timerBoxElement.textContent = `のこり ${TIME_LIMIT} びょう`;
-
-        startNewQuiz(); 
         
-    } catch (error) {
-        console.error("データのよみこみに しっぱいしました:", error);
-        questionTextElement.textContent = "エラー: データのよみこみにしっぱいしました。ファイルパスをかくにんしてください。";
-        disableAllButtons();
+        // タイマースタート
+        timeLeft = 10;
+        timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
+        timer = setInterval(updateTimer, 1000);
     }
-}
 
-/**
- * 新しいクイズセッションを開始する
- */
-function startNewQuiz() {
-    if (timerId) clearInterval(timerId); 
-
-    currentQuestionIndex = 0;
-    score = 0;
-    wrongAnswerCount = 0; 
-
-    quizQuestions = generateQuizQuestions(); 
-
-    resultMessageElement.style.display = 'none';
-    finalScoreElement.style.display = 'none';
-    restartButton.style.display = 'none';
-    choicesContainer.style.display = 'grid'; 
-    homeButton.style.display = 'inline-block'; 
-
-    displayQuestion(); 
-}
-
-/**
- * クイズの問題リストを生成する
- */
-function generateQuizQuestions() {
-    const shuffledGreetings = [...greetingsList]; 
-    for (let i = shuffledGreetings.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledGreetings[i], shuffledGreetings[j]] = [shuffledGreetings[j], shuffledGreetings[i]];
-    }
-    
-    const questions = shuffledGreetings.map(item => {
-        const choices = [item.correct, ...item.wrongs].slice(0, CHOICES_COUNT);
-        
-        for (let i = choices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [choices[i], choices[j]] = [choices[j], choices[i]];
-        }
-        
-        return {
-            situation: item.situation,
-            correctAnswer: item.correct,
-            choices: choices
-        };
-    });
-    
-    return questions;
-}
-
-/**
- * タイマーを開始する
- */
-function startTimer() {
-    let timeLeft = TIME_LIMIT;
-    timerBoxElement.textContent = `のこり ${timeLeft} びょう`;
-    timerBoxElement.style.backgroundColor = '#ff6347'; 
-
-    timerId = setInterval(() => {
+    function updateTimer() {
         timeLeft--;
-        timerBoxElement.textContent = `のこり ${timeLeft} びょう`;
+        timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
         
-        if (timeLeft <= 3) { // 3秒以下で色を強調
-            timerBoxElement.style.backgroundColor = '#ff4500'; 
-        }
-
         if (timeLeft <= 0) {
-            clearInterval(timerId);
-            handleTimeUp();
+            clearInterval(timer);
+            // 時間切れ
+            showResult(false, currentQuestions[currentQuestionIndex].correct);
         }
-    }, 1000);
-}
-
-/**
- * 時間切れ時の処理
- */
-function handleTimeUp() {
-    disableAllButtons();
-    const currentQuestion = quizQuestions[currentQuestionIndex];
-    checkAnswer(null, 'TIME_UP', currentQuestion.correctAnswer);
-}
-
-
-/**
- * 現在の問題を画面に表示する
- */
-function displayQuestion() {
-    if (timerId) clearInterval(timerId); 
-    
-    choicesContainer.innerHTML = '';
-    resultMessageElement.style.display = 'none';
-    resultMessageElement.className = 'result-message';
-    timerBoxElement.textContent = `のこり ${TIME_LIMIT} びょう`;
-    timerBoxElement.style.backgroundColor = '#ff6347'; 
-    
-    if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
-        endQuiz(true); 
-        return;
     }
 
-    if (currentQuestionIndex >= quizQuestions.length) {
-        endQuiz(false); 
-        return;
+    function checkAnswer(event, correctAnswer) {
+        clearInterval(timer); // タイマー停止
+        
+        const chosenButton = event.target;
+        const chosenAnswer = chosenButton.textContent;
+        
+        // ★ 選択した答えの音声を再生
+        const answerSound = loadAudio(SOUND_PATH_AISATSU + chosenAnswer + '.mp3');
+        playSound(answerSound);
+
+        // すべてのボタンを無効化
+        disableChoices();
+
+        if (chosenAnswer === correctAnswer) {
+            score++;
+            chosenButton.classList.add('correct-answer'); // 正解ボタンを緑に
+            showResult(true, correctAnswer);
+        } else {
+            // 不正解
+            chosenButton.style.backgroundColor = '#d9534f'; // 不正解を赤に
+            chosenButton.style.borderColor = '#d9534f';
+            showResult(false, correctAnswer);
+        }
     }
 
-    const question = quizQuestions[currentQuestionIndex];
-    
-    questionNumberElement.textContent = 
-        `だい ${currentQuestionIndex + 1} もん (のこり まちがい ${MAX_WRONG_ANSWERS - wrongAnswerCount} かい)`; 
-    
-    questionPromptElement.textContent = "ただしい あいさつを えらんでね："; 
+    function showResult(isCorrect, correctAnswer) {
+        // ★ 音声再生ボタンを無効化
+        playSoundButton.disabled = true;
 
-    // 状況説明をh2タグ（質問文エリア）に表示
-    questionTextElement.textContent = question.situation; 
-    
-    question.choices.forEach(choice => {
-        const button = document.createElement('button');
-        
-        button.textContent = choice;
-        
-        button.addEventListener('click', (event) => {
-            if (timerId) clearInterval(timerId); 
-            checkAnswer(event.target, choice, question.correctAnswer);
-        });
-        
-        choicesContainer.appendChild(button);
-    });
-
-    startTimer();
-}
-
-/**
- * ユーザーの回答をチェックし、結果を表示する関数
- */
-function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
-    
-    if (resultMessageElement.style.display === 'block') return;
-
-    if (selectedChoice === 'TIME_UP') {
-        resultMessageElement.textContent = `🚨 じかんぎれです！`;
-    }
-    
-    const isCorrect = (selectedChoice === correctAnswer);
-    
-    disableAllButtons();
-    
-    if (isCorrect) {
-        playSound(SOUND_CORRECT_PATH);
-        
-        score++;
-        resultMessageElement.textContent = "✅ せいかい！つぎの もんだいへ すすみます。";
-        resultMessageElement.classList.remove('incorrect');
-        resultMessageElement.classList.add('correct');
-        if (clickedButton) clickedButton.classList.add('correct-answer'); 
-
-        resultMessageElement.style.display = 'block';
-        
-        setTimeout(() => {
-            currentQuestionIndex++;
-            displayQuestion();
-        }, 1500); 
-        
-    } else {
-        playSound(SOUND_INCORRECT_PATH);
-        
-        wrongAnswerCount++; 
-        
-        if (wrongAnswerCount >= MAX_WRONG_ANSWERS) {
-            resultMessageElement.textContent = `🚨 ざんねん！${MAX_WRONG_ANSWERS}かい まちがえました。ゲームオーバーです。`;
-            resultMessageElement.classList.remove('correct');
-            resultMessageElement.classList.add('incorrect');
-            resultMessageElement.style.display = 'block';
+        if (isCorrect) {
+            resultMessageEl.textContent = 'せいかい！';
+            resultMessageEl.className = 'result-message correct';
+            // ★ 正解の音
+            const correctSound = loadAudio('assets/sounds/seikai.mp3');
+            playSound(correctSound);
+        } else {
+            resultMessageEl.textContent = `ざんねん... せいかいは「${correctAnswer}」`;
+            resultMessageEl.className = 'result-message incorrect';
+            // ★ 不正解の音
+            const incorrectSound = loadAudio('assets/sounds/bubu.mp3');
+            playSound(incorrectSound);
             
-            setTimeout(() => {
-                endQuiz(true);
-            }, 2500);
-            return;
+            // 正解のボタンを緑にする
+            Array.from(choicesContainerEl.children).forEach(button => {
+                if (button.textContent === correctAnswer) {
+                    button.classList.add('correct-answer');
+                }
+            });
         }
+        resultMessageEl.style.display = 'block';
 
-        const msg = selectedChoice === 'TIME_UP' ? `❌ じかんぎれです。` : `❌ ふせいかいです。`;
-        resultMessageElement.textContent = `${msg} のこり まちがい ${MAX_WRONG_ANSWERS - wrongAnswerCount} かい。`;
-        resultMessageElement.classList.remove('correct');
-        resultMessageElement.classList.add('incorrect');
-        
-        if (clickedButton) {
-            clickedButton.style.backgroundColor = '#f8d7da'; 
-            clickedButton.style.color = '#721c24';
-        }
-
-        Array.from(choicesContainer.children).forEach(button => {
-            if (button.textContent === correctAnswer) {
-                 button.style.backgroundColor = '#c3e6cb'; 
-            }
-        });
-        
-        resultMessageElement.style.display = 'block';
-        
+        // 2秒後に次の問題へ
         setTimeout(() => {
             currentQuestionIndex++;
-            displayQuestion();
-        }, 2500);
+            loadQuestion();
+        }, 2000);
     }
-}
 
-/**
- * 全ての選択肢ボタンを無効化する
- */
-function disableAllButtons() {
-    Array.from(choicesContainer.children).forEach(button => {
-        button.disabled = true;
+    function disableChoices() {
+        Array.from(choicesContainerEl.children).forEach(button => {
+            button.disabled = true;
+        });
+    }
+
+    function endGame() {
+        // UI切り替え
+        finalScoreEl.innerHTML = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
+        finalScoreEl.style.display = 'block';
+        
+        questionNumberEl.textContent = 'おつかれさま';
+        questionTextEl.textContent = 'クイズしゅうりょう';
+        timerBoxEl.textContent = 'おわり';
+        choicesContainerEl.style.display = 'none';
+        resultMessageEl.style.display = 'none';
+        restartButton.style.display = 'block';
+        playSoundButton.disabled = true; // ★ 追加
+    }
+
+    // ----------------------------------------------------
+    // ユーティリティ関数
+    // ----------------------------------------------------
+    function playSound(audioElement) {
+        if (audioElement) {
+            audioElement.currentTime = 0;
+            audioElement.play().catch(e => console.error("音声再生エラー:", e));
+        }
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    // ----------------------------------------------------
+    // イベントリスナー
+    // ----------------------------------------------------
+    homeButton.addEventListener('click', () => {
+        window.location.href = 'index.html';
     });
-}
 
-/**
- * クイズを終了し、結果を表示する
- */
-function endQuiz(isGameOver) {
-    if (timerId) clearInterval(timerId); 
+    restartButton.addEventListener('click', startGame);
 
-    choicesContainer.innerHTML = ''; 
-    choicesContainer.style.display = 'none'; 
-
-    if (isGameOver) {
-        questionNumberElement.textContent = "ゲームオーバー！";
-        questionTextElement.textContent = "ざんねん！はじめから やりなおしましょう。";
-        finalScoreElement.style.color = '#dc3545'; 
-    } else {
-        questionNumberElement.textContent = "クイズ クリア！";
-        questionTextElement.textContent = "ぜんもん せいかいしました！おめでとう！";
-        finalScoreElement.style.color = '#28a745'; 
-    }
-
-    finalScoreElement.textContent = `せいかいした もんだい: ${score} もん`;
-    finalScoreElement.style.display = 'block';
-
-    homeButton.style.display = 'inline-block';
-    restartButton.style.display = 'inline-block';
-}
-
-
-document.addEventListener('DOMContentLoaded', initializeQuiz);
+    // ----------------------------------------------------
+    // ゲーム開始
+    // ----------------------------------------------------
+    startGame();
+});

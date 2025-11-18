@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>あいさつクイズ</title>
     <link rel="stylesheet" href="assets/css/style.css"> 
+    
     <style>
         /* CSSスタイルはkanji_quizと統一感を持ちます */
         body { 
@@ -64,9 +65,9 @@
             border: 3px solid #008080;
             border-radius: 10px;
             display: inline-block; 
-            margin-top: 5px;
-            min-width: 80%;
-            text-align: center;
+            margin: 0; /* ★ 修正 */
+            min-width: 60%; /* ★ 修正 */
+            text-align: left; /* ★ 修正 */
         }
 
         /* 選択肢ボタン */
@@ -115,8 +116,42 @@
 
         /* 画像エリアは構造上残しますが、今回のクイズでは非表示を維持 */
         .image-box { display:none; }
-    </style>
 
+        /* ▼▼▼ このCSSコードを追加 ▼▼▼ */
+        /* 問題文と再生ボタンを横並びにする */
+        .question-prompt-container {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 中央揃え */
+            gap: 15px; /* ボタンとの隙間 */
+            margin-top: 5px;
+            /* 問題文の背景などは #question-text 側で設定 */
+        }
+        
+        /* 音声再生ボタンのスタイル */
+        .sound-button {
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            font-size: 2em;
+            background-color: #008080; /* テーマカラー */
+            color: white;
+            border: none;
+            border-radius: 50%; /* 丸くする */
+            cursor: pointer;
+            flex-shrink: 0; /* 縮まないように */
+            transition: background-color 0.2s;
+        }
+        .sound-button:hover {
+            background-color: #006666;
+        }
+        .sound-button:disabled {
+            background-color: #cccccc;
+            opacity: 0.7;
+        }
+        /* ▲▲▲ ここまで追加 ▲▲▲ */
+
+    </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -138,8 +173,11 @@
             
             <p id="question-prompt">ただしい あいさつを えらんでね：</p>
             
-            <h2 id="question-text">もんだいぶんが ひょうじされます...</h2> 
-        </div>
+            <div class="question-prompt-container">
+                <h2 id="question-text">もんだいぶんが ひょうじされます...</h2> 
+                <button id="play-situation-sound" class="sound-button">▶</button>
+            </div>
+            </div>
 
         <div class="choices" id="choices-container">
             </div>
