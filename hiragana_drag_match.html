@@ -129,19 +129,15 @@
             justify-content: center; align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
 
-            /* ▼▼▼ スマホ・タブレット対応のために以下を追加 ▼▼▼ */
-            /* (1) スクロールやズームと競合するのを防ぎ、遅延をなくす */
+            /* ▼▼▼ モバイル最適化のためのCSS ▼▼▼ */
             touch-action: none;
-            /* (2) iOSで長押しした際のメニューを無効化 */
             -webkit-touch-callout: none;
-            /* (3) テキストや画像を選択しようとする動作を無効化 */
             user-select: none;
             -webkit-user-select: none;
+            /* ▲▲▲ モバイル最適化のためのCSS ▲▲▲ */
         }
-        .hg-drag-item:active {
-            cursor: grabbing; transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+        /* :active スタイルを削除 (タッチイベントで制御するため) */
+        
         .hg-drag-item img {
             width: 90%; height: 90%; object-fit: contain;
         }
@@ -179,9 +175,14 @@
             border: none; opacity: 1 !important; 
             cursor: pointer; 
         }
-        /* ドラッグ中のアイテムはクリックできないようにする */
-        .hg-drag-item:active {
-            cursor: grabbing;
+        
+        /* タッチイベントで指に追随させるためのゴーストスタイル */
+        .hg-touch-ghost {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.8;
+            transform: scale(1.1);
         }
 
         #hg-feedback {
@@ -317,11 +318,9 @@
 
             // --- 1. データ定義 ---
             
-            // ★★★ ひらがな用のパスに変更 ★★★
             const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/';
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
-            // ★★★ ひらがな用のデータに変更 ★★★
             const gameLevels = [
                 { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
                 { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'き', file: 'き' },{ hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
@@ -394,7 +393,7 @@
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
                 
-                resetPlacedButton.style.display = 'none'; // ロジック上、まだ非表示
+                resetPlacedButton.style.display = 'none';
 
                 homeButton.onclick = () => showLevelSelect();
 
@@ -425,7 +424,7 @@
                 shuffledIllusts.forEach(wordData => {
                     const item = document.createElement('div');
                     item.className = 'hg-drag-item';
-                    item.draggable = true;
+                    item.draggable = false; // タッチイベントを使うのでブラウザのドラッグは無効化
                     item.dataset.word = wordData.hira;
                     item.id = `hg-item-${wordData.hira}`; 
                     item.dataset.initialParentId = 'hg-illust-pool';
@@ -450,15 +449,15 @@
                 // 1. プールに戻す
                 illustPoolEl.appendChild(itemToReturn);
                 
-                // 2. 再度ドラッグできるようにする
-                itemToReturn.draggable = true;
+                // 2. 再度タッチドラッグできるようにする
+                // draggable属性は常にfalseだが、ここでは念の為の処理
                 
                 // 3. クリックイベントを削除
                 itemToReturn.removeEventListener('click', returnItemToPool);
                 
                 // 4. 親スロットのスタイルをリセット
                 if (parentTarget && parentTarget.classList.contains('hg-drop-target')) {
-                    parentTarget.classList.remove('correct'); // correctクラスがあっても削除
+                    parentTarget.classList.remove('correct');
                 }
 
                 // 5. 判定をリセットし、フィードバックを更新
@@ -468,21 +467,30 @@
 
 
             // --- 5. ドラッグ＆ドロップのイベントリスナー設定 (★タッチ対応版に差し替え) ---
+            
+            // --- タッチ操作用の補助関数とグローバル変数 ---
+            let ghostItem = null;      
+            let currentDragItem = null; 
+            let lastTouchTarget = null; 
+            
+            // タッチ位置にゴーストを更新する関数
+            function updateGhostPosition(touch) {
+                if (!ghostItem) return;
+                // ゴーストが指の中心に来るように調整
+                ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
+                ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
+            }
+
+            // addDragDropListeners 関数
             function addDragDropListeners() {
                 const dragItems = document.querySelectorAll('.hg-drag-item');
                 const dropTargets = document.querySelectorAll('.hg-drop-target');
                 
-                // --- タッチ操作用の変数 ---
-                let ghostItem = null;      // 指に追随するゴースト（コピー）
-                let currentDragItem = null; // ドラッグ中の元のアイテム
-                let lastTouchTarget = null; // 最後に指が乗ったターゲット
-
-                // --- 1. マウス イベント (既存のロジック) ---
+                // --- 1. マウス イベント (タッチイベント優先のため、ブラウザのD&Dは機能しない) ---
                 dragItems.forEach(item => {
+                    // draggableはfalseなので、基本的にこれらのイベントは発火しないが、保険として残す
                     item.addEventListener('dragstart', (e) => {
-                        if (!item.draggable) { e.preventDefault(); return; }
-                        e.dataTransfer.setData('text/plain', item.id);
-                        setTimeout(() => item.style.opacity = '0.5', 0);
+                        e.preventDefault(); 
                     });
                     item.addEventListener('dragend', (e) => {
                         e.target.style.opacity = '1';
@@ -491,47 +499,24 @@
 
                 dropTargets.forEach(target => {
                     target.addEventListener('dragover', (e) => {
-                        if (target.querySelector('.hg-drag-item')) return;
+                         // タッチイベントで制御するため、基本は無効
                         e.preventDefault();
-                        target.classList.add('drag-over');
-                    });
-                    target.addEventListener('dragleave', () => {
-                        target.classList.remove('drag-over');
-                    });
-                    target.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        target.classList.remove('drag-over');
-                        if (target.querySelector('.hg-drag-item')) return;
-                        
-                        const dragItemId = e.dataTransfer.getData('text/plain');
-                        const dragItem = document.getElementById(dragItemId);
-
-                        if (dragItem) {
-                            target.innerHTML = ''; 
-                            target.appendChild(dragItem);
-                            dragItem.draggable = false; 
-                            dragItem.addEventListener('click', returnItemToPool);
-                            checkFinalAnswers();
-                        }
                     });
                 });
 
-                // --- 2. タッチ イベント (★ここからが追加ロジック) ---
+                // --- 2. タッチ イベント (★モバイル対応のコアロジック) ---
 
                 // (A) アイテムを指で押し始めた時 (touchstart)
                 dragItems.forEach(item => {
                     item.addEventListener('touchstart', (e) => {
-                        if (!item.draggable) return;
+                        // 既にドラッグ中なら無視
+                        if (currentDragItem) return;
 
                         currentDragItem = item; // 元のアイテムを記憶
-
+                        
                         // (1) ゴースト（指に追随するコピー）を作成
                         ghostItem = item.cloneNode(true);
-                        ghostItem.style.position = 'absolute';
-                        ghostItem.style.pointerEvents = 'none'; // ゴースト自体がタッチを邪魔しないように
-                        ghostItem.style.zIndex = '1000';
-                        ghostItem.style.opacity = '0.8';
-                        ghostItem.style.transform = 'scale(1.1)'; // 少し大きくして掴んだ感を出す
+                        ghostItem.classList.add('hg-touch-ghost'); // スタイルを適用
                         document.body.appendChild(ghostItem);
 
                         // (2) 元のアイテムを半透明にする
@@ -540,64 +525,62 @@
                         // (3) ゴーストを指の位置に配置
                         updateGhostPosition(e.touches[0]);
 
-                    }, { passive: true }); // passive: true で開始
+                    }, { passive: true });
                 });
 
                 // (B) 指を動かした時 (touchmove)
                 document.addEventListener('touchmove', (e) => {
                     if (!currentDragItem || !ghostItem) return;
 
-                    // ★重要：ここで preventDefault を呼び、ドラッグ中の画面スクロールを止める
+                    // ★重要：画面スクロールを止める
                     e.preventDefault(); 
                     
                     // (1) ゴーストを指の位置に更新
                     updateGhostPosition(e.touches[0]);
 
-                    // (2) 指の下にある要素を特定
+                    // (2) 指の下にある要素を特定 (ドロップ先の特定)
                     const touch = e.touches[0];
-                    ghostItem.style.display = 'none'; // 一瞬ゴーストを消して、下の要素をチェック
+                    ghostItem.style.display = 'none'; 
                     const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-                    ghostItem.style.display = ''; // すぐに戻す
+                    ghostItem.style.display = ''; 
 
                     let currentTouchTarget = null;
-                    if (elementUnder && elementUnder.classList.contains('hg-drop-target')) {
-                        currentTouchTarget = elementUnder;
+                    // ドロップターゲットとその中の画像要素（img）もチェック
+                    if (elementUnder && (elementUnder.classList.contains('hg-drop-target') || elementUnder.parentElement?.classList.contains('hg-drop-target'))) {
+                         currentTouchTarget = elementUnder.classList.contains('hg-drop-target') ? elementUnder : elementUnder.parentElement;
                     }
 
                     // (3) ドロップ先のハイライトを更新
                     if (lastTouchTarget && lastTouchTarget !== currentTouchTarget) {
                         lastTouchTarget.classList.remove('drag-over');
                     }
-                    if (currentTouchTarget && !currentTouchTarget.querySelector('.hg-drag-item')) {
+                    // ドロップ先が空で、かつドロップターゲットである場合
+                    if (currentTouchTarget && currentTouchTarget.classList.contains('hg-drop-target') && !currentTouchTarget.querySelector('.hg-drag-item')) {
                         currentTouchTarget.classList.add('drag-over');
                         lastTouchTarget = currentTouchTarget;
                     } else {
+                        // ターゲット外または埋まっている場合はハイライト解除
+                        if (lastTouchTarget) lastTouchTarget.classList.remove('drag-over');
                         lastTouchTarget = null;
                     }
 
-                }, { passive: false }); // ★ passive: false で preventDefault を許可
+                }, { passive: false }); 
 
                 // (C) 指を離した時 (touchend)
                 document.addEventListener('touchend', (e) => {
                     if (!currentDragItem || !ghostItem) return;
 
-                    // (1) 指を離した場所の要素を特定
-                    const touch = e.changedTouches[0];
-                    ghostItem.style.display = 'none';
-                    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-                    ghostItem.style.display = '';
-
-                    let dropTarget = null;
-                    if (elementUnder && elementUnder.classList.contains('hg-drop-target')) {
-                        dropTarget = elementUnder;
-                    }
-
-                    // (2) 有効なドロップ先（＝空のターゲット）か判定
+                    // (1) ドロップ先を決定 (最後にハイライトされたターゲットを使用)
+                    let dropTarget = lastTouchTarget; 
+                    
+                    // (2) 有効なドロップ先か判定
                     if (dropTarget && !dropTarget.querySelector('.hg-drag-item')) {
                         // --- ドロップ成功 ---
+                        dropTarget.classList.remove('drag-over');
+                        
                         dropTarget.innerHTML = ''; 
                         dropTarget.appendChild(currentDragItem); // ★元のアイテムを配置
-                        currentDragItem.draggable = false;
+                        
                         currentDragItem.style.opacity = '1'; // 透明度を戻す
                         
                         // 「クリックで戻る」イベントを追加
@@ -615,19 +598,8 @@
                     document.body.removeChild(ghostItem);
                     ghostItem = null;
                     currentDragItem = null;
-                    if (lastTouchTarget) {
-                        lastTouchTarget.classList.remove('drag-over');
-                    }
                     lastTouchTarget = null;
                 });
-
-                // --- タッチ操作用の補助関数 ---
-                function updateGhostPosition(touch) {
-                    if (!ghostItem) return;
-                    // ゴーストが指の中心に来るように調整
-                    ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
-                    ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
-                }
             }
             // ▲▲▲ ここまでが addDragDropListeners 関数 ▲▲▲
 
@@ -656,7 +628,6 @@
                 }
 
                 // 3. スロットがすべて埋まった場合 (filledCount === totalTargets)
-                //    答え合わせを実行
                 dropTargets.forEach(target => {
                     const placedItem = target.querySelector('.hg-drag-item');
                     const targetWord = target.dataset.word;
@@ -675,7 +646,6 @@
                     
                     dropTargets.forEach(target => {
                          target.classList.add('correct');
-                         // 正解確定後、もうクリックで戻せないようにイベント削除
                          const placedItem = target.querySelector('.hg-drag-item');
                          if (placedItem) {
                              placedItem.removeEventListener('click', returnItemToPool);
@@ -710,9 +680,6 @@
                     
                     feedbackEl.textContent = 'ちがうところがあるよ。まちがっているイラストをクリックして、もどしてね。';
                     feedbackEl.classList.remove('success');
-                    
-                    // 「イラストをもどす」ボタンはここでは表示しない
-                    // (カタカナ版のロジックでは、個別にクリックして戻すため)
                 }
             }
 
