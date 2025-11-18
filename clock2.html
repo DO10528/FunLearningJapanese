@@ -96,7 +96,6 @@
             margin-bottom: 20px;
         }
         
-        /* ▼▼▼ ここから時計のCSSを修正 ▼▼▼ */
         .tc-clock-face {
             width: 200px;
             height: 200px;
@@ -107,26 +106,32 @@
             background-position: center;
         }
         .tc-hand {
-            height: 6px; /* 針の太さは維持 */
             position: absolute;
             top: 50%; 
             left: 50%; 
             transform-origin: 0% 50%; 
             transform: translateY(-50%) rotate(-90deg); /* 12時を指す */
-            border-radius: 3px; /* 針の先端を丸く */
         }
+        
+        /* 短い針 (完璧な状態) */
         .tc-hour-hand {
-            /* 200px (時計の直径) の4分の3短く = 25% の長さになる */
-            width: calc(200px * 0.25); 
-            height: 8px; /* 太さ維持 */
+            width: calc(200px * 0.25); /* 50px */
+            height: 8px; 
             background: #4CAF50; /* 緑色 */
+            border-radius: 4px; /* 太さに合わせて調整 */
         }
+        
+        /* ▼▼▼ 長い針 (ここを修正) ▼▼▼ */
         .tc-minute-hand {
-            /* 200px (時計の直径) の5分の4短く = 20% の長さになる */
-            width: calc(200px * 0.20); 
-            height: 4px; /* 太さ維持 */
+            /* 長さ: 数字に届くように (40% = 80px) */
+            width: calc(200px * 0.40); 
+            /* 太さ: 短い針(8px)より太く */
+            height: 10px; 
             background: #FF9800; /* オレンジ色 */
+            border-radius: 5px; /* 太さに合わせて調整 */
         }
+        /* ▲▲▲ 修正完了 ▲▲▲ */
+
         .tc-center-dot {
             width: 12px;
             height: 12px;
@@ -139,7 +144,6 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
-        /* ▲▲▲ ここまで時計のCSSを修正 ▲▲▲ */
 
         #tc-quiz-options {
             display: grid;
