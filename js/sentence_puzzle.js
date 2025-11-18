@@ -1,24 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // DOM要素と定数の定義
+    // DOM要素と定数の定義 ( "sp-" プレフィックス付きに変更)
     // ----------------------------------------------------
     const DATA_PATH = 'data/sentence_data.json';
 
-    const dropZone = document.getElementById('puzzle-drop-zone');
-    const cardContainer = document.getElementById('card-container');
-    const checkButton = document.getElementById('check-button');
-    const resetButton = document.getElementById('reset-button');
-    const feedbackMessage = document.getElementById('feedback-message');
-    const questionText = document.getElementById('question-text');
-    const scoreDisplay = document.getElementById('score-display');
-    const englishTranslation = document.getElementById('english-translation');
+    const dropZone = document.getElementById('sp-drop-zone');
+    const cardContainer = document.getElementById('sp-card-container');
+    const checkButton = document.getElementById('sp-check-button');
+    const resetButton = document.getElementById('sp-reset-button');
+    const feedbackMessage = document.getElementById('sp-feedback-message');
+    const questionText = document.getElementById('sp-question-text');
+    const scoreDisplay = document.getElementById('sp-score-display');
+    const englishTranslation = document.getElementById('sp-english-translation');
 
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
     
     let allTemplates = [];         
     let wordPool = {};             
-    let currentCorrectParts = [];  // 現在の問題の正しい単語の配列
+    let currentCorrectParts = [];
     let score = 0;
     let totalQuestions = 0;
     let currentQuestionIndex = 0;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 新しい問題を出題する (ランダム生成ロジックを含む)
+     * 新しい問題を出題する
      */
     function startNewQuestion() {
         if (currentQuestionIndex >= totalQuestions) {
@@ -62,13 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const template = allTemplates[currentQuestionIndex];
         const { japaneseParts, englishText } = generateRandomSentence(template);
-        currentCorrectParts = japaneseParts; // 正解の順序を保存
+        currentCorrectParts = japaneseParts; 
 
         // 1. UIをリセット
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         feedbackMessage.classList.add('hidden');
-        feedbackMessage.className = 'quiz-feedback-message hidden'; // ★ .hidden も確実に追加
+        feedbackMessage.className = 'sp-quiz-feedback-message hidden'; // クラスをリセット
         checkButton.disabled = false;
         resetButton.disabled = false;
         
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shuffledParts.forEach((part, index) => {
             const card = document.createElement('div');
             card.textContent = part; 
-            card.classList.add('puzzle-card'); // ★ ここは修正済み
+            card.classList.add('puzzle-card'); // ★ .puzzle-card を使用
             
             card.dataset.id = `${part}-${index}-${currentQuestionIndex}`; 
             cardContainer.appendChild(card);
@@ -136,18 +136,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // ★★★ イベント設定とクリック処理 (修正) ★★★
+    // ★★★ イベント設定とクリック処理 (バグ修正) ★★★
     // ----------------------------------------------------
     
     function setupCardEvents() {
-        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        // ★ 修正 ★： .puzzle-card を探す
         document.querySelectorAll('.puzzle-card').forEach(card => {
             card.addEventListener('click', handleCardClick); 
         });
     }
 
     function handleCardClick(e) {
-        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        // ★ 修正 ★： .puzzle-card を探す
         const clickedCard = e.target.closest('.puzzle-card');
         if (!clickedCard) return;
 
@@ -173,16 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackMessage.classList.add('hidden');
     }
 
-
     // ----------------------------------------------------
-    // 正誤判定とゲーム制御 (修正)
+    // 正誤判定とゲーム制御 (バグ修正)
     // ----------------------------------------------------
 
     function checkAnswer() {
         checkButton.disabled = true;
         resetButton.disabled = true;
         
-        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        // ★ 修正 ★： .puzzle-card を探す
         const droppedCards = [...dropZone.querySelectorAll('.puzzle-card')];
         
         if (droppedCards.length !== currentCorrectParts.length) {
@@ -224,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetPuzzle() {
-        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        // ★ 修正 ★： .puzzle-card を探す
         const cardsToMove = [...dropZone.querySelectorAll('.puzzle-card')];
         
         cardsToMove.forEach(card => {
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         dropZone.innerHTML = '';
         displayFeedback(false, `パズルをリセットしました。`);
-        feedbackMessage.classList.remove('feedback-correct', 'feedback-incorrect');
+        feedbackMessage.className = 'sp-quiz-feedback-message hidden';
         checkButton.disabled = false;
         resetButton.disabled = false;
     }

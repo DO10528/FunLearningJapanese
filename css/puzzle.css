@@ -1,14 +1,13 @@
 /* ======================================== */
 /* 文法並び替えゲーム専用スタイル (クリック版) */
+/* セレクタを "sp-" プレフィックス付きに全て変更 */
 /* ======================================== */
 
 /* ゲーム画面のメインコンテナ調整 */
-.container {
-    max-width: 850px; 
-}
+/* .container は style.css のものを使用 */
 
 /* 並び替えゲームのメインエリア */
-#puzzle-area {
+#sp-puzzle-area {
     display: flex;
     flex-direction: column; 
     gap: 25px;
@@ -16,23 +15,23 @@
 }
 
 /* 各エリアのタイトル */
-.area-title {
+.sp-area-title {
     font-size: 1.1em;
     font-weight: bold;
-    color: #3f51b5; /* style.css の色と合わせる */
+    color: #3f51b5;
     margin-bottom: 10px;
     text-align: left;
 }
 
 /* --- 1. ドロップゾーン（解答エリア） --- */
-#drop-zone-container {
+#sp-drop-zone-container {
     background-color: #eef2f8; /* 薄い青 */
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#puzzle-drop-zone {
+#sp-drop-zone {
     min-height: 80px;
     border: 3px dashed #ff6f61; /* 点線 */
     background-color: white;
@@ -46,7 +45,7 @@
 }
 
 /* --- 2. カード選択エリア (クリック元) --- */
-#card-selection-area {
+#sp-card-selection-area {
     background-color: #fffde7; /* 薄い黄色 */
     padding: 20px;
     border-radius: 12px;
@@ -54,7 +53,7 @@
     border: 1px solid #ffcc5c;
 }
 
-#card-container {
+#sp-card-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -64,8 +63,7 @@
 }
 
 /* ======================================== */
-/* ★ 3. 単語カードのデザイン (クリック版) ★ */
-/* ▼▼▼ ここを .word-card から .puzzle-card に変更 ▼▼▼ */
+/* ★ 3. 単語カードのデザイン ( .puzzle-card ) ★ */
 /* ======================================== */
 
 .puzzle-card {
@@ -90,10 +88,8 @@
     box-shadow: 0 0 0 #f0a000;
 }
 
-/* (参考) .dragging クラスはクリック版JSでは使われない */
-
 /* ドロップエリアのカード (色を変える) */
-#puzzle-drop-zone .puzzle-card {
+#sp-drop-zone .puzzle-card {
     background-color: #fff8e1; 
     border-color: #ff6f61;
 }
@@ -116,17 +112,16 @@
 
 /* ======================================== */
 /* 4. アクションボタンの共通化 */
-/* (これは style.css にあるものと同じはず) */
 /* ======================================== */
 
-.game-controls-area {
+.sp-game-controls-area {
     margin-top: 30px;
     display: flex;
     justify-content: center;
     gap: 20px;
 }
 
-.action-button {
+.sp-action-button {
     min-width: 150px; 
     padding: 12px 25px;
     font-size: 1.2em;
@@ -142,25 +137,45 @@
     align-items: center;
 }
 
-.action-button:active {
+.sp-action-button:active {
     transform: translateY(4px);
     box-shadow: 0 0 0;
 }
 
-.action-button.primary {
+.sp-action-button.sp-primary {
     background-color: #3f51b5; /* 答え合わせボタン */
     color: white;
     box-shadow: 0 4px 0 #1a237e;
 }
 
-.action-button.secondary {
+.sp-action-button.sp-secondary {
     background-color: #ff6f61; /* リセットボタン */
     color: white;
     box-shadow: 0 4px 0 #dc3545;
 }
 
-.action-button.tertiary { /* ホームに戻るボタン */
+.sp-action-button.sp-tertiary { /* ホームに戻るボタン */
     background-color: #3f51b5;
     color: white;
     box-shadow: 0 4px 0 #1a237e;
+}
+
+/* --- テキスト / メッセージ --- */
+.sp-quiz-hint-text {
+    /* HTMLのstyle.cssから継承 */
+}
+
+.sp-quiz-feedback-message {
+    font-weight: bold;
+    margin: 15px 0;
+    text-align: center;
+}
+.sp-quiz-feedback-message.hidden {
+    display: none;
+}
+.sp-quiz-feedback-message.feedback-correct {
+    color: #155724; /* 緑 */
+}
+.sp-quiz-feedback-message.feedback-incorrect {
+    color: #721c24; /* 赤 */
 }
