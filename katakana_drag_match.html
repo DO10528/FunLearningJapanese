@@ -10,8 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* (スタイルは変更なしのため省略) */
-        
+        /* （元のスタイルをそのまま利用） */
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
             background: linear-gradient(180deg, #f0f8ff 0%, #cce7ff 100%);
@@ -316,8 +315,6 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- 1. データ定義 ---
-            
-            // ★★★ 修正点：イラストのパスをカタカナ用に修正 ★★★
             const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/'; 
             const ILLUSTRATION_PATH_SUFFIX = '.png'; 
 
@@ -444,9 +441,8 @@ function loadLevel(levelData) {
 }
 
 
-// --- 5. ドラッグ＆ドロップのイベントリスナー設定 (★PC/タッチ両対応版に修正) ---
+// --- 5. ドラッグ＆ドロップのイベントリスナー設定 (PC/タッチ両対応版) ---
 
-// --- タッチ操作用の補助関数とグローバル変数 (変更なし) ---
 let ghostItem = null;      
 let currentDragItem = null; 
 let lastTouchTarget = null; 
@@ -455,6 +451,35 @@ function updateGhostPosition(touch) {
     if (!ghostItem) return;
     ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
     ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
+}
+
+/**
+ * クリック/タップで配置済みアイテムを元に戻す処理
+ */
+function returnItemToPool(e) {
+    // クリックされたアイテム（またはイベントターゲット）
+    const item = e.currentTarget || e.target;
+    if (!item || !item.classList.contains('km-drag-item')) return;
+
+    const parent = item.parentElement;
+    // 親がドロップターゲットなら、そのターゲットから除去
+    if (parent && parent.classList.contains('km-drop-target')) {
+        parent.removeChild(item);
+        parent.classList.remove('drag-over');
+        parent.classList.remove('correct');
+    }
+    // イラストプールへ戻す
+    illustPoolEl.appendChild(item);
+
+    // 状態を初期化
+    item.style.opacity = '1';
+    item.draggable = true;
+    item.style.cursor = 'grab';
+    // クリックで戻すイベントはプールに戻したら外しておく（既に付与されている場合）
+    item.removeEventListener('click', returnItemToPool);
+
+    // もしフィードバックが「まちがい」が出ているなら更新
+    checkFinalAnswers();
 }
 
 function addDragDropListeners() {
@@ -466,33 +491,56 @@ function addDragDropListeners() {
     transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
 
     dragItems.forEach(item => {
-        // PC操作の残像防止
+        // PCドラッグ開始
         item.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', item.id);
-            if (e.dataTransfer && e.dataTransfer.setDragImage) {
-                e.dataTransfer.setDragImage(transparentImage, 0, 0);
+            // e.dataTransfer がない環境はガード
+            try {
+                e.dataTransfer.setData('text/plain', item.id);
+                if (e.dataTransfer && e.dataTransfer.setDragImage) {
+                    e.dataTransfer.setDragImage(transparentImage, 0, 0);
+                }
+            } catch (err) {
+                // ignore
             }
             setTimeout(() => item.style.opacity = '0.5', 0);
         });
+
         item.addEventListener('dragend', (e) => {
             e.target.style.opacity = '1';
         });
 
-        // ★★★ 修正箇所: マウスとタッチの競合を回避するロジックを追加 ★★★
-        item.removeEventListener('click', returnItemToPool); 
-        
-        // 既に配置されているアイテムにはクリックイベントを再設定し、PCドラッグを無効化
-        if (item.parentElement && item.parentElement.classList.contains('km-drop-target')) {
-             item.addEventListener('click', returnItemToPool);
-             item.draggable = false;
-        } else {
-             // プール内にあるものだけドラッグ可能
-             item.draggable = true; 
-        }
+        // クリックで戻す（配置後に付けるが、安全のためここでも外しておく）
+        item.removeEventListener('click', returnItemToPool);
+
+        // --- タッチ用イベント (※ passive:false にして preventDefault を効かせる) ---
+        item.addEventListener('touchstart', (e) => {
+            // すでにタッチドラッグ中なら無視
+            if (currentDragItem) return;
+
+            // タッチでのドラッグ開始 — ブラウザのデフォルト動作抑止
+            if (e.cancelable) e.preventDefault();
+
+            currentDragItem = item;
+            // 保存して一時的にドラッグ不可に（mouseのエミュレートを防ぐ）
+            item._wasDraggable = item.draggable;
+            item.draggable = false;
+
+            ghostItem = item.cloneNode(true);
+            ghostItem.classList.add('km-touch-ghost'); 
+            document.body.appendChild(ghostItem);
+
+            item.style.opacity = '0.4';
+            const touch = e.touches[0];
+            updateGhostPosition(touch);
+
+        }, { passive: false });
+
+        // クリックで戻す（主に配置後に使うため、ここでは付けない。配置時に付与）
     });
 
     dropTargets.forEach(target => {
         target.addEventListener('dragover', (e) => {
+            // 空きがないなら許可しない
             if (target.querySelector('.km-drag-item')) return;
             e.preventDefault();
             target.classList.add('drag-over');
@@ -505,46 +553,31 @@ function addDragDropListeners() {
             target.classList.remove('drag-over');
             if (target.querySelector('.km-drag-item')) return;
             
-            const dragItemId = e.dataTransfer.getData('text/plain');
-            const dragItem = document.getElementById(dragItemId);
+            const dragItemId = (e.dataTransfer && e.dataTransfer.getData) ? e.dataTransfer.getData('text/plain') : null;
+            const dragItem = dragItemId ? document.getElementById(dragItemId) : null;
 
             if (dragItem) {
                 target.innerHTML = ''; 
                 target.appendChild(dragItem);
                 dragItem.draggable = false; 
-                dragItem.addEventListener('click', returnItemToPool); // クリックで戻る機能を再設定
+                dragItem.addEventListener('click', returnItemToPool); // クリックで戻す機能を再設定
+                dragItem.style.cursor = 'pointer';
                 checkFinalAnswers();
             }
         });
     });
 
-    // --- 2. タッチ イベント (★モバイル対応のコアロジック) ---
-
-    // (A) アイテムを指で押し始めた時 (touchstart)
-    dragItems.forEach(item => {
-        item.addEventListener('touchstart', (e) => {
-            // 既にドラッグ中、またはPCドラッグが有効な場合は無視 (PC優先)
-            if (currentDragItem || item.draggable) return; 
-
-            currentDragItem = item; 
-            ghostItem = item.cloneNode(true);
-            ghostItem.classList.add('km-touch-ghost'); 
-            document.body.appendChild(ghostItem);
-
-            item.style.opacity = '0.4';
-            updateGhostPosition(e.touches[0]);
-
-        }, { passive: true });
-    });
-
-    // (B) 指を動かした時 (touchmove)
+    // --- 2. タッチ イベント (ドキュメント全体で監視) ---
     document.addEventListener('touchmove', (e) => {
         if (!currentDragItem || !ghostItem) return;
 
-        e.preventDefault(); 
-        updateGhostPosition(e.touches[0]);
+        // タッチ移動中のスクロール防止
+        if (e.cancelable) e.preventDefault();
 
         const touch = e.touches[0];
+        updateGhostPosition(touch);
+
+        // ghost非表示にして下の要素を判定する（ghostが要素を隠さないように）
         ghostItem.style.display = 'none'; 
         const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
         ghostItem.style.display = ''; 
@@ -567,14 +600,14 @@ function addDragDropListeners() {
 
     }, { passive: false }); 
 
-    // (C) 指を離した時 (touchend)
     document.addEventListener('touchend', (e) => {
         if (!currentDragItem || !ghostItem) return;
 
+        // ドロップ先は最後に見つけたターゲット
         let dropTarget = lastTouchTarget; 
         
         if (dropTarget && !dropTarget.querySelector('.km-drag-item')) {
-            // --- ドロップ成功 ---
+            // ドロップ成功
             dropTarget.classList.remove('drag-over');
             dropTarget.innerHTML = ''; 
             dropTarget.appendChild(currentDragItem); 
@@ -582,17 +615,32 @@ function addDragDropListeners() {
             currentDragItem.style.opacity = '1'; 
             currentDragItem.draggable = false; // 配置後はPCでもドラッグ不可にする
             currentDragItem.addEventListener('click', returnItemToPool); 
+            currentDragItem.style.cursor = 'pointer';
             
             checkFinalAnswers();
             
         } else {
-            // --- ドロップ失敗 (元の場所に戻す) ---
+            // ドロップ失敗（元の場所に戻す）
             currentDragItem.style.opacity = '1'; 
+            // もし元の親がプールであれば append し直す（通常は自動で残る）
+            const initParent = document.getElementById(currentDragItem.dataset.initialParentId || 'km-illust-pool');
+            if (initParent && !initParent.contains(currentDragItem)) {
+                initParent.appendChild(currentDragItem);
+            }
         }
         
-        // 後片付け
-        document.body.removeChild(ghostItem);
+        // 後片付け（ghost と状態復元）
+        if (ghostItem && ghostItem.parentElement) {
+            document.body.removeChild(ghostItem);
+        }
         ghostItem = null;
+
+        // タッチ開始時に一時的に変更した draggable を戻す
+        if (currentDragItem && typeof currentDragItem._wasDraggable !== 'undefined') {
+            currentDragItem.draggable = !!currentDragItem._wasDraggable;
+            delete currentDragItem._wasDraggable;
+        }
+
         currentDragItem = null;
         lastTouchTarget = null;
     });
@@ -600,29 +648,25 @@ function addDragDropListeners() {
 // ▲▲▲ addDragDropListeners 関数ここまで ▲▲▲
 
 
-            // --- 7. 最終判定ロジック (変更なし) ---
+            // --- 7. 最終判定ロジック ---
             function checkFinalAnswers() {
                 const dropTargets = document.querySelectorAll('.km-drop-target');
                 const totalTargets = currentLevelWords.length;
                 let filledCount = 0;
                 let allCorrect = true;
 
-                // 1. すべてのスロットが埋まっているか確認
                 dropTargets.forEach(target => {
                     if (target.querySelector('.km-drag-item')) {
                         filledCount++;
                     }
                 });
 
-                // 2. スロットがすべて埋まっていない場合は終了
                 if (filledCount < totalTargets) {
                     feedbackEl.textContent = `あと ${totalTargets - filledCount} こ。`;
                     feedbackEl.classList.remove('success');
                     return; 
                 }
 
-                // 3. スロットがすべて埋まった場合 (filledCount === totalTargets)
-                //    答え合わせを実行
                 dropTargets.forEach(target => {
                     const placedItem = target.querySelector('.km-drag-item');
                     const targetWord = target.dataset.word;
@@ -633,11 +677,9 @@ function addDragDropListeners() {
                     }
                 });
 
-                // 4. 最終判定結果
                 if (allCorrect) {
-                    // ★ 全問正解
-                    soundCorrect.currentTime = 0;
-                    soundCorrect.play();
+                    // 正解時
+                    try { soundCorrect.currentTime = 0; soundCorrect.play(); } catch (e) {}
                     
                     dropTargets.forEach(target => {
                          target.classList.add('correct');
@@ -653,7 +695,6 @@ function addDragDropListeners() {
                     feedbackEl.classList.add('success');
                     resetPlacedButton.style.display = 'none'; 
                     
-                    // 次のレベルへ
                     const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
                     const nextLevelIndex = currentLevelIndex + 1;
                     
@@ -662,16 +703,15 @@ function addDragDropListeners() {
                         levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
                         setTimeout(() => {
                             loadLevel(nextLevelData);
-                        }, 2000); 
+                        }, 1200); 
                     } else {
                         levelTitleEl.textContent = 'ぜんぶクリア！';
                         feedbackEl.textContent = '全レベル おめでとうございます！';
                     }
                     
                 } else {
-                    // ★ 1つでも間違いがある
-                    soundIncorrect.currentTime = 0;
-                    soundIncorrect.play();
+                    // 間違いあり
+                    try { soundIncorrect.currentTime = 0; soundIncorrect.play(); } catch (e) {}
                     
                     feedbackEl.textContent = 'ちがうところがあるよ。まちがっているイラストをクリックして、もどしてね。';
                     feedbackEl.classList.remove('success');
