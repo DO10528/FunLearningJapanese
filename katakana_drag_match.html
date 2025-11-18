@@ -461,7 +461,6 @@ function addDragDropListeners() {
     const dropTargets = document.querySelectorAll('.km-drop-target');
     
     // --- 1. PC/マウス イベント (標準の D&D API を使用) ---
-    // PC操作時の残像を透明にするための1x1ピクセル透明GIF
     const transparentImage = new Image();
     transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
 
@@ -469,7 +468,6 @@ function addDragDropListeners() {
         // PC操作の残像防止
         item.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', item.id);
-            // ★追加★ ゴーストイメージを透明な画像に置き換える
             if (e.dataTransfer && e.dataTransfer.setDragImage) {
                 e.dataTransfer.setDragImage(transparentImage, 0, 0);
             }
@@ -479,8 +477,8 @@ function addDragDropListeners() {
             e.target.style.opacity = '1';
         });
 
-        // クリックイベントの再設定 (ドロップ後のアイテムをプールに戻す)
-        item.removeEventListener('click', returnItemToPool);
+        // ★★★ 修正点：マウスとタッチの競合を回避するロジックを追加 ★★★
+        item.removeEventListener('click', returnItemToPool); // イベントをリセット
         
         // 既に配置されているアイテムにはクリックイベントを再設定し、PCドラッグを無効化
         if (item.parentElement && item.parentElement.classList.contains('km-drop-target')) {
