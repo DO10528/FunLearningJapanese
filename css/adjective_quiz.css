@@ -1,0 +1,114 @@
+/* ======================================== */
+/* ★ イラスト形容詞クイズ専用スタイル ★ */
+/* ======================================== */
+
+/* メインコンテナのレイアウト調整 */
+#adjective-quiz-container {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+/* 画像表示エリア */
+#quiz-image-area {
+    width: 100%;
+    max-width: 300px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0ff; /* 画像エリアの背景色 */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#quiz-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+/* 選択肢ボタンのエリア */
+#quiz-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* 選択肢ボタンの基本スタイル */
+.option-button {
+    min-width: 160px;
+    padding: 15px 25px;
+    font-size: 1.4em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    /* 初期の色 */
+    background-color: #ffcc5c; /* 明るい黄色 */
+    color: #333;
+    box-shadow: 0 4px 0 #f0a000;
+}
+
+.option-button:hover:not(:disabled) {
+    background-color: #ffdb89; 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #f0a000;
+}
+
+.option-button:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #f0a000;
+}
+
+/* --- 正解/不正解時のスタイル --- */
+
+/* 間違った選択肢 (disabledと組み合わせて使用) */
+.option-button.wrong-selection {
+    background-color: #ff6f61 !important; /* 赤 */
+    color: white !important;
+    box-shadow: 0 4px 0 #dc3545 !important;
+    opacity: 0.6;
+}
+
+/* 正解の選択肢 */
+.option-button.correct-selection {
+    background-color: #4CAF50 !important; /* 緑 */
+    color: white !important;
+    box-shadow: 0 4px 0 #28a745 !important;
+}
+
+
+/* --- フィードバックメッセージ --- */
+
+.quiz-feedback-message {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    min-height: 30px;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.quiz-feedback-message.hidden {
+    display: none;
+}
+
+.quiz-feedback-message.feedback-correct {
+    color: #4CAF50; /* 緑の文字 */
+}
+
+.quiz-feedback-message.feedback-incorrect {
+    color: #ff6f61; /* 赤の文字 */
+}

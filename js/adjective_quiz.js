@@ -3,34 +3,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // クイズデータ
     // ----------------------------------------------------
-    // ★重要★: assets/imagesフォルダに対応する画像ファイルを入れてください。
+    // ★画像パスを修正し、assets/images/ から読み込むように変更しました
+    const IMAGE_BASE_PATH = "assets/images/"; 
+
     const quizData = [
         {
-            image: "assets/images/ame.png",
+            image: IMAGE_BASE_PATH + "ame.png",
             options: ["あまい", "にぎやか", "かんたん"],
             correct: "あまい",
             english: "Sweet"
         },
         {
-            image: "assets/images/kuruma.png",
+            image: IMAGE_BASE_PATH + "kuruma.png",
             options: ["あかい", "おもい", "すずしい"],
             correct: "あかい",
             english: "Red"
         },
         {
-            image: "assets/images/zou.png",
+            image: IMAGE_BASE_PATH + "zou.png",
             options: ["ちいさい", "おおきい", "かるい"],
             correct: "おおきい",
             english: "Big"
         },
         {
-            image: "assets/images/taiyo.png",
+            image: IMAGE_BASE_PATH + "taiyo.png",
             options: ["くらい", "さむい", "あかるい"],
             correct: "あかるい",
             english: "Bright"
         },
         {
-            image: "assets/images/koori.png",
+            image: IMAGE_BASE_PATH + "koori.png",
             options: ["あたたかい", "つめたい", "やさしい"],
             correct: "つめたい",
             english: "Cold"
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackElement = document.getElementById('quiz-feedback');
 
     let currentQuestionIndex = 0;
-    let isClickable = true; // 連続クリック防止用
+    let isClickable = true; 
 
     // ----------------------------------------------------
     // クイズの読み込み処理
@@ -67,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 1. 画像をセット
         imageElement.src = currentQuiz.image;
-        imageElement.alt = currentQuiz.correct; // altテキストに答えを設定（デバッグ用）
+        imageElement.alt = currentQuiz.correct; 
 
         // 2. 選択肢ボタンを作成
         optionsContainer.innerHTML = ''; // 前の問題のボタンを消去
@@ -77,7 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuiz.options.forEach(optionText => {
             const button = document.createElement('button');
             button.textContent = optionText;
-            button.classList.add('option-button', 'action-button'); // 既存のスタイルを流用
+            
+            // ★修正★: style.cssのaction-buttonではなく、専用のoption-buttonクラスを使用
+            button.classList.add('option-button'); 
             
             // 3. ボタンにクリックイベントを設定
             button.addEventListener('click', checkAnswer);
