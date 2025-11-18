@@ -1,0 +1,191 @@
+/* ======================================== */
+/* しりとり2 専用スタイル */
+/* ======================================== */
+header {
+background-color: white;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+padding: 10px 20px;
+margin-bottom: 20px;
+}
+
+.header-container {
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.header-container h1 {
+margin: 0;
+font-size: 1.5em;
+border-bottom: none;
+color: #333;
+}
+
+.back-button {
+text-decoration: none;
+color: #3f51b5;
+font-weight: bold;
+padding: 8px 15px;
+border: 1px solid #3f51b5;
+border-radius: 5px;
+transition: background-color 0.2s;
+}
+
+.back-button:hover {
+background-color: #e0e7ff;
+}
+
+/* --- しりとり2：レイアウト（左右配置） --- */
+.shiritori2-container {
+display: flex;
+justify-content: center;
+align-items: flex-start;
+gap: 20px; /* ギャップを調整 */
+flex-wrap: nowrap;
+max-width: 1000px; /* 最大幅を少し調整 */
+margin: 20px auto;
+}
+
+/* --- 左側：カードリストエリア（ドラッグ元） --- */
+.card-area {
+flex: 1; /* リストエリアは柔軟に幅を取る */
+min-width: 250px;
+max-height: 500px; /* グリッドに高さを合わせる */
+overflow-y: auto;
+border: 2px solid #ccc;
+border-radius: 10px;
+padding: 10px;
+background-color: #fafafa;
+text-align: center;
+}
+
+/* --- 右側：グリッドエリア（ドロップ先） --- */
+.grid-area {
+flex: 2; /* グリッドエリアはリストエリアより広く取る */
+text-align: center;
+padding: 10px;
+border: 2px solid #3f51b5;
+border-radius: 10px;
+background-color: #eef2f8;
+}
+
+/* --- 4x4のグリッド設定 --- */
+.shiritori-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr); /* 4列に均等分割 */
+gap: 8px;
+padding: 10px;
+background: #f5f5f5;
+border-radius: 12px;
+margin: 10px auto;
+max-width: 480px; /* グリッドの最大幅を制限して中央に寄せる */
+}
+
+/* スクロールバーを非表示（横並びで使っていた名残を削除） */
+.shiritori-grid::-webkit-scrollbar {
+display: none;
+}
+
+/* --- 1マス（セル）の設定 --- */
+.grid-cell {
+/* width/heightの絶対指定を削除し、グリッドに任せる */
+aspect-ratio: 1 / 1; /* 正方形を維持 */
+border: 2px dashed #3f51b5;
+border-radius: 10px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-color: white;
+transition: border 0.3s, background-color 0.2s;
+overflow: hidden;
+padding: 2px;
+}
+
+.grid-cell.filled {
+border: 2px solid #4CAF50;
+background-color: #e8f5e9;
+}
+
+.grid-cell:hover:not(.filled) {
+background-color: #e0e7ff;
+border-color: #3f51b5;
+}
+
+/* マス内の単語 */
+.word-text {
+font-size: 1.2em;
+font-weight: bold;
+white-space: nowrap; /* 1行表示を維持 */
+}
+
+/* しりとり開始マス */
+.shiritori-start {
+background-color: #fffae6;
+border: 2px solid #ffb74d;
+}
+
+/* --- 残り単語カード --- */
+.word-card {
+display: flex;
+align-items: center;
+border: 1px solid #ffcc5c;
+border-radius: 8px;
+margin-bottom: 10px;
+padding: 5px;
+background-color: white;
+cursor: grab;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+transition: transform 0.2s, opacity 0.3s;
+}
+
+.word-card:hover {
+transform: translateY(-2px);
+}
+
+.word-card.dragging {
+opacity: 0.5;
+}
+
+.card-image {
+width: 45px;
+height: 45px;
+object-fit: contain;
+border-radius: 4px;
+margin-right: 8px;
+}
+
+.card-label {
+font-size: 1.1em;
+font-weight: bold;
+}
+
+/* ======================================== */
+/* メッセージとボタン配置 */
+/* ======================================== */
+.feedback-message {
+margin-top: 15px;
+font-weight: bold;
+color: #3f51b5;
+}
+
+#return-card-area {
+margin-top: 10px;
+text-align: center;
+}
+
+#returnCardButton {
+background-color: #f0a000;
+}
+
+/* ======================================== */
+/* 下部ボタン（リセット・メニュー） */
+/* ======================================== */
+.game-controls-area {
+margin-top: 25px;
+display: flex;
+justify-content: center;
+gap: 20px;
+}
