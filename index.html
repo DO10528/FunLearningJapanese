@@ -43,22 +43,27 @@ margin-bottom: 20px;
 </script>
 </head>
 <body>
-<h1>Fun Learning Japanese</h1>
+    
+<div id="language-switcher">
+    <button onclick="setLanguage('ja')" id="lang-ja" class="lang-button active">にほんご</button>
+    <button onclick="setLanguage('en')" id="lang-en" class="lang-button">English</button>
+</div>
+<h1 data-i18n="main_title">Fun Learning Japanese</h1>
 <div id="main-menu" class="container">
 <div class="menu-group">
-<h2>きそ・たんごリスト</h2>
+<h2 data-i18n="group_kiso">きそ・たんごリスト</h2>
 <div class="menu-buttons-grid">
-<a href="kiso.html" class="menu-card-button menu-card-reset">
+<a href="kiso.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kiso">
 📝<br>ひらがな・カタカナ基礎
 </a>
 
-<a href="hiragana_video_list.html" class="menu-card-button menu-card-reset">
+<a href="hiragana_video_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_video">
 🎥<br>ひらがな練習
 </a>
-<a href="keiyoshi_list.html" class="menu-card-button menu-card-reset">
+<a href="keiyoshi_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_list">
 📚<br>形容詞リスト
 </a>
-<a href="kanji_list.html" class="menu-card-button menu-card-reset">
+<a href="kanji_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_list">
 📖<br>漢字リスト (小1)
 </a>
 
@@ -66,55 +71,55 @@ margin-bottom: 20px;
 </div>
 
 <div class="menu-group">
-<h2>なにをしてあそぶ?</h2>
+<h2 data-i18n="group_game">なにをしてあそぶ?</h2>
 
 <div class="menu-buttons-grid">
-<a href="hiragana_drag_match.html" class="menu-card-button menu-card-reset">
+<a href="hiragana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_drag">
 🧩<br>ひらがな単語あわせ
 </a>
-<a href="hiragana.html" class="menu-card-button menu-card-reset">
+<a href="hiragana.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game">
 🎮<br>ひらがな単語ゲーム
 </a>
-<a href="hiragana2.html" class="menu-card-button menu-card-reset">
+<a href="hiragana2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game2">
 ⭐<br>ひらがなゲーム2 (並び替え)
 </a>
-<a href="katakana_drag_match.html" class="menu-card-button menu-card-reset">
+<a href="katakana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_katakana_drag">
 🧩<br>カタカナ単語あわせ
 </a>
-<a href="shiritori.html" class="menu-card-button menu-card-reset">
+<a href="shiritori.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori">
 🗣️<br>しりとりゲーム
 </a>
-<a href="shiritori2.html" class="menu-card-button menu-card-reset">
+<a href="shiritori2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori2">
 🗣️<br>しりとりゲーム2
 </a>
-<a href="clock.html" class="menu-card-button menu-card-reset">
+<a href="clock.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock">
 🗣️<br>とけいゲーム
 </a>
-<a href="clock2.html" class="menu-card-button menu-card-reset">
+<a href="clock2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock2">
 🗣️<br>とけいゲーム2
 </a>
-<a href="keiyoshi.html" class="menu-card-button menu-card-reset">
+<a href="keiyoshi.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_quiz">
 🤔<br>形容詞クイズ
 </a>
-<a href="adjective_quiz.html" class="menu-card-button menu-card-reset">
+<a href="adjective_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_adjective_quiz">
 🤔<br>形容詞クイズ2
 </a>
-<a href="kanji_quiz.html" class="menu-card-button menu-card-reset">
+<a href="kanji_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_quiz">
 🈳<br>漢字クイズ (小1)
 </a>
-<a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset">
+<a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_aisatsu_quiz">
 🗣️<br>挨拶クイズ
 </a>
-<a href="verb.html" class="menu-card-button menu-card-reset">
+<a href="verb.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_verb_game">
 🗣️<br>動詞ゲーム
 </a>
-<a href="sentence_puzzle.html" class="menu-card-button menu-card-reset">
+<a href="sentence_puzzle.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_sentence_puzzle">
 🗣️<br>文法並び替えゲーム
 </a>
-<a href="meteor_quiz.html" class="menu-card-button menu-card-reset">
+<a href="meteor_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_meteor_quiz">
 🗣️<br>隕石クイズ
 </a>
-<a href="treasure_Hunt.html" class="menu-card-button menu-card-reset">
+<a href="treasure_Hunt.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_treasure_hunt">
 🗣️<br>たからさがしゲーム
 </a>
 
@@ -124,19 +129,126 @@ margin-bottom: 20px;
 <div id="game-area" class="container" style="display:none;">
 <p>ゲームを読み込んでいます...</p>
 </div>
-
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
-          console.log('ServiceWorker registered: ', registration);
-        })
-        .catch(registrationError => {
-          console.log('ServiceWorker registration failed: ', registrationError);
+    // ----------------------------------------------------
+    // ★★★ サービスワーカーは削除しないでください ★★★
+    // ----------------------------------------------------
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registered: ', registration);
+          })
+          .catch(registrationError => {
+            console.log('ServiceWorker registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // ----------------------------------------------------
+    // ★★★ 言語データと制御ロジック (ステップ2-2) ★★★
+    // ----------------------------------------------------
+
+    const translations = {
+        'ja': {
+            'main_title': 'Fun Learning Japanese',
+            'group_kiso': 'きそ・たんごリスト',
+            'group_game': 'なにをしてあそぶ?',
+            // きそ・たんごリスト
+            'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
+            'btn_hiragana_video': '🎥<br>ひらがな練習',
+            'btn_keiyoshi_list': '📚<br>形容詞リスト',
+            'btn_kanji_list': '📖<br>漢字リスト (小1)',
+            // なにをしてあそぶ?
+            'btn_hiragana_drag': '🧩<br>ひらがな単語あわせ',
+            'btn_hiragana_game': '🎮<br>ひらがな単語ゲーム',
+            'btn_hiragana_game2': '⭐<br>ひらがなゲーム2 (並び替え)',
+            'btn_katakana_drag': '🧩<br>カタカナ単語あわせ',
+            'btn_shiritori': '🗣️<br>しりとりゲーム',
+            'btn_shiritori2': '🗣️<br>しりとりゲーム2',
+            'btn_clock': '🗣️<br>とけいゲーム',
+            'btn_clock2': '🗣️<br>とけいゲーム2',
+            'btn_keiyoshi_quiz': '🤔<br>形容詞クイズ',
+            'btn_adjective_quiz': '🤔<br>形容詞クイズ2',
+            'btn_kanji_quiz': '🈳<br>漢字クイズ (小1)',
+            'btn_aisatsu_quiz': '🗣️<br>挨拶クイズ',
+            'btn_verb_game': '🗣️<br>動詞ゲーム',
+            'btn_sentence_puzzle': '🗣️<br>文法並び替えゲーム',
+            'btn_meteor_quiz': '🗣️<br>隕石クイズ',
+            'btn_treasure_hunt': '🗣️<br>たからさがしゲーム',
+        },
+        'en': {
+            'main_title': 'Fun Learning Japanese',
+            'group_kiso': 'Basics & Vocabulary Lists',
+            'group_game': 'What would you like to play?',
+            // Basics & Lists
+            'btn_kiso': '📝<br>Hiragana/Katakana Basics',
+            'btn_hiragana_video': '🎥<br>Hiragana Practice',
+            'btn_keiyoshi_list': '📚<br>Adjective List',
+            'btn_kanji_list': '📖<br>Kanji List (Gr.1)',
+            // Games
+            'btn_hiragana_drag': '🧩<br>Hiragana Word Match',
+            'btn_hiragana_game': '🎮<br>Hiragana Word Game',
+            'btn_hiragana_game2': '⭐<br>Hiragana Game 2 (Order)',
+            'btn_katakana_drag': '🧩<br>Katakana Word Match',
+            'btn_shiritori': '🗣️<br>Shiritori Game',
+            'btn_shiritori2': '🗣️<br>Shiritori Game 2',
+            'btn_clock': '🗣️<br>Clock Game',
+            'btn_clock2': '🗣️<br>Clock Game 2',
+            'btn_keiyoshi_quiz': '🤔<br>Adjective Quiz',
+            'btn_adjective_quiz': '🤔<br>Adjective Quiz 2',
+            'btn_kanji_quiz': '🈳<br>Kanji Quiz (Gr.1)',
+            'btn_aisatsu_quiz': '🗣️<br>Greetings Quiz',
+            'btn_verb_game': '🗣️<br>Verb Game',
+            'btn_sentence_puzzle': '🗣️<br>Grammar Puzzle',
+            'btn_meteor_quiz': '🗣️<br>Meteor Quiz',
+            'btn_treasure_hunt': '🗣️<br>Treasure Hunt',
+        }
+    };
+
+    // UIを更新するメイン関数
+    function updateUI(lang) {
+        const langData = translations[lang];
+
+        // 1. data-i18n属性 (textContentを書き換える要素: h1, h2など)
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (langData[key]) {
+                el.textContent = langData[key];
+            }
         });
+
+        // 2. data-i18n-html属性 (innerHTMLを書き換える要素: ボタンなど)
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            const key = el.getAttribute('data-i18n-html');
+            if (langData[key]) {
+                el.innerHTML = langData[key];
+            }
+        });
+
+        // 3. ボタンのアクティブ状態を更新
+        document.getElementById('lang-ja')?.classList.remove('active');
+        document.getElementById('lang-en')?.classList.remove('active');
+        document.getElementById(`lang-${lang}`)?.classList.add('active');
+    }
+
+    // 言語を保存し、UIを更新する関数 (onclickイベントから呼び出される)
+    window.setLanguage = function(lang) {
+        if (!translations[lang]) return;
+        
+        // 選択された言語をブラウザに保存 (永続化)
+        localStorage.setItem('preferredLang', lang);
+        
+        // UIを更新
+        updateUI(lang);
+    };
+
+    // ページ読み込み時の処理
+    document.addEventListener('DOMContentLoaded', () => {
+        // 以前保存された設定を読み込む。なければ 'ja' をデフォルトとする
+        const savedLang = localStorage.getItem('preferredLang') || 'ja';
+        setLanguage(savedLang); // 最初のUI更新を実行
     });
-  }
 </script>
 
 </body>
