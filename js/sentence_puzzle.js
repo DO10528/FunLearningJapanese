@@ -44,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
             checkButton.addEventListener('click', checkAnswer);
             resetButton.addEventListener('click', resetPuzzle);
             
-            // ★変更点: setupDropZoneEvents() は不要なので削除
-            
             startNewQuestion();
         } catch (error) {
             console.error("データの読み込みまたはゲーム初期化に失敗しました:", error);
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.innerHTML = '';
         cardContainer.innerHTML = '';
         feedbackMessage.classList.add('hidden');
-        feedbackMessage.className = 'quiz-feedback-message';
+        feedbackMessage.className = 'quiz-feedback-message hidden'; // ★ .hidden も確実に追加
         checkButton.disabled = false;
         resetButton.disabled = false;
         
@@ -85,15 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
         shuffledParts.forEach((part, index) => {
             const card = document.createElement('div');
             card.textContent = part; 
-            card.classList.add('puzzle-card');
-            
-            // ★変更点: card.draggable = true; を削除
+            card.classList.add('puzzle-card'); // ★ ここは修正済み
             
             card.dataset.id = `${part}-${index}-${currentQuestionIndex}`; 
             cardContainer.appendChild(card);
         });
         
-        // 4. ★変更点: クリックイベントのみを設定
+        // 4. クリックイベントを設定
         setupCardEvents();
     }
 
@@ -140,29 +136,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // ★★★ イベント設定とクリック処理 (大幅に変更) ★★★
+    // ★★★ イベント設定とクリック処理 (修正) ★★★
     // ----------------------------------------------------
     
-    /**
-     * ★変更点: クリックイベントのみを設定
-     */
     function setupCardEvents() {
-        document.querySelectorAll('.word-card').forEach(card => {
-            // ★変更点: dragstart を削除し、click のみ
+        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        document.querySelectorAll('.puzzle-card').forEach(card => {
             card.addEventListener('click', handleCardClick); 
         });
     }
 
-    /**
-     * ★変更点: ドラッグ＆ドロップ関連の関数はすべて削除
-     * (setupDropZoneEvents, handleDragStart, handleDragEnd, handleDragOver, handleDragLeave, handleDrop, getDragAfterElement)
-     */
-
-    /**
-     * ★変更点: クリック（タップ）でカードを移動するロジック
-     */
     function handleCardClick(e) {
-        const clickedCard = e.target.closest('.word-card');
+        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        const clickedCard = e.target.closest('.puzzle-card');
         if (!clickedCard) return;
 
         // 答え合わせ後（正解スロット）は動かないようにする
@@ -189,17 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ----------------------------------------------------
-    // 正誤判定とゲーム制御 (一部変更)
+    // 正誤判定とゲーム制御 (修正)
     // ----------------------------------------------------
 
-    /**
-     * 答え合わせを行う
-     */
     function checkAnswer() {
         checkButton.disabled = true;
         resetButton.disabled = true;
         
-        const droppedCards = [...dropZone.querySelectorAll('.word-card')];
+        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        const droppedCards = [...dropZone.querySelectorAll('.puzzle-card')];
         
         if (droppedCards.length !== currentCorrectParts.length) {
             displayFeedback(false, `❌ カードの数が違います。（${currentCorrectParts.length}枚必要です）`);
@@ -221,11 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.remove('correct-slot');
                 isCorrect = false;
             }
-            // ★変更点: draggable = false は不要なので削除
         });
 
         if (isCorrect) {
-            // ★★★ 全て正解 ★★★
             playSound(SOUND_CORRECT_PATH); 
             score++;
             currentQuestionIndex++;
@@ -234,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(startNewQuestion, 2000);
             
         } else {
-            // ★★★ 不正解 ★★★
             playSound(SOUND_INCORRECT_PATH); 
             displayFeedback(false, `🤔 残念、並び順が違います。カードをクリックして戻すか、リセットして再挑戦！`);
             checkButton.disabled = false;
@@ -242,16 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * パズルをリセットし、カードをカードコンテナに戻す
-     */
     function resetPuzzle() {
-        const cardsToMove = [...dropZone.querySelectorAll('.word-card')];
+        // ★ 修正 ★： .word-card ではなく .puzzle-card を探す
+        const cardsToMove = [...dropZone.querySelectorAll('.puzzle-card')];
         
         cardsToMove.forEach(card => {
             cardContainer.appendChild(card);
             card.classList.remove('correct-slot', 'wrong-slot');
-            // ★変更点: draggable = true は不要なので削除
         });
         
         dropZone.innerHTML = '';
@@ -261,9 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetButton.disabled = false;
     }
 
-    /**
-     * フィードバックメッセージを表示する (変更なし)
-     */
     function displayFeedback(isCorrect, message) {
         feedbackMessage.textContent = message;
         feedbackMessage.classList.remove('hidden'); 
@@ -276,16 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * スコア表示を更新する (変更なし)
-     */
     function updateScoreDisplay() {
         scoreDisplay.textContent = `正解数: ${score} / ${totalQuestions} 問`;
     }
 
-    /**
-     * ゲーム終了処理 (変更なし)
-     */
     function endGame() {
         playSound(SOUND_CORRECT_PATH); 
         questionText.textContent = `🎉 ゲームクリア！`;
@@ -298,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // ユーティリティ (変更なし)
+    // ユーティリティ
     // ----------------------------------------------------
     
     function playSound(path) {
@@ -314,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return newArray;
     }
-
 
     // ゲーム開始
     initializeGame();
