@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fun Learning Japanese - Free Games for Beginners</title>
+<title data-i18n="main_title">Fun Learning Japanese</title>
 <meta name="description" content="Learn Hiragana, Katakana, Kanji, and grammar with fun, free Japanese learning games! Perfect for beginners.">
 
 <link rel="manifest" href="manifest.json">
@@ -15,21 +15,136 @@
 <link rel="apple-touch-icon" href="images/icons/icon-192x192.png"> 
 <link rel="stylesheet" href="css/style.css">
 <style>
-/* メインコンテナ（白）の中のグループ分け */
+/* ---------------------------------------------------- */
+/* 既存のメニューグループスタイル */
+/* ---------------------------------------------------- */
 .menu-group {
-background-color: #f0f8ff; /* 薄い青色の背景 */
-border: 2px solid #5c7aff; /* kiso.html と色を合わせる */
-border-radius: 15px;
-padding: 15px 20px;
-margin-bottom: 25px; /* 2つのグループ間の余白 */
-box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background-color: #f0f8ff; /* 薄い青色の背景 */
+    border: 2px solid #5c7aff; /* kiso.html と色を合わせる */
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 25px; /* 2つのグループ間の余白 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 /* グループのタイトル (h2) */
 .menu-group h2 {
-text-align: center;
-color: #5c7aff; /* 青色 */
-font-size: 1.5em;
-margin-bottom: 20px;
+    text-align: center;
+    color: #5c7aff; /* 青色 */
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+/* ---------------------------------------------------- */
+/* 新規追加: 認証/ステータスバー スタイル */
+/* ---------------------------------------------------- */
+#auth-status-bar {
+    width: 100%;
+    max-width: 800px;
+    margin: 10px auto 20px;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+#user-info {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    padding: 5px 0;
+}
+#auth-buttons button {
+    margin-left: 10px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.2s;
+}
+.btn-login { background-color: #5cb85c; color: white; }
+.btn-signup { background-color: #007bff; color: white; }
+.btn-guest { background-color: #f0ad4e; color: white; }
+.btn-logout { background-color: #d9534f; color: white; }
+
+/* --- モーダル（認証フォーム） --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* 言語スイッチャーより前面に */
+}
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 { margin-top: 0; color: #005bb5; }
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+.modal-content button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.modal-content .btn-submit { background-color: #007bff; color: white; }
+.modal-content .btn-close { background-color: #ccc; color: #333; margin-top: 10px; }
+.form-message {
+    color: #d9534f;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* --- メインメニューの制御 --- */
+#main-menu.locked {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+}
+#initial-message {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 1.1em;
+    color: #d9534f;
+    font-weight: bold;
+    border: 2px dashed #d9534f50;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    #auth-status-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #auth-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    #auth-buttons button {
+        margin: 0 2px;
+        flex-grow: 1;
+    }
 }
 </style>
 
@@ -48,87 +163,124 @@ margin-bottom: 20px;
     <button onclick="setLanguage('ja')" id="lang-ja" class="lang-button active">にほんご</button>
     <button onclick="setLanguage('en')" id="lang-en" class="lang-button">English</button>
 </div>
+
+<div id="auth-status-bar">
+    <span id="user-info">ログインしていません</span>
+    <div id="auth-buttons">
+        <button id="login-btn" class="btn-login">ログイン</button>
+        <button id="signup-btn" class="btn-signup">新規登録</button>
+        <button id="guest-btn" class="btn-guest">ゲストでプレイ</button>
+        <button id="logout-btn" class="btn-logout" style="display:none;">ログアウト</button>
+    </div>
+</div>
+
 <h1 data-i18n="main_title">Fun Learning Japanese</h1>
+
+<div id="initial-message" style="display: none;">
+    <p>ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
+    <p>進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
+</div>
+
 <div id="main-menu" class="container">
-<div class="menu-group">
-<h2 data-i18n="group_kiso">きそ・たんごリスト</h2>
-<div class="menu-buttons-grid">
-<a href="kiso.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kiso">
-📝<br>ひらがな・カタカナ基礎
-</a>
+    <div class="menu-group">
+        <h2 data-i18n="group_kiso">きそ・たんごリスト</h2>
+        <div class="menu-buttons-grid">
+            <a href="kiso.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kiso">
+                📝<br>ひらがな・カタカナ基礎
+            </a>
+            <a href="hiragana_video_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_video">
+                🎥<br>ひらがな練習
+            </a>
+            <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_list">
+                📚<br>形容詞リスト
+            </a>
+            <a href="kanji_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_list">
+                📖<br>漢字リスト (小1)
+            </a>
+        </div>
+    </div>
 
-<a href="hiragana_video_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_video">
-🎥<br>ひらがな練習
-</a>
-<a href="keiyoshi_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_list">
-📚<br>形容詞リスト
-</a>
-<a href="kanji_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_list">
-📖<br>漢字リスト (小1)
-</a>
-
-</div>
-</div>
-
-<div class="menu-group">
-<h2 data-i18n="group_game">なにをしてあそぶ?</h2>
-
-<div class="menu-buttons-grid">
-<a href="hiragana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_drag">
-🧩<br>ひらがな単語あわせ
-</a>
-<a href="hiragana.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game">
-🎮<br>ひらがな単語ゲーム
-</a>
-<a href="hiragana2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game2">
-⭐<br>ひらがなゲーム2 (並び替え)
-</a>
-<a href="katakana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_katakana_drag">
-🧩<br>カタカナ単語あわせ
-</a>
-<a href="shiritori.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori">
-🗣️<br>しりとりゲーム
-</a>
-<a href="shiritori2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori2">
-🗣️<br>しりとりゲーム2
-</a>
-<a href="clock.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock">
-🗣️<br>とけいゲーム
-</a>
-<a href="clock2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock2">
-🗣️<br>とけいゲーム2
-</a>
-<a href="keiyoshi.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_quiz">
-🤔<br>形容詞クイズ
-</a>
-<a href="adjective_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_adjective_quiz">
-🤔<br>形容詞クイズ2
-</a>
-<a href="kanji_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_quiz">
-🈳<br>漢字クイズ (小1)
-</a>
-<a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_aisatsu_quiz">
-🗣️<br>挨拶クイズ
-</a>
-<a href="verb.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_verb_game">
-🗣️<br>動詞ゲーム
-</a>
-<a href="sentence_puzzle.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_sentence_puzzle">
-🗣️<br>文法並び替えゲーム
-</a>
-<a href="meteor_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_meteor_quiz">
-🗣️<br>隕石クイズ
-</a>
-<a href="treasure_Hunt.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_treasure_hunt">
-🗣️<br>たからさがしゲーム
-</a>
-
-</div>
-</div>
+    <div class="menu-group">
+        <h2 data-i18n="group_game">なにをしてあそぶ?</h2>
+        <div class="menu-buttons-grid">
+            <a href="hiragana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_drag">
+                🧩<br>ひらがな単語あわせ
+            </a>
+            <a href="hiragana.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game">
+                🎮<br>ひらがな単語ゲーム
+            </a>
+            <a href="hiragana2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game2">
+                ⭐<br>ひらがなゲーム2 (並び替え)
+            </a>
+            <a href="katakana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_katakana_drag">
+                🧩<br>カタカナ単語あわせ
+            </a>
+            <a href="shiritori.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori">
+                🗣️<br>しりとりゲーム
+            </a>
+            <a href="shiritori2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori2">
+                🗣️<br>しりとりゲーム2
+            </a>
+            <a href="clock.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock">
+                🗣️<br>とけいゲーム
+            </a>
+            <a href="clock2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock2">
+                🗣️<br>とけいゲーム2
+            </a>
+            <a href="keiyoshi.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_quiz">
+                🤔<br>形容詞クイズ
+            </a>
+            <a href="adjective_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_adjective_quiz">
+                🤔<br>形容詞クイズ2
+            </a>
+            <a href="kanji_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_quiz">
+                🈳<br>漢字クイズ (小1)
+            </a>
+            <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_aisatsu_quiz">
+                🗣️<br>挨拶クイズ
+            </a>
+            <a href="verb.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_verb_game">
+                🗣️<br>動詞ゲーム
+            </a>
+            <a href="sentence_puzzle.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_sentence_puzzle">
+                🗣️<br>文法並び替えゲーム
+            </a>
+            <a href="meteor_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_meteor_quiz">
+                🗣️<br>隕石クイズ
+            </a>
+            <a href="treasure_Hunt.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_treasure_hunt">
+                🗣️<br>たからさがしゲーム
+            </a>
+        </div>
+    </div>
 </div>
 <div id="game-area" class="container" style="display:none;">
-<p>ゲームを読み込んでいます...</p>
+    <p>ゲームを読み込んでいます...</p>
 </div>
+
+<div id="auth-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div id="login-view">
+            <h2>ログイン</h2>
+            <div id="login-message" class="form-message"></div>
+            <input type="text" id="login-gamename" placeholder="ゲーム名" required>
+            <input type="password" id="login-password" placeholder="パスワード" required>
+            <button id="login-submit-btn" class="btn-submit">ログイン</button>
+            <button class="btn-close">キャンセル</button>
+        </div>
+        
+        <div id="signup-view" style="display:none;">
+            <h2>新規登録</h2>
+            <div id="signup-message" class="form-message"></div>
+            <p style="font-size: 0.9em; color: #555;">※サインアップするとゲームの進捗が保存されます。</p>
+            <input type="text" id="signup-gamename" placeholder="新しいゲーム名 (必須)" required>
+            <input type="password" id="signup-password" placeholder="パスワード (必須)" required>
+            <button id="signup-submit-btn" class="btn-submit">登録してログイン</button>
+            <button class="btn-close">キャンセル</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ----------------------------------------------------
     // ★★★ サービスワーカーは削除しないでください ★★★
@@ -146,7 +298,7 @@ margin-bottom: 20px;
     }
 
     // ----------------------------------------------------
-    // ★★★ 言語データと制御ロジック (ステップ2-2) ★★★
+    // ★★★ 既存の言語データと制御ロジック ★★★
     // ----------------------------------------------------
 
     const translations = {
@@ -154,12 +306,11 @@ margin-bottom: 20px;
             'main_title': 'Fun Learning Japanese',
             'group_kiso': 'きそ・たんごリスト',
             'group_game': 'なにをしてあそぶ?',
-            // きそ・たんごリスト
+            // (以下、既存のボタン翻訳データが続く...)
             'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
             'btn_hiragana_video': '🎥<br>ひらがな練習',
             'btn_keiyoshi_list': '📚<br>形容詞リスト',
             'btn_kanji_list': '📖<br>漢字リスト (小1)',
-            // なにをしてあそぶ?
             'btn_hiragana_drag': '🧩<br>ひらがな単語あわせ',
             'btn_hiragana_game': '🎮<br>ひらがな単語ゲーム',
             'btn_hiragana_game2': '⭐<br>ひらがなゲーム2 (並び替え)',
@@ -181,12 +332,11 @@ margin-bottom: 20px;
             'main_title': 'Fun Learning Japanese',
             'group_kiso': 'Basics & Vocabulary Lists',
             'group_game': 'What would you like to play?',
-            // Basics & Lists
+            // (以下、既存のボタン翻訳データが続く...)
             'btn_kiso': '📝<br>Hiragana/Katakana Basics',
             'btn_hiragana_video': '🎥<br>Hiragana Practice',
             'btn_keiyoshi_list': '📚<br>Adjective List',
             'btn_kanji_list': '📖<br>Kanji List (Gr.1)',
-            // Games
             'btn_hiragana_drag': '🧩<br>Hiragana Word Match',
             'btn_hiragana_game': '🎮<br>Hiragana Word Game',
             'btn_hiragana_game2': '⭐<br>Hiragana Game 2 (Order)',
@@ -206,8 +356,8 @@ margin-bottom: 20px;
         }
     };
 
-    // UIを更新するメイン関数
-    function updateUI(lang) {
+    // UIを更新するメイン関数 (既存の言語切り替えロジック)
+    function updateLanguageUI(lang) {
         const langData = translations[lang];
 
         // 1. data-i18n属性 (textContentを書き換える要素: h1, h2など)
@@ -236,18 +386,199 @@ margin-bottom: 20px;
     window.setLanguage = function(lang) {
         if (!translations[lang]) return;
         
-        // 選択された言語をブラウザに保存 (永続化)
         localStorage.setItem('preferredLang', lang);
-        
-        // UIを更新
-        updateUI(lang);
+        updateLanguageUI(lang);
     };
 
-    // ページ読み込み時の処理
+
+    // ----------------------------------------------------
+    // ★★★ 新規追加: 認証ロジック (localStorageでシミュレート) ★★★
+    // ----------------------------------------------------
+
+    const USER_STORAGE_KEY = 'user_accounts';
+    const SESSION_STORAGE_KEY = 'current_user';
+    const GUEST_NAME = 'ゲスト';
+
+    // --- 認証DOM要素の取得 ---
+    const userInfoEl = document.getElementById('user-info');
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    const guestBtn = document.getElementById('guest-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    
+    const initialMessageEl = document.getElementById('initial-message');
+    const mainMenuEl = document.getElementById('main-menu');
+    
+    const modalOverlay = document.getElementById('auth-modal');
+    const loginView = document.getElementById('login-view');
+    const signupView = document.getElementById('signup-view');
+    
+    // --- ユーティリティ関数 ---
+
+    // ユーザーアカウントデータを取得
+    function getUsers() {
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+        return usersJson ? JSON.parse(usersJson) : {};
+    }
+
+    // ユーザーアカウントデータを保存
+    function saveUsers(users) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    // --- セッション管理 ---
+
+    // ログイン処理
+    function setSession(gameName) {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, gameName);
+        updateAuthenticationUI();
+    }
+    
+    // ログアウト処理
+    function logout() {
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        updateAuthenticationUI();
+    }
+
+    // ゲストとしてプレイ
+    function playAsGuest() {
+        setSession(GUEST_NAME);
+    }
+
+    // --- UIの更新 (ログイン状態に応じて表示を切り替える) ---
+    function updateAuthenticationUI() {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        const isLoggedIn = !!currentUser;
+        const isGuest = currentUser === GUEST_NAME;
+
+        // 認証ステータスバーの表示切り替え
+        if (isLoggedIn) {
+            userInfoEl.textContent = isGuest ? 'ゲストモード' : `${currentUser} さん、ようこそ！`;
+            loginBtn.style.display = 'none';
+            signupBtn.style.display = 'none';
+            guestBtn.style.display = 'none';
+            logoutBtn.style.display = 'inline-block';
+            
+            // メニューエリアの表示制御
+            initialMessageEl.style.display = 'none';
+            mainMenuEl.classList.remove('locked');
+
+        } else {
+            userInfoEl.textContent = 'ログインしていません';
+            loginBtn.style.display = 'inline-block';
+            signupBtn.style.display = 'inline-block';
+            guestBtn.style.display = 'inline-block';
+            logoutBtn.style.display = 'none';
+            
+            // メニューエリアの非表示/ロック
+            initialMessageEl.style.display = 'block';
+            mainMenuEl.classList.add('locked');
+        }
+    }
+
+    // --- 認証イベントリスナー ---
+
+    // 5. サインアップ処理
+    document.getElementById('signup-submit-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        const gamenameInput = document.getElementById('signup-gamename');
+        const passwordInput = document.getElementById('signup-password');
+        const messageEl = document.getElementById('signup-message');
+
+        const gamename = gamenameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!gamename || !password) {
+            messageEl.textContent = 'ゲーム名とパスワードは必須です。';
+            return;
+        }
+        if (gamename === GUEST_NAME) {
+            messageEl.textContent = 'そのゲーム名は予約されています。';
+            return;
+        }
+
+        const users = getUsers();
+        if (users[gamename]) {
+            messageEl.textContent = 'このゲーム名はすでに使用されています。';
+            return;
+        }
+
+        // 新しいユーザーを登録
+        users[gamename] = { password: password, name: gamename };
+        saveUsers(users);
+
+        // 登録後、自動でログイン
+        setSession(gamename);
+        modalOverlay.style.display = 'none';
+        messageEl.textContent = '';
+        gamenameInput.value = '';
+        passwordInput.value = '';
+    });
+
+    // 6. ログイン処理
+    document.getElementById('login-submit-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        const gamenameInput = document.getElementById('login-gamename');
+        const passwordInput = document.getElementById('login-password');
+        const messageEl = document.getElementById('login-message');
+
+        const gamename = gamenameInput.value.trim();
+        const password = passwordInput.value;
+
+        const users = getUsers();
+        const user = users[gamename];
+
+        if (user && user.password === password) {
+            // ログイン成功
+            setSession(gamename);
+            modalOverlay.style.display = 'none';
+            messageEl.textContent = '';
+            gamenameInput.value = '';
+            passwordInput.value = '';
+        } else {
+            // ログイン失敗
+            messageEl.textContent = 'ゲーム名またはパスワードが違います。';
+        }
+    });
+
+    // 7. ボタンアクションの設定
+    
+    loginBtn.addEventListener('click', () => {
+        loginView.style.display = 'block';
+        signupView.style.display = 'none';
+        modalOverlay.style.display = 'flex';
+        document.getElementById('login-message').textContent = '';
+        document.getElementById('signup-message').textContent = '';
+    });
+
+    signupBtn.addEventListener('click', () => {
+        loginView.style.display = 'none';
+        signupView.style.display = 'block';
+        modalOverlay.style.display = 'flex';
+        document.getElementById('login-message').textContent = '';
+        document.getElementById('signup-message').textContent = '';
+    });
+
+    guestBtn.addEventListener('click', playAsGuest);
+    logoutBtn.addEventListener('click', logout);
+
+    // モーダル内のキャンセルボタン
+    modalOverlay.querySelectorAll('.btn-close').forEach(button => {
+        button.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+            document.getElementById('login-message').textContent = '';
+            document.getElementById('signup-message').textContent = '';
+        });
+    });
+
+    // --- ページ読み込み時の初期化 ---
     document.addEventListener('DOMContentLoaded', () => {
-        // 以前保存された設定を読み込む。なければ 'ja' をデフォルトとする
+        // 既存の言語設定の初期化
         const savedLang = localStorage.getItem('preferredLang') || 'ja';
-        setLanguage(savedLang); // 最初のUI更新を実行
+        setLanguage(savedLang); 
+        
+        // 新規追加: 認証状態の初期化
+        updateAuthenticationUI();
     });
 </script>
 
