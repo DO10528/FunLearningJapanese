@@ -154,3 +154,99 @@ border-radius: 10px;
 .lang-button:hover:not(.active) {
     background-color: #f0f0f0;
 }
+
+/* ======================================== */
+/* ★★★ ランキング機能のCSS (index.htmlからの移動・統合) ★★★ */
+/* ======================================== */
+
+/* ランキングコンテナの基本設定 */
+#ranking-container {
+    background-color: #fff;
+    border: 3px solid #ffca28; /* ゴールドっぽい枠線 */
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    /* 認証ステータスバーと干渉しないよう、デフォルトで非表示 */
+    display: none; 
+}
+
+#ranking-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    text-align: center;
+    color: #ff6f00;
+    font-weight: 800;
+}
+
+#ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#ranking-list li {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 2px;
+    white-space: nowrap; 
+}
+
+/* 1位〜3位のアイコン色 */
+#ranking-list li:nth-child(1) { color: #d4af37; } 
+#ranking-list li:nth-child(2) { color: #c0c0c0; } 
+#ranking-list li:nth-child(3) { color: #cd7f32; } 
+
+/* -----------------------------------------
+   スマホ (FunLearningJapaneseの下に横並び)
+   ----------------------------------------- */
+@media (max-width: 1023px) {
+    #ranking-container {
+        width: 90%;
+        max-width: 600px;
+        margin: 10px auto 20px auto; 
+        text-align: center;
+    }
+
+    #ranking-list {
+        display: flex;          /* 横並びにする */
+        overflow-x: auto;       /* 横に収まらない場合はスクロール可能にする */
+        justify-content: flex-start; 
+        gap: 15px;               
+    }
+
+    #ranking-list li {
+        flex-shrink: 0;         /* カードが縮まないように */
+        border-bottom: none;    
+        background: #fff8e1;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+}
+
+/* -----------------------------------------
+   PC/iPad (画面左側に固定して縦並び)
+   ----------------------------------------- */
+@media (min-width: 1024px) {
+    #ranking-container {
+        position: fixed;        /* 場所を固定 */
+        left: 20px;             /* 左端から20px */
+        top: 150px;             /* 画面上から */
+        width: 200px;           /* 幅を固定 */
+    }
+    
+    #ranking-list {
+        display: block;         /* 縦並び */
+    }
+    /* メインコンテンツがランキングの下に潜り込まないよう調整 */
+    #main-menu {
+        /* 元のCSSに依存しますが、左のランキングのスペースを確保するためマージンを追加 */
+        margin-left: 240px; 
+    }
+}
+
+/* ========================================= */
+/* ★★★ CSSコードはここまで ★★★ */
+/* ======================================== */

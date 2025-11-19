@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="images/icons/icon-192x192.png"> 
 <link rel="stylesheet" href="css/style.css">
 <style>
-/* （省略 — 既存の CSS をそのまま使ってください） */
+/* 既存の認証UIとメニューのCSS */
 .menu-group { background-color: #f0f8ff; border: 2px solid #5c7aff; border-radius: 15px; padding: 15px 20px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 .menu-group h2 { text-align: center; color: #5c7aff; font-size: 1.5em; margin-bottom: 20px; }
 #auth-status-bar { width: 100%; max-width: 800px; margin: 10px auto 20px; padding: 10px 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
@@ -39,6 +39,94 @@
 #main-menu.locked { filter: blur(2px); pointer-events: none; user-select: none; }
 #initial-message { text-align: center; padding: 50px 20px; font-size: 1.1em; color: #d9534f; font-weight: bold; border: 2px dashed #d9534f50; border-radius: 10px; margin-top: 20px; }
 @media (max-width: 600px) { #auth-status-bar { flex-direction: column; gap: 10px; } #user-status-container { width: 100%; align-items: center; } #auth-buttons { width: 100%; display: flex; justify-content: space-between; } #auth-buttons button { margin: 0 2px; flex-grow: 1; } }
+
+
+/* ========================================= */
+/* ランキング機能のCSS */
+/* ========================================= */
+#ranking-container {
+    background-color: #fff;
+    border: 3px solid #ffca28; /* ゴールドっぽい枠線 */
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+#ranking-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    text-align: center;
+    color: #ff6f00;
+    font-weight: 800;
+}
+
+#ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#ranking-list li {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 2px;
+    white-space: nowrap; /* テキストが途中で途切れないように */
+}
+
+/* 1位〜3位のアイコン色 */
+#ranking-list li:nth-child(1) { color: #d4af37; } /* 金 */
+#ranking-list li:nth-child(2) { color: #c0c0c0; } /* 銀 */
+#ranking-list li:nth-child(3) { color: #cd7f32; } /* 銅 */
+
+/* -----------------------------------------
+   スマホ (FunLearningJapaneseの下に横並び)
+   ----------------------------------------- */
+@media (max-width: 1023px) {
+    #ranking-container {
+        width: 90%;
+        max-width: 600px;
+        margin: 10px auto 20px auto; 
+        text-align: center;
+    }
+
+    #ranking-list {
+        display: flex;          /* 横並びにする */
+        overflow-x: auto;       /* 横に収まらない場合はスクロール可能にする */
+        justify-content: flex-start; 
+        gap: 15px;               
+    }
+
+    #ranking-list li {
+        flex-shrink: 0;         /* カードが縮まないように */
+        border-bottom: none;    
+        background: #fff8e1;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+}
+
+/* -----------------------------------------
+   PC/iPad (画面左側に固定して縦並び)
+   ----------------------------------------- */
+@media (min-width: 1024px) {
+    #ranking-container {
+        position: fixed;        /* 場所を固定 */
+        left: 20px;             /* 左端から20px */
+        top: 150px;             /* 画面上から */
+        width: 200px;           /* 幅を固定 */
+    }
+    
+    #ranking-list {
+        display: block;         /* 縦並び */
+    }
+    /* メインコンテンツがランキングの下に潜り込まないように、paddingを入れる */
+    #main-menu {
+        margin-left: 240px; /* ランキングの幅(200px) + 余白(40px) */
+    }
+}
 </style>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
@@ -73,6 +161,10 @@
 
 <h1 data-i18n="main_title">Fun Learning Japanese</h1>
 
+<div id="ranking-container" style="display: none;">
+    <h3>🏆 今月のトップ5</h3>
+    <ul id="ranking-list"></ul>
+</div>
 <div id="initial-message" style="display: none;">
     <p data-i18n="msg_initial_1">ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
     <p data-i18n="msg_initial_2">進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
@@ -195,7 +287,7 @@
     }
 
     // ----------------------------------------------------
-    // 言語データ（省略。元の translations をそのまま使ってください）
+    // 言語データ
     // ----------------------------------------------------
     const translations = {
         'ja': {
@@ -231,7 +323,7 @@
             'btn_hiragana_game2': '⭐<br>ひらがなゲーム2 (並び替え)',
             'btn_katakana_drag': '🧩<br>カタカナ単語あわせ',
             'btn_shiritori': '🗣️<br>しりとりゲーム',
-            'btn_shiritori2': '🗣️<br>しりとりゲーム2',
+            'btn_shiritori2': '🗣️️<br>しりとりゲーム2',
             'btn_clock': '🗣️<br>とけいゲーム',
             'btn_clock2': '🗣️<br>とけいゲーム2',
             'btn_keiyoshi_quiz': '🤔<br>形容詞クイズ',
@@ -336,6 +428,7 @@
     const SESSION_STORAGE_KEY = 'current_user';
     const GUEST_NAME = 'ゲスト'; 
     const LANG_DEFAULT = 'ja'; 
+    const RANKING_MONTH_KEY = 'ranking_month_check'; // ★ 月間リセットチェック用のキー
 
     const userInfoEl = document.getElementById('user-info');
     const streakDisplayEl = document.getElementById('streak-display'); 
@@ -352,6 +445,10 @@
     const modalOverlay = document.getElementById('auth-modal');
     const loginView = document.getElementById('login-view');
     const signupView = document.getElementById('signup-view');
+
+    // ★ランキング表示用のDOM
+    const rankingContainer = document.getElementById('ranking-container');
+    const rankingList = document.getElementById('ranking-list');
     
     function getUsers() {
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
@@ -407,10 +504,7 @@
         return user;
     }
 
-
-    // --- 改良: addPoints の実装 ---
-    // 呼び出し: window.addPoints(amount, gameId)
-    // 戻り値: true ならポイントが実際に加算された。false なら加算されなかった（未ログイン・ゲスト・不正な数値など）。
+    // --- 改良: addPoints の実装 (既存のゲームから呼び出す必要なし) ---
     window.addPoints = function(amount, gameId) {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (!currentUser || currentUser === GUEST_NAME) {
@@ -431,22 +525,19 @@
              return false;
         }
 
-        // ポイントを増やす
         user.points = (user.points || 0) + amount; 
 
-        // ゲームIDに基づいた進捗データの記録 (オプション)
         if (gameId) {
             user.progress = user.progress || {};
             user.progress[gameId] = user.progress[gameId] || { total_points: 0 };
             user.progress[gameId].total_points = (user.progress[gameId].total_points || 0) + amount;
         }
         
-        // usersオブジェクト全体を保存し直す
         users[currentUser] = user;
         saveUsers(users);
         
-        // UIを更新して新しいポイントを表示
-        updateAuthenticationUI();
+        updateAuthenticationUI(); // UI更新
+        displayRanking();         // ランキング更新
         
         console.log(`[ポイント加算] ${currentUser}に${amount}ポイント加算されました。合計: ${user.points}`);
         return true;
@@ -545,9 +636,87 @@
             initialMessageEl.style.display = 'block';
             mainMenuEl.classList.add('locked');
         }
+        
+        // ★ ランキングの表示/非表示と更新を制御
+        if (isLoggedIn && !isGuest) {
+            rankingContainer.style.display = 'block';
+            displayRanking();
+        } else {
+            rankingContainer.style.display = 'none';
+        }
     }
 
-    // --- 認証イベントリスナー ---
+
+    // ----------------------------------------------------
+    // ★★★ ランキング機能 (月間累積・毎日更新) ★★★
+    // ----------------------------------------------------
+
+    // ★ 月が変わったら累積ポイントをリセットする処理 (月間ランキングの維持)
+    function checkMonthlyReset() {
+        const now = new Date();
+        // "2025-11" のような文字列を作る
+        const currentYearMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        
+        const storedMonth = localStorage.getItem(RANKING_MONTH_KEY);
+
+        // 保存されている月と今の月が違う場合 = 月が変わった！
+        if (storedMonth !== currentYearMonth) {
+            const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+            if (usersJson) {
+                let users = JSON.parse(usersJson);
+                Object.keys(users).forEach(key => {
+                    users[key].points = 0;         // ポイントリセット
+                    users[key].progress = {};      // 進捗データもリセット
+                });
+                saveUsers(users);
+            }
+            
+            // 新しい月を保存
+            localStorage.setItem(RANKING_MONTH_KEY, currentYearMonth);
+            console.log(`[ランキング] 新しい月(${currentYearMonth})になったため、ポイントをリセットしました。`);
+        }
+    }
+
+
+    function displayRanking() {
+        checkMonthlyReset(); // ランキング表示前に月間リセットチェックを実行
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+        if (!usersJson) return;
+
+        const users = JSON.parse(usersJson);
+        
+        // ★ ポイントが多い順に並べ替え。ポイントが加算されるたびに順位は即時更新されます。
+        const sortedUsers = Object.keys(users).map(key => {
+            return { name: key, points: users[key].points || 0 };
+        })
+        .filter(u => u.points > 0) // 0ポイントのユーザーは除外
+        .sort((a, b) => b.points - a.points); // 降順 (大きい順)
+
+        const top5 = sortedUsers.slice(0, 5);
+
+        rankingList.innerHTML = '';
+        top5.forEach((u, index) => {
+            const li = document.createElement('li');
+            let rankIcon = `${index + 1}. `;
+            if (index === 0) rankIcon = '🥇 ';
+            if (index === 1) rankIcon = '🥈 ';
+            if (index === 2) rankIcon = '🥉 ';
+            
+            li.textContent = `${rankIcon}${u.name} : ${u.points} pt`;
+            rankingList.appendChild(li);
+        });
+        
+        if (top5.length === 0 || top5[0].points === 0) {
+            const li = document.createElement('li');
+            li.textContent = "まだ データがありません";
+            rankingList.appendChild(li);
+        }
+    }
+
+    // ----------------------------------------------------
+    // --- 認証イベントリスナー (既存) ---
+    // ----------------------------------------------------
     document.getElementById('signup-submit-btn').addEventListener('click', (e) => {
         e.preventDefault();
         const gamenameInput = document.getElementById('signup-gamename');
