@@ -313,6 +313,51 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- ★ポイントシステム設定 (ここから) ---
+            const GAME_ID = 'katakana_drag_match'; 
+            
+            const USER_STORAGE_KEY = 'user_accounts'; 
+            const SESSION_STORAGE_KEY = 'current_user'; 
+            const GUEST_NAME = 'ゲスト'; 
+
+            // 日付取得
+            function getTodayDateString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // ポイント加算・チェック関数
+            function checkAndAwardPoints(level) {
+                const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
+
+                const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+                let users = usersJson ? JSON.parse(usersJson) : {};
+                let user = users[currentUser];
+                if (!user) return "error"; 
+
+                const today = getTodayDateString();
+                const levelKey = `${GAME_ID}_level_${level}`;
+
+                user.progress = user.progress || {};
+                user.progress[levelKey] = user.progress[levelKey] || {};
+
+                if (user.progress[levelKey][today] === true) return "already_scored"; 
+
+                user.points = (user.points || 0) + 1;
+                user.progress[levelKey][today] = true;
+                
+                users[currentUser] = user;
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+                console.log(`[Game] ${currentUser} 1 point added.`);
+                return "scored"; 
+            }
+            // --- ★ポイントシステム設定 (ここまで) ---
+
 
             // --- 1. データ定義 ---
             const ILLUSTRATION_PATH_PREFIX = 'assets/images/katakana_words/'; 
@@ -377,68 +422,68 @@
             }
 
            // --- 4. レベル読み込み ---
-function loadLevel(levelData) {
-    levelSelectionEl.style.display = 'none';
-    mainTitleEl.style.display = 'none';
-    
-    currentLevelData = levelData; 
-    currentLevelWords = levelData.words;
+            function loadLevel(levelData) {
+                levelSelectionEl.style.display = 'none';
+                mainTitleEl.style.display = 'none';
+                
+                currentLevelData = levelData; 
+                currentLevelWords = levelData.words;
 
-    levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
-    feedbackEl.textContent = '';
-    feedbackEl.classList.remove('success');
-    gameAreaEl.style.display = 'flex';
-    
-    resetPlacedButton.style.display = 'none';
+                levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
+                feedbackEl.textContent = '';
+                feedbackEl.classList.remove('success');
+                gameAreaEl.style.display = 'flex';
+                
+                resetPlacedButton.style.display = 'none';
 
-    homeButton.onclick = () => showLevelSelect();
+                homeButton.onclick = () => showLevelSelect();
 
-    illustPoolEl.innerHTML = '';
-    wordListEl.innerHTML = '';
+                illustPoolEl.innerHTML = '';
+                wordListEl.innerHTML = '';
 
-    const shuffledWords = shuffleArray([...currentLevelWords]);
-    const shuffledIllusts = shuffleArray([...currentLevelWords]);
+                const shuffledWords = shuffleArray([...currentLevelWords]);
+                const shuffledIllusts = shuffleArray([...currentLevelWords]);
 
-    // 4-1. 単語リスト（ドロップ先）を生成
-    shuffledWords.forEach(wordData => {
-        const row = document.createElement('div');
-        row.className = 'km-word-row';
-        const dropTarget = document.createElement('div');
-        dropTarget.className = 'km-drop-target';
-        dropTarget.dataset.word = wordData.hira; 
-        dropTarget.id = `km-target-${wordData.hira}`; 
-        
-        const label = document.createElement('span');
-        label.className = 'km-word-label';
-        label.textContent = wordData.hira;
-        row.appendChild(dropTarget);
-        row.appendChild(label);
-        wordListEl.appendChild(row);
-    });
+                // 4-1. 単語リスト（ドロップ先）を生成
+                shuffledWords.forEach(wordData => {
+                    const row = document.createElement('div');
+                    row.className = 'km-word-row';
+                    const dropTarget = document.createElement('div');
+                    dropTarget.className = 'km-drop-target';
+                    dropTarget.dataset.word = wordData.hira; 
+                    dropTarget.id = `km-target-${wordData.hira}`; 
+                    
+                    const label = document.createElement('span');
+                    label.className = 'km-word-label';
+                    label.textContent = wordData.hira;
+                    row.appendChild(dropTarget);
+                    row.appendChild(label);
+                    wordListEl.appendChild(row);
+                });
 
-    // 4-2. イラストリスト（ドラッグアイテム）を生成
-    shuffledIllusts.forEach(wordData => {
-        const item = document.createElement('div');
-        item.className = 'km-drag-item';
-        
-        // PCでドラッグできるように 'draggable = true'
-        item.draggable = true;
-        
-        item.dataset.word = wordData.hira;
-        item.id = `km-item-${wordData.hira}`; 
-        item.dataset.initialParentId = 'km-illust-pool';
-        
-        const img = document.createElement('img');
-        img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
-        img.alt = wordData.hira;
-        img.draggable = false; 
-        item.appendChild(img);
-        illustPoolEl.appendChild(item);
-    });
+                // 4-2. イラストリスト（ドラッグアイテム）を生成
+                shuffledIllusts.forEach(wordData => {
+                    const item = document.createElement('div');
+                    item.className = 'km-drag-item';
+                    
+                    // PCでドラッグできるように 'draggable = true'
+                    item.draggable = true;
+                    
+                    item.dataset.word = wordData.hira;
+                    item.id = `km-item-${wordData.hira}`; 
+                    item.dataset.initialParentId = 'km-illust-pool';
+                    
+                    const img = document.createElement('img');
+                    img.src = `${ILLUSTRATION_PATH_PREFIX}${wordData.file}${ILLUSTRATION_PATH_SUFFIX}`;
+                    img.alt = wordData.hira;
+                    img.draggable = false; 
+                    item.appendChild(img);
+                    illustPoolEl.appendChild(item);
+                });
 
-    // 4-3. イベントリスナーを設定
-    addDragDropListeners();
-}
+                // 4-3. イベントリスナーを設定
+                addDragDropListeners();
+            }
 
 
 // --- 5. ドラッグ＆ドロップのイベントリスナー設定 (PC/タッチ両対応版) ---
@@ -690,23 +735,36 @@ function addDragDropListeners() {
                          }
                     });
                     
-                    levelTitleEl.textContent = 'レベルクリア！';
-                    feedbackEl.textContent = 'おめでとうございます！ぜんぶせいかい！';
+                    // ★★★ ポイント処理の実行 (ここから) ★★★
+                    const result = checkAndAwardPoints(currentLevelData.level);
+                    let message = 'おめでとうございます！ぜんぶせいかい！';
+
+                    if (result === "scored") {
+                        message += ' (+1 ポイント獲得！)';
+                    } else if (result === "already_scored") {
+                        message += ' (今日はポイント獲得済み)';
+                    } else if (result === "guest") {
+                        message += ' (ゲストはポイントなし)';
+                    }
+                    feedbackEl.textContent = message;
+                    // ★★★ ポイント処理の実行 (ここまで) ★★★
+                    
                     feedbackEl.classList.add('success');
                     resetPlacedButton.style.display = 'none'; 
+                    levelTitleEl.textContent = 'レベルクリア！';
                     
                     const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
                     const nextLevelIndex = currentLevelIndex + 1;
                     
                     if (nextLevelIndex < gameLevels.length) {
                         const nextLevelData = gameLevels[nextLevelIndex];
-                        levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
+                        // levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
                         setTimeout(() => {
                             loadLevel(nextLevelData);
-                        }, 1200); 
+                        }, 1500); 
                     } else {
                         levelTitleEl.textContent = 'ぜんぶクリア！';
-                        feedbackEl.textContent = '全レベル おめでとうございます！';
+                        feedbackEl.textContent = message + ' 全レベルクリア！';
                     }
                     
                 } else {
