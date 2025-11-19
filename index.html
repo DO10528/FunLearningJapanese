@@ -72,14 +72,13 @@
     font-weight: bold;
     font-size: 0.9em;
     border-bottom: 1px dashed #eee;
-    padding-bottom: 2px;
-    white-space: nowrap; /* テキストが途中で途切れないように */
+    white-space: nowrap; 
 }
 
 /* 1位〜3位のアイコン色 */
-#ranking-list li:nth-child(1) { color: #d4af37; } /* 金 */
-#ranking-list li:nth-child(2) { color: #c0c0c0; } /* 銀 */
-#ranking-list li:nth-child(3) { color: #cd7f32; } /* 銅 */
+#ranking-list li:nth-child(1) { color: #d4af37; } 
+#ranking-list li:nth-child(2) { color: #c0c0c0; } 
+#ranking-list li:nth-child(3) { color: #cd7f32; } 
 
 /* -----------------------------------------
    スマホ (FunLearningJapaneseの下に横並び)
@@ -93,14 +92,14 @@
     }
 
     #ranking-list {
-        display: flex;          /* 横並びにする */
-        overflow-x: auto;       /* 横に収まらない場合はスクロール可能にする */
+        display: flex;          
+        overflow-x: auto;       
         justify-content: flex-start; 
         gap: 15px;               
     }
 
     #ranking-list li {
-        flex-shrink: 0;         /* カードが縮まないように */
+        flex-shrink: 0;         
         border-bottom: none;    
         background: #fff8e1;
         padding: 5px 10px;
@@ -113,18 +112,17 @@
    ----------------------------------------- */
 @media (min-width: 1024px) {
     #ranking-container {
-        position: fixed;        /* 場所を固定 */
-        left: 20px;             /* 左端から20px */
-        top: 150px;             /* 画面上から */
-        width: 200px;           /* 幅を固定 */
+        position: fixed;        
+        left: 20px;             
+        top: 150px;             
+        width: 200px;           
     }
     
     #ranking-list {
-        display: block;         /* 縦並び */
+        display: block;         
     }
-    /* メインコンテンツがランキングの下に潜り込まないように、paddingを入れる */
     #main-menu {
-        margin-left: 240px; /* ランキングの幅(200px) + 余白(40px) */
+        margin-left: 240px; 
     }
 }
 </style>
@@ -165,6 +163,7 @@
     <h3>🏆 今月のトップ5</h3>
     <ul id="ranking-list"></ul>
 </div>
+
 <div id="initial-message" style="display: none;">
     <p data-i18n="msg_initial_1">ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
     <p data-i18n="msg_initial_2">進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
@@ -323,7 +322,7 @@
             'btn_hiragana_game2': '⭐<br>ひらがなゲーム2 (並び替え)',
             'btn_katakana_drag': '🧩<br>カタカナ単語あわせ',
             'btn_shiritori': '🗣️<br>しりとりゲーム',
-            'btn_shiritori2': '🗣️️<br>しりとりゲーム2',
+            'btn_shiritori2': '🗣️<br>しりとりゲーム2',
             'btn_clock': '🗣️<br>とけいゲーム',
             'btn_clock2': '🗣️<br>とけいゲーム2',
             'btn_keiyoshi_quiz': '🤔<br>形容詞クイズ',
@@ -428,7 +427,7 @@
     const SESSION_STORAGE_KEY = 'current_user';
     const GUEST_NAME = 'ゲスト'; 
     const LANG_DEFAULT = 'ja'; 
-    // ★ 月間リセットチェック用のキーは使用を停止します
+    const RANKING_MONTH_KEY = 'ranking_month_check'; // ★ 月間リセットチェック用のキー
 
     const userInfoEl = document.getElementById('user-info');
     const streakDisplayEl = document.getElementById('streak-display'); 
@@ -525,7 +524,6 @@
              return false;
         }
 
-        // ★ ポイントを累積
         user.points = (user.points || 0) + amount; 
 
         if (gameId) {
@@ -647,31 +645,81 @@
         }
     }
 
+    // ============================================
+    // ★★★ 禁止ワードリストと判定関数 (新規追加) ★★★
+    // ============================================
 
-    // ----------------------------------------------------
-    // ★★★ ランキング機能 (月末最終日まで累積・リアルタイム更新) ★★★
-    // ----------------------------------------------------
-    
-    // ★ 月末リセット機能を追加
-    function resetPointsAtEndOfMonth() {
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const lastDayOfMonth = new Date(nextMonth - 1);
+    // (1) 禁止ワードリストの定義（すべて小文字で定義する）
+    const BANNED_WORDS = [
+        // --- 攻撃的な言葉 / 下品なスラング (Offensive / Vulgar) ---
+        "kuso", "shinu", "kizu", "kusai", "hentai", "ero", "aho", "ahoka", 
+        "bakayaro", "gomi", "kasu", "manuke", "busu", "chikan", "kimoi",
+        "bitch", "fuck", "shit", "ass", "cunt", "penis", "vagina", "pussy", 
+        "cock", "whore", "slut", "damn", "kill", "die", "nazi", "hitler", 
+        "sex", "xxx", "porn", "rape", "nude", 
+
+        // --- システム予約語 / 管理用 (Reserved / Admin) ---
+        "admin", "administrator", "system", "mod", "guest", "root", "support", 
+        "管理者", "システム", 
+        "admini", "systema", 
         
-        // 今日の日付が月の最終日かつ時間が23:59を過ぎた場合、または次の月になった瞬間にリセットが必要。
-        // 簡単のため、セッション開始時に「前回のチェック日」と比較して月が変わったかを確認します。
+        // --- 日本語の不適切な言葉 (Japanese Inappropriate) ---
+        "ばか", "あほ", "くそ", "しね", "うんこ", "きもい", "びんぼう", "げすと",
+        
+        // --- その他 (Other Inappropriate) ---
+        "covid", "corona", 
+        "virus", "drug", "weed", "alcohol", "drunk",
+    ];
 
-        const lastResetDate = localStorage.getItem('last_ranking_reset');
+    /**
+     * ゲーム名に禁止ワードが含まれていないかチェックする
+     * @param {string} name - チェック対象のゲーム名
+     * @returns {string | null} - 禁止ワードが見つかった場合はそのワード、見つからない場合は null
+     */
+    function checkBannedWords(name) {
+        if (!name) return null;
+        
+        // 判定しやすくするため、全角スペース除去、小文字化、ひらがな化を行う
+        const normalizedName = name.trim()
+                                   .toLowerCase()
+                                   .replace(/[０-９Ａ-Ｚａ-ｚ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角英数字を半角に
+                                   .replace(/[　\s]/g, ''); // スペース除去
+
+        // リスト内の単語が含まれているかチェック
+        for (const word of BANNED_WORDS) {
+            // カタカナ・ひらがな変換を簡易的に行う（例: 'ｱﾎ' -> 'あほ'）
+            let searchName = normalizedName;
+            if (/[ァ-ヶ]/.test(word)) { // もしリストのワードがカタカナを含んでいたら、ユーザー入力もカタカナとして処理する
+                 // 実際にはもっと複雑な変換が必要だが、シンプルなチェックのために小文字化で対応
+            }
+
+
+            if (normalizedName.includes(word)) {
+                return word; // 見つかった禁止ワードを返す
+            }
+        }
+        return null;
+    }
+
+
+    // ----------------------------------------------------
+    // ★★★ ランキング機能 (月間累積・毎日更新) ★★★
+    // ----------------------------------------------------
+
+    // 月が変わったら累積ポイントをリセットする処理 (月間ランキングの維持)
+    function checkMonthlyReset() {
+        const now = new Date();
         const currentYearMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
-
+        
+        const lastResetDate = localStorage.getItem('last_ranking_reset');
+        
+        // 前回のチェック日が今月ではない場合、リセットを実行
         if (!lastResetDate || lastResetDate.split('-').slice(0, 2).join('-') !== currentYearMonth) {
-            // 月が変わったか、初回アクセスの場合
+            
+            // 前月からのポイント累積をリセット
             if (lastResetDate && new Date(lastResetDate).getMonth() !== now.getMonth()) {
-                
-                // 前月からのポイント累積をリセット
                 let users = getUsers();
                 Object.keys(users).forEach(key => {
-                    // ゲストではないアカウントのみ対象
                     if (key !== GUEST_NAME) {
                         users[key].points = 0;         // ポイントリセット
                         users[key].progress = {};      // 進捗データもリセット
@@ -684,30 +732,28 @@
             localStorage.setItem('last_ranking_reset', now.toISOString().split('T')[0]);
         }
         
-        // ユーザーがログインしていれば、リセット後すぐに UI を更新
         if (sessionStorage.getItem(SESSION_STORAGE_KEY) && sessionStorage.getItem(SESSION_STORAGE_KEY) !== GUEST_NAME) {
              updateAuthenticationUI();
         }
     }
     
     // アプリケーション起動時にリセットチェックを実行
-    resetPointsAtEndOfMonth();
+    checkMonthlyReset();
 
 
     function displayRanking() {
-        // ★ displayRankingが呼び出されるたび、つまりポイントが加算されるたびに順位はリアルタイムで更新されます。
+        // ポイントが加算されるたびに、ソートして表示し直す (リアルタイム更新)
         
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
         if (!usersJson) return;
 
         const users = JSON.parse(usersJson);
         
-        // ポイントが多い順に並べ替え。
         const sortedUsers = Object.keys(users).map(key => {
             return { name: key, points: users[key].points || 0 };
         })
-        .filter(u => u.points > 0) // 0ポイントのユーザーは除外
-        .sort((a, b) => b.points - a.points); // 降順 (大きい順)
+        .filter(u => u.points > 0) 
+        .sort((a, b) => b.points - a.points); 
 
         const top5 = sortedUsers.slice(0, 5);
 
@@ -732,7 +778,7 @@
 
 
     // ----------------------------------------------------
-    // --- 認証イベントリスナー (既存) ---
+    // --- 認証イベントリスナー (既存 + 禁止ワードチェック) ---
     // ----------------------------------------------------
     document.getElementById('signup-submit-btn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -753,6 +799,14 @@
             messageEl.textContent = 'そのゲーム名は予約されています。';
             return;
         }
+
+        // ★★★ 禁止ワードチェックの実行 ★★★
+        const bannedWordFound = checkBannedWords(gamename);
+        if (bannedWordFound) {
+            messageEl.textContent = `不適切なゲーム名です。「${bannedWordFound}」に関連する言葉は使えません。`;
+            return;
+        }
+        // ★★★★★★★★★★★★★★★★★★★★★★★
 
         const users = getUsers();
         if (users[gamename]) {
@@ -834,6 +888,3 @@
         setLanguage(savedLang); 
     });
 </script>
-
-</body>
-</html>
