@@ -428,7 +428,7 @@
     const SESSION_STORAGE_KEY = 'current_user';
     const GUEST_NAME = 'ゲスト'; 
     const LANG_DEFAULT = 'ja'; 
-    const RANKING_MONTH_KEY = 'ranking_month_check'; // ★ 月間リセットチェック用のキー
+    // ★ 月間リセットチェック用のキーは使用を停止します
 
     const userInfoEl = document.getElementById('user-info');
     const streakDisplayEl = document.getElementById('streak-display'); 
@@ -504,7 +504,7 @@
         return user;
     }
 
-    // --- 改良: addPoints の実装 (既存のゲームから呼び出す必要なし) ---
+    // --- 改良: addPoints の実装 ---
     window.addPoints = function(amount, gameId) {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (!currentUser || currentUser === GUEST_NAME) {
@@ -525,6 +525,7 @@
              return false;
         }
 
+        // ★ ポイントを累積
         user.points = (user.points || 0) + amount; 
 
         if (gameId) {
@@ -537,7 +538,7 @@
         saveUsers(users);
         
         updateAuthenticationUI(); // UI更新
-        displayRanking();         // ランキング更新
+        displayRanking();         // ランキングのリアルタイム更新
         
         console.log(`[ポイント加算] ${currentUser}に${amount}ポイント加算されました。合計: ${user.points}`);
         return true;
@@ -648,45 +649,60 @@
 
 
     // ----------------------------------------------------
-    // ★★★ ランキング機能 (月間累積・毎日更新) ★★★
+    // ★★★ ランキング機能 (月末最終日まで累積・リアルタイム更新) ★★★
     // ----------------------------------------------------
-
-    // ★ 月が変わったら累積ポイントをリセットする処理 (月間ランキングの維持)
-    function checkMonthlyReset() {
+    
+    // ★ 月末リセット機能を追加
+    function resetPointsAtEndOfMonth() {
         const now = new Date();
-        // "2025-11" のような文字列を作る
-        const currentYearMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const lastDayOfMonth = new Date(nextMonth - 1);
         
-        const storedMonth = localStorage.getItem(RANKING_MONTH_KEY);
+        // 今日の日付が月の最終日かつ時間が23:59を過ぎた場合、または次の月になった瞬間にリセットが必要。
+        // 簡単のため、セッション開始時に「前回のチェック日」と比較して月が変わったかを確認します。
 
-        // 保存されている月と今の月が違う場合 = 月が変わった！
-        if (storedMonth !== currentYearMonth) {
-            const usersJson = localStorage.getItem(USER_STORAGE_KEY);
-            if (usersJson) {
-                let users = JSON.parse(usersJson);
+        const lastResetDate = localStorage.getItem('last_ranking_reset');
+        const currentYearMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+
+        if (!lastResetDate || lastResetDate.split('-').slice(0, 2).join('-') !== currentYearMonth) {
+            // 月が変わったか、初回アクセスの場合
+            if (lastResetDate && new Date(lastResetDate).getMonth() !== now.getMonth()) {
+                
+                // 前月からのポイント累積をリセット
+                let users = getUsers();
                 Object.keys(users).forEach(key => {
-                    users[key].points = 0;         // ポイントリセット
-                    users[key].progress = {};      // 進捗データもリセット
+                    // ゲストではないアカウントのみ対象
+                    if (key !== GUEST_NAME) {
+                        users[key].points = 0;         // ポイントリセット
+                        users[key].progress = {};      // 進捗データもリセット
+                    }
                 });
                 saveUsers(users);
+                console.log(`[ランキング] 月が変わったため、全ユーザーのポイントをリセットしました。新月: ${currentYearMonth}`);
             }
-            
-            // 新しい月を保存
-            localStorage.setItem(RANKING_MONTH_KEY, currentYearMonth);
-            console.log(`[ランキング] 新しい月(${currentYearMonth})になったため、ポイントをリセットしました。`);
+            // 新しいリセット月を保存
+            localStorage.setItem('last_ranking_reset', now.toISOString().split('T')[0]);
+        }
+        
+        // ユーザーがログインしていれば、リセット後すぐに UI を更新
+        if (sessionStorage.getItem(SESSION_STORAGE_KEY) && sessionStorage.getItem(SESSION_STORAGE_KEY) !== GUEST_NAME) {
+             updateAuthenticationUI();
         }
     }
+    
+    // アプリケーション起動時にリセットチェックを実行
+    resetPointsAtEndOfMonth();
 
 
     function displayRanking() {
-        checkMonthlyReset(); // ランキング表示前に月間リセットチェックを実行
-
+        // ★ displayRankingが呼び出されるたび、つまりポイントが加算されるたびに順位はリアルタイムで更新されます。
+        
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
         if (!usersJson) return;
 
         const users = JSON.parse(usersJson);
         
-        // ★ ポイントが多い順に並べ替え。ポイントが加算されるたびに順位は即時更新されます。
+        // ポイントが多い順に並べ替え。
         const sortedUsers = Object.keys(users).map(key => {
             return { name: key, points: users[key].points || 0 };
         })
@@ -713,6 +729,7 @@
             rankingList.appendChild(li);
         }
     }
+
 
     // ----------------------------------------------------
     // --- 認証イベントリスナー (既存) ---
