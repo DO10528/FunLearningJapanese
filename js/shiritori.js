@@ -1,4 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここから追加) ★★★
+    // ----------------------------------------------------
+    const GAME_ID = 'shiritori_game'; // ★ゲームID (しりとり用)
+    
+    const USER_STORAGE_KEY = 'user_accounts'; 
+    const SESSION_STORAGE_KEY = 'current_user'; 
+    const GUEST_NAME = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (単語IDごとに管理)
+    function checkAndAwardPoints(wordId) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 単語ID」にする
+        const progressKey = `${GAME_ID}_word_${wordId}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その単語で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for word "${wordId}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+
+
     // ----------------------------------------------------
     // DOM要素の取得 (shiritori.html に合わせる)
     // ----------------------------------------------------
@@ -12,22 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAME_CONTROLS = document.getElementById('game-controls');
     const END_GAME_CONTROLS = document.getElementById('endGameControls');
 
-    // ★★★ 音声ファイルのパス設定 (修正済み) ★★★
+    // 音声ファイルのパス設定
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
-    // ★★★★★★★★★★★★★★★★★★★★★
 
     let allWords = [];
     let currentWord = null; 
     let gameHistoryIds = new Set();
     let turnCount = 0; 
 
-    // ★★★ 補助関数: 音源を再生する関数 ★★★
+    // 補助関数: 音源を再生する関数
     function playSound(path) {
         const audio = new Audio(path);
         audio.play().catch(e => console.error("音声再生エラー:", e));
     }
-    // ★★★★★★★★★★★★★★★★★★★★★
 
     // 1. ゲーム開始関数
     window.startNewGame = function() {
@@ -116,14 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <img src="${imagePath}" alt="${currentWord.word}" 
                  onerror="this.style.border='3px solid red'; this.alt='画像なし';" 
                  style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain;">
-        `; // ★修正: object-fit: cover を contain に変更
+        `; 
         
         CHOICE_BUTTONS_AREA.innerHTML = choices.map(word => 
             `<div class="menu-card-button menu-card-reset choice-card" data-id="${word.id}">
                 
                 <img src="assets/images/${word.image}" alt="${word.word}" style="width: 130px; height: 130px; object-fit: contain; border-radius: 5px;" onerror="this.src='assets/images/placeholder.png';">
                 
-            </div>` // ★修正: object-fit: cover を contain に変更
+            </div>` 
         ).join('');
 
         document.querySelectorAll('.choice-card').forEach(card => {
@@ -157,8 +208,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (selectedWord.reading.startsWith(lastChar)) {
             playSound(SOUND_CORRECT_PATH);
+
+            // ★★★ ポイント付与ロジック (選んだ単語のIDを渡す) ★★★
+            const result = checkAndAwardPoints(selectedWord.id);
             
-            FEEDBACK.textContent = 'せいかい！✨ つぎは...';
+            let message = 'せいかい！✨ つぎは...';
+            if (result === "scored") {
+                message += ' (+1 ポイント！)';
+            } else if (result === "already_scored") {
+                 // message += ' (獲得ずみ)';
+            }
+            FEEDBACK.textContent = message;
+            // ★★★★★★★★★★★★★★★★★★★★★★★
+
             FEEDBACK.style.color = '#5c7aff';
             turnCount += 1;
             
@@ -169,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newLastChar = getCleanLastChar(currentWord.reading);
             if (newLastChar === 'ん' || newLastChar === 'っ') {
                 setTimeout(() => {
-                    endGame(false); // false = D
+                    endGame(false); // false = ゲームオーバー
                 }, 1500);
             } else {
                 setTimeout(showNextQuestion, 1500);
@@ -200,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         CURRENT_WORD_DISPLAY_TEXT.textContent = currentWord.word;
         const imagePath = `assets/images/${currentWord.image}`; 
-        IMAGE_AREA.innerHTML = `<img src="${imagePath}" alt="${currentWord.word}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: contain;">`; // ★修正: object-fit: cover を contain に変更
+        IMAGE_AREA.innerHTML = `<img src="${imagePath}" alt="${currentWord.word}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: contain;">`; 
         
         if (isWin) {
             playSound(SOUND_CORRECT_PATH);
