@@ -315,6 +315,47 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
+            // ★★★ 修正点1: ゲームIDの定義 ★★★
+            const GAME_ID = 'hiragana_drag_match'; 
+            
+            // ★★★ 修正点2: 日付取得ユーティリティ関数（index.htmlからコピー）★★★
+            function getTodayDateString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // ★★★ 修正点3: 獲得履歴チェック＆更新関数 ★★★
+            function checkAndRecordScore(level) {
+                if (!window.addPoints) {
+                    // index.htmlのポイント機能がロードされていない場合はスキップ（ゲスト含む）
+                    return false;
+                }
+
+                const todayStr = getTodayDateString();
+                const progressKey = `progress_${GAME_ID}_L${level}`; // 例: progress_hiragana_drag_match_L1
+                
+                // 獲得履歴をlocalStorageから取得
+                const scoreHistory = JSON.parse(localStorage.getItem(progressKey) || '{}');
+                
+                // 今日の日付で既にポイントを獲得しているかチェック
+                if (scoreHistory[todayStr] && scoreHistory[todayStr] === true) {
+                    return true; // 既に獲得済み
+                }
+
+                // 未獲得の場合: 1ポイント加算
+                window.addPoints(1, GAME_ID); 
+                
+                // 今日の獲得履歴を記録
+                scoreHistory[todayStr] = true;
+                localStorage.setItem(progressKey, JSON.stringify(scoreHistory));
+                
+                return false; // ポイントを獲得した
+            }
+
+
             // --- 1. データ定義 ---
             
             const ILLUSTRATION_PATH_PREFIX = 'assets/images/hiragana_words/';
@@ -387,7 +428,17 @@
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
 
-                levelTitleEl.textContent = `レベル ${levelData.level} スタート！`;
+                // ★追加: このレベルで今日ポイント獲得済みか確認
+                const alreadyScored = checkAndRecordScore(levelData.level);
+                let pointStatus = '';
+                if (alreadyScored) {
+                    pointStatus = ' (今日はポイント獲得済み)';
+                } else if (!window.addPoints) {
+                    pointStatus = ' (未ログイン/ゲスト: ポイント獲得不可)';
+                }
+                
+                levelTitleEl.textContent = `レベル ${levelData.level} スタート！${pointStatus}`;
+                
                 feedbackEl.textContent = '';
                 feedbackEl.classList.remove('success');
                 gameAreaEl.style.display = 'flex';
@@ -424,7 +475,6 @@
                     const item = document.createElement('div');
                     item.className = 'hg-drag-item';
                     
-                    // ★修正点1: PCでドラッグできるように 'draggable = true' に戻す
                     item.draggable = true; 
                     
                     item.dataset.word = wordData.hira;
@@ -668,13 +718,30 @@
                          }
                     });
                     
-                    levelTitleEl.textContent = 'レベルクリア！';
-                    feedbackEl.textContent = 'おめでとうございます！ぜんぶせいかい！';
+                    // ★★★ ポイント加算ロジックの実行 ★★★
+                    let message = 'おめでとうございます！ぜんぶせいかい！';
+                    
+                    const level = currentLevelData.level;
+
+                    // ポイント獲得を試みる
+                    const alreadyScored = checkAndRecordScore(level);
+
+                    if (window.addPoints && !alreadyScored) {
+                        // 1ポイント加算し、フィードバックを更新
+                        message += ' (+1 ポイント獲得！)';
+                    } else if (alreadyScored) {
+                        message += ' (今日はポイント獲得済み)';
+                    }
+                    
+                    feedbackEl.textContent = message;
                     feedbackEl.classList.add('success');
+                    
+                    
+                    levelTitleEl.textContent = 'レベルクリア！';
                     resetPlacedButton.style.display = 'none'; 
                     
                     // 次のレベルへ
-                    const currentLevelIndex = gameLevels.findIndex(level => level.level === currentLevelData.level);
+                    const currentLevelIndex = gameLevels.findIndex(lvl => lvl.level === currentLevelData.level);
                     const nextLevelIndex = currentLevelIndex + 1;
                     
                     if (nextLevelIndex < gameLevels.length) {
