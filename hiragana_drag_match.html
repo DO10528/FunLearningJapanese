@@ -315,10 +315,26 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ★★★ 修正点1: ゲームIDの定義 ★★★
+            // ★★★ 修正点1: 認証キーとユーティリティ関数の追加 ★★★
             const GAME_ID = 'hiragana_drag_match'; 
+            const USER_STORAGE_KEY = 'user_accounts';
+            const SESSION_STORAGE_KEY = 'current_user';
+            const GUEST_NAME = 'ゲスト';
             
-            // ★★★ 修正点2: 日付取得ユーティリティ関数（index.htmlからコピー）★★★
+            // ユーザーデータとセッションの取得
+            function getUsers() {
+                const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+                return usersJson ? JSON.parse(usersJson) : {};
+            }
+            function saveUsers(users) {
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+            }
+            function getCurrentUser() {
+                const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                return (currentUser && currentUser !== GUEST_NAME) ? currentUser : null;
+            }
+
+            // 日付取得ユーティリティ関数
             function getTodayDateString() {
                 const now = new Date();
                 const year = now.getFullYear();
@@ -327,30 +343,41 @@
                 return `${year}-${month}-${day}`;
             }
 
-            // ★★★ 修正点3: 獲得履歴チェック＆更新関数 ★★★
+            // ★★★ 修正点2: 獲得履歴チェック＆更新関数 (ユーザーデータに直接保存) ★★★
             function checkAndRecordScore(level) {
-                if (!window.addPoints) {
-                    // index.htmlのポイント機能がロードされていない場合はスキップ（ゲスト含む）
-                    return false;
+                const currentUser = getCurrentUser();
+                
+                // 1. 未ログイン/ゲストの場合は即座に終了
+                if (!window.addPoints || !currentUser) {
+                    return false; // ポイント獲得済みではないが、獲得対象外
                 }
 
+                const users = getUsers();
+                let user = users[currentUser];
+                if (!user) return false;
+
                 const todayStr = getTodayDateString();
-                const progressKey = `progress_${GAME_ID}_L${level}`; // 例: progress_hiragana_drag_match_L1
+                const levelKey = `${GAME_ID}_L${level}`;
                 
-                // 獲得履歴をlocalStorageから取得
-                const scoreHistory = JSON.parse(localStorage.getItem(progressKey) || '{}');
-                
-                // 今日の日付で既にポイントを獲得しているかチェック
-                if (scoreHistory[todayStr] && scoreHistory[todayStr] === true) {
+                user.progress = user.progress || {};
+                user.progress[levelKey] = user.progress[levelKey] || {};
+
+                // 2. 今日の日付で既にポイントを獲得しているかチェック
+                if (user.progress[levelKey][todayStr] === true) {
                     return true; // 既に獲得済み
                 }
 
-                // 未獲得の場合: 1ポイント加算
+                // 3. 未獲得の場合: 1ポイント加算し、履歴を記録
+                
+                // (1) ポイント加算を index.html の関数に依頼
                 window.addPoints(1, GAME_ID); 
                 
-                // 今日の獲得履歴を記録
-                scoreHistory[todayStr] = true;
-                localStorage.setItem(progressKey, JSON.stringify(scoreHistory));
+                // (2) ユーザーの進捗データを更新
+                user.progress[levelKey][todayStr] = true;
+
+                // (3) localStorage に保存
+                users[currentUser] = user;
+                saveUsers(users);
                 
                 return false; // ポイントを獲得した
             }
@@ -427,13 +454,26 @@
                 
                 currentLevelData = levelData; 
                 currentLevelWords = levelData.words;
-
-                // ★追加: このレベルで今日ポイント獲得済みか確認
-                const alreadyScored = checkAndRecordScore(levelData.level);
+                
+                const currentUser = getCurrentUser();
+                let alreadyScored = false;
+                
+                // ログインユーザーの場合、今日のクリア状態をチェック
+                if (currentUser) {
+                    const users = getUsers();
+                    const user = users[currentUser];
+                    const levelKey = `${GAME_ID}_L${levelData.level}`;
+                    const todayStr = getTodayDateString();
+                    
+                    if (user && user.progress && user.progress[levelKey] && user.progress[levelKey][todayStr] === true) {
+                        alreadyScored = true;
+                    }
+                }
+                
                 let pointStatus = '';
                 if (alreadyScored) {
                     pointStatus = ' (今日はポイント獲得済み)';
-                } else if (!window.addPoints) {
+                } else if (!currentUser) {
                     pointStatus = ' (未ログイン/ゲスト: ポイント獲得不可)';
                 }
                 
@@ -720,10 +760,8 @@
                     
                     // ★★★ ポイント加算ロジックの実行 ★★★
                     let message = 'おめでとうございます！ぜんぶせいかい！';
-                    
                     const level = currentLevelData.level;
 
-                    // ポイント獲得を試みる
                     const alreadyScored = checkAndRecordScore(level);
 
                     if (window.addPoints && !alreadyScored) {
@@ -746,13 +784,14 @@
                     
                     if (nextLevelIndex < gameLevels.length) {
                         const nextLevelData = gameLevels[nextLevelIndex];
+                        // ポイント獲得状況を反映させるため、再ロード時にチェック
                         levelTitleEl.textContent = `レベルクリア！ ${nextLevelData.level} にすすむよ！`;
                         setTimeout(() => {
                             loadLevel(nextLevelData);
                         }, 2000); 
                     } else {
                         levelTitleEl.textContent = 'ぜんぶクリア！';
-                        feedbackEl.textContent = '全レベル おめでとうございます！';
+                        feedbackEl.textContent = message; // 最終フィードバックにポイント状況を含める
                     }
                     
                 } else {
