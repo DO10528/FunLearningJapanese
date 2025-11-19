@@ -165,20 +165,20 @@
 </div>
 
 <div id="auth-status-bar">
-    <span id="user-info">ログインしていません</span>
+    <span id="user-info" data-i18n="auth_status_default">ログインしていません</span>
     <div id="auth-buttons">
-        <button id="login-btn" class="btn-login">ログイン</button>
-        <button id="signup-btn" class="btn-signup">新規登録</button>
-        <button id="guest-btn" class="btn-guest">ゲストでプレイ</button>
-        <button id="logout-btn" class="btn-logout" style="display:none;">ログアウト</button>
+        <button id="login-btn" class="btn-login" data-i18n="btn_login">ログイン</button>
+        <button id="signup-btn" class="btn-signup" data-i18n="btn_signup">新規登録</button>
+        <button id="guest-btn" class="btn-guest" data-i18n="btn_guest">ゲストでプレイ</button>
+        <button id="logout-btn" class="btn-logout" data-i18n="btn_logout" style="display:none;">ログアウト</button>
     </div>
 </div>
 
 <h1 data-i18n="main_title">Fun Learning Japanese</h1>
 
 <div id="initial-message" style="display: none;">
-    <p>ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
-    <p>進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
+    <p data-i18n="msg_initial_1">ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
+    <p data-i18n="msg_initial_2">進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
 </div>
 
 <div id="main-menu" class="container">
@@ -261,22 +261,22 @@
 <div id="auth-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
         <div id="login-view">
-            <h2>ログイン</h2>
+            <h2 data-i18n="login_title">ログイン</h2>
             <div id="login-message" class="form-message"></div>
-            <input type="text" id="login-gamename" placeholder="ゲーム名" required>
-            <input type="password" id="login-password" placeholder="パスワード" required>
-            <button id="login-submit-btn" class="btn-submit">ログイン</button>
-            <button class="btn-close">キャンセル</button>
+            <input type="text" id="login-gamename" data-i18n-placeholder="placeholder_gamename" placeholder="ゲーム名" required>
+            <input type="password" id="login-password" data-i18n-placeholder="placeholder_password" placeholder="パスワード" required>
+            <button id="login-submit-btn" class="btn-submit" data-i18n="btn_login">ログイン</button>
+            <button class="btn-close" data-i18n="btn_cancel">キャンセル</button>
         </div>
         
         <div id="signup-view" style="display:none;">
-            <h2>新規登録</h2>
+            <h2 data-i18n="signup_title">新規登録</h2>
             <div id="signup-message" class="form-message"></div>
-            <p style="font-size: 0.9em; color: #555;">※サインアップするとゲームの進捗が保存されます。</p>
-            <input type="text" id="signup-gamename" placeholder="新しいゲーム名 (必須)" required>
-            <input type="password" id="signup-password" placeholder="パスワード (必須)" required>
-            <button id="signup-submit-btn" class="btn-submit">登録してログイン</button>
-            <button class="btn-close">キャンセル</button>
+            <p style="font-size: 0.9em; color: #555;" data-i18n="msg_signup_note">※サインアップするとゲームの進捗が保存されます。</p>
+            <input type="text" id="signup-gamename" data-i18n-placeholder="placeholder_new_gamename" placeholder="新しいゲーム名 (必須)" required>
+            <input type="password" id="signup-password" data-i18n-placeholder="placeholder_password" placeholder="パスワード (必須)" required>
+            <button id="signup-submit-btn" class="btn-submit" data-i18n="btn_signup_submit">登録してログイン</button>
+            <button class="btn-close" data-i18n="btn_cancel">キャンセル</button>
         </div>
     </div>
 </div>
@@ -298,7 +298,7 @@
     }
 
     // ----------------------------------------------------
-    // ★★★ 既存の言語データと制御ロジック ★★★
+    // ★★★ 既存の言語データと制御ロジック (認証関連の翻訳を追加) ★★★
     // ----------------------------------------------------
 
     const translations = {
@@ -306,7 +306,26 @@
             'main_title': 'Fun Learning Japanese',
             'group_kiso': 'きそ・たんごリスト',
             'group_game': 'なにをしてあそぶ?',
-            // (以下、既存のボタン翻訳データが続く...)
+            // 認証ボタン
+            'auth_status_default': 'ログインしていません',
+            'btn_login': 'ログイン',
+            'btn_signup': '新規登録',
+            'btn_guest': 'ゲストでプレイ',
+            'btn_logout': 'ログアウト',
+            // 認証メッセージとモーダル
+            'msg_initial_1': 'ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。',
+            'msg_initial_2': '進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。',
+            'login_title': 'ログイン',
+            'signup_title': '新規登録',
+            'msg_signup_note': '※サインアップするとゲームの進捗が保存されます。',
+            'btn_signup_submit': '登録してログイン',
+            'btn_cancel': 'キャンセル',
+            'placeholder_gamename': 'ゲーム名',
+            'placeholder_new_gamename': '新しいゲーム名 (必須)',
+            'placeholder_password': 'パスワード',
+            'status_guest': 'ゲストモード',
+            'status_welcome': 'さん、ようこそ！',
+            // ゲームメニュー
             'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
             'btn_hiragana_video': '🎥<br>ひらがな練習',
             'btn_keiyoshi_list': '📚<br>形容詞リスト',
@@ -332,7 +351,26 @@
             'main_title': 'Fun Learning Japanese',
             'group_kiso': 'Basics & Vocabulary Lists',
             'group_game': 'What would you like to play?',
-            // (以下、既存のボタン翻訳データが続く...)
+            // 認証ボタン
+            'auth_status_default': 'Not logged in',
+            'btn_login': 'Login',
+            'btn_signup': 'Sign Up',
+            'btn_guest': 'Play as Guest',
+            'btn_logout': 'Logout',
+            // 認証メッセージとモーダル
+            'msg_initial_1': 'To start the game, please **Log in** to your account or **Sign up**.',
+            'msg_initial_2': 'If you do not wish to save your progress, you can play as a **Guest**.',
+            'login_title': 'Login',
+            'signup_title': 'Sign Up',
+            'msg_signup_note': 'Note: Signing up allows you to save your game progress.',
+            'btn_signup_submit': 'Register and Login',
+            'btn_cancel': 'Cancel',
+            'placeholder_gamename': 'Game Name',
+            'placeholder_new_gamename': 'New Game Name (Required)',
+            'placeholder_password': 'Password',
+            'status_guest': 'Guest Mode',
+            'status_welcome': ', welcome!',
+            // ゲームメニュー
             'btn_kiso': '📝<br>Hiragana/Katakana Basics',
             'btn_hiragana_video': '🎥<br>Hiragana Practice',
             'btn_keiyoshi_list': '📚<br>Adjective List',
@@ -360,7 +398,7 @@
     function updateLanguageUI(lang) {
         const langData = translations[lang];
 
-        // 1. data-i18n属性 (textContentを書き換える要素: h1, h2など)
+        // 1. data-i18n属性 (textContentを書き換える要素: h1, h2, ボタンなど)
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (langData[key]) {
@@ -375,11 +413,22 @@
                 el.innerHTML = langData[key];
             }
         });
+        
+        // 3. data-i18n-placeholder属性 (placeholderを書き換える要素)
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (langData[key]) {
+                el.placeholder = langData[key];
+            }
+        });
 
-        // 3. ボタンのアクティブ状態を更新
+        // 4. ボタンのアクティブ状態を更新
         document.getElementById('lang-ja')?.classList.remove('active');
         document.getElementById('lang-en')?.classList.remove('active');
         document.getElementById(`lang-${lang}`)?.classList.add('active');
+        
+        // 5. 言語が変わったら認証UIのメッセージを再更新
+        updateAuthenticationUI();
     }
 
     // 言語を保存し、UIを更新する関数 (onclickイベントから呼び出される)
@@ -392,12 +441,14 @@
 
 
     // ----------------------------------------------------
-    // ★★★ 新規追加: 認証ロジック (localStorageでシミュレート) ★★★
+    // ★★★ 認証ロジック (多言語対応含む) ★★★
     // ----------------------------------------------------
 
     const USER_STORAGE_KEY = 'user_accounts';
     const SESSION_STORAGE_KEY = 'current_user';
-    const GUEST_NAME = 'ゲスト';
+    const GUEST_NAME = 'ゲスト'; // 内部での識別子
+    
+    const LANG_DEFAULT = 'ja'; // デフォルト言語
 
     // --- 認証DOM要素の取得 ---
     const userInfoEl = document.getElementById('user-info');
@@ -414,33 +465,26 @@
     const signupView = document.getElementById('signup-view');
     
     // --- ユーティリティ関数 ---
-
-    // ユーザーアカウントデータを取得
     function getUsers() {
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
         return usersJson ? JSON.parse(usersJson) : {};
     }
-
-    // ユーザーアカウントデータを保存
     function saveUsers(users) {
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
     }
+    function getCurrentLang() {
+        return localStorage.getItem('preferredLang') || LANG_DEFAULT;
+    }
 
     // --- セッション管理 ---
-
-    // ログイン処理
     function setSession(gameName) {
         sessionStorage.setItem(SESSION_STORAGE_KEY, gameName);
         updateAuthenticationUI();
     }
-    
-    // ログアウト処理
     function logout() {
         sessionStorage.removeItem(SESSION_STORAGE_KEY);
         updateAuthenticationUI();
     }
-
-    // ゲストとしてプレイ
     function playAsGuest() {
         setSession(GUEST_NAME);
     }
@@ -448,12 +492,24 @@
     // --- UIの更新 (ログイン状態に応じて表示を切り替える) ---
     function updateAuthenticationUI() {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        const lang = getCurrentLang();
+        const langData = translations[lang] || translations[LANG_DEFAULT]; // 翻訳データを取得
+
         const isLoggedIn = !!currentUser;
         const isGuest = currentUser === GUEST_NAME;
 
         // 認証ステータスバーの表示切り替え
         if (isLoggedIn) {
-            userInfoEl.textContent = isGuest ? 'ゲストモード' : `${currentUser} さん、ようこそ！`;
+            let statusText;
+            if (isGuest) {
+                // ゲストモード
+                statusText = langData['status_guest'];
+            } else {
+                // 登録ユーザー
+                statusText = `${currentUser}${langData['status_welcome']}`;
+            }
+            userInfoEl.textContent = statusText;
+            
             loginBtn.style.display = 'none';
             signupBtn.style.display = 'none';
             guestBtn.style.display = 'none';
@@ -464,7 +520,9 @@
             mainMenuEl.classList.remove('locked');
 
         } else {
-            userInfoEl.textContent = 'ログインしていません';
+            // 未ログイン状態
+            userInfoEl.textContent = langData['auth_status_default'];
+            
             loginBtn.style.display = 'inline-block';
             signupBtn.style.display = 'inline-block';
             guestBtn.style.display = 'inline-block';
@@ -487,27 +545,27 @@
 
         const gamename = gamenameInput.value.trim();
         const password = passwordInput.value;
+        const lang = getCurrentLang();
+        const langData = translations[lang] || translations[LANG_DEFAULT];
 
         if (!gamename || !password) {
-            messageEl.textContent = 'ゲーム名とパスワードは必須です。';
+            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
             return;
         }
         if (gamename === GUEST_NAME) {
-            messageEl.textContent = 'そのゲーム名は予約されています。';
+            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
             return;
         }
 
         const users = getUsers();
         if (users[gamename]) {
-            messageEl.textContent = 'このゲーム名はすでに使用されています。';
+            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
             return;
         }
 
-        // 新しいユーザーを登録
         users[gamename] = { password: password, name: gamename };
         saveUsers(users);
 
-        // 登録後、自動でログイン
         setSession(gamename);
         modalOverlay.style.display = 'none';
         messageEl.textContent = '';
@@ -524,25 +582,24 @@
 
         const gamename = gamenameInput.value.trim();
         const password = passwordInput.value;
+        const lang = getCurrentLang();
+        const langData = translations[lang] || translations[LANG_DEFAULT];
 
         const users = getUsers();
         const user = users[gamename];
 
         if (user && user.password === password) {
-            // ログイン成功
             setSession(gamename);
             modalOverlay.style.display = 'none';
             messageEl.textContent = '';
             gamenameInput.value = '';
             passwordInput.value = '';
         } else {
-            // ログイン失敗
-            messageEl.textContent = 'ゲーム名またはパスワードが違います。';
+            messageEl.textContent = langData['msg_login_fail'] || 'ゲーム名またはパスワードが違います。'; // 仮のエラーメッセージ
         }
     });
 
     // 7. ボタンアクションの設定
-    
     loginBtn.addEventListener('click', () => {
         loginView.style.display = 'block';
         signupView.style.display = 'none';
@@ -574,10 +631,10 @@
     // --- ページ読み込み時の初期化 ---
     document.addEventListener('DOMContentLoaded', () => {
         // 既存の言語設定の初期化
-        const savedLang = localStorage.getItem('preferredLang') || 'ja';
+        const savedLang = localStorage.getItem('preferredLang') || LANG_DEFAULT;
         setLanguage(savedLang); 
         
-        // 新規追加: 認証状態の初期化
+        // 認証状態の初期化
         updateAuthenticationUI();
     });
 </script>
