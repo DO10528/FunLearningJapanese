@@ -351,6 +351,7 @@
             'status_welcome': 'さん、ようこそ！',
             'streak_text': '🔥連続%DAYS%日目！', 
             'points_text': '⭐ポイント：%POINTS%',
+            'msg_login_fail': 'ゲーム名またはパスワードが違います。', // ログイン失敗メッセージ
             // ゲームメニュー
             'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
             'btn_hiragana_video': '🎥<br>ひらがな練習',
@@ -398,6 +399,7 @@
             'status_welcome': ', welcome!',
             'streak_text': '🔥Streak: %DAYS% days!', 
             'points_text': '⭐Points: %POINTS%',
+            'msg_login_fail': 'Game Name or password incorrect.', // ログイン失敗メッセージ
             // ゲームメニュー
             'btn_kiso': '📝<br>Hiragana/Katakana Basics',
             'btn_hiragana_video': '🎥<br>Hiragana Practice',
@@ -480,7 +482,7 @@
     // --- 認証DOM要素の取得 ---
     const userInfoEl = document.getElementById('user-info');
     const streakDisplayEl = document.getElementById('streak-display'); 
-    const pointsDisplayEl = document.getElementById('points-display'); // DOMから取得するように変更
+    const pointsDisplayEl = document.getElementById('points-display'); 
     
     const loginBtn = document.getElementById('login-btn');
     const signupBtn = document.getElementById('signup-btn');
@@ -553,7 +555,7 @@
     }
 
 
-    // --- ★重要: ポイント加算グローバル関数 ★ ---
+    // --- ★重要: ポイント加算グローバル関数 (修正済み) ★ ---
     window.addPoints = function(amount, gameId) {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (!currentUser || currentUser === GUEST_NAME) {
@@ -569,6 +571,11 @@
         let users = getUsers();
         let user = users[currentUser];
 
+        if (!user) {
+             console.error(`ユーザー ${currentUser} がlocalStorageに見つかりません。`);
+             return;
+        }
+
         // ポイントを増やす
         user.points = (user.points || 0) + amount; 
 
@@ -579,6 +586,7 @@
             user.progress[gameId].total_points += amount;
         }
         
+        // ★★★ 修正点: usersオブジェクト全体を保存し直す ★★★
         users[currentUser] = user;
         saveUsers(users);
         
@@ -598,13 +606,15 @@
         if (gameName !== GUEST_NAME) {
             let users = getUsers();
             let user = users[gameName];
-
-            // ストリークを更新
-            user = updateStreak(user);
             
-            // 変更を保存
-            users[gameName] = user;
-            saveUsers(users);
+            if (user) {
+                // ストリークを更新
+                user = updateStreak(user);
+                
+                // 変更を保存
+                users[gameName] = user;
+                saveUsers(users);
+            }
         }
 
         updateAuthenticationUI();
@@ -632,6 +642,13 @@
         if (isLoggedIn && !isGuest) {
             const users = getUsers();
             const user = users[currentUser];
+            
+            // ユーザーデータが存在しない場合はログアウト状態に戻す
+            if (!user) {
+                 logout();
+                 return;
+            }
+
             const streak = user.streak || 0;
             const points = user.points || 0; 
 
@@ -665,7 +682,7 @@
             logoutBtn.style.display = 'inline-block';
 
             initialMessageEl.style.display = 'none';
-            mainMenuEl.classList.remove('locked'); // ゲストはメニュー解除
+            mainMenuEl.classList.remove('locked');
             
         } else {
             // 未ログイン状態
@@ -712,13 +729,13 @@
             return;
         }
 
-        // 新しいユーザーをデータ構造に合わせて登録 (ポイント初期値 0 を追加)
+        // 新しいユーザーをデータ構造に合わせて登録
         users[gamename] = { 
             password: password, 
             name: gamename,
             streak: 0, 
             last_login: null,
-            points: 0, // ★新規追加
+            points: 0, 
             progress: {} 
         };
         saveUsers(users);
