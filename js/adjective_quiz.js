@@ -1,10 +1,65 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここから追加) ★★★
+    // ----------------------------------------------------
+    const GAME_ID_ADJ_SIMPLE = 'adjective_picture_quiz'; // ★ゲームID
+    
+    const USER_STORAGE_KEY_ADJ = 'user_accounts'; 
+    const SESSION_STORAGE_KEY_ADJ = 'current_user'; 
+    const GUEST_NAME_ADJ = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (正解の言葉をキーにする)
+    function checkAndAwardPoints(wordKey) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_ADJ);
+        if (!currentUser || currentUser === GUEST_NAME_ADJ) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY_ADJ);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 正解の言葉」にする
+        const progressKey = `${GAME_ID_ADJ_SIMPLE}_word_${wordKey}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その言葉で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY_ADJ, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for word "${wordKey}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+
+
+    // ----------------------------------------------------
     // クイズデータ
     // ----------------------------------------------------
-    // ★画像パスを修正し、assets/images/ から読み込むように変更しました
     const IMAGE_BASE_PATH = "assets/images/"; 
+    
+    // ★音源ファイルのパス設定 (追加)
+    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 
     const quizData = [
         {
@@ -50,6 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestionIndex = 0;
     let isClickable = true; 
 
+    // ★ 音源再生関数 (追加)
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
+
     // ----------------------------------------------------
     // クイズの読み込み処理
     // ----------------------------------------------------
@@ -70,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. 画像をセット
         imageElement.src = currentQuiz.image;
         imageElement.alt = currentQuiz.correct; 
+        // 画像が見切れないように調整 (念のため)
+        imageElement.style.objectFit = 'contain'; 
 
         // 2. 選択肢ボタンを作成
         optionsContainer.innerHTML = ''; // 前の問題のボタンを消去
@@ -80,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.textContent = optionText;
             
-            // ★修正★: style.cssのaction-buttonではなく、専用のoption-buttonクラスを使用
             button.classList.add('option-button'); 
             
             // 3. ボタンにクリックイベントを設定
@@ -101,21 +163,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 4. 間違えた場合
         if (selectedAnswer !== correctAnswer) {
+            playSound(SOUND_INCORRECT_PATH); // ★音を鳴らす
+
             feedbackElement.textContent = "🤔 ちがうよ、もういちど！";
             feedbackElement.classList.remove('hidden');
             feedbackElement.classList.add('feedback-incorrect');
             
             // 間違えたボタンだけを無効化
             selectedButton.disabled = true; 
-            selectedButton.classList.add('wrong-selection'); // CSS用
-            isClickable = true; // 他のボタンはまだ押せる
+            selectedButton.classList.add('wrong-selection'); 
+            isClickable = true; 
         } 
         // 5. 正解した場合
         else {
             isClickable = false; // 次の問題が読み込まれるまでクリック不可
+            playSound(SOUND_CORRECT_PATH); // ★音を鳴らす
+
             const englishTranslation = quizData[currentQuestionIndex].english;
 
-            feedbackElement.textContent = `🎉 せいかい！ ( ${englishTranslation} )`;
+            // ★★★ ポイント付与 (正解の言葉をIDとして渡す) ★★★
+            const result = checkAndAwardPoints(correctAnswer);
+            
+            let pointMsg = "";
+            if (result === "scored") {
+                pointMsg = " (+1 ポイント！)";
+            }
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★
+
+            feedbackElement.textContent = `🎉 せいかい！ ( ${englishTranslation} )${pointMsg}`;
             feedbackElement.classList.remove('hidden');
             feedbackElement.classList.add('feedback-correct');
 
@@ -123,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.querySelectorAll('.option-button').forEach(btn => {
                 btn.disabled = true;
                 if (btn.textContent === correctAnswer) {
-                    btn.classList.add('correct-selection'); // CSS用
+                    btn.classList.add('correct-selection'); 
                 }
             });
 

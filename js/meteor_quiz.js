@@ -1,4 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (単語ごとに1日1回) ★★★
+    // ----------------------------------------------------
+    const GAME_ID_METEOR = 'meteor_shooting_game'; // ゲームID
+    
+    const USER_STORAGE_KEY_METEOR = 'user_accounts'; 
+    const SESSION_STORAGE_KEY_METEOR = 'current_user'; 
+    const GUEST_NAME_METEOR = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (単語をキーにする)
+    function checkAndAwardPoints(wordKey) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_METEOR);
+        if (!currentUser || currentUser === GUEST_NAME_METEOR) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY_METEOR);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 単語」にする
+        const progressKey = `${GAME_ID_METEOR}_word_${wordKey}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その単語で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY_METEOR, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for word "${wordKey}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+
+
     // ----------------------------------------------------
     // DOM要素の定義
     // ----------------------------------------------------
@@ -15,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const INITIAL_LIFE = 3;
     const METEOR_INTERVAL = 4000; 
     
-    // ★修正★ 画像パスからサブフォルダ名 'hiragana/' を削除しました。
     const IMAGE_BASE_PATH = 'assets/images/'; 
     
     let gameInterval = null;
@@ -27,20 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuizData = null; 
     let currentChoiceButtons = []; 
 
-   // ★★★ 問題データ (文法エラーを修正) ★★★
+   // ★★★ 問題データ ★★★
     const QUIZ_DATA = [
-        // (省略... データは変更ありません)
         { "word": "いぬ", "english": "dog", "image": "inu.png" },
         { "word": "ねこ", "english": "cat", "image": "neko.png" },
         { "word": "りんご", "english": "apple", "image": "ringo.png" },
         { "word": "さかな", "english": "fish", "image": "sakana.png" },
         { "word": "たまご", "english": "egg", "image": "tamago.png" },
         { "word": "つくえ", "english": "desk", "image": "tsukue.png" },
-        { "word": "くるま", "english": "car", "image": "kuruma.png" }, // ★修正点
+        { "word": "くるま", "english": "car", "image": "kuruma.png" }, 
         { "word": "はさみ", "english": "scissors", "image": "hasami.png" },
         { "word": "ひこうき", "english": "airplane", "image": "hikoki.png" },
         { "word": "めがね", "english": "glasses", "image": "megane.png" },
-        { "word": "やま", "english": "mountain", "image": "yama.png" }, // ★修正点
+        { "word": "やま", "english": "mountain", "image": "yama.png" }, 
         { "word": "ゆき", "english": "snow", "image": "yuki.png" },
         { "word": "すし", "english": "sushi", "image": "sushi.png" },
         { "word": "いも", "english": "potato", "image": "imo.png" },
@@ -69,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { "word": "ぬの", "english": "fabric", "image": "nuno.png" },
         { "word": "ひとで", "english": "starfish", "image": "hitode.png" },
         { "word": "ふうせん", "english": "balloon", "image": "fusen.png" },
+        { "word": "へちま", "english": "loofah", "image": "hechima.png" },
         { "word": "へび", "english": "snake", "image": "hebi.png" },
         { "word": "ほし", "english": "star", "image": "hoshi.png" },
         { "word": "まめ", "english": "bean", "image": "mame.png" },
@@ -94,121 +146,121 @@ document.addEventListener('DOMContentLoaded', () => {
         { "word": "たいこ", "english": "drum", "image": "taiko.png" },
         { "word": "ちょう", "english": "butterfly", "image": "cho.png" },
         { "word": "つばめ", "english": "swallow", "image": "tsubame.png" },
-        { "word": "てるてる", "english": "teru teru bozu", image: "teruteru.png" },
-        { "word": "とうふ", "english": "tofu", image: "tofu.png" },
-        { "word": "なべ", "english": "pot", image: "nabe.png" },
-        { "word": "にわ", "english": "garden", image: "niwa.png" },
-        { "word": "ぬいぐるみ", "english": "stuffed toy", image: "nuigurumi.png" },
-        { "word": "のりもの", "english": "vehicle", image: "norimono.png" },
-        { "word": "はくちょう", "english": "swan", image: "hakucho.png" },
-        { "word": "ふうりん", "english": "wind chime", image: "furin.png" },
-        { "word": "へちま", "english": "loofah", image: "hechima.png" },
-        { "word": "ほうき", "english": "broom", image: "hoki.png" },
-        { "word": "まくら", "english": "pillow", image: "makura.png" },
-        { "word": "みずうみ", "english": "lake", image: "mizuumi.png" },
-        { "word": "むぎ", "english": "wheat", image: "mugi.png" },
-        { "word": "もり", "english": "forest", image: "mori.png" },
-        { "word": "ゆびわ", "english": "ring", image: "yubiwa.png" },
-        { "word": "よしず", "english": "bamboo blind", image: "yoshizu.png" },
-        { "word": "るりびたき", "english": "red-flanked bluetail", image: "ruribitaki.png" },
-        { "word": "れんげ", "english": "Chinese milk vetch", image: "renge.png" },
-        { "word": "ろぼっと", "english": "robot", image: "robotto.png" },
-        { "word": "わかめ", "english": "seaweed", image: "wakame.png" },
-        { "word": "いとまき", "english": "thread spool", image: "itomaki.png" },
-        { "word": "うちわ", "english": "fan", image: "uchiwa.png" },
-        { "word": "えびふらい", "english": "fried shrimp", image: "ebifurai.png" },
-        { "word": "おもちゃ", "english": "toy", image: "omocha.png" },
-        { "word": "かたな", "english": "sword", image: "katana.png" },
-        { "word": "きもの", "english": "kimono", image: "kimono.png" },
-        { "word": "くさ", "english": "grass", image: "kusa.png" },
-        { "word": "けしごむ", "english": "eraser", image: "keshigomu.png" },
-        { "word": "こま", "english": "top (toy)", image: "koma.png" },
-        { "word": "さいふ", "english": "wallet", image: "saifu.png" },
-        { "word": "あめ", "english": "candy", image: "ame.png" },
-        { "word": "アヒル", "english": "duck", image: "ahiru.png" },
-        { "word": "あり", "english": "ant", image: "ari.png" },
-        { "word": "いか", "english": "squid", image: "ika.png" },
-        { "word": "いちご", "english": "strawberry", image: "ichigo.png" },
-        { "word": "いす", "english": "chair", image: "isu.png" },
-        { "word": "うさぎ", "english": "rabbit", image: "usagi.png" },
-        { "word": "うし", "english": "cow", image: "ushi.png" },
-        { "word": "うま", "english": "horse", image: "uma.png" },
-        { "word": "えび", "english": "shrimp", image: "ebi.png" },
-        { "word": "えんぴつ", "english": "pencil", image: "enpitsu.png" },
-        { "word": "おにぎり", "english": "rice ball (onigiri)", image: "onigiri.png" },
-        { "word": "おに", "english": "demon (oni)", image: "oni.png" },
-        { "word": "オムレツ", "english": "omelette", image: "omuretsu.png" },
-        { "word": "かばん", "english": "bag", image: "kaban.png" },
-        { "word": "かさ", "english": "umbrella", image: "kasa.png" },
-        { "word": "かに", "english": "crab", image: "kani.png" },
-        { "word": "かめ", "english": "turtle", image: "kame.png" },
-        { "word": "きゅうり", "english": "cucumber", image: "kyuuri.png" },
-        { "word": "くつ", "english": "shoes", image: "kutsu.png" },
-        { "word": "くま", "english": "bear", image: "kuma.png" },
-        { "word": "くも", "english": "spider/cloud", image: "kumo.png" },
-        { "word": "ケーキ", "english": "cake", image: "keki.png" },
-        { "word": "けむし", "english": "caterpillar", image: "kemushi.png" },
-        { "word": "き", "english": "tree", image: "ki.png" },
-        { "word": "きりん", "english": "giraffe", image: "kirin.png" },
-        { "word": "きのこ", "english": "mushroom", image: "kinoko.png" },
-        { "word": "きつね", "english": "fox", image: "kitsune.png" },
-        { "word": "コアラ", "english": "koala", image: "koara.png" },
-        { "word": "コップ", "english": "cup", image: "koppu.png" },
-        { "word": "こいのぼり", "english": "carp streamer", image: "koinobori.png" },
-        { "word": "ごはん", "english": "rice", image: "gohan.png" },
-        { "word": "ごみばこ", "english": "trash can", image: "gomibako.png" },
-        { "word": "ごくう", "english": "Goku", image: "goku.png" },
-        { "word": "ごま", "english": "sesame", image: "goma.png" },
-        { "word": "ゴリラ", "english": "gorilla", image: "gorira.png" },
-        { "word": "さる", "english": "monkey", image: "saru.png" },
-        { "word": "しか", "english": "deer", image: "shika.png" },
-        { "word": "しまうま", "english": "zebra", image: "shimauma.png" },
-        { "word": "しんごう", "english": "traffic light", image: "shingou.png" },
-        { "word": "すいか", "english": "watermelon", image: "suika.png" },
-        { "word": "すなはま", "english": "sandy beach", image: "sunahama.png" },
-        { "word": "すべりだい", "english": "slide", image: "suberidai.png" },
-        { "word": "せみ", "english": "cicada", image: "semi.png" },
-        { "word": "せんぷうき", "english": "electric fan", image: "senpuki.png" },
-        { "word": "そら", "english": "sky", image: "sora.png" },
-        { "word": "そらまめ", "english": "fava bean", image: "soramame.png" },
-        { "word": "たこ", "english": "octopus", image: "tako.png" },
-        { "word": "たぬき", "english": "raccoon dog", image: "tanuki.png" },
-        { "word": "だんご", "english": "dango (sweet dumpling)", image: "dango.png" },
-        { "word": "ちず", "english": "map", image: "chizu.png" },
-        { "word": "チョコレート", "english": "chocolate", image: "choko.png" },
-        { "word": "チューリップ", "english": "tulip", image: "churippu.png" },
-        { "word": "つき", "english": "moon", image: "tsuki.png" },
-        { "word": "つみき", "english": "building blocks", image: "tsumiki.png" },
-        { "word": "て", "english": "hand", image: "te.png" },
-        { "word": "テレビ", "english": "television", image: "terebi.png" },
-        { "word": "テント", "english": "tent", image: "tento.png" },
-        { "word": "とけい", "english": "clock", image: "tokei.png" },
-        { "word": "とら", "english": "tiger", image: "tora.png" },
-        { "word": "トマト", "english": "tomato", image: "tomato.png" }, // ★修正点
-        { "word": "なす", "english": "eggplant", image: "nasu.png" },
-        { "word": "なし", "english": "Japanese pear", image: "nashi.png" },
-        { "word": "なっとう", "english": "natto (fermented soybeans)", image: "natto.png" },
-        { "word": "にじ", "english": "rainbow", image: "niji.png" },
-        { "word": "にんじん", "english": "carrot", image: "ninjin.png" },
-        { "word": "にわとり", "english": "chicken", image: "niwatori.png" },
-        { "word": "ねずみ", "english": "mouse", image: "nezumi.png" },
-        { "word": "ねんど", "english": "clay/playdough", image: "nendo.png" },
-        { "word": "のこぎり", "english": "saw", image: "nokogiri.png" },
-        { "word": "のり", "english": "seaweed (nori)", image: "nori.png" },
-        { "word": "ぬりえ", "english": "coloring book/page", image: "nurie.png" },
-        { "word": "は", "english": "tooth", image: "ha.png" },
-        { "word": "はし", "english": "chopsticks/bridge", image: "hashi.png" },
-        { "word": "はな", "english": "flower", image: "hana.png" },
-        { "word": "はみがき", "english": "tooth-brushing", image: "hamigaki.png" },
-        { "word": "ひ", "english": "fire", image: "hi.png" },
-        { "word": "ひよこ", "english": "chick", image: "hiyoko.png" },
-        { "word": "ひまわり", "english": "sunflower", image: "himawari.png" },
-        { "word": "ライオン", "english": "lion", image: "raion.png" },
-        { "word": "ラクダ", "english": "camel", image: "rakuda.png" },
-        { "word": "ラジオ", "english": "radio", image: "radio.png" },
-        { "word": "りか", "english": "science", image: "rika.png" },
-        { "word": "りきし", "english": "sumo wrestler", image: "rikishi.png" },
-        { "word": "りす", "english": "squirrel", image: "risu.png" }
+        { "word": "てるてる", "english": "teru teru bozu", "image": "teruteru.png" },
+        { "word": "とうふ", "english": "tofu", "image": "tofu.png" },
+        { "word": "なべ", "english": "pot", "image": "nabe.png" },
+        { "word": "にわ", "english": "garden", "image": "niwa.png" },
+        { "word": "ぬいぐるみ", "english": "stuffed toy", "image": "nuigurumi.png" },
+        { "word": "のりもの", "english": "vehicle", "image": "norimono.png" },
+        { "word": "はくちょう", "english": "swan", "image": "hakucho.png" },
+        { "word": "ふうりん", "english": "wind chime", "image": "furin.png" },
+        { "word": "へちま", "english": "loofah", "image": "hechima.png" },
+        { "word": "ほうき", "english": "broom", "image": "hoki.png" },
+        { "word": "まくら", "english": "pillow", "image": "makura.png" },
+        { "word": "みずうみ", "english": "lake", "image": "mizuumi.png" },
+        { "word": "むぎ", "english": "wheat", "image": "mugi.png" },
+        { "word": "もり", "english": "forest", "image": "mori.png" },
+        { "word": "ゆびわ", "english": "ring", "image": "yubiwa.png" },
+        { "word": "よしず", "english": "bamboo blind", "image": "yoshizu.png" },
+        { "word": "るりびたき", "english": "red-flanked bluetail", "image": "ruribitaki.png" },
+        { "word": "れんげ", "english": "Chinese milk vetch", "image": "renge.png" },
+        { "word": "ろぼっと", "english": "robot", "image": "robotto.png" },
+        { "word": "わかめ", "english": "seaweed", "image": "wakame.png" },
+        { "word": "いとまき", "english": "thread spool", "image": "itomaki.png" },
+        { "word": "うちわ", "english": "fan", "image": "uchiwa.png" },
+        { "word": "えびふらい", "english": "fried shrimp", "image": "ebifurai.png" },
+        { "word": "おもちゃ", "english": "toy", "image": "omocha.png" },
+        { "word": "かたな", "english": "sword", "image": "katana.png" },
+        { "word": "きもの", "english": "kimono", "image": "kimono.png" },
+        { "word": "くさ", "english": "grass", "image": "kusa.png" },
+        { "word": "けしごむ", "english": "eraser", "image": "keshigomu.png" },
+        { "word": "こま", "english": "top (toy)", "image": "koma.png" },
+        { "word": "さいふ", "english": "wallet", "image": "saifu.png" },
+        { "word": "あめ", "english": "candy", "image": "ame.png" },
+        { "word": "アヒル", "english": "duck", "image": "ahiru.png" },
+        { "word": "あり", "english": "ant", "image": "ari.png" },
+        { "word": "いか", "english": "squid", "image": "ika.png" },
+        { "word": "いちご", "english": "strawberry", "image": "ichigo.png" },
+        { "word": "いす", "english": "chair", "image": "isu.png" },
+        { "word": "うさぎ", "english": "rabbit", "image": "usagi.png" },
+        { "word": "うし", "english": "cow", "image": "ushi.png" },
+        { "word": "うま", "english": "horse", "image": "uma.png" },
+        { "word": "えび", "english": "shrimp", "image": "ebi.png" },
+        { "word": "えんぴつ", "english": "pencil", "image": "enpitsu.png" },
+        { "word": "おにぎり", "english": "rice ball (onigiri)", "image": "onigiri.png" },
+        { "word": "おに", "english": "demon (oni)", "image": "oni.png" },
+        { "word": "オムレツ", "english": "omelette", "image": "omuretsu.png" },
+        { "word": "かばん", "english": "bag", "image": "kaban.png" },
+        { "word": "かさ", "english": "umbrella", "image": "kasa.png" },
+        { "word": "かに", "english": "crab", "image": "kani.png" },
+        { "word": "かめ", "english": "turtle", "image": "kame.png" },
+        { "word": "きゅうり", "english": "cucumber", "image": "kyuuri.png" },
+        { "word": "くつ", "english": "shoes", "image": "kutsu.png" },
+        { "word": "くま", "english": "bear", "image": "kuma.png" },
+        { "word": "くも", "english": "spider/cloud", "image": "kumo.png" },
+        { "word": "ケーキ", "english": "cake", "image": "keki.png" },
+        { "word": "けむし", "english": "caterpillar", "image": "kemushi.png" },
+        { "word": "き", "english": "tree", "image": "ki.png" },
+        { "word": "きりん", "english": "giraffe", "image": "kirin.png" },
+        { "word": "きのこ", "english": "mushroom", "image": "kinoko.png" },
+        { "word": "きつね", "english": "fox", "image": "kitsune.png" },
+        { "word": "コアラ", "english": "koala", "image": "koara.png" },
+        { "word": "コップ", "english": "cup", "image": "koppu.png" },
+        { "word": "こいのぼり", "english": "carp streamer", "image": "koinobori.png" },
+        { "word": "ごはん", "english": "rice", "image": "gohan.png" },
+        { "word": "ごみばこ", "english": "trash can", "image": "gomibako.png" },
+        { "word": "ごくう", "english": "Goku", "image": "goku.png" },
+        { "word": "ごま", "english": "sesame", "image": "goma.png" },
+        { "word": "ゴリラ", "english": "gorilla", "image": "gorira.png" },
+        { "word": "さる", "english": "monkey", "image": "saru.png" },
+        { "word": "しか", "english": "deer", "image": "shika.png" },
+        { "word": "しまうま", "english": "zebra", "image": "shimauma.png" },
+        { "word": "しんごう", "english": "traffic light", "image": "shingou.png" },
+        { "word": "すいか", "english": "watermelon", "image": "suika.png" },
+        { "word": "すなはま", "english": "sandy beach", "image": "sunahama.png" },
+        { "word": "すべりだい", "english": "slide", "image": "suberidai.png" },
+        { "word": "せみ", "english": "cicada", "image": "semi.png" },
+        { "word": "せんぷうき", "english": "electric fan", "image": "senpuki.png" },
+        { "word": "そら", "english": "sky", "image": "sora.png" },
+        { "word": "そらまめ", "english": "fava bean", "image": "soramame.png" },
+        { "word": "たこ", "english": "octopus", "image": "tako.png" },
+        { "word": "たぬき", "english": "raccoon dog", "image": "tanuki.png" },
+        { "word": "だんご", "english": "dango (sweet dumpling)", "image": "dango.png" },
+        { "word": "ちず", "english": "map", "image": "chizu.png" },
+        { "word": "チョコレート", "english": "chocolate", "image": "choko.png" },
+        { "word": "チューリップ", "english": "tulip", "image": "churippu.png" },
+        { "word": "つき", "english": "moon", "image": "tsuki.png" },
+        { "word": "つみき", "english": "building blocks", "image": "tsumiki.png" },
+        { "word": "て", "english": "hand", "image": "te.png" },
+        { "word": "テレビ", "english": "television", "image": "terebi.png" },
+        { "word": "テント", "english": "tent", "image": "tento.png" },
+        { "word": "とけい", "english": "clock", "image": "tokei.png" },
+        { "word": "とら", "english": "tiger", "image": "tora.png" },
+        { "word": "トマト", "english": "tomato", "image": "tomato.png" }, 
+        { "word": "なす", "english": "eggplant", "image": "nasu.png" },
+        { "word": "なし", "english": "Japanese pear", "image": "nashi.png" },
+        { "word": "なっとう", "english": "natto (fermented soybeans)", "image": "natto.png" },
+        { "word": "にじ", "english": "rainbow", "image": "niji.png" },
+        { "word": "にんじん", "english": "carrot", "image": "ninjin.png" },
+        { "word": "にわとり", "english": "chicken", "image": "niwatori.png" },
+        { "word": "ねずみ", "english": "mouse", "image": "nezumi.png" },
+        { "word": "ねんど", "english": "clay/playdough", "image": "nendo.png" },
+        { "word": "のこぎり", "english": "saw", "image": "nokogiri.png" },
+        { "word": "のり", "english": "seaweed (nori)", "image": "nori.png" },
+        { "word": "ぬりえ", "english": "coloring book/page", "image": "nurie.png" },
+        { "word": "は", "english": "tooth", "image": "ha.png" },
+        { "word": "はし", "english": "chopsticks/bridge", "image": "hashi.png" },
+        { "word": "はな", "english": "flower", "image": "hana.png" },
+        { "word": "はみがき", "english": "tooth-brushing", "image": "hamigaki.png" },
+        { "word": "ひ", "english": "fire", "image": "hi.png" },
+        { "word": "ひよこ", "english": "chick", "image": "hiyoko.png" },
+        { "word": "ひまわり", "english": "sunflower", "image": "himawari.png" },
+        { "word": "ライオン", "english": "lion", "image": "raion.png" },
+        { "word": "ラクダ", "english": "camel", "image": "rakuda.png" },
+        { "word": "ラジオ", "english": "radio", "image": "radio.png" },
+        { "word": "りか", "english": "science", "image": "rika.png" },
+        { "word": "りきし", "english": "sumo wrestler", "image": "rikishi.png" },
+        { "word": "りす", "english": "squirrel", "image": "risu.png" }
     ];
     
     // ----------------------------------------------------
@@ -219,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * 配列をシャッフルする
      */
     function shuffleArray(array) {
-        // 配列のコピーを作成してからシャッフルする
         const newArray = [...array];
         for (let i = newArray.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -268,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const quizData = QUIZ_DATA[quizIndex];
         meteor.dataset.quizIndex = quizIndex;
         
-        // ★ランダムで「言葉」か「イラスト」かを決める★
+        // ランダムで「言葉」か「イラスト」かを決める
         const quizType = Math.random() < 0.5 ? 'word' : 'image'; 
         meteor.dataset.quizType = quizType; // クイズの種類を隕石に保存
 
@@ -278,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // タイプ2: 隕石に「イラスト」を表示
             meteor.classList.add('meteor-image'); // CSSスタイルを適用
-            // ★重要★ 画像パスを修正（定数を使用）
             meteor.style.backgroundImage = `url('${IMAGE_BASE_PATH}${quizData.image}')`; 
         }
 
@@ -287,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 落下アニメーションループ (★ロジック修正版★)
+     * 落下アニメーションループ
      */
     function fallLoop() {
         if (life <= 0) return;
@@ -347,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * 2つの選択肢ボタンを生成し、アニメーション表示する
-     * ★★★ ロジックを修正 ★★★
      */
     function createAnimatedChoiceButtons(meteorElement, quizData, quizType) {
         let correctChoice = '';
@@ -406,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 選択肢ボタンがクリックされたときの処理 (変更なし)
+     * 選択肢ボタンがクリックされたときの処理
      */
     function handleChoiceButtonClick(e) {
         if (!isQuestionActive) return; 
@@ -429,6 +478,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCorrect) {
             updateScore(10);
             triggerExplosion(meteorX, meteorY, false); // 黄色い爆発
+
+            // ★★★ ポイント付与 (正解した単語をキーとして渡す) ★★★
+            if (currentQuizData) {
+                checkAndAwardPoints(currentQuizData.word);
+            }
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★
+
         } else {
             updateLife(-1);
             triggerExplosion(meteorX, meteorY, true); // 赤い爆発

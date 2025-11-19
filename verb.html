@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 <style>
-        /* ▼▼▼ この <style> タグの中身を丸ごと入れ替えてください ▼▼▼ */
-        
         /* キーフレームアニメーション (ポップアップ用) */
         @keyframes dv-pop-in {
             0% { transform: scale(0.5); opacity: 0; }
@@ -12,7 +10,6 @@
 
         body {
             font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
-            /* 背景を明るいイエロー系に変更 */
             background: linear-gradient(180deg, #fffde7 0%, #fff9c4 100%);
             display: flex;
             justify-content: center;
@@ -20,7 +17,6 @@
             min-height: 100vh;
             padding: 10px;
             box-sizing: border-box;
-            /* メインの文字色を濃いブルーに変更 */
             color: #01579b; 
         }
 
@@ -30,11 +26,8 @@
             margin: 20px auto;
             padding: 20px; 
             background-color: #ffffff;
-            /* 影を柔らかく、青みがかったものに変更 */
             box-shadow: 0 10px 30px rgba(41, 182, 246, 0.2); 
-            /* 角をさらに丸く */
             border-radius: 30px; 
-            /* 枠線を太く、白にして浮き上がらせる */
             border: 5px solid #fff; 
         }
         
@@ -47,9 +40,7 @@
 
         h1, h2 {
             text-align: center;
-            /* タイトルの色を明るいブルーに変更 */
             color: #0288d1;
-            /* 文字に白い影をつけ、ステッカーのように見せる */
             text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
         }
         h1 { font-size: 2.5em; margin-bottom: 20px; }
@@ -61,42 +52,39 @@
             display: block;
             width: 90%;
             margin: 15px auto;
-            padding: 20px; /* パディングを調整 */
+            padding: 20px; 
             font-size: 1.5em;
             font-weight: 700;
             color: #fff;
-            background-color: #29b6f6; /* ベースの色を明るいブルーに */
-            border: none; /* 枠線を削除 */
+            background-color: #29b6f6; 
+            border: none; 
             border-radius: 15px;
             cursor: pointer;
-            /* 影で立体感を出す（「押す部分」と「厚み」） */
-            box-shadow: 0 6px 0 #0288d1; /* 濃い青で厚みを表現 */
+            box-shadow: 0 6px 0 #0288d1; 
             transition: all 0.1s ease-out;
-            position: relative; /* :active のため */
+            position: relative; 
             top: 0;
         }
         
-        /* ボタンを押したときの「へこむ」表現 */
         .dv-button:active {
-            top: 4px; /* 4px下にずらす */
-            box-shadow: 0 2px 0 #0288d1; /* 影を薄くする */
+            top: 4px; 
+            box-shadow: 0 2px 0 #0288d1; 
         }
         
-        /* --- メニューボタンの色を個別に設定 --- */
         #dv-menu-game1 {
-            background-color: #66bb6a; /* グリーン */
+            background-color: #66bb6a; 
             box-shadow: 0 6px 0 #388e3c;
         }
         #dv-menu-game1:active { box-shadow: 0 2px 0 #388e3c; top: 4px; }
 
         #dv-menu-game2 {
-            background-color: #ffa726; /* オレンジ */
+            background-color: #ffa726; 
             box-shadow: 0 6px 0 #f57c00;
         }
         #dv-menu-game2:active { box-shadow: 0 2px 0 #f57c00; top: 4px; }
 
         #dv-menu-game3 {
-            background-color: #42a5f5; /* ブルー */
+            background-color: #42a5f5; 
             box-shadow: 0 6px 0 #1e88e5;
         }
         #dv-menu-game3:active { box-shadow: 0 2px 0 #1e88e5; top: 4px; }
@@ -116,17 +104,16 @@
         /* --- フィードバック --- */
         .dv-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
-            margin-top: 20px; min-height: 1.3em; color: #ef5350; /* 赤色を鮮やかに */
-            transform: scale(0); /* 最初は見えない */
+            margin-top: 20px; min-height: 1.3em; color: #ef5350; 
+            transform: scale(0); 
             opacity: 0;
         }
-        /* メッセージが表示されたらポップアップアニメ */
         .dv-feedback:not(:empty) {
             animation: dv-pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: scale(1); /* アニメ後に表示を維持 */
+            transform: scale(1); 
             opacity: 1;
         }
-        .dv-feedback.success { color: #66bb6a; } /* 緑色を鮮やかに */
+        .dv-feedback.success { color: #66bb6a; } 
 
         /* --- 0. メインメニュー --- */
         #dv-main-menu p {
@@ -139,13 +126,13 @@
             width: 90%;
             height: 150px;
             margin: 10px auto;
-            background: #f1f8e9; /* 薄いグリーン */
+            background: #f1f8e9; 
             border: 3px dashed #c5e1a5;
             border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* 画像がはみ出ないように */
+            overflow: hidden; 
         }
         #dv-game1-char-img {
             height: 140px;
@@ -158,16 +145,14 @@
             margin-top: 20px;
         }
         .dv-game1-option-card {
-            border: 4px solid #fff; /* 枠線を白に変更 */
+            border: 4px solid #fff; 
             border-radius: 15px;
             padding: 10px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             background: #fff;
-            /* 弾むようなトランジション */
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        /* カードが跳ねるようなホバーエフェクト */
         .dv-game1-option-card:hover {
             background-color: #f1f8e9;
             transform: rotate(-3deg) scale(1.05);
@@ -190,7 +175,7 @@
             width: 90%;
             height: 200px;
             margin: 10px auto;
-            background: #e3f2fd; /* 薄いブルー */
+            background: #e3f2fd; 
             border: 3px dashed #90caf9;
             border-radius: 10px;
             display: flex;
@@ -208,7 +193,6 @@
             top: 10px;
             right: 10px;
             font-size: 3em;
-            /* アイコンに影をつける */
             text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
         }
         #dv-game2-options {
@@ -220,7 +204,7 @@
         .dv-game2-option-button {
             padding: 25px;
             font-size: 1.4em;
-            background-color: #29b6f6; /* 明るいブルー */
+            background-color: #29b6f6; 
             box-shadow: 0 6px 0 #0288d1;
         }
         .dv-game2-option-button.correct {
@@ -281,15 +265,12 @@
             border-radius: 10px;
             cursor: pointer;
             box-shadow: 0 3px 5px rgba(0,0,0,0.05);
-            /* 弾むようなトランジション */
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        /* カードが跳ねるようなホバーエフェクト */
         .dv-game3-card:hover {
             transform: rotate(3deg) scale(1.05);
             box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
-        /* カードがスロットに入った時のスタイル */
         .dv-game3-slot .dv-game3-card {
             width: 100%;
             height: 100%;
@@ -301,7 +282,6 @@
             transform: rotate(0) scale(1);
             box-shadow: none;
         }
-        /* 名詞・動詞で色分け */
         .dv-game3-card[data-type="noun"] {
             border-color: #4fc3f7;
             color: #0288d1;
@@ -310,8 +290,6 @@
             border-color: #81c784;
             color: #388e3c;
         }
-        
-        /* ▲▲▲ この <style> タグの中身を丸ごと入れ替えてください ▲▲▲ */
     </style>
 <body>
 
@@ -389,13 +367,65 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
+            // ★★★ ポイントシステム設定 (ゲーム種別ごと) ★★★
+            // ----------------------------------------------------
+            const GAME_ID_VERB = 'verb_game'; // ゲームID
+            
+            const USER_STORAGE_KEY_VERB = 'user_accounts'; 
+            const SESSION_STORAGE_KEY_VERB = 'current_user'; 
+            const GUEST_NAME_VERB = 'ゲスト'; 
+
+            function getTodayDateString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // ポイント加算・チェック関数 (ゲームタイプと動詞IDをキーにする)
+            // gameType: 'game1', 'game2', 'game3'
+            // verbId: 'tabemasu', 'nomimasu' など
+            function checkAndAwardPoints(gameType, verbId) {
+                const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_VERB);
+                if (!currentUser || currentUser === GUEST_NAME_VERB) return "guest"; 
+
+                const usersJson = localStorage.getItem(USER_STORAGE_KEY_VERB);
+                let users = usersJson ? JSON.parse(usersJson) : {};
+                let user = users[currentUser];
+                if (!user) return "error"; 
+
+                const today = getTodayDateString();
+                // キーを「ゲームID + ゲームタイプ + 動詞ID」にする
+                const progressKey = `${GAME_ID_VERB}_${gameType}_${verbId}`;
+
+                user.progress = user.progress || {};
+                user.progress[progressKey] = user.progress[progressKey] || {};
+
+                // その条件で、今日すでにポイントをもらっているかチェック
+                if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+                // ポイント加算
+                user.points = (user.points || 0) + 1;
+                user.progress[progressKey][today] = true;
+                
+                users[currentUser] = user;
+                localStorage.setItem(USER_STORAGE_KEY_VERB, JSON.stringify(users));
+                console.log(`[Game] ${currentUser} gained 1 point for ${gameType} - ${verbId}. Total: ${user.points}`);
+                return "scored"; 
+            }
+            // ----------------------------------------------------
+            // ★★★ ポイントシステム設定 (ここまで) ★★★
+            // ----------------------------------------------------
+
+
+            // ----------------------------------------------------
             // データ定義
             // ----------------------------------------------------
             
             const IMG_PATH = 'assets/images/verbs/';
             const SOUND_PATH = 'assets/sounds/verbs/';
 
-            // ★ 新しい動詞5つを含む、構文エラーが修正されたリスト
             const verbData = [
                 { id: 'tabemasu', masu: 'たべます', mashita: 'たべました', english: 'eat', 
                   tprImg: 'tpr_eat.png', animImg: 'anim_eating.gif', noun: 'ごはん', nounImg: 'noun_rice.png' },
@@ -431,7 +461,6 @@
                   tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
             ];
 
-            // 動的にオーディオ要素をキャッシュ
             const audioCache = {};
             function loadAudio(id, type) {
                 const verb = verbData.find(v => v.id === id);
@@ -454,7 +483,6 @@
             const screens = document.querySelectorAll('.dv-screen');
             const homeButtons = document.querySelectorAll('.dv-home-button');
 
-            // メニュー画面
             const menuScreen = document.getElementById('dv-screen-menu');
             const menuGame1Btn = document.getElementById('dv-menu-game1');
             const menuGame2Btn = document.getElementById('dv-menu-game2');
@@ -567,7 +595,16 @@
 
                 if (chosenId === game1AnswerId) {
                     playSound(soundCorrect);
-                    game1Feedback.textContent = 'せいかい！';
+                    
+                    // ★★★ ポイント付与 (Game1) ★★★
+                    const result = checkAndAwardPoints('game1', game1AnswerId);
+                    let msg = 'せいかい！';
+                    if (result === "scored") {
+                        msg += ' (+1 ポイント！)';
+                    }
+                    // ★★★★★★★★★★★★★★★★★
+
+                    game1Feedback.textContent = msg;
                     game1Feedback.className = 'dv-feedback success';
                     const correctVerb = verbData.find(v => v.id === chosenId);
                     game1CharImg.src = `${IMG_PATH}${correctVerb.animImg}`;
@@ -589,9 +626,11 @@
             // ゲーム2 (時制) のロジック
             // ----------------------------------------------------
             let game2Answer = '';
+            let game2CurrentVerbId = ''; // ★追加: ポイント付与用
 
             function setupGame2() {
                 const verb = verbData[Math.floor(Math.random() * verbData.length)];
+                game2CurrentVerbId = verb.id; // ★IDを保持
                 
                 const isMasu = Math.random() < 0.5;
                 game2Answer = isMasu ? 'masu' : 'mashita';
@@ -635,7 +674,16 @@
                 if (chosenTense === game2Answer) {
                     playSound(soundCorrect);
                     chosenBtn.classList.add('correct');
-                    game2Feedback.textContent = 'せいかい！';
+                    
+                    // ★★★ ポイント付与 (Game2) ★★★
+                    const result = checkAndAwardPoints('game2', game2CurrentVerbId);
+                    let msg = 'せいかい！';
+                    if (result === "scored") {
+                        msg += ' (+1 ポイント！)';
+                    }
+                    // ★★★★★★★★★★★★★★★★★
+
+                    game2Feedback.textContent = msg;
                     game2Feedback.className = 'dv-feedback success';
                     
                     setTimeout(setupGame2, 2000); 
@@ -657,7 +705,6 @@
             // ゲーム3 (文づくり) のロジック
             // ----------------------------------------------------
             
-            // ★ setupGame3 は前回の修正（noun: null を除外）のままです
             function setupGame3() {
                 game3SlotNoun.innerHTML = '';
                 game3SlotVerb.innerHTML = '';
@@ -679,9 +726,6 @@
                      return;
                 }
                 const currentPairs = shuffledData.slice(0, optionsCount);
-
-                // ★ バグ修正のため、この行は不要になりました
-                // game3CorrectPair = currentPairs[0]; 
 
                 const nounCards = [];
                 const verbCards = [];
@@ -733,7 +777,6 @@
                 }
             }
             
-            // ▼▼▼ ここがバグ修正のメイン部分です ▼▼▼
             game3CheckBtn.onclick = () => {
                 const nounCard = game3SlotNoun.querySelector('.dv-game3-card');
                 const verbCard = game3SlotVerb.querySelector('.dv-game3-card');
@@ -749,20 +792,24 @@
                 
                 game3CheckBtn.disabled = true;
 
-                // ★ 修正 ★
-                // 「nounId」と「verbId」が一致すれば、どのペアでも正解とします
                 if (nounId === verbId) {
-                    // 正解
-                    // 正解のペア情報を verbData から見つけます
                     const correctPair = verbData.find(v => v.id === nounId);
 
                     playSound(soundCorrect);
-                    game3Feedback.textContent = 'せいかい！「' + correctPair.noun + ' を ' + correctPair.masu + '」';
+
+                    // ★★★ ポイント付与 (Game3) ★★★
+                    const result = checkAndAwardPoints('game3', nounId);
+                    let msg = 'せいかい！';
+                    if (result === "scored") {
+                        msg += ' (+1 ポイント！)';
+                    }
+                    // ★★★★★★★★★★★★★★★★★
+
+                    game3Feedback.textContent = `${msg}「${correctPair.noun} を ${correctPair.masu}」`;
                     game3Feedback.className = 'dv-feedback success';
                     
-                    setTimeout(setupGame3, 2500); // 次の問題へ
+                    setTimeout(setupGame3, 2500); 
                 } else {
-                    // 不正解 (例: 「ごはん」と「のみます」)
                     playSound(soundIncorrect);
                     game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
                     game3Feedback.className = 'dv-feedback';
@@ -775,12 +822,7 @@
                     }, 2500);
                 }
             };
-            // ▲▲▲ バグ修正完了 ▲▲▲
-            
 
-            // ----------------------------------------------------
-            // ゲーム開始
-            // ----------------------------------------------------
             showScreen(menuScreen); // 最初にメニュー画面を表示
         });
     </script>

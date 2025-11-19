@@ -1,6 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (あいさつ言葉ごとに1日1回) ★★★
+    // ----------------------------------------------------
+    const GAME_ID_AISATSU = 'aisatsu_game'; // ゲームID
+    
+    const USER_STORAGE_KEY_AISATSU = 'user_accounts'; 
+    const SESSION_STORAGE_KEY_AISATSU = 'current_user'; 
+    const GUEST_NAME_AISATSU = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (正解の言葉をキーにする)
+    function checkAndAwardPoints(wordKey) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_AISATSU);
+        if (!currentUser || currentUser === GUEST_NAME_AISATSU) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY_AISATSU);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 言葉」にする
+        const progressKey = `${GAME_ID_AISATSU}_word_${wordKey}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その言葉で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY_AISATSU, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for word "${wordKey}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+
+
+    // ----------------------------------------------------
     // データ定義
     // ----------------------------------------------------
     const SOUND_PATH_AISATSU = 'assets/sounds/aisatsu/';
@@ -35,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionNumberEl = document.getElementById('question-number');
     const timerBoxEl = document.getElementById('timer-box');
     const questionTextEl = document.getElementById('question-text');
-    const playSoundButton = document.getElementById('play-situation-sound'); // ★ 追加
+    const playSoundButton = document.getElementById('play-situation-sound'); 
     const choicesContainerEl = document.getElementById('choices-container');
     const resultMessageEl = document.getElementById('result-message');
     const finalScoreEl = document.getElementById('final-score');
@@ -43,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restart-button');
 
     // --- ゲーム状態変数 ---
-    let allQuestions = []; // 全問題リスト
-    let currentQuestions = []; // 今回のクイズ10問
+    let allQuestions = []; 
+    let currentQuestions = []; 
     let currentQuestionIndex = 0;
     let score = 0;
     let timer;
     let timeLeft = 10;
-    let currentSituationSound = null; // ★ 追加
+    let currentSituationSound = null; 
 
     // ----------------------------------------------------
     // メイン関数
@@ -67,16 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         resultMessageEl.style.display = 'none';
         choicesContainerEl.style.display = 'grid';
         restartButton.style.display = 'none';
-        playSoundButton.disabled = false; // ★ 追加
+        playSoundButton.disabled = false; 
 
         loadQuestion();
     }
 
     function loadQuestion() {
-        // 前回のタイマーをクリア
         clearInterval(timer);
         
-        // 結果メッセージを隠す
         resultMessageEl.style.display = 'none';
         
         if (currentQuestionIndex >= currentQuestions.length) {
@@ -86,18 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const problem = currentQuestions[currentQuestionIndex];
         
-        // 問題文と番号を設定
         questionNumberEl.textContent = `だい ${currentQuestionIndex + 1} もん`;
         questionTextEl.textContent = problem.situation;
 
-        // ★ 音声再生ボタンの設定
         const soundFile = `situation${problem.id}.mp3`;
         currentSituationSound = loadAudio(SOUND_PATH_AISATSU + soundFile);
         playSoundButton.onclick = () => playSound(currentSituationSound);
         // 最初に一度だけ自動再生
         playSound(currentSituationSound);
 
-        // 選択肢を作成
         choicesContainerEl.innerHTML = '';
         const options = shuffleArray([problem.correct, ...problem.wrongs]);
         
@@ -126,48 +173,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkAnswer(event, correctAnswer) {
-        clearInterval(timer); // タイマー停止
+        clearInterval(timer); 
         
         const chosenButton = event.target;
         const chosenAnswer = chosenButton.textContent;
         
-        // ★ 選択した答えの音声を再生
+        // 選択した答えの音声を再生
         const answerSound = loadAudio(SOUND_PATH_AISATSU + chosenAnswer + '.mp3');
         playSound(answerSound);
 
-        // すべてのボタンを無効化
         disableChoices();
 
         if (chosenAnswer === correctAnswer) {
             score++;
-            chosenButton.classList.add('correct-answer'); // 正解ボタンを緑に
-            showResult(true, correctAnswer);
+            chosenButton.classList.add('correct-answer'); 
+            
+            // ★★★ ポイント付与 (正解の言葉をIDとして渡す) ★★★
+            const result = checkAndAwardPoints(correctAnswer);
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★
+
+            // 結果表示にポイント情報を渡す
+            showResult(true, correctAnswer, result);
+
         } else {
             // 不正解
-            chosenButton.style.backgroundColor = '#d9534f'; // 不正解を赤に
+            chosenButton.style.backgroundColor = '#d9534f'; 
             chosenButton.style.borderColor = '#d9534f';
             showResult(false, correctAnswer);
         }
     }
 
-    function showResult(isCorrect, correctAnswer) {
-        // ★ 音声再生ボタンを無効化
+    function showResult(isCorrect, correctAnswer, pointResult = null) {
         playSoundButton.disabled = true;
 
         if (isCorrect) {
-            resultMessageEl.textContent = 'せいかい！';
+            // ★ ポイントメッセージ作成
+            let msg = 'せいかい！';
+            if (pointResult === "scored") {
+                msg += ' (+1 ポイント！)';
+            }
+            
+            resultMessageEl.textContent = msg;
             resultMessageEl.className = 'result-message correct';
-            // ★ 正解の音
+            
             const correctSound = loadAudio('assets/sounds/seikai.mp3');
             playSound(correctSound);
         } else {
             resultMessageEl.textContent = `ざんねん... せいかいは「${correctAnswer}」`;
             resultMessageEl.className = 'result-message incorrect';
-            // ★ 不正解の音
+            
             const incorrectSound = loadAudio('assets/sounds/bubu.mp3');
             playSound(incorrectSound);
             
-            // 正解のボタンを緑にする
             Array.from(choicesContainerEl.children).forEach(button => {
                 if (button.textContent === correctAnswer) {
                     button.classList.add('correct-answer');
@@ -176,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         resultMessageEl.style.display = 'block';
 
-        // 2秒後に次の問題へ
         setTimeout(() => {
             currentQuestionIndex++;
             loadQuestion();
@@ -190,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endGame() {
-        // UI切り替え
         finalScoreEl.innerHTML = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
         finalScoreEl.style.display = 'block';
         
@@ -200,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         choicesContainerEl.style.display = 'none';
         resultMessageEl.style.display = 'none';
         restartButton.style.display = 'block';
-        playSoundButton.disabled = true; // ★ 追加
+        playSoundButton.disabled = true; 
     }
 
     // ----------------------------------------------------

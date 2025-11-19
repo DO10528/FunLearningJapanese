@@ -1,3 +1,56 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここから追加) ★★★
+    // ----------------------------------------------------
+    const GAME_ID_KANJI = 'kanji_reading_quiz'; // ゲームID
+    
+    const USER_STORAGE_KEY_KANJI = 'user_accounts'; 
+    const SESSION_STORAGE_KEY_KANJI = 'current_user'; 
+    const GUEST_NAME_KANJI = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (漢字をキーにする)
+    function checkAndAwardPoints(wordKey) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_KANJI);
+        if (!currentUser || currentUser === GUEST_NAME_KANJI) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY_KANJI);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 漢字」にする
+        const progressKey = `${GAME_ID_KANJI}_word_${wordKey}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その漢字で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY_KANJI, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for kanji "${wordKey}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+});
+
 // データのパス
 const DATA_PATH = 'data/kanji.json';
 const IMAGE_PATHS = [
@@ -91,7 +144,7 @@ function startNewQuiz() {
     handleModeSwitch(selectedMode, false); 
 }
 
-// ======== 修正版：モード切替 ========
+// ======== モード切替 ========
 
 function handleModeSwitch(newMode, isSwitching = true) {
     let targetKanji = null;
@@ -134,7 +187,6 @@ function handleModeSwitch(newMode, isSwitching = true) {
             }
         }
     } 
-    // リスタートのときは全問題生成済みなのでそのまま表示
 
     resultMessageElement.style.display = 'none';
     finalScoreElement.style.display = 'none';
@@ -232,15 +284,32 @@ function displayQuestion() {
     });
 }
 
-// ======== 回答チェック ========
+// ======== 回答チェック (★修正) ========
 
 function checkAnswer(clickedButton, selectedChoice, correctAnswer) {
     const isCorrect = (selectedChoice === correctAnswer);
     
     if (isCorrect) {
         playSound(SOUND_CORRECT_PATH);
+
+        // ★★★ ポイント付与ロジック (正解した漢字を渡す) ★★★
+        // グローバルなポイント関数を呼び出すために、ここで定義されているか確認が必要ですが、
+        // 上記で document.addEventListener 内に定義してしまっているので、スコープの問題が出ます。
+        // ★修正: ポイント関数をグローバルスコープに出すか、この checkAnswer 内で完結させる必要があります。
+        // ここではシンプルに、先ほど追加した関数を利用できるようにスコープを調整した書き方に直しています。
+        
+        const currentKanji = quizQuestions[currentQuestionIndex].kanji;
+        // checkAndAwardPoints は下記で定義し直します
+        const result = checkAndAwardPoints(currentKanji);
+
+        let msg = "✅ 正解です！次の問題へ進みます。";
+        if (result === "scored") {
+            msg += " (+1 ポイント！)";
+        }
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★
+
         score++;
-        resultMessageElement.textContent = "✅ 正解です！次の問題へ進みます。";
+        resultMessageElement.textContent = msg;
         resultMessageElement.classList.remove('incorrect');
         resultMessageElement.classList.add('correct');
         clickedButton.classList.add('correct-answer'); 
@@ -314,6 +383,48 @@ function endQuiz(isGameOver) {
     finalScoreElement.style.display = 'block';
     homeButton.style.display = 'inline-block';
     restartButton.style.display = 'inline-block';
+}
+
+// ----------------------------------------------------
+// ★★★ ポイントシステムの定義 (グローバルスコープ) ★★★
+// ----------------------------------------------------
+const GAME_ID_KANJI = 'kanji_reading_quiz'; 
+const USER_STORAGE_KEY_KANJI = 'user_accounts'; 
+const SESSION_STORAGE_KEY_KANJI = 'current_user'; 
+const GUEST_NAME_KANJI = 'ゲスト'; 
+
+function getTodayDateString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function checkAndAwardPoints(wordKey) {
+    const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_KANJI);
+    if (!currentUser || currentUser === GUEST_NAME_KANJI) return "guest"; 
+
+    const usersJson = localStorage.getItem(USER_STORAGE_KEY_KANJI);
+    let users = usersJson ? JSON.parse(usersJson) : {};
+    let user = users[currentUser];
+    if (!user) return "error"; 
+
+    const today = getTodayDateString();
+    const progressKey = `${GAME_ID_KANJI}_word_${wordKey}`;
+
+    user.progress = user.progress || {};
+    user.progress[progressKey] = user.progress[progressKey] || {};
+
+    if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+    user.points = (user.points || 0) + 1;
+    user.progress[progressKey][today] = true;
+    
+    users[currentUser] = user;
+    localStorage.setItem(USER_STORAGE_KEY_KANJI, JSON.stringify(users));
+    console.log(`[Game] ${currentUser} gained 1 point for kanji "${wordKey}". Total: ${user.points}`);
+    return "scored"; 
 }
 
 document.addEventListener('DOMContentLoaded', initializeQuiz);
