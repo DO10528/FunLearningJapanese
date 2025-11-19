@@ -1,4 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここから追加) ★★★
+    // ----------------------------------------------------
+    const GAME_ID = 'hiragana_word_game'; // ★ゲームID
+    
+    const USER_STORAGE_KEY = 'user_accounts'; 
+    const SESSION_STORAGE_KEY = 'current_user'; 
+    const GUEST_NAME = 'ゲスト'; 
+
+    // 日付取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // ポイント加算・チェック関数 (単語IDごとに管理)
+    function checkAndAwardPoints(wordId) {
+        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
+
+        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+        let users = usersJson ? JSON.parse(usersJson) : {};
+        let user = users[currentUser];
+        if (!user) return "error"; 
+
+        const today = getTodayDateString();
+        // キーを「ゲームID + 単語ID」にする
+        const progressKey = `${GAME_ID}_word_${wordId}`;
+
+        user.progress = user.progress || {};
+        user.progress[progressKey] = user.progress[progressKey] || {};
+
+        // その単語で、今日すでにポイントをもらっているかチェック
+        if (user.progress[progressKey][today] === true) return "already_scored"; 
+
+        // ポイント加算
+        user.points = (user.points || 0) + 1;
+        user.progress[progressKey][today] = true;
+        
+        users[currentUser] = user;
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+        console.log(`[Game] ${currentUser} gained 1 point for word "${wordId}". Total: ${user.points}`);
+        return "scored"; 
+    }
+    // ----------------------------------------------------
+    // ★★★ ポイントシステム設定 (ここまで) ★★★
+    // ----------------------------------------------------
+
+
     // ----------------------------------------------------
     // DOM要素の取得
     // ----------------------------------------------------
@@ -6,10 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAME_AREA = document.getElementById('game-area');
     const SCORE_MESSAGE = document.getElementById('score-message'); 
     
-    // ★★★ 1. 音声ファイルのパス設定 ★★★
+    // 音声ファイルのパス設定
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
-    // ★★★★★★★★★★★★★★★★★★★★★
 
     let allWords = [];
     let currentWord = null;
@@ -18,12 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrectCount = 0;
     let askedWordIds = new Set(); 
 
-    // ★★★ 2. 補助関数: 音源を再生する関数 ★★★
+    // 補助関数: 音源を再生する関数
     function playSound(path) {
         const audio = new Audio(path);
         audio.play().catch(e => console.error("音声再生エラー:", e));
     }
-    // ★★★★★★★★★★★★★★★★★★★★★
 
     // 1. JSONデータを読み込む関数
     async function loadWords() {
@@ -136,10 +187,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.choice-button').forEach(btn => btn.disabled = true);
 
         if (selectedWord === currentWord.word) {
-            // ★★★ 4. 正解の音を追加 ★★★
             playSound(SOUND_CORRECT_PATH);
 
-            feedbackElement.textContent = 'せいかい！✨';
+            // ★★★ ポイント付与ロジック (単語IDごとに判定) ★★★
+            const result = checkAndAwardPoints(currentWord.id);
+            
+            let message = 'せいかい！✨';
+            if (result === "scored") {
+                message += ' (+1 ポイント！)';
+            } else if (result === "already_scored") {
+                // メッセージが長くなるので省略してもOK
+                // message += ' (獲得ずみ)';
+            }
+            feedbackElement.textContent = message;
+            // ★★★★★★★★★★★★★★★★★★★★★★★
+
             feedbackElement.style.color = '#5c7aff';
             score += 10;
             correctCount += 1; 
@@ -149,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
 
         } else {
-            // ★★★ 5. 不正解の音を追加 ★★★
             playSound(SOUND_INCORRECT_PATH);
 
             feedbackElement.textContent = `ざんねん...。正解は「${currentWord.word}」だよ。`;
@@ -182,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
     
-    // 8. スコア表示のみを更新する補助関数 (handleAnswerから呼び出されるため追加)
+    // 8. スコア表示のみを更新する補助関数
     function renderScoreTitleUpdate() {
         const titleElement = GAME_AREA.querySelector('h3');
         if (titleElement) {
@@ -191,13 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // ★★★ 9. DOMContentLoadedのネストを解消 ★★★
-    // (ページが読み込まれたら、まずデータをロードする)
+    // 9. 初期化
     loadWords();
     
     // 外部から呼ばれる startMainGame 関数を公開
-    // (index.html から "startMainGame()" で呼び出される)
     window.startMainGame = function() {
         if (allWords.length === 0) {
             loadWords().then(startNewGame);
@@ -205,7 +263,5 @@ document.addEventListener('DOMContentLoaded', () => {
             startNewGame();
         }
     };
-    
-    // (startButton1 のロジックは、このファイルではなく index.html 側にあるべきなので削除)
     
 });
