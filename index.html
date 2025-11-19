@@ -56,6 +56,15 @@
     color: #333;
     padding: 5px 0;
 }
+/* ★追加: ストリーク表示エリアのスタイル */
+#streak-display {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 800;
+    color: #ff6b6b; /* 赤色で強調 */
+    padding: 5px 0;
+    display: none;
+}
 #auth-buttons button {
     margin-left: 10px;
     padding: 8px 15px;
@@ -165,7 +174,10 @@
 </div>
 
 <div id="auth-status-bar">
-    <span id="user-info" data-i18n="auth_status_default">ログインしていません</span>
+    <div>
+        <span id="user-info" data-i18n="auth_status_default">ログインしていません</span>
+        <div id="streak-display" style="display: none;"></div>
+    </div>
     <div id="auth-buttons">
         <button id="login-btn" class="btn-login" data-i18n="btn_login">ログイン</button>
         <button id="signup-btn" class="btn-signup" data-i18n="btn_signup">新規登録</button>
@@ -325,6 +337,7 @@
             'placeholder_password': 'パスワード',
             'status_guest': 'ゲストモード',
             'status_welcome': 'さん、ようこそ！',
+            'streak_text': '🔥連続%DAYS%日目！', // ★追加
             // ゲームメニュー
             'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
             'btn_hiragana_video': '🎥<br>ひらがな練習',
@@ -370,6 +383,7 @@
             'placeholder_password': 'Password',
             'status_guest': 'Guest Mode',
             'status_welcome': ', welcome!',
+            'streak_text': '🔥Streak: %DAYS% days!', // ★追加
             // ゲームメニュー
             'btn_kiso': '📝<br>Hiragana/Katakana Basics',
             'btn_hiragana_video': '🎥<br>Hiragana Practice',
@@ -441,17 +455,17 @@
 
 
     // ----------------------------------------------------
-    // ★★★ 認証ロジック (多言語対応含む) ★★★
+    // ★★★ 新規追加: 認証ロジック (ストリーク更新ロジックを追加) ★★★
     // ----------------------------------------------------
 
     const USER_STORAGE_KEY = 'user_accounts';
     const SESSION_STORAGE_KEY = 'current_user';
     const GUEST_NAME = 'ゲスト'; // 内部での識別子
-    
     const LANG_DEFAULT = 'ja'; // デフォルト言語
 
     // --- 認証DOM要素の取得 ---
     const userInfoEl = document.getElementById('user-info');
+    const streakDisplayEl = document.getElementById('streak-display'); // ★追加
     const loginBtn = document.getElementById('login-btn');
     const signupBtn = document.getElementById('signup-btn');
     const guestBtn = document.getElementById('guest-btn');
@@ -475,12 +489,81 @@
     function getCurrentLang() {
         return localStorage.getItem('preferredLang') || LANG_DEFAULT;
     }
+    
+    // YYYY-MM-DD形式の今日の日付を取得
+    function getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // 日付文字列をDateオブジェクトに変換 (タイムゾーンの影響を受けないよう調整)
+    function parseDate(dateString) {
+        if (!dateString) return null;
+        // YYYY-MM-DD形式をUTCとしてパースし、ローカルタイムゾーンの影響を避ける
+        const parts = dateString.split('-');
+        return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    }
+
+    // --- ストリークの更新ロジック ---
+    function updateStreak(user) {
+        const todayStr = getTodayDateString();
+        
+        // ユーザーが初めてログインする場合、またはデータが古い場合
+        if (!user.streak || !user.last_login) {
+            user.streak = 1;
+            user.last_login = todayStr;
+            return user;
+        }
+
+        if (user.last_login === todayStr) {
+            // 既に今日ログイン済み (何もしない)
+            return user;
+        }
+
+        const lastLoginDate = parseDate(user.last_login);
+        const yesterday = new Date(parseDate(todayStr));
+        yesterday.setUTCDate(yesterday.getUTCDate() - 1); // 昨日の日付
+
+        // 昨日の日付を 'YYYY-MM-DD' 形式の文字列で取得
+        const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
+        
+        if (user.last_login === yesterdayStr) {
+            // 連続アクセス成功 (ストリーク継続)
+            user.streak += 1;
+        } else {
+            // 2日以上アクセスがない (ストリークリセット)
+            user.streak = 1;
+        }
+        
+        // 最終ログイン日を今日に更新
+        user.last_login = todayStr;
+        return user;
+    }
 
     // --- セッション管理 ---
+
+    // ログイン処理 (ストリーク更新と保存を含む)
     function setSession(gameName) {
         sessionStorage.setItem(SESSION_STORAGE_KEY, gameName);
+        
+        if (gameName !== GUEST_NAME) {
+            let users = getUsers();
+            let user = users[gameName];
+
+            // ストリークを更新
+            user = updateStreak(user);
+            
+            // 変更を保存
+            users[gameName] = user;
+            saveUsers(users);
+        }
+
         updateAuthenticationUI();
     }
+    
     function logout() {
         sessionStorage.removeItem(SESSION_STORAGE_KEY);
         updateAuthenticationUI();
@@ -489,46 +572,59 @@
         setSession(GUEST_NAME);
     }
 
+
     // --- UIの更新 (ログイン状態に応じて表示を切り替える) ---
     function updateAuthenticationUI() {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
         const lang = getCurrentLang();
-        const langData = translations[lang] || translations[LANG_DEFAULT]; // 翻訳データを取得
+        const langData = translations[lang] || translations[LANG_DEFAULT];
 
         const isLoggedIn = !!currentUser;
         const isGuest = currentUser === GUEST_NAME;
 
-        // 認証ステータスバーの表示切り替え
-        if (isLoggedIn) {
-            let statusText;
-            if (isGuest) {
-                // ゲストモード
-                statusText = langData['status_guest'];
-            } else {
-                // 登録ユーザー
-                statusText = `${currentUser}${langData['status_welcome']}`;
-            }
-            userInfoEl.textContent = statusText;
+        // ストリーク情報を取得・表示
+        if (isLoggedIn && !isGuest) {
+            const users = getUsers();
+            const user = users[currentUser];
+            const streak = user.streak || 0;
+
+            let streakText = langData['streak_text'].replace('%DAYS%', streak);
             
+            userInfoEl.textContent = `${currentUser}${langData['status_welcome']}`;
+            streakDisplayEl.innerHTML = streakText;
+            streakDisplayEl.style.display = 'block';
+
             loginBtn.style.display = 'none';
             signupBtn.style.display = 'none';
             guestBtn.style.display = 'none';
             logoutBtn.style.display = 'inline-block';
             
-            // メニューエリアの表示制御
+            initialMessageEl.style.display = 'none';
+            mainMenuEl.classList.remove('locked');
+        
+        } else if (isGuest) {
+            // ゲストモード
+            userInfoEl.textContent = langData['status_guest'];
+            streakDisplayEl.style.display = 'none'; // ゲストはストリーク非表示
+
+            loginBtn.style.display = 'none';
+            signupBtn.style.display = 'none';
+            guestBtn.style.display = 'none';
+            logoutBtn.style.display = 'inline-block';
+
             initialMessageEl.style.display = 'none';
             mainMenuEl.classList.remove('locked');
 
         } else {
             // 未ログイン状態
             userInfoEl.textContent = langData['auth_status_default'];
-            
+            streakDisplayEl.style.display = 'none';
+
             loginBtn.style.display = 'inline-block';
             signupBtn.style.display = 'inline-block';
             guestBtn.style.display = 'inline-block';
             logoutBtn.style.display = 'none';
             
-            // メニューエリアの非表示/ロック
             initialMessageEl.style.display = 'block';
             mainMenuEl.classList.add('locked');
         }
@@ -549,23 +645,31 @@
         const langData = translations[lang] || translations[LANG_DEFAULT];
 
         if (!gamename || !password) {
-            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
+            messageEl.textContent = 'ゲーム名とパスワードは必須です。'; // エラーメッセージはシンプルに
             return;
         }
         if (gamename === GUEST_NAME) {
-            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
+            messageEl.textContent = 'そのゲーム名は予約されています。'; // エラーメッセージはシンプルに
             return;
         }
 
         const users = getUsers();
         if (users[gamename]) {
-            messageEl.textContent = langData['msg_signup_note']; // 適当なエラーメッセージ
+            messageEl.textContent = 'このゲーム名はすでに使用されています。'; // エラーメッセージはシンプルに
             return;
         }
 
-        users[gamename] = { password: password, name: gamename };
+        // 新しいユーザーをデータ構造に合わせて登録 (ストリーク、最終ログイン日、進捗の初期化を含む)
+        users[gamename] = { 
+            password: password, 
+            name: gamename,
+            streak: 0, // 登録時には0か1にするか迷いますが、ここではログイン時に1日目とします
+            last_login: null,
+            progress: {} 
+        };
         saveUsers(users);
 
+        // 登録後、自動でログイン (ストリーク更新ロジックが走り、1日目になる)
         setSession(gamename);
         modalOverlay.style.display = 'none';
         messageEl.textContent = '';
@@ -589,13 +693,15 @@
         const user = users[gamename];
 
         if (user && user.password === password) {
+            // ログイン成功 (ストリーク更新ロジックが走る)
             setSession(gamename);
             modalOverlay.style.display = 'none';
             messageEl.textContent = '';
             gamenameInput.value = '';
             passwordInput.value = '';
         } else {
-            messageEl.textContent = langData['msg_login_fail'] || 'ゲーム名またはパスワードが違います。'; // 仮のエラーメッセージ
+            // ログイン失敗
+            messageEl.textContent = langData['msg_login_fail'] || 'ゲーム名またはパスワードが違います。'; 
         }
     });
 
@@ -630,12 +736,10 @@
 
     // --- ページ読み込み時の初期化 ---
     document.addEventListener('DOMContentLoaded', () => {
-        // 既存の言語設定の初期化
         const savedLang = localStorage.getItem('preferredLang') || LANG_DEFAULT;
         setLanguage(savedLang); 
         
-        // 認証状態の初期化
-        updateAuthenticationUI();
+        // updateAuthenticationUI() は setLanguage の中で呼ばれる
     });
 </script>
 
