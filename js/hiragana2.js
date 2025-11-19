@@ -1,7 +1,7 @@
 // ----------------------------------------------------
 // ★★★ ポイントシステム設定 (ここから追加) ★★★
 // ----------------------------------------------------
-const GAME_ID_2 = 'hiragana_sort_game'; // ★ゲームID (他と被らない名前に変更)
+const GAME_ID_2 = 'hiragana_sort_game'; // ゲームID
 
 const USER_STORAGE_KEY_2 = 'user_accounts'; 
 const SESSION_STORAGE_KEY_2 = 'current_user'; 
@@ -16,7 +16,7 @@ function getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-// ポイント加算・チェック関数 (単語IDごとに管理)
+// ポイント加算・チェック関数
 function checkAndAwardPoints(wordId) {
     const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_2);
     if (!currentUser || currentUser === GUEST_NAME_2) return "guest"; 
@@ -27,22 +27,19 @@ function checkAndAwardPoints(wordId) {
     if (!user) return "error"; 
 
     const today = getTodayDateString();
-    // キーを「ゲームID + 単語ID」にする
     const progressKey = `${GAME_ID_2}_word_${wordId}`;
 
     user.progress = user.progress || {};
     user.progress[progressKey] = user.progress[progressKey] || {};
 
-    // その単語で、今日すでにポイントをもらっているかチェック
     if (user.progress[progressKey][today] === true) return "already_scored"; 
 
-    // ポイント加算
     user.points = (user.points || 0) + 1;
     user.progress[progressKey][today] = true;
     
     users[currentUser] = user;
     localStorage.setItem(USER_STORAGE_KEY_2, JSON.stringify(users));
-    console.log(`[Game] ${currentUser} gained 1 point for word "${wordId}". Total: ${user.points}`);
+    console.log(`[Game] ${currentUser} gained 1 point. Total: ${user.points}`);
     return "scored"; 
 }
 // ----------------------------------------------------
@@ -51,11 +48,9 @@ function checkAndAwardPoints(wordId) {
 
 
 // --- グローバル変数 ---
-// hiragana2.htmlのIDに合わせて変数を定義
-let MAIN_MENU_2 = null; // hiragana2.htmlのメニューエリア
-let GAME_AREA_2 = null; // hiragana2.htmlのゲームエリア
+let MAIN_MENU_2 = null; 
+let GAME_AREA_2 = null; 
 
-// 音声ファイルのパス
 const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
 const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 
@@ -65,16 +60,19 @@ let score = 0;
 let correctCount = 0;   
 let incorrectCount = 0; 
 let askedWordIds = new Set();
-let selectedBlocks = []; 
 
-// 補助関数: 音源を再生する関数
+// ★★★ ドラッグ＆ドロップ用の変数 ★★★
+let ghostItem = null;      
+let currentDragItem = null; 
+let lastTouchTarget = null; 
+
 function playSound(path) {
     const audio = new Audio(path);
     audio.play().catch(e => console.error("音声再生エラー:", e));
 }
 
 // ----------------------------------------------------
-// 1. ゲーム開始関数 (HTMLの onclick="startNewGame2()" から呼ばれる)
+// 1. ゲーム開始関数
 // ----------------------------------------------------
 window.startNewGame2 = function() {
     if (!MAIN_MENU_2) {
@@ -106,7 +104,6 @@ function startNewGameLogic() {
     correctCount = 0;
     incorrectCount = 0;
     askedWordIds.clear(); 
-    selectedBlocks = [];
 
     showNextQuestion();
 }
@@ -136,7 +133,6 @@ async function loadWords() {
 
 // 4. 問題をランダムに選び、ブロックを生成する
 function showNextQuestion() {
-    
     if (askedWordIds.size >= allWords.length) {
         alert(`全${allWords.length}問を終了しました！\n最終スコア: ${score}点\n正解: ${correctCount}問, 失敗: ${incorrectCount}回`);
         renderMenu(); 
@@ -144,7 +140,6 @@ function showNextQuestion() {
     }
 
     let availableWords = allWords.filter(word => !askedWordIds.has(word.id));
-    
     const correctIndex = Math.floor(Math.random() * availableWords.length);
     currentWord = availableWords[correctIndex];
     
@@ -159,11 +154,11 @@ function showNextQuestion() {
 // 5. 画面に問題とブロックを表示する
 function renderQuestion(word, shuffledChars) {
     const imagePath = `assets/images/${word.image}`; 
-    
     const scoreDisplay = `${correctCount}/${incorrectCount}`; 
 
+    // ★★★ 修正点: draggable="true" を追加 ★★★
     let blocksHtml = shuffledChars.map((char, index) => 
-        `<div class="char-block" data-char="${char}" data-original-index="${index}">${char}</div>`
+        `<div class="char-block" draggable="true" data-char="${char}" id="block-${index}" style="cursor: grab;">${char}</div>`
     ).join('');
 
     GAME_AREA_2.innerHTML = `
@@ -175,7 +170,7 @@ function renderQuestion(word, shuffledChars) {
                  style="width: 150px; height: 150px; border: 3px solid #ffcc5c; border-radius: 10px; object-fit: contain; margin-bottom: 20px;">
         </div> 
         
-        <div id="word-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <div id="word-container" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
             ${blocksHtml}
         </div>
         
@@ -183,58 +178,156 @@ function renderQuestion(word, shuffledChars) {
             <button id="checkButton" class="menu-card-button choice-button" style="width: 150px; height: 50px; margin: 0 auto; display: block;">答え合わせ</button>
         </div>
 
-        <p id="feedback" style="font-weight: bold; margin-top: 15px; min-height: 25px;">クリックで文字を入れ替え！</p>
+        <p id="feedback" style="font-weight: bold; margin-top: 15px; min-height: 25px;">ドラッグして並び替え！</p>
         
         <div id="game-controls-2" style="margin-top: 30px;">
             <button id="backToMenu2" class="menu-card-button menu-card-reset">メニューに戻る</button>
         </div>
     `;
 
-    document.querySelectorAll('.char-block').forEach(block => {
-        block.addEventListener('click', handleBlockClick);
-    });
+    // ★★★ ドラッグ＆ドロップイベントの設定 ★★★
+    addDragDropListeners();
     
     document.getElementById('checkButton').addEventListener('click', checkAnswer);
     document.getElementById('backToMenu2').addEventListener('click', renderMenu);
 }
 
-// 6. ブロックをクリックしたときの処理（並び替えロジック）
-function handleBlockClick(event) {
-    const clickedBlock = event.target;
-    
-    if (selectedBlocks.includes(clickedBlock)) {
-        selectedBlocks = selectedBlocks.filter(block => block !== clickedBlock);
-        clickedBlock.classList.remove('selected');
-    } else {
-        selectedBlocks.push(clickedBlock);
-        clickedBlock.classList.add('selected');
-    }
+// ----------------------------------------------------
+// ★★★ 6. ドラッグ＆ドロップ (並び替え) ロジック ★★★
+// ----------------------------------------------------
 
-    if (selectedBlocks.length === 2) {
-        const block1 = selectedBlocks[0];
-        const block2 = selectedBlocks[1];
-
-        const container = document.getElementById('word-container');
-        const nodes = Array.from(container.children);
-        const index1 = nodes.indexOf(block1);
-        const index2 = nodes.indexOf(block2);
-
-        if (index1 !== -1 && index2 !== -1) {
-            container.innerHTML = '';
-            [nodes[index1], nodes[index2]] = [nodes[index2], nodes[index1]];
-            nodes.forEach(node => container.appendChild(node));
-        }
-        
-        block1.classList.remove('selected');
-        block2.classList.remove('selected');
-        selectedBlocks = [];
-    }
-    
-    document.getElementById('feedback').textContent = 'クリックで文字を入れ替え！';
-    document.getElementById('feedback').style.color = '#333';
+function updateGhostPosition(touch) {
+    if (!ghostItem) return;
+    ghostItem.style.left = (touch.clientX - ghostItem.offsetWidth / 2) + 'px';
+    ghostItem.style.top = (touch.clientY - ghostItem.offsetHeight / 2) + 'px';
 }
 
-// 7. 答え合わせの処理 (不正解なら同じ問題)
+// DOM上で2つの要素の位置を入れ替える関数
+function swapNodes(n1, n2) {
+    if (n1 === n2) return;
+    const p1 = n1.parentNode;
+    const p2 = n2.parentNode;
+    if (p1 !== p2) return; // 同じ親の中でのみ入れ替え
+
+    // n1とn2の相対位置を確認して入れ替え
+    const next1 = n1.nextSibling;
+    const next2 = n2.nextSibling;
+
+    if (next1 === n2) {
+        p1.insertBefore(n2, n1);
+    } else if (next2 === n1) {
+        p1.insertBefore(n1, n2);
+    } else {
+        p1.insertBefore(n2, next1);
+        p1.insertBefore(n1, next2);
+    }
+}
+
+function addDragDropListeners() {
+    const dragItems = document.querySelectorAll('.char-block');
+    const container = document.getElementById('word-container');
+
+    // 透明な画像（ドラッグ中の残像を消すため）
+    const transparentImage = new Image();
+    transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; 
+
+    dragItems.forEach(item => {
+        // --- PC / マウス操作 ---
+        item.addEventListener('dragstart', (e) => {
+            currentDragItem = item;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', item.innerText); // Firefox対応
+            if (e.dataTransfer.setDragImage) {
+                e.dataTransfer.setDragImage(transparentImage, 0, 0);
+            }
+            setTimeout(() => item.style.opacity = '0.4', 0);
+        });
+
+        item.addEventListener('dragend', (e) => {
+            item.style.opacity = '1';
+            currentDragItem = null;
+        });
+
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault(); // ドロップ許可
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        item.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (currentDragItem && currentDragItem !== item) {
+                swapNodes(currentDragItem, item);
+            }
+        });
+
+
+        // --- スマホ / タッチ操作 ---
+        item.addEventListener('touchstart', (e) => {
+            if (e.cancelable) e.preventDefault(); // スクロール防止
+            currentDragItem = item;
+            
+            // ゴースト作成
+            ghostItem = item.cloneNode(true);
+            ghostItem.style.position = 'absolute';
+            ghostItem.style.opacity = '0.8';
+            ghostItem.style.pointerEvents = 'none';
+            ghostItem.style.zIndex = '1000';
+            ghostItem.style.transform = 'scale(1.1)';
+            document.body.appendChild(ghostItem);
+            
+            item.style.opacity = '0.4';
+            updateGhostPosition(e.touches[0]);
+        }, { passive: false });
+
+        item.addEventListener('touchmove', (e) => {
+            if (!currentDragItem || !ghostItem) return;
+            if (e.cancelable) e.preventDefault();
+
+            const touch = e.touches[0];
+            updateGhostPosition(touch);
+
+            // 指の下にある要素を取得
+            ghostItem.style.display = 'none';
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            ghostItem.style.display = '';
+
+            if (elementUnder && elementUnder.classList.contains('char-block')) {
+                if (lastTouchTarget && lastTouchTarget !== elementUnder) {
+                    lastTouchTarget.style.transform = '';
+                }
+                lastTouchTarget = elementUnder;
+                // 指の下のブロックを少し大きくして反応を示す
+                elementUnder.style.transform = 'scale(1.1)';
+            } else {
+                if (lastTouchTarget) lastTouchTarget.style.transform = '';
+                lastTouchTarget = null;
+            }
+        }, { passive: false });
+
+        item.addEventListener('touchend', (e) => {
+            if (currentDragItem) {
+                currentDragItem.style.opacity = '1';
+                
+                // ドロップ先にブロックがあれば入れ替える
+                if (lastTouchTarget && lastTouchTarget !== currentDragItem && lastTouchTarget.classList.contains('char-block')) {
+                    swapNodes(currentDragItem, lastTouchTarget);
+                    lastTouchTarget.style.transform = '';
+                }
+            }
+            
+            if (ghostItem) {
+                document.body.removeChild(ghostItem);
+                ghostItem = null;
+            }
+            currentDragItem = null;
+            lastTouchTarget = null;
+        });
+    });
+}
+// ----------------------------------------------------
+
+
+// 7. 答え合わせの処理
 function checkAnswer() {
     const blocks = Array.from(document.querySelectorAll('.char-block'));
     const attemptedReading = blocks.map(block => block.dataset.char).join('');
@@ -243,19 +336,15 @@ function checkAnswer() {
     if (attemptedReading === currentWord.reading) {
         playSound(SOUND_CORRECT_PATH);
         
-        // ★★★ ポイント付与ロジック (単語IDごとに判定) ★★★
         const result = checkAndAwardPoints(currentWord.id);
         
         let message = 'せいかい！✨';
         if (result === "scored") {
             message += ' (+1 ポイント！)';
         } else if (result === "already_scored") {
-             // メッセージが長くなりすぎるなら省略可
              // message += ' (獲得ずみ)';
         }
         feedbackElement.textContent = message;
-        // ★★★★★★★★★★★★★★★★★★★★★★★
-
         feedbackElement.style.color = '#5c7aff';
         score += 10;
         correctCount += 1; 
@@ -273,11 +362,6 @@ function checkAnswer() {
         feedbackElement.textContent = 'ざんねん...。もう一度並び替えてください。';
         feedbackElement.style.color = '#ff6f61';
         incorrectCount += 1; 
-
-        document.querySelectorAll('.char-block').forEach(block => {
-            block.classList.remove('selected'); 
-        });
-        selectedBlocks = [];
         
         renderScoreTitleUpdate();
     }
