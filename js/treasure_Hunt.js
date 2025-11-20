@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioCache = {};
 
     // ポイントシステム用定数
-    const GAME_ID_SCAVENGER = 'scavenger_hunt_game';
+    const GAME_ID_TREASURE_HUNT = 'treasure_hunt_game';
     const USER_STORAGE_KEY = 'user_accounts'; 
     const SESSION_STORAGE_KEY = 'current_user'; 
 
