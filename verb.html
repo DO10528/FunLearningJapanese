@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>どうしゲーム</title>
 <style>
         /* キーフレームアニメーション (ポップアップ用) */
         @keyframes dv-pop-in {
@@ -290,7 +294,8 @@
             border-color: #81c784;
             color: #388e3c;
         }
-    </style>
+</style>
+</head>
 <body>
 
     <div id="dv-container">
@@ -367,13 +372,16 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
-            // ★★★ ポイントシステム設定 (ゲーム種別ごと) ★★★
+            // ★★★ ポイントシステム設定 ★★★
             // ----------------------------------------------------
-            const GAME_ID_VERB = 'verb_game'; // ゲームID
+            const GAME_ID_VERB = 'verb_game'; 
             
             const USER_STORAGE_KEY_VERB = 'user_accounts'; 
             const SESSION_STORAGE_KEY_VERB = 'current_user'; 
             const GUEST_NAME_VERB = 'ゲスト'; 
+
+            // ★修正1: タイマーIDを管理する変数
+            let gameTimer = null; 
 
             function getTodayDateString() {
                 const now = new Date();
@@ -383,9 +391,6 @@
                 return `${year}-${month}-${day}`;
             }
 
-            // ポイント加算・チェック関数 (ゲームタイプと動詞IDをキーにする)
-            // gameType: 'game1', 'game2', 'game3'
-            // verbId: 'tabemasu', 'nomimasu' など
             function checkAndAwardPoints(gameType, verbId) {
                 const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_VERB);
                 if (!currentUser || currentUser === GUEST_NAME_VERB) return "guest"; 
@@ -396,16 +401,13 @@
                 if (!user) return "error"; 
 
                 const today = getTodayDateString();
-                // キーを「ゲームID + ゲームタイプ + 動詞ID」にする
                 const progressKey = `${GAME_ID_VERB}_${gameType}_${verbId}`;
 
                 user.progress = user.progress || {};
                 user.progress[progressKey] = user.progress[progressKey] || {};
 
-                // その条件で、今日すでにポイントをもらっているかチェック
                 if (user.progress[progressKey][today] === true) return "already_scored"; 
 
-                // ポイント加算
                 user.points = (user.points || 0) + 1;
                 user.progress[progressKey][today] = true;
                 
@@ -414,49 +416,34 @@
                 console.log(`[Game] ${currentUser} gained 1 point for ${gameType} - ${verbId}. Total: ${user.points}`);
                 return "scored"; 
             }
-            // ----------------------------------------------------
-            // ★★★ ポイントシステム設定 (ここまで) ★★★
-            // ----------------------------------------------------
-
 
             // ----------------------------------------------------
             // データ定義
             // ----------------------------------------------------
-            
             const IMG_PATH = 'assets/images/verbs/';
             const SOUND_PATH = 'assets/sounds/verbs/';
 
             const verbData = [
                 { id: 'tabemasu', masu: 'たべます', mashita: 'たべました', english: 'eat', 
                   tprImg: 'tpr_eat.png', animImg: 'anim_eating.gif', noun: 'ごはん', nounImg: 'noun_rice.png' },
-                
                 { id: 'nomimasu', masu: 'のみます', mashita: 'のみました', english: 'drink', 
                   tprImg: 'tpr_drink.png', animImg: 'anim_drinking.gif', noun: 'ジュース', nounImg: 'noun_juice.png' },
-                
                 { id: 'nemasu', masu: 'ねます', mashita: 'ねました', english: 'sleep', 
                   tprImg: 'tpr_sleep.png', animImg: 'anim_sleeping.gif', noun: 'ベッド', nounImg: 'noun_bed.png' },
-                
                 { id: 'mimasu', masu: 'みます', mashita: 'みました', english: 'watch', 
                   tprImg: 'tpr_watch.png', animImg: 'anim_watching.gif', noun: 'テレビ', nounImg: 'noun_tv.png' },
-                
                 { id: 'yomimasu', masu: 'よみます', mashita: 'よみました', english: 'read', 
                   tprImg: 'tpr_read.png', animImg: 'anim_reading.gif', noun: 'ほん', nounImg: 'noun_book.png' },
-                
                 { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', english: 'write/draw', 
                   tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' },
-            
                 { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', english: 'listen', 
                   tprImg: 'tpr_listen.png', animImg: 'anim_listening.gif', noun: 'おんがく', nounImg: 'noun_music.png' },
-
                 { id: 'kaimasu', masu: 'かいます', mashita: 'かいました', english: 'buy', 
                   tprImg: 'tpr_buy.png', animImg: 'anim_buying.gif', noun: 'おかし', nounImg: 'noun_snacks.png' },
-
                 { id: 'ikimasu', masu: 'いきます', mashita: 'いきました', english: 'go', 
                   tprImg: 'tpr_go.png', animImg: 'anim_going.gif', noun: null, nounImg: null },
-
                 { id: 'kimasu', masu: 'きます', mashita: 'きました', english: 'come', 
                   tprImg: 'tpr_come.png', animImg: 'anim_coming.gif', noun: null, nounImg: null },
-                
                 { id: 'kaerimasu', masu: 'かえります', mashita: 'かえりました', english: 'return home', 
                   tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
             ];
@@ -465,10 +452,8 @@
             function loadAudio(id, type) {
                 const verb = verbData.find(v => v.id === id);
                 if (!verb) return;
-                
                 const file = (type === 'masu') ? verb.masu : verb.mashita;
                 const path = `${SOUND_PATH}${file}.mp3`;
-                
                 if (!audioCache[path]) {
                     audioCache[path] = new Audio(path);
                 }
@@ -488,22 +473,23 @@
             const menuGame2Btn = document.getElementById('dv-menu-game2');
             const menuGame3Btn = document.getElementById('dv-menu-game3');
 
-            // ゲーム1 (アクション)
+            // ゲーム1
             const game1Screen = document.getElementById('dv-screen-game1');
             const game1Prompt = document.getElementById('dv-game1-prompt');
             const game1CharImg = document.getElementById('dv-game1-char-img');
             const game1Options = document.getElementById('dv-game1-options');
             const game1Feedback = document.getElementById('dv-game1-feedback');
 
-            // ゲーム2 (時制)
+            // ゲーム2
             const game2Screen = document.getElementById('dv-screen-game2');
             const game2AnimImg = document.getElementById('dv-game2-anim-img');
             const game2TenseIcon = document.getElementById('dv-game2-tense-icon');
-            const game2Option1 = document.getElementById('dv-game2-option1');
-            const game2Option2 = document.getElementById('dv-game2-option2');
+            // ★修正2: constからletに変更 (再代入エラー回避)
+            let game2Option1 = document.getElementById('dv-game2-option1');
+            let game2Option2 = document.getElementById('dv-game2-option2');
             const game2Feedback = document.getElementById('dv-game2-feedback');
 
-            // ゲーム3 (文づくり)
+            // ゲーム3
             const game3Screen = document.getElementById('dv-screen-game3');
             const game3SlotNoun = document.getElementById('dv-game3-slot-noun');
             const game3SlotVerb = document.getElementById('dv-game3-slot-verb');
@@ -545,6 +531,9 @@
 
             homeButtons.forEach(btn => {
                 btn.onclick = () => {
+                    // ★修正3: ホームに戻るときはタイマーを必ずリセット
+                    if (gameTimer) clearTimeout(gameTimer);
+                    
                     game1CharImg.src = `${IMG_PATH}char_idle.png`;
                     showScreen(menuScreen);
                 };
@@ -556,6 +545,9 @@
             let game1AnswerId = '';
 
             function setupGame1() {
+                // ★修正4: 前のタイマーが残っていたら消す
+                if (gameTimer) clearTimeout(gameTimer);
+
                 game1Options.innerHTML = '';
                 game1Feedback.textContent = '';
                 game1CharImg.src = `${IMG_PATH}char_idle.png`;
@@ -593,29 +585,30 @@
                 
                 document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.add('disabled'));
 
+                // ★修正5: タイマーをセットする前に必ずクリアし、IDを変数に保存
+                if (gameTimer) clearTimeout(gameTimer);
+
                 if (chosenId === game1AnswerId) {
                     playSound(soundCorrect);
                     
-                    // ★★★ ポイント付与 (Game1) ★★★
                     const result = checkAndAwardPoints('game1', game1AnswerId);
                     let msg = 'せいかい！';
                     if (result === "scored") {
                         msg += ' (+1 ポイント！)';
                     }
-                    // ★★★★★★★★★★★★★★★★★
 
                     game1Feedback.textContent = msg;
                     game1Feedback.className = 'dv-feedback success';
                     const correctVerb = verbData.find(v => v.id === chosenId);
                     game1CharImg.src = `${IMG_PATH}${correctVerb.animImg}`;
                     
-                    setTimeout(setupGame1, 2500); 
+                    gameTimer = setTimeout(setupGame1, 2500); 
                 } else {
                     playSound(soundIncorrect);
                     game1Feedback.textContent = 'ちがうよ';
                     game1Feedback.className = 'dv-feedback';
                     
-                    setTimeout(() => {
+                    gameTimer = setTimeout(() => {
                         game1Feedback.textContent = '';
                         document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.remove('disabled'));
                     }, 2000);
@@ -626,11 +619,13 @@
             // ゲーム2 (時制) のロジック
             // ----------------------------------------------------
             let game2Answer = '';
-            let game2CurrentVerbId = ''; // ★追加: ポイント付与用
+            let game2CurrentVerbId = '';
 
             function setupGame2() {
+                if (gameTimer) clearTimeout(gameTimer);
+
                 const verb = verbData[Math.floor(Math.random() * verbData.length)];
-                game2CurrentVerbId = verb.id; // ★IDを保持
+                game2CurrentVerbId = verb.id;
                 
                 const isMasu = Math.random() < 0.5;
                 game2Answer = isMasu ? 'masu' : 'mashita';
@@ -653,11 +648,13 @@
                 [game2Option1, game2Option2].forEach(btn => {
                     btn.className = 'dv-button dv-game2-option-button';
                     btn.disabled = false;
+                    // cloneNodeでリスナーを削除して作り直す
                     const newBtn = btn.cloneNode(true);
                     btn.parentNode.replaceChild(newBtn, btn);
                     newBtn.addEventListener('click', handleGame2Choice);
                 });
                 
+                // ★修正6: let定義なので再代入可能（これでエラーが消えます）
                 game2Option1 = document.getElementById('dv-game2-option1');
                 game2Option2 = document.getElementById('dv-game2-option2');
 
@@ -671,22 +668,22 @@
                 game2Option1.disabled = true;
                 game2Option2.disabled = true;
 
+                if (gameTimer) clearTimeout(gameTimer);
+
                 if (chosenTense === game2Answer) {
                     playSound(soundCorrect);
                     chosenBtn.classList.add('correct');
                     
-                    // ★★★ ポイント付与 (Game2) ★★★
                     const result = checkAndAwardPoints('game2', game2CurrentVerbId);
                     let msg = 'せいかい！';
                     if (result === "scored") {
                         msg += ' (+1 ポイント！)';
                     }
-                    // ★★★★★★★★★★★★★★★★★
 
                     game2Feedback.textContent = msg;
                     game2Feedback.className = 'dv-feedback success';
                     
-                    setTimeout(setupGame2, 2000); 
+                    gameTimer = setTimeout(setupGame2, 2000); 
                 } else {
                     playSound(soundIncorrect);
                     chosenBtn.classList.add('incorrect');
@@ -696,7 +693,7 @@
                     const correctBtn = (game2Option1.dataset.tense === game2Answer) ? game2Option1 : game2Option2;
                     correctBtn.classList.add('correct');
                     
-                    setTimeout(setupGame2, 2500); 
+                    gameTimer = setTimeout(setupGame2, 2500); 
                 }
             }
 
@@ -706,6 +703,8 @@
             // ----------------------------------------------------
             
             function setupGame3() {
+                if (gameTimer) clearTimeout(gameTimer);
+
                 game3SlotNoun.innerHTML = '';
                 game3SlotVerb.innerHTML = '';
                 game3ContainerNoun.innerHTML = '';
@@ -792,29 +791,30 @@
                 
                 game3CheckBtn.disabled = true;
 
+                // タイマークリア
+                if (gameTimer) clearTimeout(gameTimer);
+
                 if (nounId === verbId) {
                     const correctPair = verbData.find(v => v.id === nounId);
 
                     playSound(soundCorrect);
 
-                    // ★★★ ポイント付与 (Game3) ★★★
                     const result = checkAndAwardPoints('game3', nounId);
                     let msg = 'せいかい！';
                     if (result === "scored") {
                         msg += ' (+1 ポイント！)';
                     }
-                    // ★★★★★★★★★★★★★★★★★
 
                     game3Feedback.textContent = `${msg}「${correctPair.noun} を ${correctPair.masu}」`;
                     game3Feedback.className = 'dv-feedback success';
                     
-                    setTimeout(setupGame3, 2500); 
+                    gameTimer = setTimeout(setupGame3, 2500); 
                 } else {
                     playSound(soundIncorrect);
                     game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
                     game3Feedback.className = 'dv-feedback';
                     
-                    setTimeout(() => {
+                    gameTimer = setTimeout(() => {
                         game3CheckBtn.disabled = false;
                         game3Feedback.textContent = '';
                         if (nounCard) game3ContainerNoun.appendChild(nounCard);
@@ -823,7 +823,7 @@
                 }
             };
 
-            showScreen(menuScreen); // 最初にメニュー画面を表示
+            showScreen(menuScreen); 
         });
     </script>
 
