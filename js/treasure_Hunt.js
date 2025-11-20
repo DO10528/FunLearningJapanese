@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'pen', name: 'ペン', img: 'pen.png', sound: 'pen.mp3' },
                 { id: 'note', name: 'ノート', img: 'note.png', sound: 'note.mp3' },
                 { id: 'hasami', name: 'はさみ', img: 'hasami.png', sound: 'hasami.mp3' },
-                // ▼ 追加した5単語 ▼
                 { id: 'nori', name: 'のり', img: 'nori.png', sound: 'nori.mp3' },
                 { id: 'hotchkiss', name: 'ホッチキス', img: 'hotchkiss.png', sound: 'hotchkiss.mp3' },
                 { id: 'jougi', name: 'じょうぎ', img: 'jougi.png', sound: 'jougi.mp3' },
@@ -30,41 +29,72 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'たべもの',
             color: '#ffab91', 
             words: [
+                // 元の5つ
                 { id: 'ringo', name: 'りんご', img: 'apple.png', sound: 'apple.mp3' },
                 { id: 'banana', name: 'バナナ', img: 'banana.png', sound: 'banana.mp3' },
                 { id: 'pan', name: 'パン', img: 'bread.png', sound: 'bread.mp3' },
                 { id: 'gyunyu', name: 'ぎゅうにゅう', img: 'milk.png', sound: 'milk.mp3' },
-                { id: 'tamago', name: 'たまご', img: 'egg.png', sound: 'egg.mp3' }
+                { id: 'tamago', name: 'たまご', img: 'egg.png', sound: 'egg.mp3' },
+                // ★追加した5つ
+                { id: 'onigiri', name: 'おにぎり', img: 'onigiri.png', sound: 'onigiri.mp3' },
+                { id: 'mikan', name: 'みかん', img: 'orange.png', sound: 'orange.mp3' },
+                { id: 'juice', name: 'ジュース', img: 'juice.png', sound: 'juice.mp3' },
+                { id: 'cookie', name: 'クッキー', img: 'cookie.png', sound: 'cookie.mp3' },
+                { id: 'tomato', name: 'トマト', img: 'tomato.png', sound: 'tomato.mp3' }
             ]
         },
         clothing: {
             title: 'おようふく',
             color: '#81d4fa', 
             words: [
+                // 元の5つ
                 { id: 'kutsu', name: 'くつ', img: 'shoes.png', sound: 'shoes.mp3' },
                 { id: 'boushi', name: 'ぼうし', img: 'hat.png', sound: 'hat.mp3' },
                 { id: 'tshirt', name: 'Tシャツ', img: 'tshirt.png', sound: 'tshirt.mp3' },
-                { id: 'kutsushita', name: 'くつした', img: 'socks.png', sound: 'socks.mp3' }
+                { id: 'kutsushita', name: 'くつした', img: 'socks.png', sound: 'socks.mp3' },
+                { id: 'zubon', name: 'ズボン', img: 'pants.png', sound: 'pants.mp3' },
+                // ★追加した5つ
+                { id: 'uwagi', name: 'うわぎ', img: 'jacket.png', sound: 'jacket.mp3' },
+                { id: 'skirt', name: 'スカート', img: 'skirt.png', sound: 'skirt.mp3' },
+                { id: 'kaban', name: 'かばん', img: 'bag.png', sound: 'bag.mp3' },
+                { id: 'kasa', name: 'かさ', img: 'umbrella.png', sound: 'umbrella.mp3' },
+                { id: 'megane', name: 'めがね', img: 'glasses.png', sound: 'glasses.mp3' }
             ]
         },
         toys: {
             title: 'おもちゃ',
             color: '#a5d6a7', 
             words: [
+                // 元の5つ
                 { id: 'ball', name: 'ボール', img: 'ball.png', sound: 'ball.mp3' },
                 { id: 'kuruma', name: 'くるま', img: 'car.png', sound: 'car.mp3' },
                 { id: 'ningyou', name: 'にんぎょう', img: 'doll.png', sound: 'doll.mp3' },
-                { id: 'block', name: 'ブロック', img: 'block.png', sound: 'block.mp3' }
+                { id: 'block', name: 'ブロック', img: 'block.png', sound: 'block.mp3' },
+                { id: 'nuigurumi', name: 'ぬいぐるみ', img: 'plush.png', sound: 'plush.mp3' },
+                // ★追加した5つ
+                { id: 'densha', name: 'でんしゃ', img: 'train.png', sound: 'train.mp3' },
+                { id: 'hikouki', name: 'ひこうき', img: 'airplane.png', sound: 'airplane.mp3' },
+                { id: 'robotto', name: 'ロボット', img: 'robot.png', sound: 'robot.mp3' },
+                { id: 'ehon', name: 'えほん', img: 'book.png', sound: 'book.mp3' },
+                { id: 'fuusen', name: 'ふうせん', img: 'balloon.png', sound: 'balloon.mp3' }
             ]
         },
         room: {
             title: 'おへや',
             color: '#ce93d8', 
             words: [
+                // 元の5つ
                 { id: 'isu', name: 'いす', img: 'chair.png', sound: 'chair.mp3' },
                 { id: 'tsukue', name: 'つくえ', img: 'desk.png', sound: 'desk.mp3' },
                 { id: 'tokei', name: 'とけい', img: 'clock.png', sound: 'clock.mp3' },
-                { id: 'tv', name: 'テレビ', img: 'tv.png', sound: 'tv.mp3' }
+                { id: 'tv', name: 'テレビ', img: 'tv.png', sound: 'tv.mp3' },
+                { id: 'gomibako', name: 'ごみばこ', img: 'trashcan.png', sound: 'trashcan.mp3' },
+                // ★追加した5つ
+                { id: 'beddo', name: 'ベッド', img: 'bed.png', sound: 'bed.mp3' },
+                { id: 'doa', name: 'ドア', img: 'door.png', sound: 'door.mp3' },
+                { id: 'mado', name: 'まど', img: 'window.png', sound: 'window.mp3' },
+                { id: 'denki', name: 'でんき', img: 'light.png', sound: 'light.mp3' },
+                { id: 'sofa', name: 'ソファ', img: 'sofa.png', sound: 'sofa.mp3' }
             ]
         }
     };
