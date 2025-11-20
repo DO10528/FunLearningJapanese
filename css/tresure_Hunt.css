@@ -1,0 +1,119 @@
+body {
+    font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
+    background: linear-gradient(180deg, #fffbe6 0%, #ffeccc 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+    color: #5a4a3a;
+}
+
+#sc-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px; 
+    background-color: #ffffff;
+    box-shadow: 0 8px 24px rgba(139, 115, 85, 0.15); 
+    border-radius: 20px; 
+    border: 3px solid #f7d899;
+}
+
+.sc-screen { display: none; }
+.sc-screen.active { display: block; }
+
+h1, h2 { text-align: center; color: #d98a00; }
+h1 { font-size: 2.2em; margin-bottom: 20px; }
+h2 { font-size: 1.8em; margin-bottom: 15px; }
+p { text-align: center; font-size: 1.2em; }
+
+/* --- ボタン共通 --- */
+.sc-button {
+    display: block; width: 90%; margin: 15px auto;
+    padding: 15px; font-size: 1.3em; font-weight: 700;
+    color: #fff; background-color: #ffb100; border: none;
+    border-radius: 15px; cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 0 #d98a00;
+}
+.sc-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+.sc-button-secondary {
+     background-color: #90a4ae;
+     box-shadow: 0 4px 0 #546e7a;
+     margin-top: 30px;
+     font-size: 1.1em;
+}
+.sc-button-camera {
+     background-color: #ef5350;
+     box-shadow: 0 4px 0 #c62828;
+}
+
+/* --- トピック選択画面 --- */
+#sc-topic-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.sc-topic-card {
+    background: #fff;
+    border: 3px solid #ffca28;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f57f17;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sc-topic-card:hover {
+    background-color: #fff8e1;
+    transform: scale(1.02);
+}
+
+/* --- 勉強リスト --- */
+#sc-study-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.sc-study-item {
+    border: 2px solid #f0f0f0; border-radius: 10px;
+    text-align: center; padding: 10px; cursor: pointer;
+}
+.sc-study-item:hover { background-color: #fffbe6; }
+.sc-study-item img {
+    width: 100%; max-width: 80px; height: 80px; object-fit: contain;
+}
+.sc-study-item p { font-size: 1.0em; font-weight: bold; margin: 5px 0 0 0; }
+
+/* --- カメラ・結果 --- */
+#sc-camera-view-wrapper {
+    position: relative; width: 100%;
+    background-color: #000; border-radius: 10px; overflow: hidden;
+    margin-bottom: 15px;
+}
+#sc-video-element { width: 100%; height: auto; display: block; }
+#sc-canvas-element { display: none; }
+
+#sc-result-comparison-area {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+}
+.sc-result-box {
+    border: 2px solid #f7d899; border-radius: 10px;
+    padding: 10px; text-align: center;
+}
+.sc-result-box img { 
+    width: 100%; height: auto; max-height: 200px; 
+    object-fit: contain; border-radius: 5px;
+}
+#sc-self-assess-buttons {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
+}
