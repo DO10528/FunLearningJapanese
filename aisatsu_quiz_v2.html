@@ -349,7 +349,6 @@
     <audio id="aq-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
 
     <script>
-        // JSはHTMLの最後に残します（ポイントシステムロジックを含む）
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
@@ -396,21 +395,22 @@
             const SOUND_PATH_AISATSU = 'assets/sounds/aisatsu/';
             const IMAGE_PATH_AISATSU = 'assets/images/aisatsu/'; 
 
+            // ★修正: file_name プロパティを追加 (これが実際のファイル名に対応すると仮定)
             const greetingsData = [
-                { "id": 1, "situation": "あさ、おきたとき、または あったひとに いう あいさつは？ (朝)", "correct": "おはよう", "image": "ohayou.png", "wrongs": ["こんにちは", "こんばんは", "おやすみなさい"] },
-                { "id": 2, "situation": "ひるま、ひとに あったときの あいさつは？ (昼)", "correct": "こんにちは", "image": "konnichiwa.png", "wrongs": ["おはよう", "こんばんは", "さようなら"] },
-                { "id": 3, "situation": "ゆうがたから よるに かけて、ひとに あったときの あいさつは？ (夜)", "correct": "こんばんは", "image": "konbanwa.png", "wrongs": ["おはよう", "こんにちは", "ただいま"] },
-                { "id": 4, "situation": "ねるまえに ひとに いう あいさつは？", "correct": "おやすみなさい", "image": "oyasumi.png", "wrongs": ["さようなら", "いただきます", "いってきます"] },
-                { "id": 5, "situation": "これから いえを でかけるときの あいさつは？ (自分が)", "correct": "いってきます", "image": "ittekimasu.png", "wrongs": ["ただいま", "いってらっしゃい", "おかえりなさい"] },
-                { "id": 6, "situation": "かぞくが でかけるときに、かえす ことばは？", "correct": "いってらっしゃい", "image": "itterasshai.png", "wrongs": ["いってきます", "ただいま", "おかえりなさい"] },
-                { "id": 7, "situation": "そとから いえに かえってきたときの あいさつは？", "correct": "ただいま", "image": "tadaima.png", "wrongs": ["おかえりなさい", "いってきます", "ごちそうさま"] },
-                { "id": 8, "situation": "「ただいま」と いわれたときの かえす ことばは？", "correct": "おかえりなさい", "image": "okaeri.png", "wrongs": ["いってきます", "さようなら", "ごめんなさい"] },
-                { "id": 9, "situation": "なにかを してもらったときの、かんしゃの ことばは？", "correct": "ありがとう", "image": "arigatou.png", "wrongs": ["ごめんなさい", "いただきます", "おやすみなさい"] },
-                { "id": 10, "situation": "わるいことを してしまったときの あいさつは？", "correct": "ごめんなさい", "image": "gomen.png", "wrongs": ["ありがとう", "こんにちは", "いただきます"] },
-                { "id": 11, "situation": "ごはんを たべるまえの あいさつは？", "correct": "いただきます", "image": "itadakimasu.png", "wrongs": ["ごちそうさま", "ありがとう", "おかえりなさい"] },
-                { "id": 12, "situation": "ごはんを たべおわった あとの あいさつは？", "correct": "ごちそうさま", "image": "gochisousama.png", "wrongs": ["いただきます", "こんにちは", "おやすみなさい"] },
-                { "id": 13, "situation": "はじめて あうひとに いう、さいしょの あいさつは？", "correct": "はじめまして", "image": "hajimemashite.png", "wrongs": ["こんにちは", "さようなら", "いってきます"] },
-                { "id": 14, "situation": "かぞくや ともだちと わかれるときの あいさつは？", "correct": "さようなら", "image": "sayounara.png", "wrongs": ["こんにちは", "おかえりなさい", "おやすみなさい"] }
+                { "id": 1, "situation": "あさ、おきたとき、または あったひとに いう あいさつは？ (朝)", "correct": "おはよう", "image": "ohayou.png", "file_name": "ohayou", "wrongs": ["こんにちは", "こんばんは", "おやすみなさい"] },
+                { "id": 2, "situation": "ひるま、ひとに あったときの あいさつは？ (昼)", "correct": "こんにちは", "image": "konnichiwa.png", "file_name": "konnichiwa", "wrongs": ["おはよう", "こんばんは", "さようなら"] },
+                { "id": 3, "situation": "ゆうがたから よるに かけて、ひとに あったときの あいさつは？ (夜)", "correct": "こんばんは", "image": "konbanwa.png", "file_name": "konbanwa", "wrongs": ["おはよう", "こんにちは", "ただいま"] },
+                { "id": 4, "situation": "ねるまえに ひとに いう あいさつは？", "correct": "おやすみなさい", "image": "oyasumi.png", "file_name": "oyasumi", "wrongs": ["さようなら", "いただきます", "いってきます"] },
+                { "id": 5, "situation": "これから いえを でかけるときの あいさつは？ (自分が)", "correct": "いってきます", "image": "ittekimasu.png", "file_name": "ittekimasu", "wrongs": ["ただいま", "いってらっしゃい", "おかえりなさい"] },
+                { "id": 6, "situation": "かぞくが でかけるときに、かえす ことばは？", "correct": "いってらっしゃい", "image": "itterasshai.png", "file_name": "itterasshai", "wrongs": ["いってきます", "ただいま", "おかえりなさい"] },
+                { "id": 7, "situation": "そとから いえに かえってきたときの あいさつは？", "correct": "ただいま", "image": "tadaima.png", "file_name": "tadaima", "wrongs": ["おかえりなさい", "いってきます", "ごちそうさま"] },
+                { "id": 8, "situation": "「ただいま」と いわれたときの かえす ことばは？", "correct": "おかえりなさい", "image": "okaeri.png", "file_name": "okaeri", "wrongs": ["いってきます", "さようなら", "ごめんなさい"] },
+                { "id": 9, "situation": "なにかを してもらったときの、かんしゃの ことばは？", "correct": "ありがとう", "image": "arigatou.png", "file_name": "arigatou", "wrongs": ["ごめんなさい", "いただきます", "おやすみなさい"] },
+                { "id": 10, "situation": "わるいことを してしまったときの あいさつは？", "correct": "ごめんなさい", "image": "gomen.png", "file_name": "gomen", "wrongs": ["ありがとう", "こんにちは", "いただきます"] },
+                { "id": 11, "situation": "ごはんを たべるまえの あいさつは？", "correct": "いただきます", "image": "itadakimasu.png", "file_name": "itadakimasu", "wrongs": ["ごちそうさま", "ありがとう", "おかえりなさい"] },
+                { "id": 12, "situation": "ごはんを たべおわった あとの あいさつは？", "correct": "ごちそうさま", "image": "gochisousama.png", "file_name": "gochisousama", "wrongs": ["いただきます", "こんにちは", "おやすみなさい"] },
+                { "id": 13, "situation": "はじめて あうひとに いう、さいしょの あいさつは？", "correct": "はじめまして", "image": "hajimemashite.png", "file_name": "hajimemashite", "wrongs": ["こんにちは", "さようなら", "いってきます"] },
+                { "id": 14, "situation": "かぞくや ともだちと わかれるときの あいさつは？", "correct": "さようなら", "image": "sayounara.png", "file_name": "sayounara", "wrongs": ["こんにちは", "おかえりなさい", "おやすみなさい"] }
             ];
 
             // --- 音声キャッシュ ---
@@ -474,7 +474,7 @@
             }
 
             // ----------------------------------------------------
-            // ★ 1. 勉強スクリーンのロジック
+            // ★ 1. 勉強スクリーンのロジック (ファイル名で再生)
             // ----------------------------------------------------
             function initStudyScreen() {
                 studyGridEl.innerHTML = '';
@@ -483,7 +483,8 @@
                     item.className = 'aq-study-item';
                     
                     item.onclick = () => {
-                        const answerSound = loadAudio(SOUND_PATH_AISATSU + word.correct + '.mp3');
+                        // ★修正: word.file_nameを使用
+                        const answerSound = loadAudio(SOUND_PATH_AISATSU + word.file_name + '.mp3');
                         playSound(answerSound);
                     };
                     
@@ -506,7 +507,7 @@
 
             function startGame() {
                 allQuestions = shuffleArray([...greetingsData]);
-                currentQuestions = allQuestions.slice(0, 10); // 10問に限定
+                currentQuestions = allQuestions.slice(0, 10); 
                 currentQuestionIndex = 0;
                 score = 0;
                 
@@ -586,8 +587,12 @@
                 const chosenButton = event.target;
                 const chosenAnswer = chosenButton.textContent;
                 
-                const answerSound = loadAudio(SOUND_PATH_AISATSU + chosenAnswer + '.mp3');
-                playSound(answerSound);
+                // ★修正: 選んだ答えのfile_nameを使って音声を再生
+                const correctWordData = greetingsData.find(w => w.correct === chosenAnswer);
+                if (correctWordData) {
+                    const answerSound = loadAudio(SOUND_PATH_AISATSU + correctWordData.file_name + '.mp3');
+                    playSound(answerSound);
+                }
 
                 disableChoices(true); 
                 playSoundButton.disabled = true; 
