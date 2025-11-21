@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>しりとりゲーム - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:hover { transform: scale(1.1); }
+
+    /* --- メインコンテナ --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 700px; 
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* --- カードデザイン --- */
+    .game-card {
+        background: white;
+        border-radius: 25px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        border: 4px solid white;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    /* --- メニュー画面 --- */
+    .menu-icon { font-size: 4em; color: #ffcc5c; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 2em; color: var(--primary); margin: 0 0 10px 0; }
+    .rule-box { background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 25px; color: #5d4037; text-align: left; font-size: 0.95em;}
+    .rule-box p { margin: 5px 0; }
+
+    .start-btn {
+        background: linear-gradient(to bottom, #5c7aff, #4b63cc);
+        color: white; font-size: 1.6em; font-weight: 900;
+        padding: 15px 50px; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
+        margin-bottom: 15px; display: inline-block; width: 80%; max-width: 300px;
+    }
+    .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
+    .home-btn-text { color: #999; text-decoration: none; font-weight: bold; display: block; margin-top: 10px; }
+
+    /* --- ゲーム画面 --- */
+    .turn-header {
+        font-size: 1.2em; font-weight: bold; color: var(--primary); margin-bottom: 15px;
+        background: #e3f2fd; padding: 8px 20px; border-radius: 20px; display: inline-block;
+    }
+
+    /* お題（直前の単語）エリア */
+    .current-word-area {
+        background: #fffbea;
+        border: 4px solid var(--accent);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    .current-word-label { font-size: 0.9em; color: #888; font-weight: bold; margin-bottom: 10px; }
+    .current-image { 
+        width: 140px; height: 140px; object-fit: contain; 
+        background: white; border-radius: 15px; padding: 5px; margin-bottom: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .current-word-text { font-size: 2em; font-weight: 900; color: #333; }
+    
+    /* しりとり強調（最後の文字） */
+    .highlight-char { color: #ef5350; font-size: 1.2em; }
+
+    /* 質問文 */
+    .question-text { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: #555; }
+
+    /* 選択肢グリッド */
+    .choices-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3列 */
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 500px) {
+        .choices-grid { gap: 10px; } /* スマホは狭めに */
+    }
+
+    /* 選択肢カード */
+    .choice-card {
+        background: white;
+        border: 3px solid #eee;
+        border-radius: 15px;
+        padding: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 0 #eee;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: 110px;
+    }
+    .choice-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .choice-card:active { transform: translateY(2px); box-shadow: none; }
+    .choice-card img { width: 80px; height: 80px; object-fit: contain; pointer-events: none; }
+    
+    /* フィードバック */
+    .feedback-msg { font-weight: bold; font-size: 1.2em; min-height: 1.5em; margin-top: 10px; }
+
+    /* アニメーション */
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="shiritori-menu" class="pop-in">
+            <div class="game-card">
+                <i class="fa-solid fa-link menu-icon"></i>
+                <h1 class="menu-title">しりとりゲーム</h1>
+                
+                <div class="rule-box">
+                    <p><strong>あそびかた：</strong></p>
+                    <p>1. いらすと の なまえ をみてね。</p>
+                    <p>2. <strong>さいご の もじ</strong> から はじまる もの を えらぼう！</p>
+                    <p>3. 「ん」がついたら おしまい だよ。</p>
+                </div>
+
+                <button id="shiritoriStartButton" class="start-btn">
+                    <i class="fa-solid fa-play"></i> スタート！
+                </button>
+                <a href="index.html" class="home-btn-text">ホームにもどる</a>
+            </div>
+        </div>
+
+        <div id="shiritori-game-area" style="display:none;" class="pop-in">
+            <div class="game-card">
+                
+                <div id="turn-message" class="turn-header">スタート！</div>
+
+                <div class="current-word-area">
+                    <div class="current-word-label">まえの ことば</div>
+                    <div id="image-area">
+                        </div>
+                    <div id="current-word-display" class="current-word-text">
+                        </div>
+                </div>
+
+                <h3 id="question-text" class="question-text">つぎ は どれかな？</h3>
+
+                <div id="choice-buttons-area" class="choices-grid">
+                    </div>
+
+                <p id="feedback" class="feedback-msg"></p>
+                
+                <div style="margin-top: 10px;">
+                    <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
+                </div>
+
+                <div id="endGameControls" style="display:none; margin-top:20px;">
+                    <button onclick="location.reload()" class="start-btn" style="font-size:1.2em; padding:10px 30px;">もういちど</button>
+                    <a href="index.html" class="home-btn-text">ホームにもどる</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/shiritori_v2.js"></script>
+
+</body>
+</html>
