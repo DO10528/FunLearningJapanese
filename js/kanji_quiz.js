@@ -60,8 +60,8 @@ const IMAGE_PATHS = [
 ];
 
 // 音声ファイルのパス設定
-const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
-const SOUND_INCORRECT_PATH = 'assets/sounds/incorrect.mp3'; 
+const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
 
 // グローバル変数
 let kanjiList = [];         
