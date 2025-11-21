@@ -487,15 +487,19 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("エラー: スタートボタン(id='quizStartButton')が見つかりません。HTMLを確認してください。");
     }
 
+    // 安全のため、HTMLのonclickでも動くようにグローバル関数としても登録しておく
+    window.startQuizGame = startNewGameLogic;
+
     function startNewGameLogic() {
         // データチェック
-        if (allWords.length < 4) {
+        // gameData 変数を直接使うように修正しました
+        if (!gameData || gameData.length < 4) {
             alert('データ不足のためゲームを開始できません(最低4単語必要)');
             return;
         }
         
-        MENU_AREA.style.display = 'none'; 
-        GAME_AREA.style.display = 'block'; 
+        if (MENU_AREA) MENU_AREA.style.display = 'none'; 
+        if (GAME_AREA) GAME_AREA.style.display = 'block'; 
 
         score = 0; 
         questionCount = 0;
@@ -517,10 +521,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScoreBoard();
 
         // まだ出題していない単語から選ぶ
-        let availableWords = allWords.filter(w => !askedWordIds.has(w.id));
+        // gameData を使うように修正
+        let availableWords = gameData.filter(w => !askedWordIds.has(w.id));
         if (availableWords.length === 0) {
             askedWordIds.clear(); // 一周したらリセット
-            availableWords = allWords;
+            availableWords = gameData;
         }
 
         const correctIndex = Math.floor(Math.random() * availableWords.length);
@@ -532,8 +537,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 無限ループ防止のための安全装置
         let safeCounter = 0;
         while (wrongChoices.length < 3 && safeCounter < 100) {
-            const rIndex = Math.floor(Math.random() * allWords.length);
-            const w = allWords[rIndex];
+            const rIndex = Math.floor(Math.random() * gameData.length);
+            const w = gameData[rIndex];
             if (w.id !== currentWord.id && !wrongChoices.some(wc => wc.id === w.id)) {
                 wrongChoices.push(w);
             }
@@ -550,16 +555,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderQuestionUI(word, choices) {
         // 画像エリア
         // 画像が見つからない時にエラーで止まらないよう onerror を設定
-        IMAGE_AREA.innerHTML = `
-            <img src="assets/images/${word.image}" 
-                 alt="${word.word}" 
-                 onerror="this.style.display='none'; this.parentNode.innerHTML='<p>(${word.image}が見つかりません)</p>'">
-        `;
+        // assets/images/ のパスを付与
+        if (IMAGE_AREA) {
+            IMAGE_AREA.innerHTML = `
+                <img src="assets/images/${word.image}" 
+                     alt="${word.word}" 
+                     onerror="this.style.display='none'; this.parentNode.innerHTML='<p style=\\'font-size:2em\\'>🖼️</p><p>(${word.image}が見つかりません)</p>'">
+            `;
+        }
         
         // 選択肢ボタン生成
-        CHOICE_BUTTONS_AREA.innerHTML = '';
-        FEEDBACK.textContent = '';
-        FEEDBACK.style.color = '#333';
+        if (CHOICE_BUTTONS_AREA) {
+            CHOICE_BUTTONS_AREA.innerHTML = '';
+        }
+        if (FEEDBACK) {
+            FEEDBACK.textContent = '';
+            FEEDBACK.style.color = '#333';
+        }
 
         choices.forEach(choice => {
             const btn = document.createElement('button');
@@ -567,7 +579,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = choice.word;
             btn.dataset.word = choice.word;
             btn.onclick = handleAnswer;
-            CHOICE_BUTTONS_AREA.appendChild(btn);
+            if (CHOICE_BUTTONS_AREA) {
+                CHOICE_BUTTONS_AREA.appendChild(btn);
+            }
         });
     }
 
