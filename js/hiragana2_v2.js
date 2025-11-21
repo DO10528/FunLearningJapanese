@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             FEEDBACK.textContent = msg;
             FEEDBACK.style.color = 'var(--correct-color)';
             CHECK_BTN.disabled = true;
-            score += 10;
+            score += 1;
             updateScoreBoard();
             
             setTimeout(() => {
