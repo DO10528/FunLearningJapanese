@@ -123,7 +123,7 @@
         margin: 0 auto;
     }
 
-    /* --- 左側：カードリストエリア (高さをコンテンツに合わせる) --- */
+    /* --- 左側：カードリストエリア (高さ修正) --- */
     .card-area {
         flex: 1; 
         min-width: 250px;
@@ -135,7 +135,7 @@
         
         /* ★修正: 高さをコンテンツに合わせる */
         align-self: flex-start; 
-        min-height: 400px; /* ある程度の最小値を確保 */
+        /* min-height: 400px; を削除 */
         
         overflow-y: auto;
     }
@@ -144,7 +144,7 @@
         margin-top: 0;
     }
 
-    /* --- 右側：グリッドエリア (高さをコンテンツに合わせる) --- */
+    /* --- 右側：グリッドエリア (高さ修正) --- */
     .grid-area {
         flex: 2; 
         text-align: center;
@@ -156,7 +156,7 @@
         
         /* ★修正: 高さをコンテンツに合わせる */
         align-self: flex-start;
-        min-height: 400px; /* ある程度の最小値を確保 */
+        /* min-height: 400px; を削除 */
     }
     .grid-area h3 {
         color: var(--primary);
