@@ -1,54 +1,253 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>ひらがな単語ゲーム</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ひらがな単語ゲーム - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/style.css">
+<style>
+    /* --- カラー設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
 
-    <link rel="stylesheet" href="css/hiragana_quiz.css">
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-    <script src="js/hiragana.js" defer></script>
-    </head>
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+
+    /* --- メインレイアウト --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 700px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* --- カードデザイン --- */
+    .quiz-card {
+        background: white;
+        border-radius: 25px;
+        padding: 30px 20px; /* 横のパディングを少し減らしてスマホで見やすく */
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        border: 4px solid white;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* --- メニュー画面 --- */
+    .menu-icon { font-size: 5em; color: #ff6f61; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 2em; color: var(--primary); margin: 0 0 10px 0; }
+    .menu-desc { color: #666; margin-bottom: 20px; font-size: 1.1em; }
+    .rule-box { background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 25px; color: #5d4037; }
+    
+    .start-btn {
+        background: linear-gradient(to bottom, #5c7aff, #4b63cc);
+        color: white; font-size: 1.6em; font-weight: 900;
+        padding: 15px 50px; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
+        margin-bottom: 15px; display: inline-block; width: 80%; max-width: 300px;
+    }
+    .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
+    .home-btn-text { color: #999; text-decoration: none; font-weight: bold; display: block; margin-top: 10px; }
+
+    /* --- ゲーム画面 --- */
+    .score-board {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; padding: 10px 20px;
+        background: white; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        font-weight: bold; color: var(--primary);
+    }
+
+    .image-frame {
+        width: 200px; height: 200px; margin: 0 auto 20px;
+        background: #fffbea; border: 6px solid var(--accent);
+        border-radius: 25px; overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .image-frame img { width: 90%; height: 90%; object-fit: contain; }
+    
+    .question-text { font-size: 1.4em; font-weight: bold; color: #444; margin-bottom: 20px; }
+
+    /* ========================================== */
+    /* ★★★ ここを修正しました (選択肢の表示) ★★★ */
+    /* ========================================== */
+    
+    /* 強制的にグリッド（横並び）にする設定 */
+    .choices-grid {
+        display: grid;
+        /* 1fr 1fr = 常に2列にする設定です。
+           もし3つを横1列にしたい場合は repeat(3, 1fr) に変えてください 
+        */
+        grid-template-columns: 1fr 1fr; 
+        gap: 15px; /* ボタン同士の間隔 */
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    /* 選択肢ボタンのデザイン（枠線を強調） */
+    .choice-btn {
+        /* 見た目をボタンらしく */
+        background-color: #ffffff;
+        
+        /* 枠線を太く、色をグレーにして見えやすく */
+        border: 3px solid #dce0e5; 
+        border-radius: 15px;
+        
+        /* 文字設定 */
+        color: #555;
+        font-size: 1.3em;
+        font-weight: 800;
+        
+        /* サイズ調整 */
+        padding: 15px 5px;
+        width: 100%; /* グリッド幅いっぱいに */
+        min-height: 70px; /* 高さを確保 */
+        
+        cursor: pointer;
+        box-shadow: 0 4px 0 #cfd8dc; /* 下に影をつけて立体的に */
+        transition: all 0.1s;
+        
+        /* 文字がはみ出さないように */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* ホバー時（マウスを乗せた時） */
+    .choice-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #cfd8dc;
+    }
+
+    /* 押した時 */
+    .choice-btn:active {
+        transform: translateY(2px);
+        box-shadow: none;
+    }
+
+    /* 正解の色 */
+    .choice-btn.correct {
+        background-color: var(--correct-color);
+        border-color: var(--correct-color);
+        color: white;
+        box-shadow: 0 4px 0 #2e7d32;
+    }
+
+    /* 不正解の色 */
+    .choice-btn.incorrect {
+        background-color: var(--incorrect-color);
+        border-color: var(--incorrect-color);
+        color: white;
+        opacity: 0.6;
+        box-shadow: none;
+    }
+    
+    /* ボタン無効化 */
+    .choice-btn.disabled { pointer-events: none; }
+
+    /* ========================================== */
+
+    .feedback-area { min-height: 1.5em; margin-top: 10px; font-size: 1.3em; font-weight: 900; }
+    
+    /* アニメーション */
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+</style>
+</head>
 <body>
-    
-    <h1>ひらがな単語クイズ</h1>
-    
-    <div id="quiz-menu-area" class="container">
-        <h2>イラストを見て言葉を選ぼう！</h2>
-        
-        <div id="quiz-score-message" style="margin-bottom: 20px;">
-            <p>ルール: イラストと同じ言葉を3択から選んでね。</p>
-            <p>スコアは下のゲーム開始ボタンを押すとリセットされます。</p>
-        </div> 
-        
-        <button id="quizStartButton" class="menu-card-button menu-card-reset" onclick="startQuizGame()">
-            🎮<br>ゲームスタート！
-        </button>
 
-        <a href="index.html" class="menu-card-button menu-card-reset">
-            🏠<br>ホームに戻る
-        </a>
-    </div>
-    
-    <div id="quiz-game-area" class="container" style="display:none;">
+    <header>
+        <a href="v2_index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="v2_index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
         
-        <p id="quiz-turn-message" style="font-size: 1.5em; font-weight: bold; color: #5c7aff; margin-bottom: 10px;">チャレンジ中！</p>
-        
-        <div id="quiz-image-area" style="margin-bottom: 30px;">
+        <div id="quiz-menu-area" class="pop-in">
+            <div class="quiz-card">
+                <i class="fa-solid fa-shapes menu-icon"></i>
+                <h1 class="menu-title">ひらがな単語</h1>
+                <p class="menu-desc">え を みて ただしい ことば をえらぼう！</p>
+                
+                <div class="rule-box">
+                    <div id="quiz-score-message">
+                        ぜんぶで <strong>10もん</strong> あるよ。<br>がんばって クリアしよう！
+                    </div>
+                </div>
+
+                <button id="quizStartButton" class="start-btn" onclick="startQuizGame()">
+                    <i class="fa-solid fa-play"></i> スタート！
+                </button>
+
+                <a href="v2_index.html" class="home-btn-text">ホームにもどる</a>
+            </div>
+        </div>
+
+        <div id="quiz-game-area" style="display:none;" class="pop-in">
+            
+            <div class="score-board">
+                <span id="quiz-turn-message">問 1 / 10</span>
+                <span><i class="fa-solid fa-star" style="color:#f0ad4e;"></i> <span id="score-val">0</span></span>
             </div>
 
-        <h3 id="quiz-question-text">このイラストはどれかな？</h3>
+            <div class="quiz-card">
+                <div id="quiz-image-area" class="image-frame">
+                    </div>
 
-        <div id="choice-buttons-area"> 
+                <h3 id="quiz-question-text" class="question-text">このイラストはどれかな？</h3>
+
+                <div id="choice-buttons-area" class="choices-grid">
+                    </div>
+
+                <p id="quiz-feedback" class="feedback-area"></p>
+
+                <div style="margin-top: 10px;">
+                    <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
+                </div>
             </div>
-
-        <p id="quiz-feedback" style="font-weight: bold; margin-top: 20px; min-height: 20px;">答えを選んでね！</p>
-        
-        <div id="quiz-game-controls" style="margin-top: 30px; display: flex; justify-content: center; min-height: 50px;">
-             </div>
+        </div>
 
     </div>
-    
+
+    <script src="js/hiragana.js"></script>
+
 </body>
 </html>

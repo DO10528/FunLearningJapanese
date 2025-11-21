@@ -3,869 +3,505 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="main_title">Fun Learning Japanese</title>
-<meta name="description" content="Learn Hiragana, Katakana, Kanji, and grammar with fun, free Japanese learning games! Perfect for beginners.">
+<title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#5c7aff">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FunLearnJP">
-<link rel="apple-touch-icon" href="images/icons/icon-192x192.png"> 
-<link rel="stylesheet" href="css/style.css">
 <style>
-/* 既存の認証UIとメニューのCSS */
-.menu-group { background-color: #f0f8ff; border: 2px solid #5c7aff; border-radius: 15px; padding: 15px 20px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.menu-group h2 { text-align: center; color: #5c7aff; font-size: 1.5em; margin-bottom: 20px; }
-#auth-status-bar { width: 100%; max-width: 800px; margin: 10px auto 20px; padding: 10px 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-#user-status-container { display: flex; flex-direction: column; align-items: flex-start; padding: 5px 0; } 
-#user-info { font-size: 1.1em; font-weight: bold; color: #333; } 
-#streak-display { font-size: 0.9em; font-weight: 800; color: #ff6b6b; } 
-#points-display { font-size: 0.9em; font-weight: 800; color: #5cb85c; } 
-#auth-buttons button { margin-left: 10px; padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: background-color 0.2s; }
-.btn-login { background-color: #5cb85c; color: white; }
-.btn-signup { background-color: #007bff; color: white; }
-.btn-guest { background-color: #f0ad4e; color: white; }
-.btn-logout { background-color: #d9534f; color: white; }
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-.modal-content { background-color: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-.modal-content h2 { margin-top: 0; color: #005bb5; }
-.modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-.modal-content button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-.modal-content .btn-submit { background-color: #007bff; color: white; }
-.modal-content .btn-close { background-color: #ccc; color: #333; margin-top: 10px; }
-.form-message { color: #d9534f; margin-bottom: 10px; font-weight: bold; }
-#main-menu.locked { filter: blur(2px); pointer-events: none; user-select: none; }
-#initial-message { text-align: center; padding: 50px 20px; font-size: 1.1em; color: #d9534f; font-weight: bold; border: 2px dashed #d9534f50; border-radius: 10px; margin-top: 20px; }
-@media (max-width: 600px) { #auth-status-bar { flex-direction: column; gap: 10px; } #user-status-container { width: 100%; align-items: center; } #auth-buttons { width: 100%; display: flex; justify-content: space-between; } #auth-buttons button { margin: 0 2px; flex-grow: 1; } }
-
-
-/* ========================================= */
-/* ランキング機能のCSS */
-/* ========================================= */
-#ranking-container {
-    background-color: #fff;
-    border: 3px solid #ffca28; /* ゴールドっぽい枠線 */
-    border-radius: 15px;
-    padding: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    z-index: 1000;
-}
-
-#ranking-container h3 {
-    margin: 0 0 10px 0;
-    font-size: 1em;
-    text-align: center;
-    color: #ff6f00;
-    font-weight: 800;
-}
-
-#ranking-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#ranking-list li {
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 0.9em;
-    border-bottom: 1px dashed #eee;
-    white-space: nowrap; 
-}
-
-/* 1位〜3位のアイコン色 */
-#ranking-list li:nth-child(1) { color: #d4af37; } 
-#ranking-list li:nth-child(2) { color: #c0c0c0; } 
-#ranking-list li:nth-child(3) { color: #cd7f32; } 
-
-/* -----------------------------------------
-   スマホ (FunLearningJapaneseの下に横並び)
-   ----------------------------------------- */
-@media (max-width: 1023px) {
-    #ranking-container {
-        width: 90%;
-        max-width: 600px;
-        margin: 10px auto 20px auto; 
-        text-align: center;
+    /* --- 基本設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
     }
 
-    #ranking-list {
-        display: flex;          
-        overflow-x: auto;       
-        justify-content: flex-start; 
-        gap: 15px;               
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        padding-bottom: 80px;
     }
 
-    #ranking-list li {
-        flex-shrink: 0;         
-        border-bottom: none;    
-        background: #fff8e1;
-        padding: 5px 10px;
-        border-radius: 10px;
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
     }
-}
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .lang-switch button {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+        color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
+    }
+    .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
 
-/* -----------------------------------------
-   PC/iPad (画面左側に固定して縦並び)
-   ----------------------------------------- */
-@media (min-width: 1024px) {
-    #ranking-container {
-        position: fixed;        
-        left: 20px;             
-        top: 150px;             
-        width: 200px;           
+    /* --- ヒーロー --- */
+    .hero-section {
+        background: white; text-align: center; padding: 30px 20px;
+        border-radius: 0 0 30px 30px; margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
+
+    /* --- ダッシュボード --- */
+    .dashboard-card {
+        background: white; margin: 20px; padding: 20px;
+        border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex; align-items: center; gap: 15px;
+    }
+    .avatar-circle {
+        width: 60px; height: 60px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.8em; background: #e0e7ff; color: var(--primary);
+    }
+    .user-meta { flex-grow: 1; }
+    .level-bar-container {
+        background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
+    }
+    .level-bar-fill {
+        background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
+    }
+    .status-badges { display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; font-weight: bold; }
+    .badge-streak { color: #ff6f61; }
+    .badge-points { color: #f0ad4e; }
+
+    /* --- 認証ボタン --- */
+    .auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .btn-auth {
+        padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+    }
+    .btn-auth:active { transform: translateY(4px); box-shadow: none; }
+    .btn-login { background: #4caf50; color: white; }
+    .btn-signup { background: var(--primary); color: white; }
+    .btn-guest { background: #90a4ae; color: white; }
+
+    /* --- グリッドレイアウト --- */
+    .section-header {
+        padding: 0 20px; margin-bottom: 15px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
+    .section-title i { color: var(--primary); }
+    
+    /* 戻るボタン (サブカテゴリ表示時用) */
+    .btn-back {
+        background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
+        font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
+        display: none; /* 初期は非表示 */
+    }
+    .btn-back:hover { background: #ddd; }
+
+    .grid-container {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px; padding: 0 20px 40px 20px; max-width: 1000px; margin: 0 auto;
+    }
+
+    /* カードデザイン */
+    .game-card {
+        background: white; border-radius: 15px; padding: 20px;
+        text-align: center; text-decoration: none; color: var(--text-color);
+        box-shadow: 0 4px 0 #e0e0e0; border: 2px solid #f0f0f0;
+        transition: all 0.2s; cursor: pointer;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        height: 130px; position: relative; overflow: hidden;
+    }
+    .game-card:active { transform: translateY(2px); box-shadow: 0 2px 0 #e0e0e0; }
+    
+    /* カテゴリフォルダっぽいデザイン */
+    .category-card {
+        border-color: #bbdefb; background: #e3f2fd;
+    }
+    .category-card .card-icon { color: #1976d2; }
+
+    .card-icon { font-size: 2.5em; margin-bottom: 10px; color: var(--primary); }
+    .card-title { font-weight: 700; font-size: 0.95em; line-height: 1.3; }
+
+    /* --- モーダル類 --- */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-box {
+        background: white; width: 90%; max-width: 400px; padding: 30px;
+        border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+    }
+    .modal-box input {
+        width: 100%; padding: 12px; margin: 10px 0;
+        border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
     }
     
-    #ranking-list {
-        display: block;         
+    .ranking-fab {
+        position: fixed; bottom: 20px; right: 20px;
+        background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        cursor: pointer; z-index: 90; border: 3px solid white;
     }
-    #main-menu {
-        margin-left: 240px; 
-    }
-}
+
+    .hidden { display: none !important; }
+    
+    /* アニメーション */
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
 </style>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-0BX3DD42C1');
-</script>
 </head>
 <body>
-    
-<div id="language-switcher">
-    <button onclick="setLanguage('ja')" id="lang-ja" class="lang-button active">にほんご</button>
-    <button onclick="setLanguage('en')" id="lang-en" class="lang-button">English</button>
-</div>
 
-<div id="auth-status-bar">
-    <div id="user-status-container">
-        <span id="user-info" data-i18n="auth_status_default">ログインしていません</span>
-        <span id="streak-display" style="display: none;"></span>
-        <span id="points-display" style="display: none;"></span>
+<header>
+    <div class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</div>
+    <div class="lang-switch">
+        <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
+        <button id="lang-en" onclick="setLanguage('en')">EN</button>
     </div>
-    <div id="auth-buttons">
-        <button id="login-btn" class="btn-login" data-i18n="btn_login">ログイン</button>
-        <button id="signup-btn" class="btn-signup" data-i18n="btn_signup">新規登録</button>
-        <button id="guest-btn" class="btn-guest" data-i18n="btn_guest">ゲストでプレイ</button>
-        <button id="logout-btn" class="btn-logout" data-i18n="btn_logout" style="display:none;">ログアウト</button>
-    </div>
+</header>
+
+<div class="hero-section">
+    <h1 data-i18n="main_title">楽しく日本語を学ぼう！</h1>
 </div>
 
-<h1 data-i18n="main_title">Fun Learning Japanese</h1>
-
-<div id="ranking-container" style="display: none;">
-    <h3>🏆 今月のトップ5</h3>
-    <ul id="ranking-list"></ul>
+<div id="guest-welcome" class="auth-action-area">
+    <button id="login-btn" class="btn-auth btn-login"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span></button>
+    <button id="signup-btn" class="btn-auth btn-signup"><i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span></button>
+    <button id="guest-btn" class="btn-auth btn-guest"><i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span></button>
 </div>
 
-<div id="initial-message" style="display: none;">
-    <p data-i18n="msg_initial_1">ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。</p>
-    <p data-i18n="msg_initial_2">進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。</p>
-</div>
-
-<div id="main-menu" class="container">
-    <div class="menu-group">
-        <h2 data-i18n="group_kiso">きそ・たんごリスト</h2>
-        <div class="menu-buttons-grid">
-            <a href="kiso.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kiso">
-                📝<br>ひらがな・カタカナ基礎
-            </a>
-            <a href="hiragana_video_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_video">
-                🎥<br>ひらがな練習
-            </a>
-            <a href="keiyoshi_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_list">
-                📚<br>形容詞リスト
-            </a>
-            <a href="kanji_list.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_list">
-                📖<br>漢字リスト (小1)
-            </a>
+<div id="user-dashboard" class="dashboard-card hidden">
+    <div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
+    <div class="user-meta">
+        <div style="display:flex; justify-content:space-between;">
+            <span id="user-name" style="font-weight:bold; font-size:1.1em;">User</span>
+            <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
+        </div>
+        <div class="level-bar-container"><div id="level-fill" class="level-bar-fill"></div></div>
+        <div class="status-badges">
+            <span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
+            <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
         </div>
     </div>
+    <button id="logout-btn" style="background:none; border:none; color:#999; cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i></button>
+</div>
 
-    <div class="menu-group">
-        <h2 data-i18n="group_game">なにをしてあそぶ?</h2>
-        <div class="menu-buttons-grid">
-            <a href="hiragana.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game">
-                🎮<br>ひらがな単語ゲーム
-            </a>
-            <a href="hiragana2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_game2">
-                ⭐<br>ひらがなゲーム2 (並び替え)
-            </a>
-            <a href="hiragana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_hiragana_drag">
-                🧩<br>ひらがな単語あわせ
-            </a>
-            <a href="katakana_drag_match.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_katakana_drag">
-                🧩<br>カタカナ単語あわせ
-            </a>
-            <a href="shiritori.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori">
-                🗣️<br>しりとりゲーム
-            </a>
-            <a href="shiritori2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_shiritori2">
-                🗣️<br>しりとりゲーム2
-            </a>
-            <a href="clock.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock">
-                🗣️<br>とけいゲーム
-            </a>
-            <a href="clock2.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_clock2">
-                🗣️<br>とけいゲーム2
-            </a>
-            <a href="keiyoshi.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_keiyoshi_quiz">
-                🤔<br>形容詞クイズ
-            </a>
-            <a href="adjective_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_adjective_quiz">
-                🤔<br>形容詞クイズ2
-            </a>
-            <a href="kanji_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_kanji_quiz">
-                🈳<br>漢字クイズ (小1)
-            </a>
-            <a href="aisatsu_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_aisatsu_quiz">
-                🗣️<br>挨拶クイズ
-            </a>
-            <a href="verb.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_verb_game">
-                🗣️<br>動詞ゲーム
-            </a>
-            <a href="sentence_puzzle.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_sentence_puzzle">
-                🗣️<br>文法並び替えゲーム
-            </a>
-            <a href="meteor_quiz.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_meteor_quiz">
-                🗣️<br>隕石クイズ
-            </a>
-            <a href="treasure_Hunt.html" class="menu-card-button menu-card-reset" data-i18n-html="btn_treasure_hunt">
-                🗣️<br>たからさがしゲーム
-            </a>
-        </div>
+<div class="section-header">
+    <h3 class="section-title"><i class="fa-solid fa-book-open"></i> <span data-i18n="group_kiso">基礎・単語</span></h3>
+</div>
+<div class="grid-container">
+    <a href="kiso.html" class="game-card">
+        <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
+        <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
+    </a>
+    <a href="hiragana_video_list.html" class="game-card">
+        <i class="fa-solid fa-video card-icon" style="color:#ffcc5c;"></i>
+        <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
+    </a>
+    <a href="keiyoshi_list.html" class="game-card">
+        <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
+        <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
+    </a>
+    <a href="kanji_list.html" class="game-card">
+        <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
+        <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
+    </a>
+</div>
+
+<div class="section-header">
+    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span id="game-section-title" data-i18n="group_game">ゲームで遊ぶ</span></h3>
+    <button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i> もどる</button>
+</div>
+
+<div id="game-grid" class="grid-container fade-in">
+    </div>
+
+<div id="fab-ranking" class="ranking-fab" onclick="toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
+
+<div id="ranking-modal" class="modal-overlay">
+    <div class="modal-box" style="text-align:left;">
+        <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> Top 5</h2>
+        <ul id="ranking-list" style="list-style:none; padding:0;"></ul>
+        <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; background:#eee;">閉じる</button>
     </div>
 </div>
-<div id="game-area" class="container" style="display:none;">
-    <p>ゲームを読み込んでいます...</p>
-</div>
 
-<div id="auth-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <div id="login-view">
-            <h2 data-i18n="login_title">ログイン</h2>
-            <div id="login-message" class="form-message"></div>
-            <input type="text" id="login-gamename" data-i18n-placeholder="placeholder_gamename" placeholder="ゲーム名" required>
-            <input type="password" id="login-password" data-i18n-placeholder="placeholder_password" placeholder="パスワード" required>
-            <button id="login-submit-btn" class="btn-submit" data-i18n="btn_login">ログイン</button>
-            <button class="btn-close" data-i18n="btn_cancel">キャンセル</button>
-        </div>
-        
-        <div id="signup-view" style="display:none;">
-            <h2 data-i18n="signup_title">新規登録</h2>
-            <div id="signup-message" class="form-message"></div>
-            <p style="font-size: 0.9em; color: #555;" data-i18n="msg_signup_note">※サインアップするとゲームの進捗が保存されます。</p>
-            <input type="text" id="signup-gamename" data-i18n-placeholder="placeholder_new_gamename" placeholder="新しいゲーム名 (必須)" required>
-            <input type="password" id="signup-password" data-i18n-placeholder="placeholder_password" placeholder="パスワード (必須)" required>
-            <button id="signup-submit-btn" class="btn-submit" data-i18n="btn_signup_submit">登録してログイン</button>
-            <button class="btn-close" data-i18n="btn_cancel">キャンセル</button>
-        </div>
+<div id="auth-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 id="modal-title">ログイン</h2>
+        <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
+        <input type="text" id="auth-name" placeholder="ユーザー名">
+        <input type="password" id="auth-pass" placeholder="パスワード">
+        <button id="modal-submit" class="btn-auth btn-login" style="width:100%; margin-top:10px;">実行</button>
+        <button id="modal-close" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
     </div>
 </div>
 
 <script>
-    // ----------------------------------------------------
-    // ★★★ サービスワーカーは削除しないでください ★★★
-    // ----------------------------------------------------
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('ServiceWorker registered: ', registration);
-          })
-          .catch(registrationError => {
-            console.log('ServiceWorker registration failed: ', registrationError);
-          });
-      });
-    }
-
-    // ----------------------------------------------------
-    // 言語データ
-    // ----------------------------------------------------
-    const translations = {
-        'ja': {
-            'main_title': 'Fun Learning Japanese',
-            'group_kiso': 'きそ・たんごリスト',
-            'group_game': 'なにをしてあそぶ?',
-            'auth_status_default': 'ログインしていません',
-            'btn_login': 'ログイン',
-            'btn_signup': '新規登録',
-            'btn_guest': 'ゲストでプレイ',
-            'btn_logout': 'ログアウト',
-            'msg_initial_1': 'ゲームを始めるには、アカウントに**ログイン**するか、**新規登録**をしてください。',
-            'msg_initial_2': '進捗を保存しない場合は、**ゲスト**としてプレイすることもできます。',
-            'login_title': 'ログイン',
-            'signup_title': '新規登録',
-            'msg_signup_note': '※サインアップするとゲームの進捗が保存されます。',
-            'btn_signup_submit': '登録してログイン',
-            'btn_cancel': 'キャンセル',
-            'placeholder_gamename': 'ゲーム名',
-            'placeholder_new_gamename': '新しいゲーム名 (必須)',
-            'placeholder_password': 'パスワード',
-            'status_guest': 'ゲストモード',
-            'status_welcome': 'さん、ようこそ！',
-            'streak_text': '🔥連続%DAYS%日目！', 
-            'points_text': '⭐ポイント：%POINTS%',
-            'msg_login_fail': 'ゲーム名またはパスワードが違います。',
-            'btn_kiso': '📝<br>ひらがな・カタカナ基礎',
-            'btn_hiragana_video': '🎥<br>ひらがな練習',
-            'btn_keiyoshi_list': '📚<br>形容詞リスト',
-            'btn_kanji_list': '📖<br>漢字リスト (小1)',
-            'btn_hiragana_drag': '🧩<br>ひらがな単語あわせ',
-            'btn_hiragana_game': '🎮<br>ひらがな単語ゲーム',
-            'btn_hiragana_game2': '⭐<br>ひらがなゲーム2 (並び替え)',
-            'btn_katakana_drag': '🧩<br>カタカナ単語あわせ',
-            'btn_shiritori': '🗣️<br>しりとりゲーム',
-            'btn_shiritori2': '🗣️<br>しりとりゲーム2',
-            'btn_clock': '🗣️<br>とけいゲーム',
-            'btn_clock2': '🗣️<br>とけいゲーム2',
-            'btn_keiyoshi_quiz': '🤔<br>形容詞クイズ',
-            'btn_adjective_quiz': '🤔<br>形容詞クイズ2',
-            'btn_kanji_quiz': '🈳<br>漢字クイズ (小1)',
-            'btn_aisatsu_quiz': '🗣️<br>挨拶クイズ',
-            'btn_verb_game': '🗣️<br>動詞ゲーム',
-            'btn_sentence_puzzle': '🗣️<br>文法並び替えゲーム',
-            'btn_meteor_quiz': '🗣️<br>隕石クイズ',
-            'btn_treasure_hunt': '🗣️<br>たからさがしゲーム',
+    // --- データ定義 ---
+    const i18nData = {
+        ja: { 
+            main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
+            group_kiso: "基礎・単語", group_game: "ゲーム",
+            btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_kanji_list: "漢字リスト",
+            // ★修正: 新しい8カテゴリのキー定義
+            cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
+            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_sentence: "ぶんしょう"
         },
-        'en': {
-            'main_title': 'Fun Learning Japanese',
-            'group_kiso': 'Basics & Vocabulary Lists',
-            'group_game': 'What would you like to play?',
-            'auth_status_default': 'Not logged in',
-            'btn_login': 'Login',
-            'btn_signup': 'Sign Up',
-            'btn_guest': 'Play as Guest',
-            'btn_logout': 'Logout',
-            'msg_initial_1': 'To start the game, please **Log in** to your account or **Sign up**.',
-            'msg_initial_2': 'If you do not wish to save your progress, you can play as a **Guest**.',
-            'login_title': 'Login',
-            'signup_title': 'Sign Up',
-            'msg_signup_note': 'Note: Signing up allows you to save your game progress.',
-            'btn_signup_submit': 'Register and Login',
-            'btn_cancel': 'Cancel',
-            'placeholder_gamename': 'Game Name',
-            'placeholder_new_gamename': 'New Game Name (Required)',
-            'placeholder_password': 'Password',
-            'status_guest': 'Guest Mode',
-            'status_welcome': ', welcome!',
-            'streak_text': '🔥Streak: %DAYS% days!', 
-            'points_text': '⭐Points: %POINTS%',
-            'msg_login_fail': 'Game Name or password incorrect.',
-            'btn_kiso': '📝<br>Hiragana/Katakana Basics',
-            'btn_hiragana_video': '🎥<br>Hiragana Practice',
-            'btn_keiyoshi_list': '📚<br>Adjective List',
-            'btn_kanji_list': '📖<br>Kanji List (Gr.1)',
-            'btn_hiragana_drag': '🧩<br>Hiragana Word Match',
-            'btn_hiragana_game': '🎮<br>Hiragana Word Game',
-            'btn_hiragana_game2': '⭐<br>Hiragana Game 2 (Order)',
-            'btn_katakana_drag': '🧩<br>Katakana Word Match',
-            'btn_shiritori': '🗣️<br>Shiritori Game',
-            'btn_shiritori2': '🗣️<br>Shiritori Game 2',
-            'btn_clock': '🗣️<br>Clock Game',
-            'btn_clock2': '🗣️<br>Clock Game 2',
-            'btn_keiyoshi_quiz': '🤔<br>Adjective Quiz',
-            'btn_adjective_quiz': '🤔<br>Adjective Quiz 2',
-            'btn_kanji_quiz': '🈳<br>Kanji Quiz (Gr.1)',
-            'btn_aisatsu_quiz': '🗣️<br>Greetings Quiz',
-            'btn_verb_game': '🗣️<br>Verb Game',
-            'btn_sentence_puzzle': '🗣️<br>Grammar Puzzle',
-            'btn_meteor_quiz': '🗣️<br>Meteor Quiz',
-            'btn_treasure_hunt': '🗣️<br>Treasure Hunt',
+        en: { 
+            main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
+            group_kiso: "Basics", group_game: "Games",
+            btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_kanji_list: "Kanji List",
+            // ★修正: 新しい8カテゴリのキー定義 (簡略化)
+            cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
+            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_sentence: "Sentence"
         }
     };
 
-    function updateLanguageUI(lang) {
-        const langData = translations[lang];
-
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            if (langData[key]) {
-                el.textContent = langData[key];
-            }
-        });
-
-        document.querySelectorAll('[data-i18n-html]').forEach(el => {
-            const key = el.getAttribute('data-i18n-html');
-            if (langData[key]) {
-                el.innerHTML = langData[key];
-            }
-        });
-        
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            const key = el.getAttribute('data-i18n-placeholder');
-            if (langData[key]) {
-                el.placeholder = langData[key];
-            }
-        });
-
-        document.getElementById('lang-ja')?.classList.remove('active');
-        document.getElementById('lang-en')?.classList.remove('active');
-        document.getElementById(`lang-${lang}`)?.classList.add('active');
-        
-        updateAuthenticationUI();
-    }
-
-    window.setLanguage = function(lang) {
-        if (!translations[lang]) return;
-        localStorage.setItem('preferredLang', lang);
-        updateLanguageUI(lang);
-    };
-
-
-    // ----------------------------------------------------
-    // 認証ロジック (ストリーク・ポイント基盤)
-    // ----------------------------------------------------
-
-    const USER_STORAGE_KEY = 'user_accounts';
-    const SESSION_STORAGE_KEY = 'current_user';
-    const GUEST_NAME = 'ゲスト'; 
-    const LANG_DEFAULT = 'ja'; 
-    const RANKING_MONTH_KEY = 'ranking_month_check'; // ★ 月間リセットチェック用のキー
-
-    const userInfoEl = document.getElementById('user-info');
-    const streakDisplayEl = document.getElementById('streak-display'); 
-    const pointsDisplayEl = document.getElementById('points-display'); 
-    
-    const loginBtn = document.getElementById('login-btn');
-    const signupBtn = document.getElementById('signup-btn');
-    const guestBtn = document.getElementById('guest-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    const initialMessageEl = document.getElementById('initial-message');
-    const mainMenuEl = document.getElementById('main-menu');
-    
-    const modalOverlay = document.getElementById('auth-modal');
-    const loginView = document.getElementById('login-view');
-    const signupView = document.getElementById('signup-view');
-
-    // ★ランキング表示用のDOM
-    const rankingContainer = document.getElementById('ranking-container');
-    const rankingList = document.getElementById('ranking-list');
-    
-    function getUsers() {
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
-        return usersJson ? JSON.parse(usersJson) : {};
-    }
-    function saveUsers(users) {
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-    }
-    function getCurrentLang() {
-        return localStorage.getItem('preferredLang') || LANG_DEFAULT;
-    }
-    
-    function getTodayDateString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    function parseDate(dateString) {
-        if (!dateString) return null;
-        const parts = dateString.split('-');
-        return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-    }
-
-    function updateStreak(user) {
-        const todayStr = getTodayDateString();
-        
-        if (!user.streak || !user.last_login) {
-            user.streak = 1;
-            user.last_login = todayStr;
-            return user;
+    // ★ 全ゲームを8カテゴリに分割して再定義
+    const gameStructure = [
+        // 1. ひらがな (4ゲーム)
+        {
+            id: "hiragana",
+            icon: "fa-solid fa-h", 
+            color: "#ff6f61", // 赤系
+            titleKey: "cat_hiragana",
+            games: [
+                { url: "hiragana.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
+                { url: "hiragana2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
+                { url: "hiragana_drag_match.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
+                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
+            ]
+        },
+        // 2. カタカナ (1ゲーム)
+        {
+            id: "katakana",
+            icon: "fa-solid fa-k", 
+            color: "#ffa726", // オレンジ系
+            titleKey: "cat_katakana",
+            games: [
+                { url: "katakana_drag_match.html", title: "カタカナマッチ", icon: "fa-solid fa-hand-pointer" }
+            ]
+        },
+        // 3. しりとり (2ゲーム)
+        {
+            id: "shiritori",
+            icon: "fa-solid fa-comments", 
+            color: "#f0ad4e", // 黄色系
+            titleKey: "cat_shiritori",
+            games: [
+                { url: "shiritori.html", title: "しりとり1", icon: "fa-solid fa-comment-dots" },
+                { url: "shiritori2.html", title: "しりとり2", icon: "fa-regular fa-comments" }
+            ]
+        },
+        // 4. ことば (しりとり以外 3ゲーム)
+        {
+            id: "word_other",
+            icon: "fa-solid fa-microphone", 
+            color: "#00bcd4", // シアン系
+            titleKey: "cat_word_other",
+            games: [
+                { url: "verb.html", title: "どうしゲーム", icon: "fa-solid fa-person-running" },
+                { url: "treasure_Hunt.html", title: "宝探し", icon: "fa-solid fa-gem" },
+                { url: "aisatsu_quiz.html", title: "あいさつ", icon: "fa-solid fa-hand-spock" },
+            ]
+        },
+        // 5. とけい (2ゲーム)
+        {
+            id: "clock",
+            icon: "fa-solid fa-clock", 
+            color: "#42a5f5", // 青系
+            titleKey: "cat_clock",
+            games: [
+                { url: "clock.html", title: "とけい1", icon: "fa-regular fa-clock" },
+                { url: "clock2.html", title: "とけい2", icon: "fa-solid fa-stopwatch" }
+            ]
+        },
+        // 6. かんじ (1ゲーム)
+        {
+            id: "kanji_game",
+            icon: "fa-solid fa-pen-fancy", 
+            color: "#66bb6a", // 緑系
+            titleKey: "cat_kanji_game",
+            games: [
+                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
+            ]
+        },
+        // 7. けいようし (2ゲーム)
+        {
+            id: "keiyoshi_game",
+            icon: "fa-solid fa-star-half-stroke", 
+            color: "#ab47bc", // 紫系
+            titleKey: "cat_keiyoshi_game",
+            games: [
+                { url: "keiyoshi.html", title: "けいようし1", icon: "fa-solid fa-star-half-stroke" },
+                { url: "adjective_quiz.html", title: "けいようし2", icon: "fa-regular fa-star" },
+            ]
+        },
+        // 8. ぶんしょう (1ゲーム)
+        {
+            id: "sentence",
+            icon: "fa-solid fa-layer-group", 
+            color: "#546e7a", // グレー系
+            titleKey: "cat_sentence",
+            games: [
+                { url: "sentence_puzzle.html", title: "ぶんづくり", icon: "fa-solid fa-layer-group" }
+            ]
         }
-
-        if (user.last_login === todayStr) {
-            return user;
-        }
-
-        const lastLoginDate = parseDate(user.last_login);
-        const yesterday = new Date(parseDate(todayStr));
-        yesterday.setUTCDate(yesterday.getUTCDate() - 1); 
-
-        const yesterdayStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
-        
-        if (user.last_login === yesterdayStr) {
-            user.streak += 1;
-        } else {
-            user.streak = 1;
-        }
-        
-        user.last_login = todayStr;
-        return user;
-    }
-
-    // --- 改良: addPoints の実装 ---
-    window.addPoints = function(amount, gameId) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (!currentUser || currentUser === GUEST_NAME) {
-            console.warn("ゲストモードまたは未ログイン: ポイントは加算されません。");
-            return false;
-        }
-
-        if (typeof amount !== 'number' || amount <= 0) {
-            console.error("無効なポイント数です。");
-            return false;
-        }
-
-        let users = getUsers();
-        let user = users[currentUser];
-
-        if (!user) {
-             console.error(`ユーザー ${currentUser} がlocalStorageに見つかりません。`);
-             return false;
-        }
-
-        user.points = (user.points || 0) + amount; 
-
-        if (gameId) {
-            user.progress = user.progress || {};
-            user.progress[gameId] = user.progress[gameId] || { total_points: 0 };
-            user.progress[gameId].total_points = (user.progress[gameId].total_points || 0) + amount;
-        }
-        
-        users[currentUser] = user;
-        saveUsers(users);
-        
-        updateAuthenticationUI(); // UI更新
-        displayRanking();         // ランキングのリアルタイム更新
-        
-        console.log(`[ポイント加算] ${currentUser}に${amount}ポイント加算されました。合計: ${user.points}`);
-        return true;
-    };
-
-
-    // --- セッション管理 ---
-    function setSession(gameName) {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, gameName);
-        
-        if (gameName !== GUEST_NAME) {
-            let users = getUsers();
-            let user = users[gameName];
-            
-            if (user) {
-                user = updateStreak(user);
-                users[gameName] = user;
-                saveUsers(users);
-            }
-        }
-
-        updateAuthenticationUI();
-    }
-
-    function logout() {
-        sessionStorage.removeItem(SESSION_STORAGE_KEY);
-        updateAuthenticationUI();
-    }
-    function playAsGuest() {
-        setSession(GUEST_NAME);
-    }
-
-
-    // --- UIの更新 ---
-    function updateAuthenticationUI() {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        const lang = getCurrentLang();
-        const langData = translations[lang] || translations[LANG_DEFAULT];
-
-        const isLoggedIn = !!currentUser;
-        const isGuest = currentUser === GUEST_NAME;
-
-        if (isLoggedIn && !isGuest) {
-            const users = getUsers();
-            const user = users[currentUser];
-            
-            if (!user) {
-                 logout();
-                 return;
-            }
-
-            const streak = user.streak || 0;
-            const points = user.points || 0; 
-
-            let streakText = langData['streak_text'].replace('%DAYS%', streak);
-            let pointsText = langData['points_text'].replace('%POINTS%', points);
-            
-            userInfoEl.textContent = `${currentUser}${langData['status_welcome']}`;
-            streakDisplayEl.textContent = streakText;
-            pointsDisplayEl.textContent = pointsText;
-            
-            streakDisplayEl.style.display = 'block';
-            pointsDisplayEl.style.display = 'block';
-
-            loginBtn.style.display = 'none';
-            signupBtn.style.display = 'none';
-            guestBtn.style.display = 'none';
-            logoutBtn.style.display = 'inline-block';
-            
-            initialMessageEl.style.display = 'none';
-            mainMenuEl.classList.remove('locked');
-        
-        } else if (isGuest) {
-            userInfoEl.textContent = langData['status_guest'];
-            streakDisplayEl.style.display = 'none'; 
-            pointsDisplayEl.style.display = 'none'; 
-
-            loginBtn.style.display = 'none';
-            signupBtn.style.display = 'none';
-            guestBtn.style.display = 'none';
-            logoutBtn.style.display = 'inline-block';
-
-            initialMessageEl.style.display = 'none';
-            mainMenuEl.classList.remove('locked');
-            
-        } else {
-            userInfoEl.textContent = langData['auth_status_default'];
-            streakDisplayEl.style.display = 'none';
-            pointsDisplayEl.style.display = 'none';
-
-            loginBtn.style.display = 'inline-block';
-            signupBtn.style.display = 'inline-block';
-            guestBtn.style.display = 'inline-block';
-            logoutBtn.style.display = 'none';
-            
-            initialMessageEl.style.display = 'block';
-            mainMenuEl.classList.add('locked');
-        }
-        
-        // ★ ランキングの表示/非表示と更新を制御
-        if (isLoggedIn && !isGuest) {
-            rankingContainer.style.display = 'block';
-            displayRanking();
-        } else {
-            rankingContainer.style.display = 'none';
-        }
-    }
-
-    // ============================================
-    // ★★★ 禁止ワードリストと判定関数 ★★★
-    // ============================================
-
-    const BANNED_WORDS = [
-        "kuso", "shinu", "kizu", "kusai", "hentai", "ero", "aho", "ahoka", 
-        "bakayaro", "gomi", "kasu", "manuke", "busu", "chikan", "kimoi",
-        "bitch", "fuck", "shit", "ass", "cunt", "penis", "vagina", "pussy", 
-        "cock", "whore", "slut", "damn", "kill", "die", "nazi", "hitler", 
-        "sex", "xxx", "porn", "rape", "nude", 
-        "admin", "administrator", "system", "mod", "guest", "root", "support", 
-        "管理者", "システム", 
-        "admini", "systema", 
-        "ばか", "あほ", "くそ", "しね", "うんこ", "きもい", "びんぼう", "げすと",
-        "covid", "corona", 
-        "virus", "drug", "weed", "alcohol", "drunk",
     ];
 
-    function checkBannedWords(name) {
-        if (!name) return null;
-        
-        const normalizedName = name.trim()
-                                   .toLowerCase()
-                                   .replace(/[０-９Ａ-Ｚａ-ｚ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) 
-                                   .replace(/[　\s]/g, ''); 
+    // --- ゲームグリッド制御 ---
+    const gameGrid = document.getElementById('game-grid');
+    const backBtn = document.getElementById('game-back-btn');
+    let currentLang = 'ja';
 
-        for (const word of BANNED_WORDS) {
-            if (normalizedName.includes(word)) {
-                return word; 
-            }
-        }
-        return null;
-    }
+    // 1. カテゴリ一覧を表示する関数
+    function renderGameCategories() {
+        gameGrid.innerHTML = '';
+        backBtn.style.display = 'none';
+        document.getElementById('game-section-title').textContent = i18nData[currentLang].group_game;
 
-
-    // ----------------------------------------------------
-    // ★★★ ランキング機能 (月間累積・毎日更新) ★★★
-    // ----------------------------------------------------
-
-    // ★修正関数: 月が変わったら累積ポイントをリセットする処理
-    function checkMonthlyReset() {
-        const now = new Date();
-        const currentYearMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
-        
-        const lastResetDateStr = localStorage.getItem('last_ranking_reset');
-        
-        // 前回のチェック日が今月ではない場合、リセットを実行
-        if (!lastResetDateStr || lastResetDateStr.split('-').slice(0, 2).join('-') !== currentYearMonth) {
+        gameStructure.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'game-card category-card';
+            div.onclick = () => renderGameList(cat);
             
-            // 月が変わった場合のみポイントをリセット
-            if (lastResetDateStr && new Date(lastResetDateStr).getMonth() !== now.getMonth()) {
-                let users = getUsers();
-                Object.keys(users).forEach(key => {
-                    if (key !== GUEST_NAME) {
-                        // 累積ポイントをリセット
-                        users[key].points = 0;         
-                        // 進捗データもリセット
-                        users[key].progress = {};      
-                    }
-                });
-                saveUsers(users);
-                console.log(`[ランキング] 月が変わったため、全ユーザーのポイントをリセットしました。新月: ${currentYearMonth}`);
-            }
-            // 新しいリセット月を保存
-            localStorage.setItem('last_ranking_reset', now.toISOString().split('T')[0]);
-        }
+            const title = i18nData[currentLang][cat.titleKey] || cat.titleKey;
+            
+            div.innerHTML = `
+                <i class="${cat.icon} card-icon" style="color:${cat.color}"></i>
+                <span class="card-title">${title}</span>
+                <span style="font-size:0.8em; color:#666; margin-top:5px;">${cat.games.length} Games</span>
+            `;
+            gameGrid.appendChild(div);
+        });
         
-        if (sessionStorage.getItem(SESSION_STORAGE_KEY) && sessionStorage.getItem(SESSION_STORAGE_KEY) !== GUEST_NAME) {
-             updateAuthenticationUI();
-        }
+        gameGrid.classList.remove('fade-in');
+        void gameGrid.offsetWidth;
+        gameGrid.classList.add('fade-in');
     }
+
+    // 2. カテゴリ内のゲーム一覧を表示する関数
+    function renderGameList(category) {
+        gameGrid.innerHTML = '';
+        backBtn.style.display = 'block';
+        document.getElementById('game-section-title').textContent = i18nData[currentLang][category.titleKey];
+
+        category.games.forEach(game => {
+            const a = document.createElement('a');
+            a.href = game.url;
+            a.className = 'game-card';
+            a.innerHTML = `
+                <i class="${game.icon} card-icon" style="color:${category.color}"></i>
+                <span class="card-title">${game.title}</span>
+            `;
+            gameGrid.appendChild(a);
+        });
+
+        gameGrid.classList.remove('fade-in');
+        void gameGrid.offsetWidth;
+        gameGrid.classList.add('fade-in');
+    }
+
+
+    // --- 認証・UIロジック (前回と同じ) ---
+    const USER_KEY = 'user_accounts';
+    const SESS_KEY = 'current_user';
     
-
-    function displayRanking() {
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
-        if (!usersJson) return;
-
-        const users = JSON.parse(usersJson);
-        
-        const sortedUsers = Object.keys(users).map(key => {
-            return { name: key, points: users[key].points || 0 };
-        })
-        .filter(u => u.points > 0) 
-        .sort((a, b) => b.points - a.points); 
-
-        const top5 = sortedUsers.slice(0, 5);
-
-        rankingList.innerHTML = '';
-        top5.forEach((u, index) => {
-            const li = document.createElement('li');
-            let rankIcon = `${index + 1}. `;
-            if (index === 0) rankIcon = '🥇 ';
-            if (index === 1) rankIcon = '🥈 ';
-            if (index === 2) rankIcon = '🥉 ';
-            
-            li.textContent = `${rankIcon}${u.name} : ${u.points} pt`;
-            rankingList.appendChild(li);
-        });
-        
-        if (top5.length === 0 || top5[0].points === 0) {
-            const li = document.createElement('li');
-            li.textContent = "まだ データがありません";
-            rankingList.appendChild(li);
+    function updateUI() {
+        const user = sessionStorage.getItem(SESS_KEY);
+        if (user) {
+            document.getElementById('guest-welcome').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.remove('hidden');
+            let users = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+            let userData = users[user] || { points: 0, streak: 0 };
+            if(user === 'ゲスト') userData = { points: 0, streak: 0 };
+            document.getElementById('user-name').textContent = user;
+            document.getElementById('streak-val').textContent = userData.streak;
+            document.getElementById('point-val').textContent = userData.points;
+            const level = Math.floor(userData.points / 100) + 1;
+            document.getElementById('user-lvl').textContent = level;
+            document.getElementById('level-fill').style.width = `${(userData.points % 100)}%`;
+        } else {
+            document.getElementById('guest-welcome').classList.remove('hidden');
+            document.getElementById('user-dashboard').classList.add('hidden');
         }
     }
 
+    document.getElementById('login-btn').onclick = () => openAuthModal('login');
+    document.getElementById('signup-btn').onclick = () => openAuthModal('signup');
+    document.getElementById('guest-btn').onclick = () => { sessionStorage.setItem(SESS_KEY, 'ゲスト'); updateUI(); };
+    document.getElementById('logout-btn').onclick = () => { sessionStorage.removeItem(SESS_KEY); updateUI(); };
 
-    // ----------------------------------------------------
-    // --- 認証イベントリスナー (既存 + 禁止ワードチェック) ---
-    // ----------------------------------------------------
-    document.getElementById('signup-submit-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        const gamenameInput = document.getElementById('signup-gamename');
-        const passwordInput = document.getElementById('signup-password');
-        const messageEl = document.getElementById('signup-message');
-
-        const gamename = gamenameInput.value.trim();
-        const password = passwordInput.value;
-        const lang = getCurrentLang();
-        const langData = translations[lang] || translations[LANG_DEFAULT];
-
-        if (!gamename || !password) {
-            messageEl.textContent = 'ゲーム名とパスワードは必須です。';
-            return;
-        }
-        if (gamename === GUEST_NAME) {
-            messageEl.textContent = 'そのゲーム名は予約されています。';
-            return;
-        }
-
-        // ★★★ 禁止ワードチェックの実行 ★★★
-        const bannedWordFound = checkBannedWords(gamename);
-        if (bannedWordFound) {
-            messageEl.textContent = `不適切なゲーム名です。「${bannedWordFound}」に関連する言葉は使えません。`;
-            return;
-        }
-        // ★★★★★★★★★★★★★★★★★★★★★★★
-
-        const users = getUsers();
-        if (users[gamename]) {
-            messageEl.textContent = 'このゲーム名はすでに使用されています。';
-            return;
-        }
-
-        users[gamename] = { 
-            password: password, 
-            name: gamename,
-            streak: 0, 
-            last_login: null,
-            points: 0, 
-            progress: {} 
-        };
-        saveUsers(users);
-
-        setSession(gamename);
-        modalOverlay.style.display = 'none';
-        messageEl.textContent = '';
-        gamenameInput.value = '';
-        passwordInput.value = '';
-    });
-
-    document.getElementById('login-submit-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        const gamenameInput = document.getElementById('login-gamename');
-        const passwordInput = document.getElementById('login-password');
-        const messageEl = document.getElementById('login-message');
-
-        const gamename = gamenameInput.value.trim();
-        const password = passwordInput.value;
-        const lang = getCurrentLang();
-        const langData = translations[lang] || translations[LANG_DEFAULT];
-
-        const users = getUsers();
-        const user = users[gamename];
-
-        if (user && user.password === password) {
-            setSession(gamename);
-            modalOverlay.style.display = 'none';
-            messageEl.textContent = '';
-            gamenameInput.value = '';
-            passwordInput.value = '';
+    const modal = document.getElementById('auth-modal');
+    let authMode = 'login';
+    function openAuthModal(mode) {
+        authMode = mode;
+        modal.style.display = 'flex';
+        document.getElementById('modal-title').textContent = mode === 'login' ? 'ログイン' : '新規登録';
+        document.getElementById('modal-msg').textContent = '';
+    }
+    document.getElementById('modal-close').onclick = () => modal.style.display = 'none';
+    document.getElementById('modal-submit').onclick = () => {
+        const name = document.getElementById('auth-name').value;
+        const pass = document.getElementById('auth-pass').value;
+        const msg = document.getElementById('modal-msg');
+        let users = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+        if (!name || !pass) { msg.textContent = '入力してください'; return; }
+        if (authMode === 'signup') {
+            if (users[name]) { msg.textContent = 'その名前は使われています'; return; }
+            users[name] = { password: pass, points: 0, streak: 1 };
+            localStorage.setItem(USER_KEY, JSON.stringify(users));
+            sessionStorage.setItem(SESS_KEY, name);
         } else {
-            messageEl.textContent = langData['msg_login_fail'] || 'ゲーム名またはパスワードが違います。'; 
+            if (!users[name] || users[name].password !== pass) { msg.textContent = '名前かパスワードが違います'; return; }
+            sessionStorage.setItem(SESS_KEY, name);
         }
-    });
+        modal.style.display = 'none';
+        updateUI();
+    };
 
-    loginBtn.addEventListener('click', () => {
-        loginView.style.display = 'block';
-        signupView.style.display = 'none';
-        modalOverlay.style.display = 'flex';
-        document.getElementById('login-message').textContent = '';
-        document.getElementById('signup-message').textContent = '';
-    });
-
-    signupBtn.addEventListener('click', () => {
-        loginView.style.display = 'none';
-        signupView.style.display = 'block';
-        modalOverlay.style.display = 'flex';
-        document.getElementById('login-message').textContent = '';
-        document.getElementById('signup-message').textContent = '';
-    });
-
-    guestBtn.addEventListener('click', playAsGuest);
-    logoutBtn.addEventListener('click', logout);
-
-    modalOverlay.querySelectorAll('.btn-close').forEach(button => {
-        button.addEventListener('click', () => {
-            modalOverlay.style.display = 'none';
-            document.getElementById('login-message').textContent = '';
-            document.getElementById('signup-message').textContent = '';
+    window.setLanguage = (lang) => {
+        currentLang = lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if(i18nData[lang][key]) el.textContent = i18nData[lang][key];
         });
-    });
+        document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        
+        if(backBtn.style.display === 'none') {
+            renderGameCategories();
+        } else {
+            // サブメニューを開いている場合はタイトルだけ更新したいが、簡単のためカテゴリに戻す
+            renderGameCategories(); 
+        }
+    };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // ★★★ 修正: ページ起動時に月間リセットチェックを実行 ★★★
-        checkMonthlyReset(); 
-        
-        const savedLang = localStorage.getItem('preferredLang') || LANG_DEFAULT;
-        setLanguage(savedLang); 
-        
-    });
+    window.toggleRanking = () => {
+        const rModal = document.getElementById('ranking-modal');
+        const list = document.getElementById('ranking-list');
+        rModal.style.display = 'flex';
+        list.innerHTML = '';
+        let users = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+        let sorted = Object.keys(users).map(k => ({name: k, pt: users[k].points || 0})).sort((a,b) => b.pt - a.pt).slice(0,5);
+        sorted.forEach((u, i) => {
+            const icon = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : `${i+1}.`;
+            list.innerHTML += `<li style="padding:10px; border-bottom:1px dashed #ccc; font-weight:bold;">${icon} ${u.name} <span style="float:right; color:#f0ad4e;">${u.pt}pt</span></li>`;
+        });
+    };
+
+    // 初期化
+    updateUI();
+    renderGameCategories();
 </script>
 </body>
 </html>

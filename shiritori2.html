@@ -2,51 +2,320 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>しりとり2 (マス埋め)</title>
     
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/shiritori2.css">
+    <style>
+    /* --- 共通設定 (V2デザイン) --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
+
+    /* --- ヘッダー（V2統一デザイン） --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-container h1 {
+        margin: 0;
+        font-size: 1.4em;
+        color: white;
+    }
+    .back-button {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* --- メインコンテンツ/メニュー --- */
+    .shiritori2-main {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* --- メニューカード --- */
+    #shiritori2-menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+    .menu-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+    }
+    .menu-card h2 {
+        color: var(--primary);
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    .menu-card p {
+        color: #666;
+        margin: 10px 0 30px;
+    }
+    .start-btn {
+        background: linear-gradient(to bottom, var(--primary), #4b63cc);
+        color: white; font-size: 1.4em; font-weight: 900;
+        padding: 15px 40px; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
+
+
+    /* --- ゲームエリア (左右配置) --- */
+    #shiritori2-game-area {
+        padding: 20px 0;
+    }
+    .shiritori2-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 25px; 
+        flex-wrap: nowrap;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* --- 左側：カードリストエリア (高さ修正) --- */
+    .card-area {
+        flex: 1; 
+        min-width: 250px;
+        border: 3px solid var(--accent);
+        border-radius: 15px;
+        padding: 15px;
+        background-color: #fff8e1; 
+        text-align: center;
+        
+        /* ★修正: 高さをコンテンツに合わせる */
+        align-self: flex-start; 
+        /* min-height: 400px; を削除 */
+        
+        overflow-y: auto;
+    }
+    .card-area h3 {
+        color: #5d4037;
+        margin-top: 0;
+    }
+
+    /* --- 右側：グリッドエリア (高さ修正) --- */
+    .grid-area {
+        flex: 2; 
+        text-align: center;
+        padding: 20px;
+        border: 3px solid var(--primary); 
+        border-radius: 15px;
+        background-color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        
+        /* ★修正: 高さをコンテンツに合わせる */
+        align-self: flex-start;
+        /* min-height: 400px; を削除 */
+    }
+    .grid-area h3 {
+        color: var(--primary);
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    /* --- 4x4のグリッド設定 --- */
+    .shiritori-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 10px;
+        background: #f0f4f8;
+        border-radius: 12px;
+        margin: 10px auto;
+        max-width: 500px;
+    }
+
+    /* --- 1マス（セル）の設定 --- */
+    .grid-cell {
+        aspect-ratio: 1 / 1; 
+        border: 2px dashed var(--primary);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        transition: border 0.3s, background-color 0.2s;
+        overflow: hidden;
+        font-size: 0.9em;
+        padding: 5px;
+    }
+
+    .grid-cell.filled {
+        border: 2px solid var(--correct-color);
+        background-color: #e8f5e9;
+    }
+
+    .grid-cell.drag-over {
+        background-color: #e0e7ff;
+        border-color: #3f51b5;
+    }
+
+    /* マス内の単語 */
+    .word-text {
+        font-size: 1em;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+    }
+
+    /* しりとり開始マス */
+    .shiritori-start {
+        background-color: #ccff90;
+        border: 2px solid var(--correct-color);
+    }
+
+    /* --- 残り単語カード --- */
+    .word-card {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: white;
+        cursor: grab;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s, opacity 0.3s;
+        min-height: 50px;
+    }
+
+    .word-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-image {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 4px;
+        margin-right: 8px;
+    }
+
+    .card-label {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+
+    /* --- 下部コントロール --- */
+    .game-controls-area {
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+    .control-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .control-button:hover {
+        opacity: 0.9;
+    }
     
-      gtag('config', 'G-0BX3DD42C1');
-    </script>
-    </head>
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .shiritori2-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        .card-area {
+            min-height: 150px;
+            max-height: none;
+            width: 100%;
+            order: 2; 
+        }
+        .grid-area {
+            width: 100%;
+            order: 1; 
+        }
+    }
+</style>
+</head>
     
 <body>
 
 <header>
     <div class="header-container">
-        <a href="index.html" class="back-button">🏠 ホームへ</a>
         <h1>しりとり2 (マス埋めゲーム)</h1>
+        <a href="index.html" class="back-button"><i class="fa-solid fa-house"></i> ホームへ</a>
     </div>
 </header>
 
 <main class="shiritori2-main">
 
-    <div id="shiritori2-menu" class="menu-area-reset">
-        <div class="menu-card-reset" style="padding: 30px;">
-            <h2>🎮 しりとり2 ゲーム説明</h2>
+    <div id="shiritori2-menu">
+        <div class="menu-card">
+            <h2><i class="fa-solid fa-puzzle-piece" style="color:#ffb74d;"></i> しりとり2 ゲーム説明</h2>
             <p>右側のマス (全16マス) に、左の単語カード (15枚) をドラッグ＆ドロップして、しりとりを完成させましょう！</p>
             <p>最初のマスは「しりとり」からスタートです。</p>
-            <button id="startButton2" class="menu-card-button menu-card-reset" onclick="startShiritori2Game()">
+            <button id="startButton2" class="start-btn" onclick="startShiritori2Game()">
                 ゲームスタート
             </button>
         </div>
     </div>
 
-    <div id="shiritori2-game-area" class="game-area-reset" style="display: none;">
+    <div id="shiritori2-game-area" style="display: none;">
         
         <div class="shiritori2-container">
 
             <div id="card-selection-area" class="card-area">
-                <h3>残りの単語 (15枚)</h3>
+                <h3 id="remaining-count-message">残りの単語 (15枚)</h3>
                 </div>
 
             <div id="drop-grid-area" class="grid-area">
@@ -56,12 +325,12 @@
                     <div id="cell-0" class="grid-cell filled shiritori-start" data-word="しりとり" data-next-char="り">
                         <span class="word-text">しりとり</span>
                     </div>
-                </div>
+                    </div>
                 
-                <p id="feedback-message" class="feedback-message">「り」から始まるカードを2マス目に入れてね！</p>
+                <p id="feedback-message" class="feedback-message">「り」から始まるカードを1マス目に入れてね！</p>
 
                 <div id="return-card-area">
-                    <button id="returnCardButton" class="control-button" style="background-color: #f0a000; margin-top: 10px; display: none;">
+                    <button id="returnCardButton" class="control-button" style="background-color: #f0a000; display: none;">
                         マスに置いたカードを戻す
                     </button>
                 </div>
