@@ -2,98 +2,105 @@
 /* サイト全体の基本設定 */
 /* ======================================== */
 body {
-font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-background-color: #f7f9fc;
-color: #333;
-margin: 0;
-padding: 20px;
-text-align: center;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background-color: #f7f9fc;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
 }
 
-/* タイトル設定 */
+/* ★★★ タイトル設定（ここをアップデートしました） ★★★ */
 h1 {
-color: #ff6f61;
-font-size: 2.5em;
-border-bottom: 4px solid #ffcc5c;
-display: inline-block;
-padding-bottom: 5px;
+    color: #ff6f61;              /* 文字色：サーモンピンク */
+    background-color: #ffffff;   /* 背景色：白 */
+    border: 4px solid #ff6f61;   /* 枠線：文字と同じ色 */
+    border-radius: 20px;         /* 角を丸くして親しみやすく */
+    font-size: 2.8em;            /* 文字を少し大きく */
+    padding: 15px 40px;          /* 枠内の余白（広めに） */
+    display: inline-block;       /* 文字の長さに合わせて枠を作る */
+    
+    /* ポップな影をつけてインパクトを出す */
+    box-shadow: 6px 6px 0px #ffcc5c; 
+    
+    margin-bottom: 20px;         /* 下の要素との間隔 */
 }
 
 /* コンテナの基本設定 */
 .container {
-background-color: white;
-padding: 30px;
-border-radius: 15px;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-max-width: 800px;
-margin: 30px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 30px auto;
 }
 
 /* ======================================== */
 /* ボタンデザイン（共通） */
 /* ======================================== */
 .menu-buttons-grid {
-display: flex;
-justify-content: center;
-flex-wrap: wrap;
-gap: 30px;
-margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 20px;
 }
 
 .menu-card-button {
-border: 2px solid #ffcc5c;
-padding: 20px;
-margin: 0;
-border-radius: 15px;
-font-size: 1.3em;
-font-weight: bold;
-text-decoration: none;
-text-align: center;
-width: 200px;
-height: 150px;
-display: inline-flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-transition: all 0.3s ease;
-cursor: pointer;
+    border: 2px solid #ffcc5c;
+    padding: 20px;
+    margin: 0;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    width: 200px;
+    height: 150px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 button.menu-card-reset,
 a.menu-card-reset {
-background-color: white !important;
-color: #333 !important;
-border: 2px solid #ffcc5c !important;
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    background-color: white !important;
+    color: #333 !important;
+    border: 2px solid #ffcc5c !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .menu-card-button:hover {
-transform: translateY(-5px);
-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-background-color: #fff8e1;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #fff8e1;
 }
 
 /* リンク要素の色とカーソルを調整 */
 a.menu-card-button {
-color: #333;
+    color: #333;
 }
 
 /* ======================================== */
 /* 共通ボタンスタイル（ゲーム中） */
 /* ======================================== */
 .control-button {
-border: none;
-border-radius: 8px;
-padding: 10px 16px;
-font-size: 16px;
-cursor: pointer;
-color: white;
-transition: opacity 0.2s;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    transition: opacity 0.2s;
 }
 
 .control-button:hover {
-opacity: 0.85;
+    opacity: 0.85;
 }
 
 /* ======================================== */
@@ -101,22 +108,22 @@ opacity: 0.85;
 /* ======================================== */
 .menu-card-button img,
 .choice-card img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-display: block;
-border-radius: 5px;
-box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
 #image-area img,
 #game-area img {
-width: 150px;
-height: 150px;
-object-fit: contain;
-display: block;
-margin: 0 auto 15px;
-border-radius: 10px;
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 15px;
+    border-radius: 10px;
 }
 
 /* ======================================== */
@@ -156,7 +163,7 @@ border-radius: 10px;
 }
 
 /* ======================================== */
-/* ★★★ ランキング機能のCSS (index.htmlからの移動・統合) ★★★ */
+/* ★★★ ランキング機能のCSS ★★★ */
 /* ======================================== */
 
 /* ランキングコンテナの基本設定 */
@@ -246,7 +253,3 @@ border-radius: 10px;
         margin-left: 240px; 
     }
 }
-
-/* ========================================= */
-/* ★★★ CSSコードはここまで ★★★ */
-/* ======================================== */
