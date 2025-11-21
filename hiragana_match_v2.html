@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ひらがなマッチ - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:hover { transform: scale(1.1); }
+
+    /* --- メインコンテナ --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 800px; /* 横並びにするため少し広めに */
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* --- カードデザイン --- */
+    .game-card {
+        background: white;
+        border-radius: 25px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        border: 4px solid white;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    /* --- レベル選択画面 --- */
+    .menu-icon { font-size: 4em; color: #5c7aff; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 1.8em; color: var(--primary); margin: 0 0 10px 0; }
+    
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .level-btn {
+        background: white;
+        border: 3px solid #eee;
+        border-radius: 15px;
+        padding: 15px 10px;
+        font-size: 1.1em;
+        font-weight: 800;
+        color: #555;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #eee;
+        transition: all 0.1s;
+    }
+    .level-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+    .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    /* --- ゲームエリア --- */
+    .game-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; font-weight: bold; color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    /* イラストと単語のレイアウト */
+    .match-container {
+        display: flex;
+        flex-direction: column; /* スマホは縦並び */
+        gap: 20px;
+    }
+    @media (min-width: 600px) {
+        .match-container {
+            flex-direction: row; /* PCは横並び */
+            align-items: flex-start;
+        }
+    }
+
+    .area-box {
+        flex: 1;
+        background: #f9f9f9;
+        border-radius: 15px;
+        padding: 10px;
+        border: 2px dashed #ccc;
+        min-height: 200px;
+    }
+    .area-title { font-size: 0.9em; color: #888; margin-bottom: 10px; font-weight: bold; }
+
+    /* イラストプール */
+    .illust-pool {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    /* ドラッグアイテム (イラスト) */
+    .drag-item {
+        width: 80px; height: 80px;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        cursor: grab;
+        display: flex; justify-content: center; align-items: center;
+        touch-action: none; /* スマホのスクロール防止 */
+        z-index: 10;
+    }
+    .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+    .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+    .drag-item.placed { cursor: pointer; } /* 配置後はクリックで戻せる */
+
+    /* ドロップターゲット (単語) */
+    .word-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        background: white;
+        padding: 5px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        box-shadow: 0 2px 0 #eee;
+    }
+    .drop-target {
+        width: 80px; height: 80px;
+        background: #e3f2fd;
+        border: 2px dashed #90caf9;
+        border-radius: 10px;
+        margin-right: 15px;
+        display: flex; justify-content: center; align-items: center;
+        transition: all 0.2s;
+    }
+    .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
+    .drop-target.correct { background: #e8f5e9; border: 2px solid var(--correct-color); }
+    
+    .word-label { font-size: 1.5em; font-weight: 900; color: #333; }
+
+    /* フィードバック */
+    .feedback-msg { font-weight: bold; font-size: 1.2em; margin-top: 15px; min-height: 1.5em; }
+    .feedback-msg.success { color: var(--correct-color); }
+    .feedback-msg.error { color: var(--incorrect-color); }
+
+    /* アニメーション */
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* ゴースト(タッチ移動用) */
+    .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="level-menu-area" class="pop-in">
+            <div class="game-card">
+                <i class="fa-solid fa-hand-pointer menu-icon"></i>
+                <h1 class="menu-title">ひらがなマッチ</h1>
+                <p style="color:#666; margin-bottom:20px;">イラスト を ドラッグして<br>ただしい ことば とあわせよう！</p>
+                
+                <div id="level-grid" class="level-grid">
+                    </div>
+                
+                <a href="index.html" style="color:#999; font-weight:bold; text-decoration:none; display:block; margin-top:10px;">ホームにもどる</a>
+            </div>
+        </div>
+
+        <div id="game-play-area" style="display:none;" class="pop-in">
+            <div class="game-card">
+                
+                <div class="game-header">
+                    <span id="level-title">レベル 1</span>
+                    <button onclick="showLevelMenu()" style="background:#eee; border:none; padding:5px 10px; border-radius:15px; cursor:pointer; font-weight:bold; color:#666;">もどる</button>
+                </div>
+
+                <div class="match-container">
+                    <div class="area-box">
+                        <div class="area-title">イラスト (ここから選んでね)</div>
+                        <div id="illust-pool" class="illust-pool"></div>
+                    </div>
+
+                    <div class="area-box">
+                        <div class="area-title">ことば (ここに置こう)</div>
+                        <div id="word-list"></div>
+                    </div>
+                </div>
+
+                <p id="feedback" class="feedback-msg"></p>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/hiragana_match_v2.js"></script>
+
+</body>
+</html>
