@@ -252,63 +252,107 @@
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", group_game: "ゲーム",
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_kanji_list: "漢字リスト",
-            cat_kana: "ひらがな・カタカナ", cat_word: "ことば・しりとり", cat_kanji: "漢字・とけい", cat_grammar: "文法・クイズ"
+            // ★修正: 新しい8カテゴリのキー定義
+            cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
+            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_sentence: "ぶんしょう"
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
             group_kiso: "Basics", group_game: "Games",
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_kanji_list: "Kanji List",
-            cat_kana: "Hiragana / Katakana", cat_word: "Words & Shiritori", cat_kanji: "Kanji & Clock", cat_grammar: "Grammar & Quiz"
+            // ★修正: 新しい8カテゴリのキー定義 (簡略化)
+            cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
+            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_sentence: "Sentence"
         }
     };
 
-    // ★ 全16ゲームのデータ構造
+    // ★ 全ゲームを8カテゴリに分割して再定義
     const gameStructure = [
+        // 1. ひらがな (3ゲーム)
         {
-            id: "kana",
-            icon: "fa-solid fa-a",
+            id: "hiragana",
+            icon: "fa-solid fa-h", 
             color: "#ff6f61", // 赤系
-            titleKey: "cat_kana",
+            titleKey: "cat_hiragana",
             games: [
                 { url: "hiragana_v2.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
                 { url: "hiragana2_v2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
-                { url: "hiragana_match_v2.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
+                { url: "hiragana_match_v2.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" }
+            ]
+        },
+        // 2. カタカナ (1ゲーム)
+        {
+            id: "katakana",
+            icon: "fa-solid fa-k", 
+            color: "#ffa726", // オレンジ系
+            titleKey: "cat_katakana",
+            games: [
                 { url: "katakana_match_v2.html", title: "カタカナマッチ", icon: "fa-solid fa-hand-pointer" }
             ]
         },
+        // 3. しりとり (2ゲーム)
         {
-            id: "word",
-            icon: "fa-solid fa-comments",
+            id: "shiritori",
+            icon: "fa-solid fa-comments", 
             color: "#f0ad4e", // 黄色系
-            titleKey: "cat_word",
+            titleKey: "cat_shiritori",
             games: [
                 { url: "shiritori_v2.html", title: "しりとり1", icon: "fa-solid fa-comment-dots" },
-                { url: "shiritori2_v2.html", title: "しりとり2", icon: "fa-regular fa-comments" },
+                { url: "shiritori2_v2.html", title: "しりとり2", icon: "fa-regular fa-comments" }
+            ]
+        },
+        // 4. ことば (しりとり以外 3ゲーム)
+        {
+            id: "word_other",
+            icon: "fa-solid fa-microphone", 
+            color: "#00bcd4", // シアン系
+            titleKey: "cat_word_other",
+            games: [
                 { url: "verb_v2.html", title: "どうしゲーム", icon: "fa-solid fa-person-running" },
                 { url: "treasure_Hunt_v2.html", title: "宝探し", icon: "fa-solid fa-gem" },
                 { url: "aisatsu_quiz_v2.html", title: "あいさつ", icon: "fa-solid fa-hand-spock" },
-                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
             ]
         },
+        // 5. とけい (2ゲーム)
         {
-            id: "kanji",
-            icon: "fa-regular fa-clock",
+            id: "clock",
+            icon: "fa-solid fa-clock", 
             color: "#42a5f5", // 青系
-            titleKey: "cat_kanji",
+            titleKey: "cat_clock",
             games: [
-                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
                 { url: "clock.html", title: "とけい1", icon: "fa-regular fa-clock" },
                 { url: "clock2.html", title: "とけい2", icon: "fa-solid fa-stopwatch" }
             ]
         },
+        // 6. かんじ (2ゲーム)
         {
-            id: "grammar",
-            icon: "fa-solid fa-puzzle-piece",
+            id: "kanji_game",
+            icon: "fa-solid fa-pen-fancy", 
+            color: "#66bb6a", // 緑系
+            titleKey: "cat_kanji_game",
+            games: [
+                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
+                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
+            ]
+        },
+        // 7. けいようし (2ゲーム)
+        {
+            id: "keiyoshi_game",
+            icon: "fa-solid fa-star-half-stroke", 
             color: "#ab47bc", // 紫系
-            titleKey: "cat_grammar",
+            titleKey: "cat_keiyoshi_game",
             games: [
                 { url: "keiyoshi.html", title: "けいようし1", icon: "fa-solid fa-star-half-stroke" },
                 { url: "adjective_quiz.html", title: "けいようし2", icon: "fa-regular fa-star" },
+            ]
+        },
+        // 8. ぶんしょう (1ゲーム)
+        {
+            id: "sentence",
+            icon: "fa-solid fa-layer-group", 
+            color: "#546e7a", // グレー系
+            titleKey: "cat_sentence",
+            games: [
                 { url: "sentence_puzzle.html", title: "ぶんづくり", icon: "fa-solid fa-layer-group" }
             ]
         }
@@ -322,7 +366,7 @@
     // 1. カテゴリ一覧を表示する関数
     function renderGameCategories() {
         gameGrid.innerHTML = '';
-        backBtn.style.display = 'none'; // 戻るボタンを隠す
+        backBtn.style.display = 'none';
         document.getElementById('game-section-title').textContent = i18nData[currentLang].group_game;
 
         gameStructure.forEach(cat => {
@@ -340,16 +384,15 @@
             gameGrid.appendChild(div);
         });
         
-        // アニメーションリセット
         gameGrid.classList.remove('fade-in');
-        void gameGrid.offsetWidth; // reflow
+        void gameGrid.offsetWidth;
         gameGrid.classList.add('fade-in');
     }
 
     // 2. カテゴリ内のゲーム一覧を表示する関数
     function renderGameList(category) {
         gameGrid.innerHTML = '';
-        backBtn.style.display = 'block'; // 戻るボタンを表示
+        backBtn.style.display = 'block';
         document.getElementById('game-section-title').textContent = i18nData[currentLang][category.titleKey];
 
         category.games.forEach(game => {
@@ -434,7 +477,7 @@
         });
         document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-        // ゲームカテゴリ再描画
+        
         if(backBtn.style.display === 'none') {
             renderGameCategories();
         } else {
@@ -458,7 +501,7 @@
 
     // 初期化
     updateUI();
-    renderGameCategories(); // ゲームカテゴリを表示
+    renderGameCategories();
 </script>
 </body>
 </html>
