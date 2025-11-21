@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
             FEEDBACK.textContent = msg;
             FEEDBACK.style.color = 'var(--correct-color)';
             
-            score += 10;
+            score += 1;
             updateScoreBoard();
             
             setTimeout(showNextQuestion, 1500);
