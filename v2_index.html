@@ -1,250 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-
-<style>
-    /* --- 基本設定 --- */
-    :root {
-        --primary: #5c7aff;
-        --accent: #ffcc5c;
-        --bg-color: #f4f7fc;
-        --text-color: #333;
-    }
-
-    body {
-        font-family: 'Zen Maru Gothic', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        padding-bottom: 80px;
-    }
-
-    /* --- ヘッダー --- */
-    header {
-        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-    .lang-switch button {
-        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-        color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
-    }
-    .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
-
-    /* --- ヒーロー --- */
-    .hero-section {
-        background: white; text-align: center; padding: 30px 20px;
-        border-radius: 0 0 30px 30px; margin-bottom: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
-
-    /* --- ダッシュボード --- */
-    .dashboard-card {
-        background: white; margin: 20px; padding: 20px;
-        border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        display: flex; align-items: center; gap: 15px;
-    }
-    .avatar-circle {
-        width: 60px; height: 60px; border-radius: 50%;
-        display: flex; justify-content: center; align-items: center;
-        font-size: 1.8em; background: #e0e7ff; color: var(--primary);
-    }
-    .user-meta { flex-grow: 1; }
-    .level-bar-container {
-        background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
-    }
-    .level-bar-fill {
-        background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
-    }
-    .status-badges { display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; font-weight: bold; }
-    .badge-streak { color: #ff6f61; }
-    .badge-points { color: #f0ad4e; }
-
-    /* --- 認証ボタン --- */
-    .auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-    .btn-auth {
-        padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
-    }
-    .btn-auth:active { transform: translateY(4px); box-shadow: none; }
-    .btn-login { background: #4caf50; color: white; }
-    .btn-signup { background: var(--primary); color: white; }
-    .btn-guest { background: #90a4ae; color: white; }
-
-    /* --- グリッドレイアウト --- */
-    .section-header {
-        padding: 0 20px; margin-bottom: 15px;
-        display: flex; align-items: center; justify-content: space-between;
-    }
-    .section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
-    .section-title i { color: var(--primary); }
-    
-    /* 戻るボタン (サブカテゴリ表示時用) */
-    .btn-back {
-        background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
-        font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
-        display: none; /* 初期は非表示 */
-    }
-    .btn-back:hover { background: #ddd; }
-
-    .grid-container {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 15px; padding: 0 20px 40px 20px; max-width: 1000px; margin: 0 auto;
-    }
-
-    /* カードデザイン */
-    .game-card {
-        background: white; border-radius: 15px; padding: 20px;
-        text-align: center; text-decoration: none; color: var(--text-color);
-        box-shadow: 0 4px 0 #e0e0e0; border: 2px solid #f0f0f0;
-        transition: all 0.2s; cursor: pointer;
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-        height: 130px; position: relative; overflow: hidden;
-    }
-    .game-card:active { transform: translateY(2px); box-shadow: 0 2px 0 #e0e0e0; }
-    
-    /* カテゴリフォルダっぽいデザイン */
-    .category-card {
-        border-color: #bbdefb; background: #e3f2fd;
-    }
-    .category-card .card-icon { color: #1976d2; }
-
-    .card-icon { font-size: 2.5em; margin-bottom: 10px; color: var(--primary); }
-    .card-title { font-weight: 700; font-size: 0.95em; line-height: 1.3; }
-
-    /* --- モーダル類 --- */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-        display: none; justify-content: center; align-items: center; z-index: 1000;
-    }
-    .modal-box {
-        background: white; width: 90%; max-width: 400px; padding: 30px;
-        border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
-    }
-    .modal-box input {
-        width: 100%; padding: 12px; margin: 10px 0;
-        border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
-    }
-    
-    .ranking-fab {
-        position: fixed; bottom: 20px; right: 20px;
-        background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
-        border-radius: 50%; display: flex; justify-content: center; align-items: center;
-        font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        cursor: pointer; z-index: 90; border: 3px solid white;
-    }
-
-    .hidden { display: none !important; }
-    
-    /* アニメーション */
-    .fade-in { animation: fadeIn 0.3s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-</style>
-</head>
-<body>
-
-<header>
-    <div class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</div>
-    <div class="lang-switch">
-        <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
-        <button id="lang-en" onclick="setLanguage('en')">EN</button>
-    </div>
-</header>
-
-<div class="hero-section">
-    <h1 data-i18n="main_title">楽しく日本語を学ぼう！</h1>
-</div>
-
-<div id="guest-welcome" class="auth-action-area">
-    <button id="login-btn" class="btn-auth btn-login"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span></button>
-    <button id="signup-btn" class="btn-auth btn-signup"><i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span></button>
-    <button id="guest-btn" class="btn-auth btn-guest"><i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span></button>
-</div>
-
-<div id="user-dashboard" class="dashboard-card hidden">
-    <div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
-    <div class="user-meta">
-        <div style="display:flex; justify-content:space-between;">
-            <span id="user-name" style="font-weight:bold; font-size:1.1em;">User</span>
-            <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
-        </div>
-        <div class="level-bar-container"><div id="level-fill" class="level-bar-fill"></div></div>
-        <div class="status-badges">
-            <span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
-            <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
-        </div>
-    </div>
-    <button id="logout-btn" style="background:none; border:none; color:#999; cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i></button>
-</div>
-
-<div class="section-header">
-    <h3 class="section-title"><i class="fa-solid fa-book-open"></i> <span data-i18n="group_kiso">基礎・単語</span></h3>
-</div>
-<div class="grid-container">
-    <a href="kiso.html" class="game-card">
-        <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
-        <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
-    </a>
-    <a href="hiragana_video_list.html" class="game-card">
-        <i class="fa-solid fa-video card-icon" style="color:#ffcc5c;"></i>
-        <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
-    </a>
-    <a href="keiyoshi_list.html" class="game-card">
-        <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
-        <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
-    </a>
-    <a href="kanji_list.html" class="game-card">
-        <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
-        <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
-    </a>
-</div>
-
-<div class="section-header">
-    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span id="game-section-title" data-i18n="group_game">ゲームで遊ぶ</span></h3>
-    <button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-</div>
-
-<div id="game-grid" class="grid-container fade-in">
-    </div>
-
-<div id="fab-ranking" class="ranking-fab" onclick="toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
-
-<div id="ranking-modal" class="modal-overlay">
-    <div class="modal-box" style="text-align:left;">
-        <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> Top 5</h2>
-        <ul id="ranking-list" style="list-style:none; padding:0;"></ul>
-        <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; background:#eee;">閉じる</button>
-    </div>
-</div>
-
-<div id="auth-modal" class="modal-overlay">
-    <div class="modal-box">
-        <h2 id="modal-title">ログイン</h2>
-        <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
-        <input type="text" id="auth-name" placeholder="ユーザー名">
-        <input type="password" id="auth-pass" placeholder="パスワード">
-        <button id="modal-submit" class="btn-auth btn-login" style="width:100%; margin-top:10px;">実行</button>
-        <button id="modal-close" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
-    </div>
-</div>
-
 <script>
     // --- データ定義 ---
     const i18nData = {
@@ -268,7 +21,7 @@
 
     // ★ 全ゲームを8カテゴリに分割して再定義
     const gameStructure = [
-        // 1. ひらがな (3ゲーム)
+        // 1. ひらがな (3ゲーム) -> 隕石クイズを追加して4ゲームに
         {
             id: "hiragana",
             icon: "fa-solid fa-h", 
@@ -277,7 +30,8 @@
             games: [
                 { url: "hiragana_v2.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
                 { url: "hiragana2_v2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
-                { url: "hiragana_match_v2.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" }
+                { url: "hiragana_match_v2.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
+                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" } // ★ここに追加
             ]
         },
         // 2. カタカナ (1ゲーム)
@@ -324,15 +78,15 @@
                 { url: "clock2.html", title: "とけい2", icon: "fa-solid fa-stopwatch" }
             ]
         },
-        // 6. かんじ (2ゲーム)
+        // 6. かんじ (2ゲーム -> 隕石クイズを削除して1ゲームに)
         {
             id: "kanji_game",
             icon: "fa-solid fa-pen-fancy", 
             color: "#66bb6a", // 緑系
             titleKey: "cat_kanji_game",
             games: [
-                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
-                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
+                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" }
+                // ★ここから削除
             ]
         },
         // 7. けいようし (2ゲーム)
@@ -505,3 +259,4 @@
 </script>
 </body>
 </html>
+```http://googleusercontent.com/image_generation_content/0
