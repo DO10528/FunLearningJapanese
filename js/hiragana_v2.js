@@ -17,18 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHOICE_BUTTONS_AREA = document.getElementById('choice-buttons-area');
     const FEEDBACK = document.getElementById('quiz-feedback');
     const SCORE_VAL = document.getElementById('score-val');
-    // ★スタートボタンをここで取得して、直接命令を与えます
     const START_BUTTON = document.getElementById('quizStartButton'); 
 
-    // 音声設定 (ファイルがあるか確認してください)
+    // 音声設定
     const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
     const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
 
     // ----------------------------------------------------
-    // ★★★ データ (JSONファイルを使わずここに直接書く) ★★★
+    // ★★★ データ (ここに全部入っています) ★★★
     // ----------------------------------------------------
-    // 画像ファイル名(image)は実際のファイル名に合わせて修正してください
-    // フォルダ assets/images/stationery/ や assets/images/food/ などにある場合はパスも含めてください
     const gameData = [
         { id: 1, word: 'あひる', image: 'ahiru.png' },
         { id: 2, word: 'あじさい', image: 'ajisai.png' },
