@@ -49,7 +49,7 @@
     .main-container {
         flex-grow: 1;
         padding: 20px;
-        max-width: 800px; /* 横並びにするため少し広めに */
+        max-width: 900px; 
         margin: 0 auto;
         width: 100%;
         box-sizing: border-box;
@@ -77,25 +77,34 @@
     
     .level-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
         gap: 15px;
         margin-bottom: 20px;
     }
 
     .level-btn {
         background: white;
-        border: 3px solid #eee;
+        border: none;
         border-radius: 15px;
-        padding: 15px 10px;
-        font-size: 1.1em;
+        padding: 20px 10px;
+        font-size: 1.2em;
         font-weight: 800;
-        color: #555;
+        color: white;
         cursor: pointer;
-        box-shadow: 0 4px 0 #eee;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15);
         transition: all 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
     }
-    .level-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+    /* 5色ローテーション */
+    .level-btn:nth-child(5n+1) { background-color: #ff6b6b; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #48dbfb; }
+    .level-btn:nth-child(5n+4) { background-color: #1dd1a1; }
+    .level-btn:nth-child(5n+5) { background-color: #ff9f43; }
+
+    .level-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
     .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
 
     /* --- ゲームエリア --- */
     .game-header {
@@ -104,77 +113,137 @@
         font-size: 1.1em;
     }
 
-    /* イラストと単語のレイアウト */
+    /* ★★★ レイアウト修正箇所 (高さ揃え) ★★★ */
     .match-container {
         display: flex;
-        flex-direction: column; /* スマホは縦並び */
-        gap: 20px;
-    }
-    @media (min-width: 600px) {
-        .match-container {
-            flex-direction: row; /* PCは横並び */
-            align-items: flex-start;
-        }
+        flex-direction: row;
+        gap: 30px; 
+        align-items: stretch; /* ← ここを stretch に変更！高さが揃います */
+        justify-content: center; 
     }
 
-    .area-box {
-        flex: 1;
-        background: #f9f9f9;
+    /* 左側：イラストプール */
+    .illust-box {
+        flex: 1; 
+        background: #f0f4f8;
         border-radius: 15px;
-        padding: 10px;
+        padding: 20px;
         border: 2px dashed #ccc;
-        min-height: 200px;
+        /* min-height を削除し、相手の高さに合わせる */
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center; /* ← 中身を上下中央に寄せる */
     }
-    .area-title { font-size: 0.9em; color: #888; margin-bottom: 10px; font-weight: bold; }
+    
+    /* 右側：単語リスト */
+    .word-box {
+        flex: 1; 
+        background: transparent; 
+        border-radius: 15px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center; /* ← 中身を上下中央に寄せる */
+    }
 
-    /* イラストプール */
+    .area-title {
+        font-size: 1em; color: #888; margin-bottom: 15px; font-weight: bold;
+        text-align: center; width: 100%;
+    }
+
+    /* イラストプール (縦一列) */
     .illust-pool {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
     }
 
     /* ドラッグアイテム (イラスト) */
     .drag-item {
-        width: 80px; height: 80px;
+        width: 85px; height: 85px;
         background: white;
-        border: 2px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border: 3px solid #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         cursor: grab;
         display: flex; justify-content: center; align-items: center;
-        touch-action: none; /* スマホのスクロール防止 */
+        touch-action: none; 
         z-index: 10;
+        transition: all 0.2s;
     }
     .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
     .drag-item:active { cursor: grabbing; transform: scale(1.05); }
-    .drag-item.placed { cursor: pointer; } /* 配置後はクリックで戻せる */
 
-    /* ドロップターゲット (単語) */
+    /* 配置済みアイテム (ピッタリ) */
+    .drag-item.placed {
+        width: 100% !important; height: 100% !important; margin: 0 !important;
+        border: none !important; box-shadow: none !important; border-radius: 8px;
+        cursor: pointer; background: transparent;
+    }
+    .drag-item.placed img { width: 95%; height: 95%; }
+
+
+    /* ドロップターゲットの行 */
     .word-row {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
         background: white;
-        padding: 5px;
-        border-radius: 10px;
-        border: 1px solid #eee;
-        box-shadow: 0 2px 0 #eee;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        box-shadow: 0 4px 0 #f0f0f0;
+        width: 90%;
+        max-width: 350px;
     }
     .drop-target {
-        width: 80px; height: 80px;
+        width: 85px; height: 85px;
         background: #e3f2fd;
-        border: 2px dashed #90caf9;
-        border-radius: 10px;
-        margin-right: 15px;
+        border: 3px dashed #90caf9;
+        border-radius: 12px;
+        margin-right: 20px;
         display: flex; justify-content: center; align-items: center;
         transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+        flex-shrink: 0; 
     }
     .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
-    .drop-target.correct { background: #e8f5e9; border: 2px solid var(--correct-color); }
+    .drop-target.correct { background: #e8f5e9; border: 3px solid var(--correct-color); border-style: solid; }
     
-    .word-label { font-size: 1.5em; font-weight: 900; color: #333; }
+    .word-label { font-size: 2em; font-weight: 900; color: #444; flex-grow: 1; text-align: center; }
+
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .match-container {
+            flex-direction: column-reverse; 
+            gap: 20px;
+            align-items: center; /* スマホでは中央揃えに戻す */
+        }
+        .illust-box, .word-box {
+            width: 100%;
+            flex: none;
+            min-height: auto;
+            padding: 15px;
+        }
+        .illust-pool {
+            flex-direction: row; 
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .word-row {
+            width: 100%;
+            padding: 8px 15px;
+        }
+        .drop-target { margin-right: 15px; }
+        .word-label { font-size: 1.8em; text-align: left; }
+    }
 
     /* フィードバック */
     .feedback-msg { font-weight: bold; font-size: 1.2em; margin-top: 15px; min-height: 1.5em; }
@@ -186,7 +255,7 @@
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    /* ゴースト(タッチ移動用) */
+    /* ゴースト */
     .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
 </style>
@@ -222,13 +291,13 @@
                 </div>
 
                 <div class="match-container">
-                    <div class="area-box">
-                        <div class="area-title">イラスト (ここから選んでね)</div>
+                    <div class="illust-box">
+                        <div class="area-title">イラスト</div>
                         <div id="illust-pool" class="illust-pool"></div>
                     </div>
 
-                    <div class="area-box">
-                        <div class="area-title">ことば (ここに置こう)</div>
+                    <div class="word-box">
+                        <div class="area-title">ことば</div>
                         <div id="word-list"></div>
                     </div>
                 </div>

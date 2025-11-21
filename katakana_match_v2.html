@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>カタカナマッチ - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:hover { transform: scale(1.1); }
+
+    /* --- メインコンテナ --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 900px; 
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* --- カードデザイン --- */
+    .game-card {
+        background: white;
+        border-radius: 25px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        border: 4px solid white;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    /* --- レベル選択画面 --- */
+    .menu-icon { font-size: 4em; color: #5c7aff; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 1.8em; color: var(--primary); margin: 0 0 10px 0; }
+    
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* カラフルなレベルボタン */
+    .level-btn {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px 10px;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        transition: all 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+    .level-btn:nth-child(5n+1) { background-color: #ff6b6b; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #48dbfb; }
+    .level-btn:nth-child(5n+4) { background-color: #1dd1a1; }
+    .level-btn:nth-child(5n+5) { background-color: #ff9f43; }
+
+    .level-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+    .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
+
+    /* --- ゲームエリア --- */
+    .game-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; font-weight: bold; color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    /* レイアウト (左右高さ揃え・中央寄せ) */
+    .match-container {
+        display: flex;
+        flex-direction: row;
+        gap: 30px; 
+        align-items: stretch; 
+        justify-content: center; 
+    }
+
+    /* 左側：イラストプール */
+    .illust-box {
+        flex: 1; 
+        background: #f0f4f8;
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px dashed #ccc;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+    }
+    
+    /* 右側：単語リスト */
+    .word-box {
+        flex: 1; 
+        background: transparent; 
+        border-radius: 15px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+    }
+
+    .area-title {
+        font-size: 1em; color: #888; margin-bottom: 15px; font-weight: bold;
+        text-align: center; width: 100%;
+    }
+
+    /* イラストプール (縦一列) */
+    .illust-pool {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /* ドラッグアイテム (イラスト) */
+    .drag-item {
+        width: 85px; height: 85px;
+        background: white;
+        border: 3px solid #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        cursor: grab;
+        display: flex; justify-content: center; align-items: center;
+        touch-action: none; 
+        z-index: 10;
+        transition: all 0.2s;
+    }
+    .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+    .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+
+    /* 配置済みアイテム (ピッタリ) */
+    .drag-item.placed {
+        width: 100% !important; height: 100% !important; margin: 0 !important;
+        border: none !important; box-shadow: none !important; border-radius: 8px;
+        cursor: pointer; background: transparent;
+    }
+    .drag-item.placed img { width: 95%; height: 95%; }
+
+
+    /* ドロップターゲットの行 */
+    .word-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        box-shadow: 0 4px 0 #f0f0f0;
+        width: 90%;
+        max-width: 350px;
+    }
+    .drop-target {
+        width: 85px; height: 85px;
+        background: #e3f2fd;
+        border: 3px dashed #90caf9;
+        border-radius: 12px;
+        margin-right: 20px;
+        display: flex; justify-content: center; align-items: center;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+        flex-shrink: 0; 
+    }
+    .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
+    .drop-target.correct { background: #e8f5e9; border: 3px solid var(--correct-color); border-style: solid; }
+    
+    .word-label { font-size: 1.6em; font-weight: 900; color: #444; flex-grow: 1; text-align: center; }
+
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .match-container {
+            flex-direction: column-reverse; 
+            gap: 20px;
+            align-items: center;
+        }
+        .illust-box, .word-box {
+            width: 100%;
+            flex: none;
+            min-height: auto;
+            padding: 15px;
+        }
+        .illust-pool {
+            flex-direction: row; 
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .word-row {
+            width: 100%;
+            padding: 8px 15px;
+        }
+        .drop-target { margin-right: 15px; }
+        .word-label { font-size: 1.5em; text-align: left; }
+    }
+
+    /* フィードバック */
+    .feedback-msg { font-weight: bold; font-size: 1.2em; margin-top: 15px; min-height: 1.5em; }
+    .feedback-msg.success { color: var(--correct-color); }
+    .feedback-msg.error { color: var(--incorrect-color); }
+
+    /* アニメーション */
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* ゴースト */
+    .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="level-menu-area" class="pop-in">
+            <div class="game-card">
+                <i class="fa-solid fa-hand-pointer menu-icon"></i>
+                <h1 class="menu-title">カタカナマッチ</h1>
+                <p style="color:#666; margin-bottom:20px;">イラスト を ドラッグして<br>ただしい ことば とあわせよう！</p>
+                
+                <div id="level-grid" class="level-grid">
+                    </div>
+                
+                <a href="index.html" style="color:#999; font-weight:bold; text-decoration:none; display:block; margin-top:10px;">ホームにもどる</a>
+            </div>
+        </div>
+
+        <div id="game-play-area" style="display:none;" class="pop-in">
+            <div class="game-card">
+                
+                <div class="game-header">
+                    <span id="level-title">レベル 1</span>
+                    <button onclick="showLevelMenu()" style="background:#eee; border:none; padding:5px 10px; border-radius:15px; cursor:pointer; font-weight:bold; color:#666;">もどる</button>
+                </div>
+
+                <div class="match-container">
+                    <div class="illust-box">
+                        <div class="area-title">イラスト</div>
+                        <div id="illust-pool" class="illust-pool"></div>
+                    </div>
+
+                    <div class="word-box">
+                        <div class="area-title">ことば</div>
+                        <div id="word-list"></div>
+                    </div>
+                </div>
+
+                <p id="feedback" class="feedback-msg"></p>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 設定 & ポイントシステム ---
+            const GAME_ID = 'katakana_drag_match'; // IDを変更
+            const USER_STORAGE_KEY = 'user_accounts';
+            const SESSION_STORAGE_KEY = 'current_user';
+            const GUEST_NAME = 'ゲスト'; 
+
+            // DOM
+            const MENU_AREA = document.getElementById('level-menu-area');
+            const GAME_AREA = document.getElementById('game-play-area');
+            const LEVEL_GRID = document.getElementById('level-grid');
+            const LEVEL_TITLE = document.getElementById('level-title');
+            const ILLUST_POOL = document.getElementById('illust-pool');
+            const WORD_LIST = document.getElementById('word-list');
+            const FEEDBACK = document.getElementById('feedback');
+
+            // 音声
+            const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
+            const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
+
+            // ★ 画像パス (カタカナ用に変更) ★
+            const IMG_PATH = 'assets/images/katakana_words/';
+            
+            // ★ カタカナデータ ★
+            const gameLevels = [
+                { level: 1, words: [ { hira: 'アイス', file: 'アイス' }, { hira: 'イヤホン', file: 'イヤホン' }, { hira: 'ウインナー', file: 'ウインナー' }, { hira: 'エプロン', file: 'エプロン' }, { hira: 'オムライス', file: 'オムライス' } ] },
+                { level: 2, words: [ { hira: 'カレンダー', file: 'カレンダー' }, { hira: 'キャベツ', file: 'キャベツ' }, { hira: 'クレヨン', file: 'クレヨン' }, { hira: 'ケーキ', file: 'ケーキ' }, { hira: 'コップ', file: 'コップ' } ] },
+                { level: 3, words: [ { hira: 'サッカー', file: 'サッカー' }, { hira: 'シャツ', file: 'シャツ' }, { hira: 'ストロー', file: 'ストロー' }, { hira: 'セーター', file: 'セーター' }, { hira: 'ソーダ', file: 'ソーダ' } ] },
+                { level: 4, words: [ { hira: 'タオル', file: 'タオル' }, { hira: 'チョコ', file: 'チョコ' }, { hira: 'ツナ', file: 'ツナ' }, { hira: 'テント', file: 'テント' }, { hira: 'トナカイ', file: 'トナカイ' } ] },
+                { level: 5, words: [ { hira: 'ナマズ', file: 'ナマズ' }, { hira: 'ニワトリ', file: 'ニワトリ' }, { hira: 'ヌードル', file: 'ヌードル' }, { hira: 'ネクタイ', file: 'ネクタイ' }, { hira: 'ノート', file: 'ノート' } ] },
+                { level: 6, words: [ { hira: 'ハンガー', file: 'ハンガー' }, { hira: 'ヒトデ', file: 'ヒトデ' }, { hira: 'フグ', file: 'フグ' }, { hira: 'ヘルメット', file: 'ヘルメット' }, { hira: 'ホタテ', file: 'ホタテ' } ] },
+                { level: 7, words: [ { hira: 'マフラー', file: 'マフラー' }, { hira: 'ミミズ', file: 'ミミズ' }, { hira: 'ムササビ', file: 'ムササビ' }, { hira: 'メダカ', file: 'メダカ' }, { hira: 'メモ', file: 'メモ' } ] },
+                { level: 8, words: [ { hira: 'タイヤ', file: 'タイヤ' }, { hira: 'ユーフォー', file: 'ユーフォー' }, { hira: 'ヨーヨー', file: 'ヨーヨー' }, { hira: 'ワイン', file: 'ワイン' }, { hira: 'パン', file: 'パン' } ] },
+                { level: 9, words: [ { hira: 'ラーメン', file: 'ラーメン' }, { hira: 'リュック', file: 'リュック' }, { hira: 'ルビー', file: 'ルビー' }, { hira: 'レタス', file: 'レタス' }, { hira: 'ロケット', file: 'ロケット' } ] }
+            ];
+
+            let currentLevelData = null;
+            let currentDragItem = null;
+
+            // --- ポイント関数 ---
+            function getTodayDateString() {
+                const now = new Date();
+                return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            }
+            function checkAndAwardPoints(level) {
+                const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
+                if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
+                const usersJson = localStorage.getItem(USER_STORAGE_KEY);
+                let users = usersJson ? JSON.parse(usersJson) : {};
+                let user = users[currentUser];
+                if (!user) return "error"; 
+
+                const today = getTodayDateString();
+                const levelKey = `${GAME_ID}_level_${level}`;
+                user.progress = user.progress || {};
+                user.progress[levelKey] = user.progress[levelKey] || {};
+
+                if (user.progress[levelKey][today] === true) return "already_scored"; 
+
+                user.points = (user.points || 0) + 1;
+                user.progress[levelKey][today] = true;
+                users[currentUser] = user;
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+                return "scored"; 
+            }
+
+            // --- 初期化 ---
+            function initGame() {
+                LEVEL_GRID.innerHTML = '';
+                gameLevels.forEach(level => {
+                    const btn = document.createElement('button');
+                    btn.className = 'level-btn';
+                    btn.textContent = `Lv.${level.level}`;
+                    btn.onclick = () => loadLevel(level);
+                    LEVEL_GRID.appendChild(btn);
+                });
+            }
+
+            // --- レベルロード ---
+            function loadLevel(levelData) {
+                currentLevelData = levelData;
+                
+                MENU_AREA.style.display = 'none';
+                GAME_AREA.style.display = 'block';
+                LEVEL_TITLE.textContent = `レベル ${levelData.level}`;
+                FEEDBACK.textContent = '';
+                FEEDBACK.className = 'feedback-msg';
+
+                ILLUST_POOL.innerHTML = '';
+                WORD_LIST.innerHTML = '';
+
+                // シャッフル
+                const words = shuffleArray([...levelData.words]);
+                const illusts = shuffleArray([...levelData.words]);
+
+                // 単語リスト作成 (Target)
+                words.forEach(w => {
+                    const row = document.createElement('div');
+                    row.className = 'word-row';
+                    
+                    const target = document.createElement('div');
+                    target.className = 'drop-target';
+                    target.dataset.word = w.hira;
+                    setupDropZone(target);
+
+                    const label = document.createElement('span');
+                    label.className = 'word-label';
+                    label.textContent = w.hira;
+
+                    row.appendChild(target);
+                    row.appendChild(label);
+                    WORD_LIST.appendChild(row);
+                });
+
+                // イラスト作成 (Source)
+                illusts.forEach(w => {
+                    const item = document.createElement('div');
+                    item.className = 'drag-item';
+                    item.dataset.word = w.hira;
+                    item.draggable = true;
+                    
+                    const img = document.createElement('img');
+                    img.src = `${IMG_PATH}${w.file}.png`;
+                    img.alt = w.hira;
+                    
+                    item.appendChild(img);
+                    setupDragItem(item);
+                    ILLUST_POOL.appendChild(item);
+                });
+            }
+
+            window.showLevelMenu = function() {
+                GAME_AREA.style.display = 'none';
+                MENU_AREA.style.display = 'block';
+            };
+
+            // --- ドラッグ＆ドロップロジック ---
+            
+            function setupDragItem(item) {
+                // クリックで戻す (配置済みの場合)
+                item.addEventListener('click', () => {
+                    if (item.parentElement && item.parentElement.classList.contains('drop-target')) {
+                        if (!item.parentElement.classList.contains('correct')) { 
+                            ILLUST_POOL.appendChild(item);
+                            item.classList.remove('placed');
+                            FEEDBACK.textContent = '';
+                        }
+                    }
+                });
+
+                // PC ドラッグ
+                item.addEventListener('dragstart', (e) => {
+                    currentDragItem = item;
+                    setTimeout(() => item.style.opacity = '0.5', 0);
+                });
+                item.addEventListener('dragend', () => {
+                    item.style.opacity = '1';
+                    currentDragItem = null;
+                });
+
+                // スマホ タッチ
+                item.addEventListener('touchstart', (e) => {
+                    if (item.parentElement.classList.contains('correct')) return;
+
+                    currentDragItem = item;
+                    item.style.opacity = '0.5';
+                }, {passive: true});
+
+                item.addEventListener('touchend', (e) => {
+                    item.style.opacity = '1';
+                    
+                    const touch = e.changedTouches[0];
+                    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                    
+                    if (target) {
+                        let dropZone = target.closest('.drop-target');
+                        if (dropZone && !dropZone.querySelector('.drag-item')) {
+                             handleDrop(dropZone);
+                        } else if (target.closest('.illust-pool')) {
+                            ILLUST_POOL.appendChild(item);
+                            item.classList.remove('placed');
+                        }
+                    }
+                    currentDragItem = null;
+                });
+            }
+
+            function setupDropZone(zone) {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!zone.querySelector('.drag-item')) {
+                        zone.classList.add('drag-over');
+                    }
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    if (!zone.querySelector('.drag-item') && currentDragItem) {
+                        handleDrop(zone);
+                    }
+                });
+            }
+
+            function handleDrop(zone) {
+                zone.appendChild(currentDragItem);
+                currentDragItem.classList.add('placed');
+                checkAnswers();
+            }
+
+            // --- 判定 ---
+            function checkAnswers() {
+                const targets = document.querySelectorAll('.drop-target');
+                const total = targets.length;
+                let filled = 0;
+                
+                targets.forEach(t => {
+                    if (t.querySelector('.drag-item')) filled++;
+                });
+
+                if (filled < total) {
+                    FEEDBACK.textContent = `あと ${total - filled} こ`;
+                    return;
+                }
+
+                let allCorrect = true;
+                targets.forEach(t => {
+                    const placed = t.querySelector('.drag-item');
+                    if (placed.dataset.word !== t.dataset.word) {
+                        allCorrect = false;
+                    }
+                });
+
+                if (allCorrect) {
+                    // 正解
+                    try { SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play(); } catch(e){}
+                    FEEDBACK.textContent = 'ぜんぶ せいかい！';
+                    FEEDBACK.className = 'feedback-msg success';
+                    
+                    targets.forEach(t => t.classList.add('correct'));
+
+                    const res = checkAndAwardPoints(currentLevelData.level);
+                    if (res === 'scored') FEEDBACK.textContent += ' (+1 pt)';
+                    
+                    setTimeout(() => {
+                        if (currentLevelData.level < 9) {
+                            FEEDBACK.textContent += ' -> つぎのレベルへいくよ！';
+                            setTimeout(() => {
+                                const nextLvl = gameLevels.find(l => l.level === currentLevelData.level + 1);
+                                if(nextLvl) loadLevel(nextLvl);
+                            }, 2000);
+                        } else {
+                            FEEDBACK.textContent = 'すごい！ぜんぶのレベルをクリアしたよ！';
+                        }
+                    }, 1000);
+
+                } else {
+                    // 不正解
+                    try { SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play(); } catch(e){}
+                    FEEDBACK.textContent = 'ちがうものがあるよ。なおしてみてね。';
+                    FEEDBACK.className = 'feedback-msg error';
+                }
+            }
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // スタート
+            initGame();
+        });
+    </script>
+
+</body>
+</html>
