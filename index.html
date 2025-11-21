@@ -646,56 +646,34 @@
     }
 
     // ============================================
-    // ★★★ 禁止ワードリストと判定関数 (新規追加) ★★★
+    // ★★★ 禁止ワードリストと判定関数 ★★★
     // ============================================
 
-    // (1) 禁止ワードリストの定義（すべて小文字で定義する）
     const BANNED_WORDS = [
-        // --- 攻撃的な言葉 / 下品なスラング (Offensive / Vulgar) ---
         "kuso", "shinu", "kizu", "kusai", "hentai", "ero", "aho", "ahoka", 
         "bakayaro", "gomi", "kasu", "manuke", "busu", "chikan", "kimoi",
         "bitch", "fuck", "shit", "ass", "cunt", "penis", "vagina", "pussy", 
         "cock", "whore", "slut", "damn", "kill", "die", "nazi", "hitler", 
         "sex", "xxx", "porn", "rape", "nude", 
-
-        // --- システム予約語 / 管理用 (Reserved / Admin) ---
         "admin", "administrator", "system", "mod", "guest", "root", "support", 
         "管理者", "システム", 
         "admini", "systema", 
-        
-        // --- 日本語の不適切な言葉 (Japanese Inappropriate) ---
         "ばか", "あほ", "くそ", "しね", "うんこ", "きもい", "びんぼう", "げすと",
-        
-        // --- その他 (Other Inappropriate) ---
         "covid", "corona", 
         "virus", "drug", "weed", "alcohol", "drunk",
     ];
 
-    /**
-     * ゲーム名に禁止ワードが含まれていないかチェックする
-     * @param {string} name - チェック対象のゲーム名
-     * @returns {string | null} - 禁止ワードが見つかった場合はそのワード、見つからない場合は null
-     */
     function checkBannedWords(name) {
         if (!name) return null;
         
-        // 判定しやすくするため、全角スペース除去、小文字化、ひらがな化を行う
         const normalizedName = name.trim()
                                    .toLowerCase()
-                                   .replace(/[０-９Ａ-Ｚａ-ｚ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角英数字を半角に
-                                   .replace(/[　\s]/g, ''); // スペース除去
+                                   .replace(/[０-９Ａ-Ｚａ-ｚ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) 
+                                   .replace(/[　\s]/g, ''); 
 
-        // リスト内の単語が含まれているかチェック
         for (const word of BANNED_WORDS) {
-            // カタカナ・ひらがな変換を簡易的に行う（例: 'ｱﾎ' -> 'あほ'）
-            let searchName = normalizedName;
-            if (/[ァ-ヶ]/.test(word)) { // もしリストのワードがカタカナを含んでいたら、ユーザー入力もカタカナとして処理する
-                 // 実際にはもっと複雑な変換が必要だが、シンプルなチェックのために小文字化で対応
-            }
-
-
             if (normalizedName.includes(word)) {
-                return word; // 見つかった禁止ワードを返す
+                return word; 
             }
         }
         return null;
@@ -706,23 +684,25 @@
     // ★★★ ランキング機能 (月間累積・毎日更新) ★★★
     // ----------------------------------------------------
 
-    // 月が変わったら累積ポイントをリセットする処理 (月間ランキングの維持)
+    // ★修正関数: 月が変わったら累積ポイントをリセットする処理
     function checkMonthlyReset() {
         const now = new Date();
         const currentYearMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
         
-        const lastResetDate = localStorage.getItem('last_ranking_reset');
+        const lastResetDateStr = localStorage.getItem('last_ranking_reset');
         
         // 前回のチェック日が今月ではない場合、リセットを実行
-        if (!lastResetDate || lastResetDate.split('-').slice(0, 2).join('-') !== currentYearMonth) {
+        if (!lastResetDateStr || lastResetDateStr.split('-').slice(0, 2).join('-') !== currentYearMonth) {
             
-            // 前月からのポイント累積をリセット
-            if (lastResetDate && new Date(lastResetDate).getMonth() !== now.getMonth()) {
+            // 月が変わった場合のみポイントをリセット
+            if (lastResetDateStr && new Date(lastResetDateStr).getMonth() !== now.getMonth()) {
                 let users = getUsers();
                 Object.keys(users).forEach(key => {
                     if (key !== GUEST_NAME) {
-                        users[key].points = 0;         // ポイントリセット
-                        users[key].progress = {};      // 進捗データもリセット
+                        // 累積ポイントをリセット
+                        users[key].points = 0;         
+                        // 進捗データもリセット
+                        users[key].progress = {};      
                     }
                 });
                 saveUsers(users);
@@ -737,13 +717,8 @@
         }
     }
     
-    // アプリケーション起動時にリセットチェックを実行
-    checkMonthlyReset();
-
 
     function displayRanking() {
-        // ポイントが加算されるたびに、ソートして表示し直す (リアルタイム更新)
-        
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
         if (!usersJson) return;
 
@@ -884,7 +859,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+        // ★★★ 修正: ページ起動時に月間リセットチェックを実行 ★★★
+        checkMonthlyReset(); 
+        
         const savedLang = localStorage.getItem('preferredLang') || LANG_DEFAULT;
         setLanguage(savedLang); 
+        
     });
 </script>
+</body>
+</html>
