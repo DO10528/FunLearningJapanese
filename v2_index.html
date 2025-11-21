@@ -246,13 +246,12 @@
 </div>
 
 <script>
-    // --- データ定義 ---
+    // --- データ定義 (省略 - 変更なし) ---
     const i18nData = {
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", group_game: "ゲーム",
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_kanji_list: "漢字リスト",
-            // ★修正: 新しい8カテゴリのキー定義
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
             cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_sentence: "ぶんしょう"
         },
@@ -260,13 +259,11 @@
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
             group_kiso: "Basics", group_game: "Games",
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_kanji_list: "Kanji List",
-            // ★修正: 新しい8カテゴリのキー定義 (簡略化)
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
             cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_sentence: "Sentence"
         }
     };
 
-    // ★ 全ゲームを8カテゴリに分割して再定義
     const gameStructure = [
         // 1. ひらがな (4ゲーム)
         {
@@ -278,7 +275,7 @@
                 { url: "hiragana_v2.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
                 { url: "hiragana2_v2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
                 { url: "hiragana_match_v2.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
-                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
+                { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" } 
             ]
         },
         // 2. カタカナ (1ゲーム)
@@ -332,7 +329,7 @@
             color: "#66bb6a", // 緑系
             titleKey: "cat_kanji_game",
             games: [
-                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
+                { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" }
             ]
         },
         // 7. けいようし (2ゲーム)
@@ -358,21 +355,30 @@
         }
     ];
 
-    // --- ゲームグリッド制御 ---
+    // --- DOM要素取得 ---
     const gameGrid = document.getElementById('game-grid');
     const backBtn = document.getElementById('game-back-btn');
+    const kisoSection = document.querySelector('.section-header:first-of-type').parentNode; // 「基礎・単語」全体
+    const kisoGrid = kisoSection.querySelector('.grid-container'); // 基礎・単語のグリッド
+
     let currentLang = 'ja';
 
-    // 1. カテゴリ一覧を表示する関数
+    // 1. カテゴリ一覧を表示する関数 (トップに戻る)
     function renderGameCategories() {
         gameGrid.innerHTML = '';
         backBtn.style.display = 'none';
         document.getElementById('game-section-title').textContent = i18nData[currentLang].group_game;
 
+        // ★基礎・単語セクションを再表示
+        kisoSection.style.display = 'block';
+        kisoGrid.style.display = 'grid'; // 基礎単語のカードを再表示
+
         gameStructure.forEach(cat => {
             const div = document.createElement('div');
             div.className = 'game-card category-card';
-            div.onclick = () => renderGameList(cat);
+            
+            // ★カテゴリカードをクリックした際の新しいハンドラを設定
+            div.onclick = () => handleCategoryClick(cat);
             
             const title = i18nData[currentLang][cat.titleKey] || cat.titleKey;
             
@@ -388,12 +394,24 @@
         void gameGrid.offsetWidth;
         gameGrid.classList.add('fade-in');
     }
+    
+    // 2. カテゴリカードをクリックしたときの処理
+    function handleCategoryClick(category) {
+        // ★基礎・単語セクションを非表示
+        kisoSection.style.display = 'none';
 
-    // 2. カテゴリ内のゲーム一覧を表示する関数
+        // カテゴリ内のゲームリストを表示
+        renderGameList(category);
+    }
+
+    // 3. カテゴリ内のゲーム一覧を表示する関数
     function renderGameList(category) {
         gameGrid.innerHTML = '';
-        backBtn.style.display = 'block';
+        backBtn.style.display = 'block'; // 戻るボタンを表示
         document.getElementById('game-section-title').textContent = i18nData[currentLang][category.titleKey];
+
+        // 戻るボタンのクリックイベントをカテゴリ一覧に戻る関数に設定
+        backBtn.onclick = renderGameCategories; 
 
         category.games.forEach(game => {
             const a = document.createElement('a');
@@ -412,7 +430,7 @@
     }
 
 
-    // --- 認証・UIロジック (前回と同じ) ---
+    // --- 認証・UIロジック (変更なし) ---
     const USER_KEY = 'user_accounts';
     const SESS_KEY = 'current_user';
     
@@ -478,12 +496,8 @@
         document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
         
-        if(backBtn.style.display === 'none') {
-            renderGameCategories();
-        } else {
-            // サブメニューを開いている場合はタイトルだけ更新したいが、簡単のためカテゴリに戻す
-            renderGameCategories(); 
-        }
+        // 常にカテゴリ表示に戻す
+        renderGameCategories();
     };
 
     window.toggleRanking = () => {
