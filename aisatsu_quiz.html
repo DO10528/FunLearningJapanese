@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 共通設定 (V2デザイン) --- */
+        /* --- 共通設定 (V2デザイン - 修正版) --- */
         :root {
             --primary: #5c7aff; /* Blue */
             --accent: #ffcc5c;  /* Yellow */
@@ -17,6 +17,11 @@
             --text-color: #333;
             --correct-color: #4caf50;
             --incorrect-color: #ef5350;
+        }
+
+        /* ★重要: 全要素のサイズ計算を統一してズレを防ぐ */
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
         body {
@@ -29,13 +34,18 @@
             display: flex;
             flex-direction: column;
             touch-action: manipulation;
+            /* 横スクロール防止 */
+            overflow-x: hidden;
+            width: 100%;
         }
 
         /* --- ヘッダー（V2統一デザイン） --- */
         header {
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
             color: white;
+            /* パディングをメインメニューと統一 */
             padding: 15px 20px;
+            width: 100%;
             box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
             z-index: 100;
         }
@@ -45,6 +55,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
         .header-container h1 {
             margin: 0;
@@ -68,11 +79,11 @@
         /* --- メインコンテナ / カードデザイン --- */
         .aq-main-container {
             flex-grow: 1;
+            /* 左右のパディングをヘッダー(20px)と合わせる */
             padding: 20px;
             max-width: 650px;
             margin: 0 auto;
             width: 100%;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -106,7 +117,7 @@
             border: none; border-radius: 50px; cursor: pointer;
             box-shadow: 0 6px 0 #388e3c; /* Green Shadow */
             transition: all 0.1s ease-out; position: relative; top: 0;
-            text-decoration: none; box-sizing: border-box;
+            text-decoration: none;
             text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
         }
         .aq-button:active { top: 4px; box-shadow: 0 2px 0 #388e3c; }
