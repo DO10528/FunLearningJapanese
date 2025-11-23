@@ -14,6 +14,10 @@
         --text-color: #333;
     }
 
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
@@ -24,6 +28,8 @@
         display: flex;
         flex-direction: column;
         touch-action: manipulation;
+        overflow-x: hidden;
+        width: 100%;
     }
 
     /* --- ヘッダー --- */
@@ -31,6 +37,7 @@
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white;
         padding: 15px 20px;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -44,17 +51,16 @@
     .main-container {
         flex-grow: 1;
         padding: 20px;
-        max-width: 800px; 
+        max-width: 1000px; /* PC向けに少し広げる */
         margin: 0 auto;
         width: 100%;
-        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
 
-    /* --- カードデザイン (メニュー画面) --- */
+    /* --- メニュー画面 --- */
     .menu-card {
         background: white;
         border-radius: 25px;
@@ -63,85 +69,50 @@
         text-align: center;
         width: 100%;
         max-width: 700px;
-        box-sizing: border-box;
     }
 
     .menu-title {
         font-size: 2.2em;
-        color: #1565c0; /* 濃い青 */
+        color: #1565c0;
         margin: 0 0 30px 0;
         font-weight: 900;
     }
 
-    /* --- レベルボタンのグリッド --- */
     .level-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3列固定 */
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         margin-bottom: 40px;
     }
-    /* スマホでは2列にする場合 (必要なら有効化) */
     @media (max-width: 500px) {
         .level-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    /* --- 大きくて見やすいレベルボタン --- */
     .level-btn {
-        border: none;
-        border-radius: 15px;
-        padding: 20px 10px;
-        font-size: 1.4em;
-        font-weight: 900;
-        color: white;
-        cursor: pointer;
-        box-shadow: 0 6px 0 rgba(0,0,0,0.15); /* 立体的な影 */
+        border: none; border-radius: 15px; padding: 20px 10px;
+        font-size: 1.4em; font-weight: 900; color: white;
+        cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.15);
         transition: transform 0.1s, box-shadow 0.1s;
-        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
-        width: 100%;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2); width: 100%;
     }
+    .level-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
     
-    /* 押した時の動き */
-    .level-btn:active {
-        transform: translateY(4px);
-        box-shadow: 0 2px 0 rgba(0,0,0,0.15);
-    }
-    
-    /* ホバー時 */
-    .level-btn:hover {
-        filter: brightness(1.1);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 0 rgba(0,0,0,0.15);
-    }
+    .level-btn:nth-child(5n+1) { background-color: #ef5350; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #4fc3f7; }
+    .level-btn:nth-child(5n+4) { background-color: #66bb6a; }
+    .level-btn:nth-child(5n+5) { background-color: #ffa726; }
 
-    /* --- 5色のローテーション (カタカナ版と同じ) --- */
-    .level-btn:nth-child(5n+1) { background-color: #ef5350; } /* 赤 */
-    .level-btn:nth-child(5n+2) { background-color: #feca57; } /* 黄 */
-    .level-btn:nth-child(5n+3) { background-color: #4fc3f7; } /* 水 */
-    .level-btn:nth-child(5n+4) { background-color: #66bb6a; } /* 緑 */
-    .level-btn:nth-child(5n+5) { background-color: #ffa726; } /* オレンジ */
-
-
-    /* --- ホームに戻るボタン --- */
     .home-btn-large {
-        background-color: #546e7a;
-        color: white;
-        border: none;
-        padding: 15px 40px;
-        border-radius: 12px;
-        font-weight: bold;
-        font-size: 1.1em;
-        cursor: pointer;
-        box-shadow: 0 4px 0 #37474f;
-        text-decoration: none;
-        display: inline-block;
+        background-color: #546e7a; color: white; border: none;
+        padding: 15px 40px; border-radius: 12px; font-weight: bold;
+        font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #37474f;
+        text-decoration: none; display: inline-block;
     }
-    .home-btn-large:active {
-        transform: translateY(4px);
-        box-shadow: none;
-    }
+    .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
 
 
-    /* --- ゲームプレイ画面のデザイン --- */
+    /* --- ゲームプレイ画面 --- */
     .game-play-card {
         background: white;
         border-radius: 25px;
@@ -149,7 +120,6 @@
         box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         text-align: center;
         width: 100%;
-        box-sizing: border-box;
     }
 
     .game-header {
@@ -158,12 +128,12 @@
         font-size: 1.2em;
     }
 
-    /* ゲーム内レイアウト (左右均等・高さ揃え・中央寄せ) */
+    /* ★ここが左右配置のキモです★ */
     .match-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: row; /* 常に横並び */
         gap: 30px; 
-        align-items: stretch; 
+        align-items: flex-start; 
         justify-content: center; 
     }
 
@@ -173,7 +143,8 @@
         border-radius: 15px;
         padding: 20px;
         border: 2px dashed #ccc;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        display: flex; flex-direction: column; align-items: center;
+        min-height: 300px;
     }
     
     .word-box {
@@ -181,7 +152,7 @@
         background: transparent; 
         border-radius: 15px;
         padding: 20px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        display: flex; flex-direction: column; align-items: center;
     }
 
     .area-title {
@@ -193,31 +164,29 @@
         display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;
     }
 
-    /* アイテムスタイル */
+    /* アイテム (PCサイズ) */
     .drag-item {
         width: 90px; height: 90px;
         background: white; border: 3px solid #fff; border-radius: 15px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         cursor: grab; display: flex; justify-content: center; align-items: center;
-        touch-action: none; z-index: 10; transition: all 0.2s;
+        touch-action: none; z-index: 10; transition: all 0.2s; flex-shrink: 0;
     }
     .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
     .drag-item:active { cursor: grabbing; transform: scale(1.05); }
     
-    /* 配置済み */
     .drag-item.placed {
         width: 100% !important; height: 100% !important; margin: 0 !important;
         border: none !important; box-shadow: none !important; border-radius: 10px;
         cursor: pointer; background: transparent;
     }
-    .drag-item.placed img { width: 90%; height: 90%; }
 
-    /* ドロップターゲット */
+    /* ドロップターゲット (PCサイズ) */
     .word-row {
         display: flex; align-items: center; justify-content: center;
         margin-bottom: 15px; background: white; padding: 10px 20px;
         border-radius: 15px; border: 2px solid #f0f0f0; box-shadow: 0 4px 0 #f0f0f0;
-        width: 90%; max-width: 350px;
+        width: 100%; max-width: 350px;
     }
     .drop-target {
         width: 90px; height: 90px;
@@ -230,25 +199,57 @@
     
     .word-label { font-size: 2em; font-weight: 900; color: #444; flex-grow: 1; text-align: center; }
 
-    /* スマホ対応 */
-    @media (max-width: 700px) {
-        .match-container { flex-direction: column-reverse; gap: 20px; align-items: center; }
-        .illust-box, .word-box { width: 100%; flex: none; min-height: auto; padding: 15px; }
-        .illust-pool { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-        .word-row { width: 100%; padding: 8px 15px; }
-        .drop-target { margin-right: 15px; }
-        .word-label { font-size: 1.6em; text-align: left; }
-    }
-
     .feedback-msg { font-weight: bold; font-size: 1.3em; margin-top: 15px; min-height: 1.5em; }
     .feedback-msg.success { color: #4caf50; }
     .feedback-msg.error { color: #ef5350; }
 
-    /* アニメーション */
+    /* --- スマホ対応 (ここが修正点) --- */
+    /* 画面幅が700px以下でも「横並び」を維持し、中身を小さくして対応 */
+    @media (max-width: 700px) {
+        .main-container {
+            padding: 10px; /* 全体の余白を減らす */
+        }
+        
+        .game-play-card {
+            padding: 10px; /* カード内の余白も減らす */
+        }
+
+        .match-container {
+            /* 縦並び(column)設定を削除し、横並び(row)を維持 */
+            gap: 10px; /* 左右の隙間を詰める */
+        }
+
+        .illust-box, .word-box {
+            padding: 10px 5px; /* ボックス内の余白をギリギリまで削る */
+        }
+        
+        /* --- アイテムを小さく縮小して左右に入れる --- */
+        .drag-item {
+            width: 60px; /* 90px -> 60px */
+            height: 60px;
+            border-width: 2px;
+        }
+        
+        .word-row {
+            padding: 5px; /* 行の余白を減らす */
+            flex-direction: column; /* スペース節約のため、穴と文字を縦に積むか…いや横のままで行こう */
+            flex-direction: row;
+        }
+
+        .drop-target {
+            width: 60px; /* 90px -> 60px */
+            height: 60px;
+            margin-right: 10px; /* 隙間を減らす */
+            border-width: 2px;
+        }
+        
+        .word-label {
+            font-size: 1.4em; /* 文字を少し小さく */
+        }
+    }
+
     .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    /* ゴースト */
     .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
 </style>
@@ -263,17 +264,12 @@
     <div class="main-container">
         
         <div id="level-menu-area" class="menu-card pop-in">
-            
             <h1 class="menu-title">ひらがな単語あわせゲーム</h1>
-            
-            <div id="level-grid" class="level-grid">
-                </div>
-            
+            <div id="level-grid" class="level-grid"></div>
             <button onclick="location.href='index.html'" class="home-btn-large">ホームにもどる</button>
         </div>
 
         <div id="game-play-area" style="display:none;" class="game-play-card pop-in">
-            
             <div class="game-header">
                 <span id="level-title">レベル 1</span>
                 <button onclick="showLevelMenu()" style="background:#eee; border:none; padding:8px 15px; border-radius:15px; cursor:pointer; font-weight:bold; color:#666;">もどる</button>
@@ -292,21 +288,11 @@
             </div>
 
             <p id="feedback" class="feedback-msg"></p>
-
         </div>
 
     </div>
 
     <script src="js/hiragana_drag_match.js"></script>
-    <script>
-        // ※ JS側でボタンのテキスト生成を「レベル X」に変更するために
-        // 既存のjsファイル(hiragana_match_v2.js)を読み込んだ後、
-        // initGame関数をここで上書きして実行し直す手もありますが、
-        // 今回はHTML構造だけでかなり近づけています。
-        // もし「Lv.1」の文字を「レベル 1」に変えたい場合は、
-        // js/hiragana_match_v2.js の `btn.textContent = 'Lv.' + level.level;` を
-        // `btn.textContent = 'レベル ' + level.level;` に変更してください。
-    </script>
 
 </body>
 </html>
