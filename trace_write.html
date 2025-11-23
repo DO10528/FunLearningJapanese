@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>かきかた道場 - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- index.html と共通のデザイン設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --accent: #ffcc5c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        display: flex; flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+        touch-action: manipulation; /* ダブルタップ拡大防止 */
+    }
+
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        width: 100%;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; gap: 10px; align-items: center; }
+    .home-icon { color: white; font-size: 1.5em; }
+
+    /* --- メインエリア --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%; max-width: 600px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    .dojo-card {
+        background: white; border-radius: 25px;
+        padding: 20px; width: 100%;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    h1 { color: var(--primary); margin-bottom: 10px; font-size: 1.8em; }
+    .sub-text { color: #666; margin-bottom: 20px; }
+
+    /* --- キャンバスエリア --- */
+    .canvas-wrapper {
+        position: relative;
+        width: 300px; height: 300px;
+        margin: 0 auto 20px auto;
+        border: 4px dashed #ccc;
+        border-radius: 20px;
+        background-color: #fff;
+        overflow: hidden;
+        /* 田の字グリッド (補助線) */
+        background-image: 
+            linear-gradient(to right, #eee 1px, transparent 1px),
+            linear-gradient(to bottom, #eee 1px, transparent 1px);
+        background-size: 150px 150px; /* 300pxの半分 */
+        background-position: center;
+    }
+
+    /* ガイド文字（薄い文字） */
+    .guide-text {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -54%); /* 少し上に調整 */
+        font-size: 240px;
+        font-weight: 400; /* 明朝体風にならなければゴシックで */
+        font-family: 'Zen Maru Gothic', sans-serif;
+        color: #e0e0e0; /* 薄いグレー */
+        pointer-events: none; /* タップをスルー */
+        user-select: none;
+        z-index: 1;
+    }
+
+    /* 描画用キャンバス */
+    canvas {
+        position: absolute; top: 0; left: 0;
+        z-index: 2;
+        cursor: crosshair;
+        touch-action: none; /* スクロール防止 */
+    }
+
+    /* --- コントロールボタン --- */
+    .controls {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+        width: 100%;
+    }
+
+    .btn {
+        border: none; border-radius: 50px; padding: 12px 24px;
+        font-size: 1.1em; font-weight: bold; color: white;
+        cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        transition: transform 0.1s; min-width: 120px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none; }
+
+    .btn-clear { background-color: #ef5350; }
+    .btn-next { background-color: var(--primary); }
+    .btn-back { background-color: #90a4ae; color: white; text-decoration: none; display: inline-block; margin-top: 20px; padding: 10px 30px; border-radius: 20px; font-weight: bold; }
+
+    /* 色変えパレット（オプション） */
+    .color-palette {
+        display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+    }
+    .color-dot {
+        width: 35px; height: 35px; border-radius: 50%;
+        cursor: pointer; border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
+    }
+    .color-dot.active { transform: scale(1.2); border-color: #333; }
+
+    @media (max-width: 400px) {
+        .canvas-wrapper { width: 280px; height: 280px; }
+        .guide-text { font-size: 220px; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+    <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+</header>
+
+<div class="main-container">
+    <div class="dojo-card">
+        <h1><i class="fa-solid fa-paintbrush"></i> かきかた 道場</h1>
+        <p class="sub-text">うすい もじを なぞって みよう！</p>
+
+        <div class="color-palette">
+            <div class="color-dot active" style="background: #333;" onclick="setColor('#333', this)"></div>
+            <div class="color-dot" style="background: #ef5350;" onclick="setColor('#ef5350', this)"></div>
+            <div class="color-dot" style="background: #5c7aff;" onclick="setColor('#5c7aff', this)"></div>
+            <div class="color-dot" style="background: #66bb6a;" onclick="setColor('#66bb6a', this)"></div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <div id="guide-char" class="guide-text">あ</div>
+            <canvas id="drawing-canvas" width="300" height="300"></canvas>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-eraser"></i> 消す</button>
+            <button class="btn btn-next" onclick="nextChar()"><i class="fa-solid fa-arrow-right"></i> つぎへ</button>
+        </div>
+
+        <a href="index.html" class="btn-back">メニューにもどる</a>
+    </div>
+</div>
+
+<script>
+    // --- 設定 ---
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+    const guideEl = document.getElementById('guide-char');
+    
+    // なぞる文字リスト
+    const chars = [
+        "あ","い","う","え","お",
+        "か","き","く","け","こ",
+        "さ","し","す","せ","そ",
+        "た","ち","つ","て","と",
+        "な","に","ぬ","ね","の",
+        "は","ひ","ふ","へ","ほ",
+        "ま","み","む","め","も",
+        "や","ゆ","よ",
+        "ら","り","る","れ","ろ",
+        "わ","を","ん"
+    ];
+    let currentIndex = 0;
+    let isDrawing = false;
+    let currentColor = '#333';
+    let lineWidth = 12; // 線の太さ
+
+    // --- 初期化 ---
+    function init() {
+        // Canvasのサイズ調整（高解像度対応）
+        // CSSサイズと実際の描画サイズを合わせる処理
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        // 線の設定
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = currentColor;
+
+        updateGuide();
+    }
+
+    // --- ガイド文字の更新 ---
+    function updateGuide() {
+        guideEl.textContent = chars[currentIndex];
+        clearCanvas(); // 文字が変わったらキャンバスも綺麗に
+    }
+
+    // --- 次の文字へ ---
+    function nextChar() {
+        currentIndex++;
+        if (currentIndex >= chars.length) {
+            currentIndex = 0; // 最後まで行ったら最初に戻る
+        }
+        updateGuide();
+    }
+
+    // --- 色の変更 ---
+    window.setColor = (color, el) => {
+        currentColor = color;
+        ctx.strokeStyle = currentColor;
+        
+        // UI更新
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        el.classList.add('active');
+    };
+
+    // --- キャンバスをクリア ---
+    window.clearCanvas = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    // --- 描画イベント処理 ---
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
+        e.preventDefault(); // スクロール防止
+        isDrawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    function endDraw() {
+        isDrawing = false;
+        ctx.closePath();
+    }
+
+    // マウスイベント
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+
+    // タッチイベント（スマホ対応）
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+
+    // 起動時実行
+    window.onload = init;
+    
+    // リサイズ対応（スマホ回転時など）
+    window.addEventListener('resize', init);
+
+</script>
+
+</body>
+</html>
