@@ -16,6 +16,11 @@
         --text-color: #333;
     }
 
+    /* ★重要: 全要素のサイズ計算を統一してズレを防ぐ */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
@@ -23,13 +28,18 @@
         margin: 0;
         padding: 0;
         padding-bottom: 80px;
+        /* 横スクロール防止 */
+        overflow-x: hidden;
+        width: 100%;
     }
 
     /* --- ヘッダー --- */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white;
-        padding: 15px 20px;
+        /* パディングを調整して端を揃える */
+        padding: 15px 20px; 
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -48,6 +58,8 @@
     /* --- ヒーロー --- */
     .hero-section {
         background: white; text-align: center; padding: 30px 20px;
+        /* 幅を100%にして余白をなくすことでヘッダーと揃える */
+        width: 100%;
         border-radius: 0 0 30px 30px; margin-bottom: 20px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
@@ -55,7 +67,10 @@
 
     /* --- ダッシュボード --- */
     .dashboard-card {
-        background: white; margin: 20px; padding: 20px;
+        background: white; 
+        /* marginを左右20pxで統一 */
+        margin: 20px; 
+        padding: 20px;
         border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         display: flex; align-items: center; gap: 15px;
     }
@@ -63,6 +78,7 @@
         width: 60px; height: 60px; border-radius: 50%;
         display: flex; justify-content: center; align-items: center;
         font-size: 1.8em; background: #e0e7ff; color: var(--primary);
+        flex-shrink: 0; /* 縮小を防ぐ */
     }
     .user-meta { flex-grow: 1; }
     .level-bar-container {
@@ -76,7 +92,7 @@
     .badge-points { color: #f0ad4e; }
 
     /* --- 認証ボタン --- */
-    .auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
     .btn-auth {
         padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
         box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
@@ -88,7 +104,9 @@
 
     /* --- グリッドレイアウト --- */
     .section-header {
-        padding: 0 20px; margin-bottom: 15px;
+        /* パディングを左右20pxに統一 */
+        padding: 0 20px; 
+        margin-bottom: 15px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
@@ -98,13 +116,15 @@
     .btn-back {
         background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
         font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
-        display: none; /* 初期は非表示 */
+        display: none; 
     }
     .btn-back:hover { background: #ddd; }
 
     .grid-container {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 15px; padding: 0 20px 40px 20px; max-width: 1000px; margin: 0 auto;
+        /* パディングを左右20pxに統一 */
+        gap: 15px; padding: 0 20px 40px 20px; 
+        max-width: 1000px; margin: 0 auto;
     }
 
     /* カードデザイン */
@@ -155,6 +175,21 @@
     /* アニメーション */
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* モバイル調整用メディアクエリ */
+    @media (max-width: 400px) {
+        .grid-container {
+            grid-template-columns: repeat(2, 1fr); /* 小さい画面では強制2列 */
+            gap: 10px;
+        }
+        .game-card {
+            height: 110px;
+            padding: 10px;
+        }
+        .card-icon {
+            font-size: 2em;
+        }
+    }
 
 </style>
 </head>
