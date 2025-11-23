@@ -8,25 +8,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
 
 <style>
-    /* --- 共通設定 --- */
+    /* --- 共通設定 (青・白基調に修正) --- */
     :root {
-        --primary: #FF8A80; /* ポップなピンク */
-        --secondary: #FFD180; /* ポップなオレンジ */
-        --accent: #A7FFEB; /* ポップなミント */
-        --bg-color: #FFF8E1; /* クリーム色 */
-        --text-color: #5D4037; /* チョコ色 */
-        --shadow: 4px 4px 0px rgba(0,0,0,0.15); /* 可愛い影 */
+        --primary: #00bcd4; /* シアン */
+        --secondary: #0097a7; /* 濃いシアン (影や枠線用) */
+        --accent: #ff4081; /* ピンク (アクセント) */
+        --bg-color: #e0f7fa; /* 薄い水色背景 */
+        --text-color: #333; /* 濃いグレーテキスト */
+        --shadow: 0 4px 8px rgba(0,0,0,0.1); /* シンプルで柔らかい影 */
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
-        /* 可愛いドットパターン背景 */
         background-color: var(--bg-color);
-        background-image: radial-gradient(#FFD180 2px, transparent 2px), radial-gradient(#FF8A80 2px, transparent 2px);
-        background-size: 30px 30px;
-        background-position: 0 0, 15px 15px;
+        /* 背景パターンを削除 */
         color: var(--text-color);
         margin: 0; padding: 0;
         min-height: 100vh;
@@ -36,21 +33,20 @@
         touch-action: manipulation;
     }
 
-    /* ヘッダー */
+    /* ヘッダー (青基調) */
     header {
         background: #FFF;
-        border-bottom: 4px solid var(--primary);
+        border-bottom: 3px solid var(--primary);
         padding: 10px 20px;
         display: flex; justify-content: space-between; align-items: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
     .level-badge { 
-        background: var(--secondary); color: #FFF; 
+        background: var(--primary); color: #FFF; 
         padding: 5px 15px; border-radius: 20px; font-weight: bold;
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-        border: 2px solid #FFF;
+        box-shadow: none; border: none;
     }
 
     /* メインエリア */
@@ -61,103 +57,106 @@
         width: 100%; max-width: 800px; margin: 0 auto;
     }
 
-    /* タイトル */
+    /* タイトル (シンプルに) */
     .game-title {
         font-size: 1.8em; font-weight: 900; color: var(--text-color);
         text-align: center; margin-bottom: 20px;
-        text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(0,0,0,0.1);
+        text-shadow: none;
     }
 
     /* --- ゲーム盤面レイアウト --- */
     .board {
         display: flex;
-        justify-content: center; /* 中央寄せ */
+        justify-content: center;
         width: 100%;
-        gap: 15px; /* パーツ間の隙間 */
+        gap: 15px;
         margin-bottom: 20px;
-        align-items: stretch; /* 高さを揃える */
+        align-items: stretch;
     }
 
-    /* 左右のプール（可愛い枠デザイン） */
+    /* 左右のプール (重なり修正とデザイン変更) */
     .pool-column {
-        display: flex; flex-direction: column; gap: 10px;
-        width: 90px; /* 幅を少し広げてリッチに */
+        display: flex; flex-direction: column;
+        width: 95px; /* 少し幅広に */
         align-items: center;
         background: #FFF;
-        border: 4px solid var(--secondary);
-        border-radius: 20px;
-        padding: 15px 10px;
+        border: 2px solid var(--primary); /* 青枠 */
+        border-radius: 15px;
+        padding: 0; /* ヘッダーを内包するためパディングをゼロに */
         min-height: 350px;
         box-shadow: var(--shadow);
-        position: relative;
+        overflow: hidden; /* 角丸からはみ出さないように */
     }
-    /* 可愛い飾りのヘッダー */
+    /* プールヘッダー (配置修正：絶対配置をやめる) */
     .pool-header {
-        background: var(--secondary);
+        background: var(--primary); /* 青背景 */
         color: #FFF;
         font-weight: 900;
-        padding: 5px 15px;
-        border-radius: 20px;
-        position: absolute;
-        top: -15px;
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        padding: 8px 0;
+        text-align: center;
+        width: 100%;
+        /* position: absolute; を削除して通常の配置に */
+        box-shadow: none;
+        border-radius: 0;
     }
-    .pool-area { margin-top: 15px; width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+    /* プールエリア (余白調整) */
+    .pool-area { 
+        margin-top: 0; 
+        padding: 15px 10px; /* 内部にパディングを追加 */
+        width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; flex-grow: 1;
+    }
 
-    /* 中央のペアリングエリア (幅を狭く) */
+    /* 中央のペアリングエリア */
     .center-area {
         flex-grow: 1;
-        max-width: 280px; /* ★幅を狭く制限 */
+        max-width: 280px;
         display: flex; flex-direction: column;
         gap: 12px;
         padding: 10px;
-        background: rgba(255,255,255,0.7); /* 少し透けた背景 */
+        background: rgba(255,255,255,0.5);
         border-radius: 20px;
-        border: 3px dashed var(--accent);
+        border: 2px dashed var(--primary); /* 青破線 */
     }
 
-    /* ペアを作る行 (デザイン変更) */
+    /* ペアを作る行 */
     .pair-row {
         display: flex;
         justify-content: center; align-items: center;
         background: #FFF;
-        border-radius: 15px;
+        border-radius: 12px;
         padding: 5px;
-        border: 3px solid var(--accent);
-        box-shadow: var(--shadow);
+        border: 2px solid var(--secondary); /* 濃い青枠 */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         gap: 10px;
         height: 70px;
     }
 
     .pair-divider {
-        color: var(--accent); font-size: 1.5em; font-weight: bold;
-        text-shadow: 1px 1px 0px #FFF;
+        color: var(--secondary); font-size: 1.5em; font-weight: bold;
+        text-shadow: none;
     }
 
     /* --- アイテムとスロット --- */
     .slot {
         width: 55px; height: 55px;
-        background: #F0F0F0;
-        border: 3px dashed #CCC;
-        border-radius: 12px;
+        background: #F5F5F5;
+        border: 2px dashed #CCC;
+        border-radius: 10px;
         display: flex; justify-content: center; align-items: center;
         transition: all 0.2s;
     }
-    .slot.drag-over { background: #E0F7FA; border-color: var(--accent); border-style: solid; transform: scale(1.05); }
+    .slot.drag-over { background: #b2ebf2; border-color: var(--primary); border-style: solid; transform: scale(1.05); }
     
-    /* プール内のスロットは枠線を消す */
     .pool-slot { border: none; background: transparent; }
 
-    /* ドラッグする文字チップ (クッキー風デザイン) */
+    /* ドラッグする文字チップ (元の配色に戻す) */
     .char-chip {
         width: 55px; height: 55px;
         background: #FFF;
-        border-radius: 12px;
-        /* クッキーのような立体感と枠線 */
-        border: 4px solid; 
-        box-shadow: 3px 3px 0px rgba(0,0,0,0.1), inset 2px 2px 5px rgba(255,255,255,0.5);
+        border-radius: 10px;
+        border: 2px solid; 
+        box-shadow: 0 3px 6px rgba(0,0,0,0.15); /* シンプルな影 */
         display: flex; justify-content: center; align-items: center;
-        /* フォント指定 */
         font-family: 'Klee One', cursive; 
         font-size: 2rem;
         font-weight: 600;
@@ -166,77 +165,80 @@
         transition: transform 0.1s;
     }
     
-    /* ひらがな・カタカナで色分け（可愛く） */
-    .char-hira { color: #D81B60; border-color: #F8BBD0; background: #FFEBEE; } /* ピンク系 */
-    .char-kata { color: #1565C0; border-color: #BBDEFB; background: #E3F2FD; } /* ブルー系 */
+    /* ひらがな：赤系 */
+    .char-hira { color: #d81b60; border-color: #f8bbd0; } 
+    /* カタカナ：青系 */
+    .char-kata { color: #1565c0; border-color: #bbdefb; } 
 
-    .char-chip:active { transform: scale(1.1) rotate(3deg); cursor: grabbing; z-index: 100; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+    .char-chip:active { transform: scale(1.1); cursor: grabbing; z-index: 100; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
 
     /* ドラッグ中のゴースト */
     .ghost {
         position: fixed; pointer-events: none; z-index: 1000;
-        opacity: 0.9; transform: scale(1.1) rotate(3deg); box-shadow: 10px 10px 0px rgba(0,0,0,0.15);
+        opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
-    /* --- ボタンエリア --- */
+    /* --- ボタンエリア (青基調) --- */
     .controls {
         width: 100%; text-align: center; margin-top: auto; padding-bottom: 20px;
     }
     .check-btn {
-        background-color: var(--primary);
+        background-color: var(--primary); /* 青 */
         color: white;
         border: none;
-        border-bottom: 6px solid #C62828; /* 立体的な影 */
+        border-bottom: 4px solid var(--secondary); /* 濃い青影 */
         padding: 12px 40px;
         border-radius: 50px;
         font-size: 1.6em;
         font-weight: 900;
         font-family: 'Zen Maru Gothic', sans-serif;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         cursor: pointer;
         transition: all 0.1s;
-        text-shadow: 1px 1px 0px #C62828;
+        text-shadow: none;
     }
-    .check-btn:active { transform: translateY(4px); border-bottom-width: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .check-btn:active { transform: translateY(3px); border-bottom-width: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-    /* モーダル（可愛く） */
+    /* モーダル (青基調) */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
         display: none; justify-content: center; align-items: center; z-index: 2000;
     }
     .modal-content {
-        background: #FFF; padding: 40px; border-radius: 30px;
-        text-align: center; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 6px solid var(--primary);
+        background: #FFF; padding: 40px; border-radius: 25px;
+        text-align: center; animation: popIn 0.3s;
+        border: 3px solid var(--primary); /* 青枠 */
         box-shadow: var(--shadow);
     }
     .modal-content h2 { 
-        color: var(--primary); font-size: 2.5em; margin: 0 0 20px 0; font-weight: 900;
-        text-shadow: 3px 3px 0px #FFF, 5px 5px 0px rgba(0,0,0,0.1);
+        color: var(--primary); /* 青文字 */
+        font-size: 2.2em; margin: 0 0 20px 0; font-weight: 900;
+        text-shadow: none;
     }
     .next-btn {
-        background: var(--secondary); color: white; border: none; 
-        border-bottom: 5px solid #E65100;
-        padding: 15px 40px;
-        font-size: 1.4em; font-weight: bold; border-radius: 15px; cursor: pointer;
+        background: var(--primary); /* 青 */
+        color: white; border: none; 
+        border-bottom: 4px solid var(--secondary); /* 濃い青影 */
+        padding: 12px 35px;
+        font-size: 1.3em; font-weight: bold; border-radius: 12px; cursor: pointer;
         font-family: 'Zen Maru Gothic', sans-serif;
-        text-shadow: 1px 1px 0px #E65100;
+        text-shadow: none;
         transition: all 0.1s;
     }
-    .next-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+    .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
 
-    @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
     /* スマホ微調整 */
     @media (max-width: 500px) {
         .board { gap: 10px; }
-        .pool-column { width: 80px; }
-        .center-area { max-width: 220px; } /* スマホではさらに狭く */
-        .slot, .char-chip { width: 45px; height: 45px; font-size: 1.5rem; border-width: 3px; }
+        .pool-column { width: 85px; }
+        .center-area { max-width: 230px; } 
+        .slot, .char-chip { width: 50px; height: 50px; font-size: 1.6rem; border-width: 2px; }
         .pair-row { height: 60px; gap: 5px; border-width: 2px; }
-        .check-btn { font-size: 1.3em; padding: 10px 30px; border-bottom-width: 4px; }
-        .game-title { font-size: 1.4em; margin-bottom: 10px; }
+        .check-btn { font-size: 1.4em; padding: 10px 30px; border-bottom-width: 3px; }
+        .game-title { font-size: 1.5em; margin-bottom: 15px; }
     }
 </style>
 </head>
@@ -252,16 +254,16 @@
     <h1 class="game-title">ひらがな と カタカナ を あわせよう！</h1>
 
     <div class="board">
-        <div class="pool-column" style="border-color: #F8BBD0;">
-            <div class="pool-header" style="background: #F8BBD0;">ひらがな</div>
+        <div class="pool-column">
+            <div class="pool-header">ひらがな</div>
             <div id="hira-pool" class="pool-area"></div>
         </div>
 
         <div class="center-area" id="pair-rows">
             </div>
 
-        <div class="pool-column" style="border-color: #BBDEFB;">
-            <div class="pool-header" style="background: #BBDEFB;">カタカナ</div>
+        <div class="pool-column">
+            <div class="pool-header">カタカナ</div>
             <div id="kata-pool" class="pool-area"></div>
         </div>
     </div>
