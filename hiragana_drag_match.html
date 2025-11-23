@@ -14,7 +14,7 @@
         --text-color: #333;
     }
 
-    /* 全要素のサイズ計算を統一（ズレ防止） */
+    /* ズレ防止の基本設定 */
     *, *::before, *::after {
         box-sizing: border-box;
     }
@@ -111,7 +111,7 @@
     .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
 
 
-    /* --- ゲームプレイ画面 (PCデフォルト設定) --- */
+    /* --- ゲームプレイ画面 (PC設定) --- */
     .game-play-card {
         background: white;
         border-radius: 25px;
@@ -127,28 +127,22 @@
         font-size: 1.2em;
     }
 
-    /* 左右のカラムを格納するコンテナ */
     .match-container {
         display: flex;
         flex-direction: row; /* 横並び */
         gap: 30px; 
-        align-items: stretch; /* 高さを揃える */
+        align-items: stretch; 
         justify-content: center; 
     }
 
-    /* 左：イラストボックス / 右：ことばボックス */
-    /* スタイルを共通化してバランスを整える */
     .illust-box, .word-box {
         flex: 1; 
         background: #f8fbff;
         border-radius: 20px;
         padding: 20px;
-        border: 3px dashed #d1e3ff; /* 枠線を統一 */
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: flex-start;
-        min-height: 400px; /* 高さを確保 */
+        border: 3px dashed #d1e3ff;
+        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+        min-height: 400px; 
     }
 
     .area-title {
@@ -156,11 +150,28 @@
         text-align: center; width: 100%;
     }
 
-    .illust-pool, #word-list {
-        display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;
+    /* --- PCでの高さ調整の肝 --- */
+    /* 右側のリスト設定 */
+    #word-list {
+        display: flex; flex-direction: column; align-items: center; 
+        gap: 20px; /* 右側の隙間は20px */
+        width: 100%;
     }
 
-    /* PC用アイテムサイズ */
+    /* 左側のリスト設定 (ここを調整して右に合わせる) */
+    .illust-pool {
+        display: flex; flex-direction: column; align-items: center; 
+        /* 計算：右の行の高さ 約114px + 隙間20px = 134pxピッチ
+           左の画像の高さ 96px。
+           差分を埋めるために隙間を大きくする (134 - 96 = 38px)
+        */
+        gap: 38px; 
+        /* 開始位置の微調整 (右のセンターに合わせる) */
+        padding-top: 10px;
+        width: 100%;
+    }
+
+    /* アイテム (PCサイズ) */
     .drag-item {
         width: 90px; height: 90px;
         background: white; border: 3px solid #fff; border-radius: 15px;
@@ -177,13 +188,14 @@
         cursor: pointer; background: transparent;
     }
 
-    /* PC用ドロップエリア */
+    /* ドロップターゲット (PCサイズ) */
     .word-row {
         display: flex; align-items: center; justify-content: center;
         background: white; padding: 10px 20px;
         border-radius: 15px; border: 2px solid #eef2f6; box-shadow: 0 4px 0 #eef2f6;
         width: 100%; max-width: 300px;
         transition: transform 0.2s;
+        min-height: 114px; /* 高さを安定させる */
     }
     .word-row:hover { transform: translateY(-2px); border-color: #bbdefb; }
 
@@ -196,14 +208,14 @@
     .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
     .drop-target.correct { background: #e8f5e9; border: 3px solid #4caf50; border-style: solid; }
     
-    /* 文字の設定（PCで縦書きにならないように nowrap を指定） */
+    /* 文字設定 (★改行禁止 white-space: nowrap を追加) */
     .word-label { 
         font-size: 2em; 
         font-weight: 900; 
         color: #444; 
         flex-grow: 1; 
         text-align: center;
-        white-space: nowrap; /* ★これで文字の折り返しを防止 */
+        white-space: nowrap; /* これで「えび」が横並びになります */
     }
 
     .feedback-msg { font-weight: bold; font-size: 1.3em; margin-top: 15px; min-height: 1.5em; }
@@ -211,32 +223,35 @@
     .feedback-msg.error { color: #ef5350; }
 
 
-    /* --- ★スマホ専用 強力レイアウト調整★ --- */
-    /* 768px以下（スマホ・タブレット縦）の場合 */
+    /* --- ★スマホ専用 強力修正★ --- */
     @media (max-width: 768px) {
         
         .main-container { padding: 10px; }
-        .game-play-card { padding: 10px 5px; }
-        .game-header { font-size: 1em; margin-bottom: 10px; }
-
-        /* 左右のカラムを強制的に維持 */
+        .game-play-card { padding: 15px 10px; }
+        
+        /* PC用の高さ調整をリセットして詰める */
+        .illust-pool { gap: 10px; padding-top: 0; }
+        #word-list { gap: 10px; }
+        
+        /* 強制的に横並びにする */
         .match-container {
             flex-direction: row !important;
-            gap: 8px; /* 隙間を最小限に */
+            gap: 5px;
         }
 
-        /* ボックスのスタイルを簡素化 */
+        /* ボックスの余白を極限まで減らす */
         .illust-box, .word-box {
             padding: 10px 2px;
-            border-width: 2px;
             border-radius: 10px;
-            min-height: auto; /* 高さは中身に合わせる */
+            border-width: 2px;
         }
         
-        .area-title { font-size: 0.9em; margin-bottom: 10px; }
-        .illust-pool, #word-list { gap: 10px; }
+        /* タイトル文字サイズ */
+        .area-title { font-size: 0.9em; margin-bottom: 8px; }
 
-        /* アイテムを小さく (90px -> 50px) */
+        /* --- 要素を小さくする (50px基準) --- */
+        
+        /* イラスト */
         .drag-item {
             width: 50px;
             height: 50px;
@@ -244,15 +259,15 @@
             border-radius: 10px;
         }
 
-        /* ことばの行をコンパクトに */
+        /* ことばの行 */
         .word-row {
             padding: 5px;
-            width: 100%;
+            min-height: auto; /* PC用の固定高さを解除 */
             border-radius: 10px;
-            box-shadow: 0 2px 0 #eef2f6;
+            margin-bottom: 0; /* リストのgapで制御 */
         }
 
-        /* ドロップターゲットも小さく (90px -> 50px) */
+        /* ドロップターゲット */
         .drop-target {
             width: 50px;
             height: 50px;
@@ -261,13 +276,13 @@
             border-radius: 8px;
         }
 
-        /* 文字サイズを小さくして改行を防ぐ */
+        /* 文字サイズ縮小 */
         .word-label {
-            font-size: 1.1em; /* 文字サイズ縮小 */
+            font-size: 1.1em;
         }
     }
 
-    /* さらに小さい画面 (iPhone SEなど) 向け微調整 */
+    /* iPhone SE等の極小画面対応 */
     @media (max-width: 350px) {
         .drag-item { width: 40px; height: 40px; }
         .drop-target { width: 40px; height: 40px; }
