@@ -200,32 +200,127 @@
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
 <script>
-    // --- 問題データ ---
+    // --- 問題データ (JLPT N5レベル) ---
     const questions = [
+        // 1. 基本の「は」と「の」 (Topic / Possession)
         { 
-            parts: ["わたし", "target", "りんご", "target", "たべます"], 
-            answers: ["は", "を"],
-            english: "I eat an apple."
+            parts: ["これ", "target", "わたし", "target", "ほん", "です"], 
+            answers: ["は", "の"],
+            english: "This is my book."
         },
+        // 2. 移動「へ」 (Direction)
         { 
-            parts: ["ねこ", "target", "さかな", "target", "すきです"], 
-            answers: ["は", "が"], // 「ねこはさかながすき」
-            english: "Cats like fish."
+            parts: ["あした", "がっこう", "target", "いきます"], 
+            answers: ["へ"],
+            english: "I will go to school tomorrow."
         },
+        // 3. 目的語「を」 (Object)
         { 
-            parts: ["こうえん", "target", "いきます"], 
-            answers: ["へ"], // 「に」でもOKだが選択肢で制御
-            english: "I go to the park."
+            parts: ["まいにち", "みず", "target", "のみます"], 
+            answers: ["を"],
+            english: "I drink water every day."
         },
+        // 4. 場所「で」と目的語「を」 (Place of action)
         { 
-            parts: ["バス", "target", "のります"], 
-            answers: ["に"],
-            english: "I get on the bus."
+            parts: ["図書館(としょかん)", "target", "ほん", "target", "よみます"], 
+            answers: ["で", "を"],
+            english: "I read a book at the library."
         },
+        // 5. 時間「に」と移動「へ」 (Time / Direction)
+        { 
+            parts: ["７じ", "target", "うち", "target", "かえります"], 
+            answers: ["に", "へ"],
+            english: "I return home at 7 o'clock."
+        },
+        // 6. 手段「で」 (Means/Method)
+        { 
+            parts: ["バス", "target", "かいしゃ", "target", "いきます"], 
+            answers: ["で", "へ"], /* "に"も可ですがプール内の正解として設定 */
+            english: "I go to the office by bus."
+        },
+        // 7. 存在「に」と「が」(Existence - Inanimate)
+        { 
+            parts: ["つくえ", "の", "うえ", "target", "ペン", "target", "あります"], 
+            answers: ["に", "が"],
+            english: "There is a pen on the desk."
+        },
+        // 8. 存在「に」と「が」(Existence - Animate)
+        { 
+            parts: ["あそこ", "target", "おとこのこ", "target", "います"], 
+            answers: ["に", "が"],
+            english: "There is a boy over there."
+        },
+        // 9. 好き嫌い「が」 (Like/Dislike)
+        { 
+            parts: ["わたし", "は", "ねこ", "target", "すきです"], 
+            answers: ["が"],
+            english: "I like cats."
+        },
+        // 10. 共同動作「と」 (With someone)
+        { 
+            parts: ["ともだち", "target", "テニス", "target", "します"], 
+            answers: ["と", "を"],
+            english: "I play tennis with my friend."
+        },
+        // 11. 対象「に」 (Giving)
+        { 
+            parts: ["ともだち", "target", "プレゼント", "target", "あげます"], 
+            answers: ["に", "を"],
+            english: "I give a present to my friend."
+        },
+        // 12. 道具「で」 (Tool)
         { 
             parts: ["はし", "target", "ごはん", "target", "たべます"], 
             answers: ["で", "を"],
             english: "I eat rice with chopsticks."
+        },
+        // 13. 具体的な時間「に」 (Specific Time)
+        { 
+            parts: ["にちようび", "target", "デパート", "target", "いきます"], 
+            answers: ["に", "へ"],
+            english: "I go to the department store on Sunday."
+        },
+        // 14. 欲しい「が」 (Desire)
+        { 
+            parts: ["わたし", "は", "あたらしい", "くるま", "target", "ほしいです"], 
+            answers: ["が"],
+            english: "I want a new car."
+        },
+        // 15. 会う「に」 (Meeting someone)
+        { 
+            parts: ["えき", "で", "せんせい", "target", "あいました"], 
+            answers: ["に"],
+            english: "I met the teacher at the station."
+        },
+        // 16. 上手・下手「が」 (Skill)
+        { 
+            parts: ["かのじょ", "は", "うた", "target", "じょうずです"], 
+            answers: ["が"],
+            english: "She is good at singing."
+        },
+        // 17. 目的地「に」 (Entrance/Arrival)
+        { 
+            parts: ["おふろ", "target", "はいります"], 
+            answers: ["に"],
+            english: "I take a bath. (Enter the bath)"
+        },
+        // 18. 並列「と」 (And)
+        { 
+            parts: ["つくえ", "の", "うえ", "に", "ほん", "target", "ノート", "が", "あります"], 
+            answers: ["と"],
+            english: "There is a book and a notebook on the desk."
+        },
+        // 19. 理由「で」 (Cause/Reason)
+        { 
+            parts: ["びょうき", "target", "がっこう", "を", "やすみました"], 
+            answers: ["で"],
+            english: "I was absent from school because of illness."
+        },
+        // 20. 誰のもの「の」 (Whose)
+        { 
+            parts: ["あれ", "target", "わたし", "target", "かばん", "では", "ありません"], 
+            answers: ["は", "の"],
+            english: "That is not my bag."
         }
     ];
 
