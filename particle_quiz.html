@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>てにをはマスター - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 (青・白基調) --- */
+    :root {
+        --primary: #00bcd4;
+        --secondary: #0097a7;
+        --accent: #ff4081;
+        --bg-color: #e0f7fa;
+        --text-color: #333;
+        --shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .game-container {
+        flex-grow: 1;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+    }
+
+    /* --- クイズエリア --- */
+    .quiz-card {
+        background: white;
+        border-radius: 25px;
+        padding: 30px 20px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: var(--shadow);
+        border: 2px solid var(--primary);
+        text-align: center;
+        margin-top: 20px;
+        animation: popIn 0.4s;
+    }
+
+    .question-title {
+        font-size: 1.2em; color: #666; margin-bottom: 20px; font-weight: bold;
+    }
+
+    /* 文全体 */
+    .sentence-display {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        font-size: 1.5em; /* スマホでは調整 */
+        font-weight: bold;
+        min-height: 80px;
+    }
+
+    /* 文中の単語ブロック */
+    .word-block {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #f0f4f8;
+        font-family: 'Klee One', cursive;
+    }
+
+    /* ドロップターゲット（穴） */
+    .drop-target {
+        width: 60px; height: 60px;
+        background: #e1f5fe;
+        border: 3px dashed var(--primary);
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: center; align-items: center;
+        vertical-align: middle;
+        transition: all 0.2s;
+    }
+    .drop-target.drag-over {
+        background: #b2ebf2; transform: scale(1.1); border-style: solid;
+    }
+    .drop-target.filled {
+        border-style: solid; background: #fff;
+    }
+
+    /* --- 選択肢エリア --- */
+    .choices-area {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* 助詞チップ */
+    .particle-chip {
+        width: 60px; height: 60px;
+        background: #fff;
+        border: 2px solid var(--secondary);
+        border-radius: 50%; /* 丸くする */
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Klee One', cursive;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: var(--secondary);
+        cursor: grab;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        transition: transform 0.1s;
+        touch-action: none;
+        z-index: 10;
+    }
+    .particle-chip:active {
+        transform: scale(1.1); cursor: grabbing; z-index: 100;
+    }
+
+    /* 正解・不正解アニメーション */
+    .correct-anim { animation: pulseGreen 0.5s; background: #c8e6c9 !important; border-color: #4caf50 !important; color: #2e7d32 !important; }
+    .incorrect-anim { animation: shakeRed 0.4s; background: #ffcdd2 !important; border-color: #f44336 !important; color: #c62828 !important; }
+
+    @keyframes pulseGreen { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    @keyframes shakeRed { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ゴースト */
+    .ghost { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* 次へボタン */
+    .next-btn {
+        margin-top: 30px;
+        background: var(--primary); color: white; border: none;
+        border-bottom: 4px solid var(--secondary);
+        padding: 12px 40px; border-radius: 50px;
+        font-size: 1.2em; font-weight: bold;
+        cursor: pointer; display: none; /* 最初は隠す */
+        font-family: 'Zen Maru Gothic', sans-serif;
+    }
+    .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
+
+    /* スマホ対応 */
+    @media (max-width: 500px) {
+        .sentence-display { font-size: 1.2em; gap: 5px; }
+        .drop-target { width: 50px; height: 50px; }
+        .particle-chip { width: 50px; height: 50px; font-size: 1.3em; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+    <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+</header>
+
+<div class="game-container">
+    
+    <div class="quiz-card">
+        <div class="question-title">
+            ただしい <b>「て・に・を・は」</b> を いれてね！
+            <br>
+            <span id="progress-text" style="font-size:0.8em; font-weight:normal;">もんめ</span>
+        </div>
+
+        <div id="sentence-area" class="sentence-display">
+            </div>
+
+        <div id="choices-area" class="choices-area">
+            </div>
+
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">つぎの もんだいへ</button>
+        <p id="feedback-msg" style="font-weight:bold; height:20px;"></p>
+    </div>
+
+</div>
+
+<audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+<audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+
+<script>
+    // --- 問題データ ---
+    const questions = [
+        { 
+            parts: ["わたし", "target", "りんご", "target", "たべます"], 
+            answers: ["は", "を"],
+            english: "I eat an apple."
+        },
+        { 
+            parts: ["ねこ", "target", "さかな", "target", "すきです"], 
+            answers: ["は", "が"], // 「ねこはさかながすき」
+            english: "Cats like fish."
+        },
+        { 
+            parts: ["こうえん", "target", "いきます"], 
+            answers: ["へ"], // 「に」でもOKだが選択肢で制御
+            english: "I go to the park."
+        },
+        { 
+            parts: ["バス", "target", "のります"], 
+            answers: ["に"],
+            english: "I get on the bus."
+        },
+        { 
+            parts: ["はし", "target", "ごはん", "target", "たべます"], 
+            answers: ["で", "を"],
+            english: "I eat rice with chopsticks."
+        }
+    ];
+
+    // 選択肢プール (常にこれらから選ばせる)
+    const particlePool = ["は", "を", "が", "に", "で", "へ", "と"];
+
+    let currentQIndex = 0;
+    let currentQuestion = null;
+    let filledCount = 0; // 埋まった数
+
+    const sentenceArea = document.getElementById('sentence-area');
+    const choicesArea = document.getElementById('choices-area');
+    const nextBtn = document.getElementById('next-btn');
+    const feedbackMsg = document.getElementById('feedback-msg');
+    const progressText = document.getElementById('progress-text');
+    
+    const sndCorrect = document.getElementById('snd-correct');
+    const sndIncorrect = document.getElementById('snd-incorrect');
+
+    window.onload = initGame;
+
+    function initGame() {
+        currentQIndex = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQIndex >= questions.length) {
+            sentenceArea.innerHTML = "🎉 ぜんぶ クリア！";
+            choicesArea.innerHTML = "";
+            nextBtn.style.display = 'none';
+            feedbackMsg.textContent = "おめでとう！";
+            return;
+        }
+
+        currentQuestion = questions[currentQIndex];
+        filledCount = 0;
+        nextBtn.style.display = 'none';
+        feedbackMsg.textContent = "";
+        progressText.textContent = `だい ${currentQIndex + 1} もん`;
+
+        // 文の生成
+        sentenceArea.innerHTML = '';
+        let ansIndex = 0;
+        currentQuestion.parts.forEach(part => {
+            if (part === "target") {
+                const target = document.createElement('div');
+                target.className = 'drop-target';
+                target.dataset.answer = currentQuestion.answers[ansIndex];
+                target.dataset.index = ansIndex; // 何番目の穴か
+                sentenceArea.appendChild(target);
+                ansIndex++;
+            } else {
+                const span = document.createElement('span');
+                span.className = 'word-block';
+                span.textContent = part;
+                sentenceArea.appendChild(span);
+            }
+        });
+
+        // 選択肢の生成 (正解を含みつつ、プールからランダムに数個追加)
+        choicesArea.innerHTML = '';
+        // 必要な正解
+        let choices = [...currentQuestion.answers];
+        // ダミーを追加 (合計5個くらいになるまで)
+        while(choices.length < 5) {
+            const rand = particlePool[Math.floor(Math.random() * particlePool.length)];
+            if(!choices.includes(rand)) choices.push(rand);
+        }
+        // シャッフル
+        choices.sort(() => Math.random() - 0.5);
+
+        choices.forEach(char => {
+            const chip = document.createElement('div');
+            chip.className = 'particle-chip';
+            chip.textContent = char;
+            chip.dataset.char = char;
+            setupDrag(chip); // ドラッグ設定
+            choicesArea.appendChild(chip);
+        });
+    }
+
+    // --- ドラッグ＆ドロップ制御 ---
+    let draggedItem = null;
+    let ghost = null;
+    let touchOffsetX, touchOffsetY;
+
+    function setupDrag(el) {
+        el.addEventListener('mousedown', startDrag);
+        el.addEventListener('touchstart', startDrag, {passive: false});
+    }
+
+    function startDrag(e) {
+        e.preventDefault();
+        // 既に配置済みのアイテムは動かせない（簡易化）
+        if(e.target.classList.contains('placed')) return;
+
+        draggedItem = e.target;
+        const rect = draggedItem.getBoundingClientRect();
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        touchOffsetX = clientX - rect.left;
+        touchOffsetY = clientY - rect.top;
+
+        // ゴースト生成
+        ghost = draggedItem.cloneNode(true);
+        ghost.className = 'particle-chip ghost';
+        document.body.appendChild(ghost);
+        moveGhost(clientX, clientY);
+
+        draggedItem.style.opacity = '0.3';
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, {passive: false});
+        document.addEventListener('touchend', onEnd);
+    }
+
+    function onMove(e) {
+        e.preventDefault();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        moveGhost(clientX, clientY);
+
+        const target = getTargetSlot(clientX, clientY);
+        document.querySelectorAll('.drop-target').forEach(s => s.classList.remove('drag-over'));
+        
+        // 既に埋まっているターゲットにはドロップ不可
+        if (target && !target.hasChildNodes()) {
+            target.classList.add('drag-over');
+        }
+    }
+
+    function moveGhost(x, y) {
+        if(ghost) {
+            ghost.style.left = (x - touchOffsetX) + 'px';
+            ghost.style.top = (y - touchOffsetY) + 'px';
+        }
+    }
+
+    function onEnd(e) {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+
+        if(ghost) ghost.remove();
+        ghost = null;
+        draggedItem.style.opacity = '1';
+
+        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+        const target = getTargetSlot(clientX, clientY);
+        
+        document.querySelectorAll('.drop-target').forEach(s => s.classList.remove('drag-over'));
+
+        // ドロップ判定
+        if (target && !target.hasChildNodes()) {
+            // 正誤判定
+            const correctAnswer = target.dataset.answer;
+            const droppedChar = draggedItem.dataset.char;
+
+            if (droppedChar === correctAnswer) {
+                // 正解！
+                playCorrect();
+                // クローンをターゲットに置く
+                const placedItem = draggedItem.cloneNode(true);
+                placedItem.style.opacity = '1';
+                placedItem.style.cursor = 'default';
+                placedItem.classList.add('placed'); // 再ドラッグ不可
+                
+                // チップのデザインを変更（枠線なし、背景透過など）して馴染ませる
+                placedItem.style.border = 'none';
+                placedItem.style.boxShadow = 'none';
+                placedItem.style.background = 'transparent';
+                
+                target.appendChild(placedItem);
+                target.classList.add('filled', 'correct-anim');
+                
+                // 元のチップは消さない（別の穴でも使うかもしれないので？今回は消さない仕様）
+                // ただし、同じ文字を複数回使う問題もあるため、プールには残す。
+                
+                filledCount++;
+                checkCompletion();
+
+            } else {
+                // 不正解
+                playIncorrect();
+                target.classList.add('incorrect-anim');
+                feedbackMsg.textContent = "ちがうよ！";
+                setTimeout(() => {
+                    target.classList.remove('incorrect-anim');
+                    feedbackMsg.textContent = "";
+                }, 500);
+            }
+        }
+        draggedItem = null;
+    }
+
+    function getTargetSlot(x, y) {
+        const el = document.elementFromPoint(x, y);
+        if (!el) return null;
+        return el.closest('.drop-target');
+    }
+
+    function playCorrect() {
+        sndCorrect.currentTime = 0;
+        sndCorrect.play();
+        feedbackMsg.textContent = "せいかい！";
+        feedbackMsg.style.color = "green";
+    }
+
+    function playIncorrect() {
+        sndIncorrect.currentTime = 0;
+        sndIncorrect.play();
+        feedbackMsg.style.color = "red";
+    }
+
+    function checkCompletion() {
+        if (filledCount >= currentQuestion.answers.length) {
+            feedbackMsg.textContent = "よくできました！";
+            nextBtn.style.display = 'inline-block';
+        }
+    }
+
+    window.nextQuestion = () => {
+        currentQIndex++;
+        loadQuestion();
+    };
+
+</script>
+</body>
+</html>
