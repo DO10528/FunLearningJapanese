@@ -14,7 +14,7 @@
         --text-color: #333;
     }
 
-    /* ズレ防止の基本設定 */
+    /* 全要素のサイズ計算を統一（ズレ防止） */
     *, *::before, *::after {
         box-sizing: border-box;
     }
@@ -37,6 +37,7 @@
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white;
         padding: 15px 20px;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -110,11 +111,11 @@
     .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
 
 
-    /* --- ゲームプレイ画面 (PC・タブレットの基本デザイン) --- */
+    /* --- ゲームプレイ画面 (PCデフォルト設定) --- */
     .game-play-card {
         background: white;
         border-radius: 25px;
-        padding: 20px;
+        padding: 30px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         text-align: center;
         width: 100%;
@@ -126,41 +127,40 @@
         font-size: 1.2em;
     }
 
+    /* 左右のカラムを格納するコンテナ */
     .match-container {
         display: flex;
-        flex-direction: row; /* PCは横並び */
+        flex-direction: row; /* 横並び */
         gap: 30px; 
-        align-items: stretch; 
+        align-items: stretch; /* 高さを揃える */
         justify-content: center; 
     }
 
-    .illust-box {
+    /* 左：イラストボックス / 右：ことばボックス */
+    /* スタイルを共通化してバランスを整える */
+    .illust-box, .word-box {
         flex: 1; 
-        background: #f0f4f8;
-        border-radius: 15px;
+        background: #f8fbff;
+        border-radius: 20px;
         padding: 20px;
-        border: 2px dashed #ccc;
-        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-    }
-    
-    .word-box {
-        flex: 1; 
-        background: transparent; 
-        border-radius: 15px;
-        padding: 20px;
-        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+        border: 3px dashed #d1e3ff; /* 枠線を統一 */
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: flex-start;
+        min-height: 400px; /* 高さを確保 */
     }
 
     .area-title {
-        font-size: 1.1em; color: #555; margin-bottom: 15px; font-weight: bold;
+        font-size: 1.2em; color: #555; margin-bottom: 20px; font-weight: bold;
         text-align: center; width: 100%;
     }
 
-    .illust-pool {
-        display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;
+    .illust-pool, #word-list {
+        display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;
     }
 
-    /* PCサイズのアイテム */
+    /* PC用アイテムサイズ */
     .drag-item {
         width: 90px; height: 90px;
         background: white; border: 3px solid #fff; border-radius: 15px;
@@ -168,7 +168,7 @@
         cursor: grab; display: flex; justify-content: center; align-items: center;
         touch-action: none; z-index: 10; transition: all 0.2s; flex-shrink: 0;
     }
-    .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+    .drag-item img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; }
     .drag-item:active { cursor: grabbing; transform: scale(1.05); }
     
     .drag-item.placed {
@@ -177,51 +177,70 @@
         cursor: pointer; background: transparent;
     }
 
-    /* PCサイズのドロップターゲット */
+    /* PC用ドロップエリア */
     .word-row {
         display: flex; align-items: center; justify-content: center;
-        margin-bottom: 15px; background: white; padding: 10px 20px;
-        border-radius: 15px; border: 2px solid #f0f0f0; box-shadow: 0 4px 0 #f0f0f0;
-        width: 90%; max-width: 350px;
+        background: white; padding: 10px 20px;
+        border-radius: 15px; border: 2px solid #eef2f6; box-shadow: 0 4px 0 #eef2f6;
+        width: 100%; max-width: 300px;
+        transition: transform 0.2s;
     }
+    .word-row:hover { transform: translateY(-2px); border-color: #bbdefb; }
+
     .drop-target {
         width: 90px; height: 90px;
         background: #e3f2fd; border: 3px dashed #90caf9; border-radius: 15px;
-        margin-right: 20px; display: flex; justify-content: center; align-items: center;
+        margin-right: 15px; display: flex; justify-content: center; align-items: center;
         transition: all 0.2s; position: relative; overflow: hidden; flex-shrink: 0;
     }
     .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
     .drop-target.correct { background: #e8f5e9; border: 3px solid #4caf50; border-style: solid; }
     
-    .word-label { font-size: 2em; font-weight: 900; color: #444; flex-grow: 1; text-align: center; }
+    /* 文字の設定（PCで縦書きにならないように nowrap を指定） */
+    .word-label { 
+        font-size: 2em; 
+        font-weight: 900; 
+        color: #444; 
+        flex-grow: 1; 
+        text-align: center;
+        white-space: nowrap; /* ★これで文字の折り返しを防止 */
+    }
 
     .feedback-msg { font-weight: bold; font-size: 1.3em; margin-top: 15px; min-height: 1.5em; }
     .feedback-msg.success { color: #4caf50; }
     .feedback-msg.error { color: #ef5350; }
 
 
-    /* --- ★スマホ専用の修正箇所★ --- */
-    /* 700px以下の画面で、強制的に「横並び」にしつつサイズを縮小 */
-    @media (max-width: 700px) {
+    /* --- ★スマホ専用 強力レイアウト調整★ --- */
+    /* 768px以下（スマホ・タブレット縦）の場合 */
+    @media (max-width: 768px) {
         
         .main-container { padding: 10px; }
-        .game-play-card { padding: 10px; }
+        .game-play-card { padding: 10px 5px; }
+        .game-header { font-size: 1em; margin-bottom: 10px; }
 
-        /* 強制的に横並びにする */
+        /* 左右のカラムを強制的に維持 */
         .match-container {
             flex-direction: row !important;
-            gap: 5px; /* 隙間を狭く */
+            gap: 8px; /* 隙間を最小限に */
         }
 
-        /* 左右のボックスの余白を削る */
+        /* ボックスのスタイルを簡素化 */
         .illust-box, .word-box {
             padding: 10px 2px;
+            border-width: 2px;
+            border-radius: 10px;
+            min-height: auto; /* 高さは中身に合わせる */
         }
+        
+        .area-title { font-size: 0.9em; margin-bottom: 10px; }
+        .illust-pool, #word-list { gap: 10px; }
 
-        /* アイテムを小さくする (90px -> 55px) */
+        /* アイテムを小さく (90px -> 50px) */
         .drag-item {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
+            border-width: 2px;
             border-radius: 10px;
         }
 
@@ -229,31 +248,35 @@
         .word-row {
             padding: 5px;
             width: 100%;
-            margin-bottom: 10px;
-        }
-
-        /* ドロップターゲットも小さく (90px -> 55px) */
-        .drop-target {
-            width: 55px;
-            height: 55px;
-            margin-right: 8px;
-            border-width: 2px;
             border-radius: 10px;
+            box-shadow: 0 2px 0 #eef2f6;
         }
 
-        /* 文字サイズを小さく */
-        .word-label {
-            font-size: 1.2em;
+        /* ドロップターゲットも小さく (90px -> 50px) */
+        .drop-target {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+            border-width: 2px;
+            border-radius: 8px;
         }
-        
-        .area-title { font-size: 0.9em; margin-bottom: 10px; }
+
+        /* 文字サイズを小さくして改行を防ぐ */
+        .word-label {
+            font-size: 1.1em; /* 文字サイズ縮小 */
+        }
+    }
+
+    /* さらに小さい画面 (iPhone SEなど) 向け微調整 */
+    @media (max-width: 350px) {
+        .drag-item { width: 40px; height: 40px; }
+        .drop-target { width: 40px; height: 40px; }
+        .word-label { font-size: 0.9em; }
     }
 
     /* アニメーション */
     .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    /* ゴースト(ドラッグ中の画像) */
     .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
 </style>
