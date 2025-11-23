@@ -6,7 +6,7 @@
 <title>かきかた道場 - FunLearnJP</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <style>
     /* --- index.html と共通のデザイン設定 --- */
     :root {
@@ -79,12 +79,15 @@
     .guide-text {
         position: absolute;
         top: 50%; left: 50%;
-        transform: translate(-50%, -54%); /* 少し上に調整 */
+        transform: translate(-50%, -54%);
         font-size: 240px;
-        font-weight: 400; /* 明朝体風にならなければゴシックで */
-        font-family: 'Zen Maru Gothic', sans-serif;
-        color: #e0e0e0; /* 薄いグレー */
-        pointer-events: none; /* タップをスルー */
+        
+        /* ★ここを変更！Klee Oneを指定★ */
+        font-family: 'Klee One', cursive; 
+        font-weight: 600; /* 少し太めにして見やすく */
+        
+        color: #e0e0e0;
+        pointer-events: none;
         user-select: none;
         z-index: 1;
     }
