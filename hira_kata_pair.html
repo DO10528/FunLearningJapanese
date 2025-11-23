@@ -5,148 +5,177 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ひらカタあわせ - FunLearnJP</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
 
 <style>
     /* --- 共通設定 --- */
     :root {
-        --primary: #00bcd4; /* シアン系 */
-        --accent: #ff4081;
-        --bg-color: #e0f7fa;
-        --text-color: #333;
-        --slot-bg: #ffffff;
+        --primary: #FF8A80; /* ポップなピンク */
+        --secondary: #FFD180; /* ポップなオレンジ */
+        --accent: #A7FFEB; /* ポップなミント */
+        --bg-color: #FFF8E1; /* クリーム色 */
+        --text-color: #5D4037; /* チョコ色 */
+        --shadow: 4px 4px 0px rgba(0,0,0,0.15); /* 可愛い影 */
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
+        /* 可愛いドットパターン背景 */
         background-color: var(--bg-color);
+        background-image: radial-gradient(#FFD180 2px, transparent 2px), radial-gradient(#FF8A80 2px, transparent 2px);
+        background-size: 30px 30px;
+        background-position: 0 0, 15px 15px;
         color: var(--text-color);
         margin: 0; padding: 0;
         min-height: 100vh;
         display: flex; flex-direction: column;
         overflow-x: hidden;
-        user-select: none; /* テキスト選択防止 */
+        user-select: none;
         touch-action: manipulation;
     }
 
     /* ヘッダー */
     header {
-        background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
-        color: white;
+        background: #FFF;
+        border-bottom: 4px solid var(--primary);
         padding: 10px 20px;
         display: flex; justify-content: space-between; align-items: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         z-index: 100;
     }
-    .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; display: flex; gap: 10px; align-items: center; }
-    .level-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .level-badge { 
+        background: var(--secondary); color: #FFF; 
+        padding: 5px 15px; border-radius: 20px; font-weight: bold;
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        border: 2px solid #FFF;
+    }
 
     /* メインエリア */
     .game-container {
         flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 15px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+    }
+
+    /* タイトル */
+    .game-title {
+        font-size: 1.8em; font-weight: 900; color: var(--text-color);
+        text-align: center; margin-bottom: 20px;
+        text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(0,0,0,0.1);
     }
 
     /* --- ゲーム盤面レイアウト --- */
     .board {
         display: flex;
-        justify-content: space-between;
+        justify-content: center; /* 中央寄せ */
         width: 100%;
-        gap: 5px;
+        gap: 15px; /* パーツ間の隙間 */
         margin-bottom: 20px;
+        align-items: stretch; /* 高さを揃える */
     }
 
-    /* 左右のプール（アイテム置き場） */
+    /* 左右のプール（可愛い枠デザイン） */
     .pool-column {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        width: 70px; /* スマホ幅に合わせて調整 */
+        display: flex; flex-direction: column; gap: 10px;
+        width: 90px; /* 幅を少し広げてリッチに */
         align-items: center;
-        background: rgba(255,255,255,0.5);
-        border-radius: 15px;
-        padding: 10px 5px;
-        min-height: 300px;
+        background: #FFF;
+        border: 4px solid var(--secondary);
+        border-radius: 20px;
+        padding: 15px 10px;
+        min-height: 350px;
+        box-shadow: var(--shadow);
+        position: relative;
     }
-    
-    .pool-title {
-        font-size: 0.9em; font-weight: bold; color: #00838f; margin-bottom: 5px; text-align: center;
+    /* 可愛い飾りのヘッダー */
+    .pool-header {
+        background: var(--secondary);
+        color: #FFF;
+        font-weight: 900;
+        padding: 5px 15px;
+        border-radius: 20px;
+        position: absolute;
+        top: -15px;
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
     }
+    .pool-area { margin-top: 15px; width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
-    /* 中央のペアリングエリア */
+    /* 中央のペアリングエリア (幅を狭く) */
     .center-area {
         flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 0 5px;
-        margin-top: 32px; /* タイトルの高さ分ずらす */
+        max-width: 280px; /* ★幅を狭く制限 */
+        display: flex; flex-direction: column;
+        gap: 12px;
+        padding: 10px;
+        background: rgba(255,255,255,0.7); /* 少し透けた背景 */
+        border-radius: 20px;
+        border: 3px dashed var(--accent);
     }
 
-    /* ペアを作る行 */
+    /* ペアを作る行 (デザイン変更) */
     .pair-row {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        background: white;
+        justify-content: center; align-items: center;
+        background: #FFF;
         border-radius: 15px;
         padding: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border: 3px solid var(--accent);
+        box-shadow: var(--shadow);
         gap: 10px;
         height: 70px;
     }
 
     .pair-divider {
-        color: #ccc; font-size: 1.5em; font-weight: bold;
+        color: var(--accent); font-size: 1.5em; font-weight: bold;
+        text-shadow: 1px 1px 0px #FFF;
     }
 
     /* --- アイテムとスロット --- */
     .slot {
-        width: 60px; height: 60px;
-        background: #f5f5f5;
-        border: 2px dashed #ccc;
-        border-radius: 10px;
+        width: 55px; height: 55px;
+        background: #F0F0F0;
+        border: 3px dashed #CCC;
+        border-radius: 12px;
         display: flex; justify-content: center; align-items: center;
-        transition: background 0.2s;
+        transition: all 0.2s;
     }
-    .slot.drag-over { background: #b2ebf2; border-color: #00bcd4; border-style: solid; }
+    .slot.drag-over { background: #E0F7FA; border-color: var(--accent); border-style: solid; transform: scale(1.05); }
+    
+    /* プール内のスロットは枠線を消す */
+    .pool-slot { border: none; background: transparent; }
 
-    /* ドラッグする文字チップ */
+    /* ドラッグする文字チップ (クッキー風デザイン) */
     .char-chip {
-        width: 60px; height: 60px;
-        background: white;
-        border-radius: 10px;
-        border: 2px solid #fff;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        width: 55px; height: 55px;
+        background: #FFF;
+        border-radius: 12px;
+        /* クッキーのような立体感と枠線 */
+        border: 4px solid; 
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.1), inset 2px 2px 5px rgba(255,255,255,0.5);
         display: flex; justify-content: center; align-items: center;
-        font-family: 'Klee One', cursive; /* 教科書体 */
+        /* フォント指定 */
+        font-family: 'Klee One', cursive; 
         font-size: 2rem;
         font-weight: 600;
-        color: #333;
         cursor: grab;
-        touch-action: none; /* スマホでのスクロール干渉防止 */
-        z-index: 10;
+        touch-action: none; z-index: 10;
+        transition: transform 0.1s;
     }
     
-    /* ひらがな・カタカナで色分け（ヒントとして少しだけ） */
-    .char-hira { color: #d81b60; border-bottom: 3px solid #f8bbd0; } /* 赤系 */
-    .char-kata { color: #1565c0; border-bottom: 3px solid #bbdefb; } /* 青系 */
+    /* ひらがな・カタカナで色分け（可愛く） */
+    .char-hira { color: #D81B60; border-color: #F8BBD0; background: #FFEBEE; } /* ピンク系 */
+    .char-kata { color: #1565C0; border-color: #BBDEFB; background: #E3F2FD; } /* ブルー系 */
 
-    .char-chip:active { transform: scale(1.1); cursor: grabbing; z-index: 100; }
+    .char-chip:active { transform: scale(1.1) rotate(3deg); cursor: grabbing; z-index: 100; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
 
     /* ドラッグ中のゴースト */
     .ghost {
         position: fixed; pointer-events: none; z-index: 1000;
-        opacity: 0.8; transform: scale(1.1);
+        opacity: 0.9; transform: scale(1.1) rotate(3deg); box-shadow: 10px 10px 0px rgba(0,0,0,0.15);
     }
 
     /* --- ボタンエリア --- */
@@ -154,43 +183,60 @@
         width: 100%; text-align: center; margin-top: auto; padding-bottom: 20px;
     }
     .check-btn {
-        background-color: #ff4081;
+        background-color: var(--primary);
         color: white;
         border: none;
-        padding: 15px 50px;
+        border-bottom: 6px solid #C62828; /* 立体的な影 */
+        padding: 12px 40px;
         border-radius: 50px;
-        font-size: 1.4em;
-        font-weight: bold;
-        box-shadow: 0 6px 0 #c2185b;
+        font-size: 1.6em;
+        font-weight: 900;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         cursor: pointer;
-        transition: transform 0.1s;
+        transition: all 0.1s;
+        text-shadow: 1px 1px 0px #C62828;
     }
-    .check-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #c2185b; }
+    .check-btn:active { transform: translateY(4px); border-bottom-width: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-    /* メッセージ（次のレベルへ） */
+    /* モーダル（可愛く） */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: none; justify-content: center; align-items: center;
-        z-index: 2000;
+        background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
+        display: none; justify-content: center; align-items: center; z-index: 2000;
     }
     .modal-content {
-        background: white; padding: 30px; border-radius: 20px;
-        text-align: center; animation: popIn 0.3s;
+        background: #FFF; padding: 40px; border-radius: 30px;
+        text-align: center; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 6px solid var(--primary);
+        box-shadow: var(--shadow);
     }
-    .modal-content h2 { color: #00bcd4; font-size: 2em; margin: 0 0 20px 0; }
+    .modal-content h2 { 
+        color: var(--primary); font-size: 2.5em; margin: 0 0 20px 0; font-weight: 900;
+        text-shadow: 3px 3px 0px #FFF, 5px 5px 0px rgba(0,0,0,0.1);
+    }
     .next-btn {
-        background: #00bcd4; color: white; border: none; padding: 10px 30px;
-        font-size: 1.2em; border-radius: 10px; cursor: pointer;
+        background: var(--secondary); color: white; border: none; 
+        border-bottom: 5px solid #E65100;
+        padding: 15px 40px;
+        font-size: 1.4em; font-weight: bold; border-radius: 15px; cursor: pointer;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        text-shadow: 1px 1px 0px #E65100;
+        transition: all 0.1s;
     }
+    .next-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
 
-    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
     /* スマホ微調整 */
-    @media (max-width: 400px) {
-        .pool-column { width: 60px; }
-        .slot, .char-chip { width: 50px; height: 50px; font-size: 1.6rem; }
-        .pair-row { height: 60px; gap: 5px; }
+    @media (max-width: 500px) {
+        .board { gap: 10px; }
+        .pool-column { width: 80px; }
+        .center-area { max-width: 220px; } /* スマホではさらに狭く */
+        .slot, .char-chip { width: 45px; height: 45px; font-size: 1.5rem; border-width: 3px; }
+        .pair-row { height: 60px; gap: 5px; border-width: 2px; }
+        .check-btn { font-size: 1.3em; padding: 10px 30px; border-bottom-width: 4px; }
+        .game-title { font-size: 1.4em; margin-bottom: 10px; }
     }
 </style>
 </head>
@@ -198,35 +244,37 @@
 
 <header>
     <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
-    <div class="level-badge" id="level-indicator">Level 1</div>
+    <div class="level-badge" id="level-indicator">レベル 1</div>
 </header>
 
 <div class="game-container">
     
+    <h1 class="game-title">ひらがな と カタカナ を あわせよう！</h1>
+
     <div class="board">
-        <div class="pool-column">
-            <div class="pool-title">ひらがな</div>
+        <div class="pool-column" style="border-color: #F8BBD0;">
+            <div class="pool-header" style="background: #F8BBD0;">ひらがな</div>
             <div id="hira-pool" class="pool-area"></div>
         </div>
 
         <div class="center-area" id="pair-rows">
             </div>
 
-        <div class="pool-column">
-            <div class="pool-title">カタカナ</div>
+        <div class="pool-column" style="border-color: #BBDEFB;">
+            <div class="pool-header" style="background: #BBDEFB;">カタカナ</div>
             <div id="kata-pool" class="pool-area"></div>
         </div>
     </div>
 
     <div class="controls">
-        <button class="check-btn" onclick="checkAnswer()">こたえあわせ</button>
+        <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
     </div>
 </div>
 
 <div id="success-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>せいかい！🎉</h2>
-        <button class="next-btn" onclick="nextLevel()">つぎのレベルへ</button>
+        <h2>だいせいかい！🎉</h2>
+        <button class="next-btn" onclick="nextLevel()">つぎの レベルへ Go!</button>
     </div>
 </div>
 
@@ -234,7 +282,7 @@
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
 <script>
-    // --- データ定義 (全10レベル) ---
+    // --- データ定義 (全10レベル - 変更なし) ---
     const levels = [
         { id: 1, chars: [ {h:'あ',k:'ア'}, {h:'い',k:'イ'}, {h:'う',k:'ウ'}, {h:'え',k:'エ'}, {h:'お',k:'オ'} ] },
         { id: 2, chars: [ {h:'か',k:'カ'}, {h:'き',k:'キ'}, {h:'く',k:'ク'}, {h:'け',k:'ケ'}, {h:'こ',k:'コ'} ] },
@@ -243,9 +291,9 @@
         { id: 5, chars: [ {h:'な',k:'ナ'}, {h:'に',k:'ニ'}, {h:'ぬ',k:'ヌ'}, {h:'ね',k:'ネ'}, {h:'の',k:'ノ'} ] },
         { id: 6, chars: [ {h:'は',k:'ハ'}, {h:'ひ',k:'ヒ'}, {h:'ふ',k:'フ'}, {h:'へ',k:'ヘ'}, {h:'ほ',k:'ホ'} ] },
         { id: 7, chars: [ {h:'ま',k:'マ'}, {h:'み',k:'ミ'}, {h:'む',k:'ム'}, {h:'め',k:'メ'}, {h:'も',k:'モ'} ] },
-        { id: 8, chars: [ {h:'や',k:'ヤ'}, {h:'ゆ',k:'ユ'}, {h:'よ',k:'ヨ'} ] }, // 3文字
+        { id: 8, chars: [ {h:'や',k:'ヤ'}, {h:'ゆ',k:'ユ'}, {h:'よ',k:'ヨ'} ] }, 
         { id: 9, chars: [ {h:'ら',k:'ラ'}, {h:'り',k:'リ'}, {h:'る',k:'ル'}, {h:'れ',k:'レ'}, {h:'ろ',k:'ロ'} ] },
-        { id: 10, chars: [ {h:'わ',k:'ワ'}, {h:'を',k:'ヲ'}, {h:'ん',k:'ン'} ] } // 3文字
+        { id: 10, chars: [ {h:'わ',k:'ワ'}, {h:'を',k:'ヲ'}, {h:'ん',k:'ン'} ] } 
     ];
 
     let currentLevelIndex = 0;
@@ -278,19 +326,16 @@
         }
 
         const levelData = levels[idx];
-        levelIndicator.textContent = `Level ${levelData.id}`;
+        levelIndicator.textContent = `レベル ${levelData.id}`;
 
-        // 中央の行を作成 (文字数分)
+        // 中央の行を作成
         levelData.chars.forEach((_, i) => {
             const row = document.createElement('div');
             row.className = 'pair-row';
-            // 左スロット (ひらがな用)
             const hSlot = createSlot('hira-slot');
-            // 区切り
             const div = document.createElement('div');
             div.className = 'pair-divider';
             div.textContent = '=';
-            // 右スロット (カタカナ用)
             const kSlot = createSlot('kata-slot');
             
             row.appendChild(hSlot);
@@ -304,7 +349,7 @@
         const kataChips = [...levelData.chars].sort(() => Math.random() - 0.5);
 
         // プールに配置
-        hiraChips.forEach(c => createChip(c.h, 'hira', c.k, hiraPool)); // dataとしてペアの答えを持たせる
+        hiraChips.forEach(c => createChip(c.h, 'hira', c.k, hiraPool));
         kataChips.forEach(c => createChip(c.k, 'kata', c.h, kataPool));
     }
 
@@ -319,13 +364,11 @@
         chip.className = `char-chip char-${type}`;
         chip.textContent = text;
         chip.dataset.value = text;
-        chip.dataset.pair = pairValue; // ペアとなる文字
-        chip.dataset.type = type;      // hira or kata
+        chip.dataset.pair = pairValue;
+        chip.dataset.type = type;
 
-        // プール内のスロットに入れて配置（プールに戻すとき用）
+        // プール内のスロットに入れて配置
         const poolSlot = createSlot('pool-slot');
-        poolSlot.style.border = 'none'; // プール内は見えない枠
-        poolSlot.style.background = 'transparent';
         poolSlot.appendChild(chip);
         container.appendChild(poolSlot);
 
@@ -333,22 +376,20 @@
         setupDrag(chip);
     }
 
-    // --- ドラッグ＆ドロップ制御 (スマホ対応) ---
+    // --- ドラッグ＆ドロップ制御 (変更なし) ---
     let draggedItem = null;
     let touchOffsetX = 0;
     let touchOffsetY = 0;
     let ghost = null;
-    let originSlot = null; // 元いた場所
+    let originSlot = null;
 
     function setupDrag(el) {
-        // マウス
         el.addEventListener('mousedown', startDrag);
-        // タッチ
         el.addEventListener('touchstart', startDrag, {passive: false});
     }
 
     function startDrag(e) {
-        e.preventDefault(); // スクロール防止
+        e.preventDefault();
         draggedItem = e.target;
         originSlot = draggedItem.parentElement;
 
@@ -358,7 +399,6 @@
         touchOffsetX = clientX - rect.left;
         touchOffsetY = clientY - rect.top;
 
-        // ゴースト作成
         ghost = draggedItem.cloneNode(true);
         ghost.className += ' ghost';
         ghost.style.width = rect.width + 'px';
@@ -366,10 +406,8 @@
         document.body.appendChild(ghost);
         moveGhost(clientX, clientY);
 
-        // 元の要素は薄くするか消す（ここでは視覚的に残すが、操作対象はGhost）
         draggedItem.style.opacity = '0.3';
 
-        // イベントリスナー追加
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onEnd);
         document.addEventListener('touchmove', onMove, {passive: false});
@@ -382,7 +420,6 @@
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         moveGhost(clientX, clientY);
 
-        // ドロップ先のハイライト（簡易版）
         const target = getTargetSlot(clientX, clientY);
         document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
         if (target && isValidDrop(target, draggedItem)) {
@@ -398,7 +435,6 @@
     }
 
     function onEnd(e) {
-        // クリーンアップ
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onEnd);
         document.removeEventListener('touchmove', onMove);
@@ -409,7 +445,6 @@
         
         draggedItem.style.opacity = '1';
 
-        // ドロップ判定
         const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
         const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
         const target = getTargetSlot(clientX, clientY);
@@ -417,53 +452,39 @@
         document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
 
         if (target && isValidDrop(target, draggedItem)) {
-            // 既に何か入っていたら入れ替える（プールに戻す）
             if (target.children.length > 0) {
                 const existing = target.children[0];
-                // 元のプールに戻す（プール内の空きスロットを探すのは複雑なので、元の場所に戻す）
-                // 簡易的に、入れ替え元がプールなら交換、別の行なら交換
                 originSlot.appendChild(existing);
             }
             target.appendChild(draggedItem);
             playClickSound();
-        } else {
-            // 無効な場所なら何もしない（元の場所に戻る）
         }
         draggedItem = null;
     }
 
-    // 座標からスロットを取得
     function getTargetSlot(x, y) {
         const el = document.elementFromPoint(x, y);
         if (!el) return null;
         return el.closest('.slot');
     }
 
-    // ドロップ可能か判定
     function isValidDrop(slot, item) {
-        // プールに戻すのは常にOK
         if (slot.classList.contains('pool-slot')) return true;
-
-        // ひらがなスロットにはひらがなのみ
         if (slot.classList.contains('hira-slot') && item.dataset.type === 'hira') return true;
-        
-        // カタカナスロットにはカタカナのみ
         if (slot.classList.contains('kata-slot') && item.dataset.type === 'kata') return true;
-
         return false;
     }
 
     function playClickSound() {
-        // 軽いクリック音（任意）
+        // 任意でクリック音を追加可能
     }
 
-    // --- 判定ロジック ---
+    // --- 判定ロジック (変更なし) ---
     window.checkAnswer = () => {
         const rows = document.querySelectorAll('.pair-row');
         let allCorrect = true;
         let isFull = true;
 
-        // 全て埋まっているかチェック
         rows.forEach(row => {
             const hSlot = row.querySelector('.hira-slot');
             const kSlot = row.querySelector('.kata-slot');
@@ -473,25 +494,15 @@
         });
 
         if (!isFull) {
-            // まだ埋まってない場合も不正解音を鳴らすか、何もしないか
-            // 指示は「全て正解するまで次に進めない」
             sndIncorrect.currentTime = 0;
             sndIncorrect.play();
             return; 
         }
 
-        // 正誤判定
         rows.forEach(row => {
             const hItem = row.querySelector('.hira-slot').children[0];
             const kItem = row.querySelector('.kata-slot').children[0];
-            
-            const hVal = hItem.dataset.value;
-            const kVal = kItem.dataset.value;
-            
-            // dataset.pair と一致しているか、あるいは文字コードなどで判定
-            // ここでは levels データ定義内のペア情報と突合する
-            // 簡易的に item.dataset.pair が相手の文字を持っている
-            if (hItem.dataset.pair !== kVal) {
+            if (hItem.dataset.pair !== kItem.dataset.value) {
                 allCorrect = false;
             }
         });
@@ -499,11 +510,10 @@
         if (allCorrect) {
             sndCorrect.currentTime = 0;
             sndCorrect.play();
-            modal.style.display = 'flex'; // 次へボタン表示
+            modal.style.display = 'flex'; 
         } else {
             sndIncorrect.currentTime = 0;
             sndIncorrect.play();
-            // どこが間違っているかは表示しない
         }
     };
 
