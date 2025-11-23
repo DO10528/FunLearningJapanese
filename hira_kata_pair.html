@@ -8,14 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
 
 <style>
-    /* --- 共通設定 (青・白基調に修正) --- */
+    /* --- 共通設定 (青・白基調) --- */
     :root {
         --primary: #00bcd4; /* シアン */
-        --secondary: #0097a7; /* 濃いシアン (影や枠線用) */
-        --accent: #ff4081; /* ピンク (アクセント) */
-        --bg-color: #e0f7fa; /* 薄い水色背景 */
-        --text-color: #333; /* 濃いグレーテキスト */
-        --shadow: 0 4px 8px rgba(0,0,0,0.1); /* シンプルで柔らかい影 */
+        --secondary: #0097a7; /* 濃いシアン (影用) */
+        --accent: #ff4081; /* ピンク */
+        --bg-color: #e0f7fa; /* 薄い水色 */
+        --text-color: #333;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -23,7 +22,6 @@
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
-        /* 背景パターンを削除 */
         color: var(--text-color);
         margin: 0; padding: 0;
         min-height: 100vh;
@@ -33,7 +31,7 @@
         touch-action: manipulation;
     }
 
-    /* ヘッダー (青基調) */
+    /* ヘッダー */
     header {
         background: #FFF;
         border-bottom: 3px solid var(--primary);
@@ -43,25 +41,90 @@
         z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
-    .level-badge { 
-        background: var(--primary); color: #FFF; 
-        padding: 5px 15px; border-radius: 20px; font-weight: bold;
-        box-shadow: none; border: none;
-    }
+    .home-icon { color: var(--primary); font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:active { transform: scale(0.9); }
 
     /* メインエリア */
     .game-container {
         flex-grow: 1;
         display: flex; flex-direction: column; align-items: center;
-        padding: 15px;
+        padding: 20px;
         width: 100%; max-width: 800px; margin: 0 auto;
     }
 
-    /* タイトル (シンプルに) */
-    .game-title {
-        font-size: 1.8em; font-weight: 900; color: var(--text-color);
-        text-align: center; margin-bottom: 20px;
-        text-shadow: none;
+    /* --- レベル選択画面 --- */
+    .menu-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+        animation: popIn 0.4s;
+    }
+
+    .menu-icon { font-size: 4em; color: #5c7aff; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 1.8em; color: var(--primary); margin: 0 0 10px 0; font-weight: 900; }
+    
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+        margin-top: 20px;
+    }
+
+    .level-btn {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px 10px;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        transition: all 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+    .level-btn:nth-child(5n+1) { background-color: #ff6b6b; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #48dbfb; }
+    .level-btn:nth-child(5n+4) { background-color: #1dd1a1; }
+    .level-btn:nth-child(5n+5) { background-color: #ff9f43; }
+
+    .level-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+    .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    .home-btn-back {
+        background: #90a4ae; color: white; border: none;
+        border-bottom: 4px solid #607d8b;
+        padding: 10px 30px; border-radius: 50px; font-weight: bold;
+        text-decoration: none; display: inline-block; cursor: pointer;
+    }
+    .home-btn-back:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+
+    /* --- ゲームプレイエリア --- */
+    #game-play-area {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game-header-info {
+        display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;
+    }
+    .level-display {
+        font-size: 1.2em; font-weight: bold; color: var(--primary);
+        background: white; padding: 5px 15px; border-radius: 15px;
+        box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+    }
+    .back-to-menu {
+        background: #e0e0e0; color: #666; border: none;
+        padding: 5px 15px; border-radius: 15px; font-weight: bold; cursor: pointer;
     }
 
     /* --- ゲーム盤面レイアウト --- */
@@ -74,36 +137,35 @@
         align-items: stretch;
     }
 
-    /* 左右のプール (重なり修正とデザイン変更) */
+    /* 左右のプール (3D風デザインに変更) */
     .pool-column {
         display: flex; flex-direction: column;
-        width: 95px; /* 少し幅広に */
+        width: 95px;
         align-items: center;
         background: #FFF;
-        border: 2px solid var(--primary); /* 青枠 */
+        /* 立体的なボーダーと影 */
+        border: 3px solid #80deea; /* 明るい色で光沢感 */
+        border-bottom-color: var(--secondary); /* 暗い色で影 */
+        border-right-color: var(--secondary);
         border-radius: 15px;
-        padding: 0; /* ヘッダーを内包するためパディングをゼロに */
+        padding: 0;
         min-height: 350px;
-        box-shadow: var(--shadow);
-        overflow: hidden; /* 角丸からはみ出さないように */
+        /* 深い影で浮き上がりを表現 */
+        box-shadow: 0 6px 0 var(--secondary), 0 8px 10px rgba(0,0,0,0.15);
+        overflow: hidden;
     }
-    /* プールヘッダー (配置修正：絶対配置をやめる) */
     .pool-header {
-        background: var(--primary); /* 青背景 */
+        background: var(--primary);
         color: #FFF;
         font-weight: 900;
         padding: 8px 0;
         text-align: center;
         width: 100%;
-        /* position: absolute; を削除して通常の配置に */
-        box-shadow: none;
-        border-radius: 0;
+        /* ヘッダーの下に少し影 */
+        box-shadow: 0 2px 0 var(--secondary);
     }
-    /* プールエリア (余白調整) */
     .pool-area { 
-        margin-top: 0; 
-        padding: 15px 10px; /* 内部にパディングを追加 */
-        width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; flex-grow: 1;
+        margin-top: 0; padding: 15px 10px; width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; flex-grow: 1;
     }
 
     /* 中央のペアリングエリア */
@@ -115,7 +177,7 @@
         padding: 10px;
         background: rgba(255,255,255,0.5);
         border-radius: 20px;
-        border: 2px dashed var(--primary); /* 青破線 */
+        border: 2px dashed var(--primary);
     }
 
     /* ペアを作る行 */
@@ -125,7 +187,7 @@
         background: #FFF;
         border-radius: 12px;
         padding: 5px;
-        border: 2px solid var(--secondary); /* 濃い青枠 */
+        border: 2px solid var(--secondary);
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         gap: 10px;
         height: 70px;
@@ -133,7 +195,6 @@
 
     .pair-divider {
         color: var(--secondary); font-size: 1.5em; font-weight: bold;
-        text-shadow: none;
     }
 
     /* --- アイテムとスロット --- */
@@ -146,60 +207,63 @@
         transition: all 0.2s;
     }
     .slot.drag-over { background: #b2ebf2; border-color: var(--primary); border-style: solid; transform: scale(1.05); }
-    
     .pool-slot { border: none; background: transparent; }
 
-    /* ドラッグする文字チップ (元の配色に戻す) */
+    /* ドラッグする文字チップ (3D風デザインに変更) */
     .char-chip {
         width: 55px; height: 55px;
         background: #FFF;
         border-radius: 10px;
-        border: 2px solid; 
-        box-shadow: 0 3px 6px rgba(0,0,0,0.15); /* シンプルな影 */
+        /* 立体的なボーダー */
+        border: 3px solid;
+        /* 下と右に厚みのある影 */
+        box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
         display: flex; justify-content: center; align-items: center;
         font-family: 'Klee One', cursive; 
         font-size: 2rem;
         font-weight: 600;
         cursor: grab;
         touch-action: none; z-index: 10;
-        transition: transform 0.1s;
+        transition: transform 0.1s, box-shadow 0.1s;
     }
     
-    /* ひらがな：赤系 */
-    .char-hira { color: #d81b60; border-color: #f8bbd0; } 
-    /* カタカナ：青系 */
-    .char-kata { color: #1565c0; border-color: #bbdefb; } 
+    /* ひらがな：赤系3D */
+    .char-hira { 
+        color: #d81b60; 
+        border-color: #f8bbd0; /* 明るい色 */
+        border-bottom-color: #c2185b; /* 暗い色 */
+        border-right-color: #c2185b;
+    } 
+    /* カタカナ：青系3D */
+    .char-kata { 
+        color: #1565c0; 
+        border-color: #bbdefb; /* 明るい色 */
+        border-bottom-color: #1976d2; /* 暗い色 */
+        border-right-color: #1976d2;
+    } 
 
-    .char-chip:active { transform: scale(1.1); cursor: grabbing; z-index: 100; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
-
-    /* ドラッグ中のゴースト */
-    .ghost {
-        position: fixed; pointer-events: none; z-index: 1000;
-        opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    /* 押したときの凹み表現 */
+    .char-chip:active { 
+        transform: translateY(2px); 
+        box-shadow: 0 0 0 rgba(0,0,0,0.1);
+        cursor: grabbing; z-index: 100; 
     }
 
-    /* --- ボタンエリア (青基調) --- */
-    .controls {
-        width: 100%; text-align: center; margin-top: auto; padding-bottom: 20px;
-    }
+    /* ゴースト */
+    .ghost { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* --- ボタンエリア --- */
+    .controls { width: 100%; text-align: center; margin-top: auto; padding-bottom: 20px; }
     .check-btn {
-        background-color: var(--primary); /* 青 */
-        color: white;
-        border: none;
-        border-bottom: 4px solid var(--secondary); /* 濃い青影 */
-        padding: 12px 40px;
-        border-radius: 50px;
-        font-size: 1.6em;
-        font-weight: 900;
+        background-color: var(--primary); color: white; border: none;
+        border-bottom: 4px solid var(--secondary); padding: 12px 40px;
+        border-radius: 50px; font-size: 1.6em; font-weight: 900;
         font-family: 'Zen Maru Gothic', sans-serif;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        cursor: pointer;
-        transition: all 0.1s;
-        text-shadow: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.1s;
     }
     .check-btn:active { transform: translateY(3px); border-bottom-width: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-    /* モーダル (青基調) */
+    /* モーダル */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
@@ -208,29 +272,20 @@
     .modal-content {
         background: #FFF; padding: 40px; border-radius: 25px;
         text-align: center; animation: popIn 0.3s;
-        border: 3px solid var(--primary); /* 青枠 */
-        box-shadow: var(--shadow);
+        border: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
-    .modal-content h2 { 
-        color: var(--primary); /* 青文字 */
-        font-size: 2.2em; margin: 0 0 20px 0; font-weight: 900;
-        text-shadow: none;
-    }
+    .modal-content h2 { color: var(--primary); font-size: 2.2em; margin: 0 0 20px 0; font-weight: 900; }
     .next-btn {
-        background: var(--primary); /* 青 */
-        color: white; border: none; 
-        border-bottom: 4px solid var(--secondary); /* 濃い青影 */
-        padding: 12px 35px;
+        background: var(--primary); color: white; border: none; 
+        border-bottom: 4px solid var(--secondary); padding: 12px 35px;
         font-size: 1.3em; font-weight: bold; border-radius: 12px; cursor: pointer;
         font-family: 'Zen Maru Gothic', sans-serif;
-        text-shadow: none;
-        transition: all 0.1s;
     }
     .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
 
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
 
-    /* スマホ微調整 */
     @media (max-width: 500px) {
         .board { gap: 10px; }
         .pool-column { width: 85px; }
@@ -238,7 +293,8 @@
         .slot, .char-chip { width: 50px; height: 50px; font-size: 1.6rem; border-width: 2px; }
         .pair-row { height: 60px; gap: 5px; border-width: 2px; }
         .check-btn { font-size: 1.4em; padding: 10px 30px; border-bottom-width: 3px; }
-        .game-title { font-size: 1.5em; margin-bottom: 15px; }
+        
+        .level-grid { grid-template-columns: repeat(3, 1fr); }
     }
 </style>
 </head>
@@ -246,31 +302,49 @@
 
 <header>
     <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
-    <div class="level-badge" id="level-indicator">レベル 1</div>
+    <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
 </header>
 
 <div class="game-container">
     
-    <h1 class="game-title">ひらがな と カタカナ を あわせよう！</h1>
+    <div id="level-menu-area" class="menu-card">
+        <div class="menu-icon"><i class="fa-solid fa-right-left"></i></div>
+        <h1 class="menu-title">ひらカタあわせ</h1>
+        <p style="color:#666; margin-bottom:10px;">あそびたい レベルを えらんでね</p>
+        
+        <div id="level-grid" class="level-grid">
+            </div>
+        
+        <button onclick="location.href='index.html'" class="home-btn-back">ホームにもどる</button>
+    </div>
 
-    <div class="board">
-        <div class="pool-column">
-            <div class="pool-header">ひらがな</div>
-            <div id="hira-pool" class="pool-area"></div>
+    <div id="game-play-area">
+        
+        <div class="game-header-info">
+            <span id="level-indicator" class="level-display">レベル 1</span>
+            <button class="back-to-menu" onclick="showLevelMenu()">メニューへ</button>
         </div>
 
-        <div class="center-area" id="pair-rows">
+        <div class="board">
+            <div class="pool-column">
+                <div class="pool-header">ひらがな</div>
+                <div id="hira-pool" class="pool-area"></div>
             </div>
 
-        <div class="pool-column">
-            <div class="pool-header">カタカナ</div>
-            <div id="kata-pool" class="pool-area"></div>
+            <div class="center-area" id="pair-rows">
+                </div>
+
+            <div class="pool-column">
+                <div class="pool-header">カタカナ</div>
+                <div id="kata-pool" class="pool-area"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
-    </div>
 </div>
 
 <div id="success-modal" class="modal-overlay">
@@ -284,7 +358,7 @@
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
 <script>
-    // --- データ定義 (全10レベル - 変更なし) ---
+    // --- データ定義 (全10レベル) ---
     const levels = [
         { id: 1, chars: [ {h:'あ',k:'ア'}, {h:'い',k:'イ'}, {h:'う',k:'ウ'}, {h:'え',k:'エ'}, {h:'お',k:'オ'} ] },
         { id: 2, chars: [ {h:'か',k:'カ'}, {h:'き',k:'キ'}, {h:'く',k:'ク'}, {h:'け',k:'ケ'}, {h:'こ',k:'コ'} ] },
@@ -299,6 +373,12 @@
     ];
 
     let currentLevelIndex = 0;
+
+    // DOM
+    const levelMenuArea = document.getElementById('level-menu-area');
+    const gamePlayArea = document.getElementById('game-play-area');
+    const levelGrid = document.getElementById('level-grid');
+    
     const hiraPool = document.getElementById('hira-pool');
     const kataPool = document.getElementById('kata-pool');
     const pairArea = document.getElementById('pair-rows');
@@ -309,21 +389,43 @@
     const sndIncorrect = document.getElementById('snd-incorrect');
 
     // --- 初期化 ---
-    function initGame() {
+    window.onload = () => {
+        initLevelMenu();
+    };
+
+    function initLevelMenu() {
+        levelGrid.innerHTML = '';
+        levels.forEach((level, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.textContent = level.id;
+            btn.onclick = () => startGame(index);
+            levelGrid.appendChild(btn);
+        });
+        showLevelMenu();
+    }
+
+    function showLevelMenu() {
+        levelMenuArea.style.display = 'block';
+        gamePlayArea.style.display = 'none';
+    }
+
+    function startGame(idx) {
+        currentLevelIndex = idx;
+        levelMenuArea.style.display = 'none';
+        gamePlayArea.style.display = 'flex';
         loadLevel(currentLevelIndex);
     }
 
     function loadLevel(idx) {
-        // リセット
         hiraPool.innerHTML = '';
         kataPool.innerHTML = '';
         pairArea.innerHTML = '';
         modal.style.display = 'none';
         
         if (idx >= levels.length) {
-            alert("全レベルクリア！おめでとう！");
-            currentLevelIndex = 0;
-            loadLevel(0);
+            alert("全レベルクリア！すごい！");
+            showLevelMenu();
             return;
         }
 
@@ -350,7 +452,6 @@
         const hiraChips = [...levelData.chars].sort(() => Math.random() - 0.5);
         const kataChips = [...levelData.chars].sort(() => Math.random() - 0.5);
 
-        // プールに配置
         hiraChips.forEach(c => createChip(c.h, 'hira', c.k, hiraPool));
         kataChips.forEach(c => createChip(c.k, 'kata', c.h, kataPool));
     }
@@ -369,16 +470,14 @@
         chip.dataset.pair = pairValue;
         chip.dataset.type = type;
 
-        // プール内のスロットに入れて配置
         const poolSlot = createSlot('pool-slot');
         poolSlot.appendChild(chip);
         container.appendChild(poolSlot);
 
-        // ドラッグイベント設定
         setupDrag(chip);
     }
 
-    // --- ドラッグ＆ドロップ制御 (変更なし) ---
+    // --- ドラッグ＆ドロップ制御 ---
     let draggedItem = null;
     let touchOffsetX = 0;
     let touchOffsetY = 0;
@@ -477,11 +576,9 @@
         return false;
     }
 
-    function playClickSound() {
-        // 任意でクリック音を追加可能
-    }
+    function playClickSound() { }
 
-    // --- 判定ロジック (変更なし) ---
+    // --- 判定ロジック ---
     window.checkAnswer = () => {
         const rows = document.querySelectorAll('.pair-row');
         let allCorrect = true;
@@ -523,9 +620,6 @@
         currentLevelIndex++;
         loadLevel(currentLevelIndex);
     };
-
-    // 開始
-    window.onload = initGame;
 
 </script>
 
