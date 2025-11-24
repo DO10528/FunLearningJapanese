@@ -291,22 +291,34 @@
         }
     }
 
+    /**
+     * 認証を初期化し、ユーザー情報を設定します。
+     * await キーワードを追加し、処理が確実に完了するのを待つように修正しました。
+     */
     async function initializeAuth() {
         if (!isConfigValid) return;
         try {
-            await setPersistence(auth, browserSessionPersistence);
+            // setPersistenceは非同期なのでawaitを追加
+            await setPersistence(auth, browserSessionPersistence); 
+            
             if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
+                // signInWithCustomTokenは非同期なのでawaitを追加
+                await signInWithCustomToken(auth, initialAuthToken); 
+                console.log("カスタムトークンでサインインしました。");
             } else {
-                await signInAnonymously(auth);
+                // signInAnonymouslyは非同期なのでawaitを追加
+                await signInAnonymously(auth); 
+                console.log("匿名でサインインしました。");
             }
         } catch (error) {
             console.error("Firebase認証エラー:", error);
+            // エラーが発生した場合、UIにも表示
             if(authStatusEl) authStatusEl.textContent = `認証エラー: ${error.message}`;
         }
     }
 
     onAuthStateChanged(auth, (user) => {
+        // userがnull（ログアウト状態）の場合でも安全に処理できるようにチェックを強化
         if (user) {
             currentUserId = user.uid;
             // ユーザー名をユニークなIDの一部から作成
@@ -320,6 +332,7 @@
             userDisplayName = null;
             if(userIdDisplayEl) userIdDisplayEl.textContent = '未認証';
             if(authStatusEl) authStatusEl.textContent = '❌ 未認証';
+            // ログアウト状態でもロード画面を隠す
         }
         if(loadingOverlayEl) loadingOverlayEl.style.display = 'none'; 
     });
