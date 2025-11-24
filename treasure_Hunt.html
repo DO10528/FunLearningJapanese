@@ -207,17 +207,19 @@
         position: relative;
         width: 100%;
         max-width: 200px;
-        /* 下のマージンを 20px から 5px に減らしました */
-        margin: 20px auto 5px auto;
+        height: 266px; 
+        /* 下のマージンを 10px から 0 に変更しました */
+        margin: 20px auto 0 auto;  /* ← ここを修正 */
         border: 4px solid var(--primary);
         border-radius: 15px;
         overflow: hidden;
+        background: #000;
     }
     #sc-video-element, #sc-canvas-element {
         width: 100%;
+        height: 100%; 
         display: block;
-        /* ビデオの下にできる微細な隙間をなくします */
-        vertical-align: bottom;
+        object-fit: cover; 
     }
 
     /* --- 5. 結果画面 --- */
