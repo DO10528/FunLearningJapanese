@@ -291,21 +291,21 @@
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", group_game: "ゲーム",
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
-            // ★修正: 新しい8カテゴリのキー定義
+            // ★修正: 新しい9カテゴリのキー定義
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
-            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_sentence: "ぶんしょう"
+            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし",cat_sentence: "ぶんしょう"
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
             group_kiso: "Basics", group_game: "Games",
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
-            // ★修正: 新しい8カテゴリのキー定義 (簡略化)
+            // ★修正: 新しい9カテゴリのキー定義 (簡略化)
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
-            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_sentence: "Sentence"
+            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs",cat_sentence: "Sentence"
         }
     };
 
-    // ★ 全ゲームを8カテゴリに分割して再定義
+    // ★ 全ゲームを9カテゴリに分割して再定義
     const gameStructure = [
         // 1. ひらがな (5ゲーム)
         {
@@ -344,14 +344,13 @@
                 { url: "shiritori2.html", title: "しりとり2", icon: "fa-regular fa-comments" }
             ]
         },
-        // 4. ことば (しりとり以外 3ゲーム)
+        // 4. ことば (しりとり以外 2ゲーム)
         {
             id: "word_other",
             icon: "fa-solid fa-microphone", 
             color: "#00bcd4", // シアン系
             titleKey: "cat_word_other",
             games: [
-                { url: "verb.html", title: "どうしゲーム", icon: "fa-solid fa-person-running" },
                 { url: "treasure_Hunt.html", title: "宝探し", icon: "fa-solid fa-gem" },
                 { url: "aisatsu_quiz.html", title: "あいさつ", icon: "fa-solid fa-hand-spock" },
             ]
@@ -388,7 +387,19 @@
                 { url: "adjective_quiz.html", title: "けいようし2", icon: "fa-regular fa-star" },
             ]
         },
-        // 8. ぶんしょう (2ゲーム)
+        // 8. どうし (3ゲーム)
+        {
+            id: "sentence",
+            icon: "fa-solid fa-layer-group", 
+            color: "#546e7a", // グレー系
+            titleKey: "cat_sentence",
+            games: [
+                { url: "verb.html", title: "どうしゲーム", icon: "fa-solid fa-person-running" },
+                { url: "verb_typing_masu.html", title: "ます形タイピング", icon: "fa-solid fa-person-running" },
+                { url: "verb_typing_te.html", title: "て形タイピング", icon: "fa-solid fa-person-running" }
+            ]
+        },
+        // 9. ぶんしょう (3ゲーム)
         {
             id: "sentence",
             icon: "fa-solid fa-layer-group", 
