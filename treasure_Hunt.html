@@ -31,7 +31,7 @@
         touch-action: manipulation;
     }
 
-    /* --- ヘッダー（V2統一デザイン） --- */
+    /* --- ヘッダー --- */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white;
@@ -65,7 +65,7 @@
         background-color: rgba(255, 255, 255, 0.1);
     }
 
-    /* --- メインコンテナ (中央配置) --- */
+    /* --- メインコンテナ --- */
     .sc-main {
         flex-grow: 1;
         padding: 20px;
@@ -78,7 +78,6 @@
         justify-content: center;
     }
     
-    /* --- カードデザイン --- */
     #sc-container {
         background: white;
         border-radius: 25px;
@@ -101,18 +100,17 @@
     h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 10px; }
     h2 { color: #555; font-size: 1.8em; margin-bottom: 20px; }
 
-    /* --- 1. トピック選択画面 --- */
+    /* --- トピック選択画面 --- */
     #sc-topic-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 15px;
         margin: 25px 0;
     }
-
     .sc-topic-card {
         padding: 25px 10px;
         background: white;
-        border: 4px solid #ccc; /* JSで色を変更 */
+        border: 4px solid #ccc;
         border-radius: 15px;
         font-size: 1.3em;
         font-weight: 700;
@@ -126,7 +124,7 @@
         box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
     
-    /* --- ボタン共通 (V2 3Dスタイル) --- */
+    /* --- ボタン --- */
     .sc-button {
         display: block;
         width: 80%;
@@ -146,10 +144,7 @@
         top: 0;
         text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
     }
-    .sc-button:active {
-        top: 4px; 
-        box-shadow: 0 2px 0 #3f51b5; 
-    }
+    .sc-button:active { top: 4px; box-shadow: 0 2px 0 #3f51b5; }
 
     .sc-button-secondary {
         background-color: #90a4ae;
@@ -170,8 +165,7 @@
     }
     .sc-button-camera:active { box-shadow: 0 2px 0 #c67900; }
     
-    
-    /* --- 2. 勉強画面 --- */
+    /* --- 勉強画面 --- */
     #sc-study-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -194,7 +188,6 @@
         font-weight: bold; margin: 5px 0 0; font-size: 1em;
     }
 
-    /* --- 3. ゲーム画面 --- */
     #sc-play-sound-button {
         background-color: #00bcd4;
         box-shadow: 0 6px 0 #008ba3;
@@ -202,27 +195,36 @@
     #sc-play-sound-button:active { box-shadow: 0 2px 0 #008ba3; }
     
     
-    /* --- 4. カメラ画面 (修正箇所) --- */
+    /* --- ★カメラ画面（修正箇所）★ --- */
     #sc-camera-view-wrapper {
         position: relative;
         width: 100%;
-        max-width: 200px;
-        height: 266px; 
-        /* 下のマージンを 10px から 0 に変更しました */
-        margin: 20px auto 0 auto;  /* ← ここを修正 */
+        max-width: 200px; /* 小さくしました */
+        height: 266px;    /* 高さ固定 */
+        
+        margin: 20px auto 10px auto;
+        
         border: 4px solid var(--primary);
         border-radius: 15px;
         overflow: hidden;
         background: #000;
     }
-    #sc-video-element, #sc-canvas-element {
+
+    /* ビデオの設定：枠いっぱいに広げる */
+    #sc-video-element {
         width: 100%;
-        height: 100%; 
+        height: 100%;
         display: block;
-        object-fit: cover; 
+        object-fit: cover; /* 重要：これで隙間なく埋まります */
     }
 
-    /* --- 5. 結果画面 --- */
+    /* キャンバス（写真データ用）：画面には表示しない！ */
+    #sc-canvas-element {
+        display: none; /* これで白い余白が消えます */
+    }
+
+
+    /* --- 結果画面 --- */
     #sc-result-comparison-area {
         display: flex;
         justify-content: center;
