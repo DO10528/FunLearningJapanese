@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>たからさがしワークブック</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 厳密なA4印刷設定 --- */
+    @page {
+        size: A4 portrait; /* A4 縦向き */
+        margin: 0; /* 余白なし */
+    }
+
+    @media print {
+        html, body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            padding: 0;
+            background: white;
+            -webkit-print-color-adjust: exact; /* 背景色を強制印刷 */
+        }
+        
+        .no-print { display: none !important; }
+
+        .sheet {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 !important;
+            padding: 15mm !important; /* 印刷時の内側余白 */
+            box-shadow: none !important;
+            page-break-after: always;
+            box-sizing: border-box;
+            border: none !important; /* 画面表示用の枠線を消す */
+            border-radius: 0 !important;
+            overflow: hidden; /* はみ出し防止 */
+        }
+    }
+
+    /* --- 画面表示用 (プレビュー) --- */
+    body {
+        background: #525659; /* PDFビューアっぽい背景色 */
+        font-family: 'Zen Maru Gothic', sans-serif;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 40px 0; margin: 0;
+        color: #333;
+    }
+
+    .sheet {
+        background: white;
+        width: 210mm;
+        height: 297mm; /* A4サイズ固定 */
+        padding: 15mm;
+        box-sizing: border-box;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    /* --- コンテンツデザイン --- */
+    
+    /* 1. 表紙 */
+    .cover-frame {
+        border: 8px solid #ffcc5c;
+        height: 100%; border-radius: 30px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: radial-gradient(circle, #fffdf5 0%, #fff 100%);
+        position: relative;
+    }
+    .cover-title {
+        font-size: 5em; color: #5c7aff; margin: 0;
+        text-shadow: 4px 4px 0px #dbeafe; letter-spacing: 5px;
+        line-height: 1.2;
+    }
+    .cover-sub { font-size: 1.8em; color: #ffa726; margin-top: 10px; font-weight: bold; }
+    .name-area {
+        margin-top: 80px; width: 80%; border: 3px dashed #ccc;
+        padding: 20px; border-radius: 20px; background: white;
+    }
+    .name-line { border-bottom: 2px solid #333; height: 40px; margin-top: 10px; }
+    
+    .deco-icon { position: absolute; font-size: 4em; opacity: 0.2; }
+    .d-1 { top: 50px; left: 40px; color: #ffab91; transform: rotate(-15deg); }
+    .d-2 { bottom: 50px; right: 40px; color: #81d4fa; transform: rotate(15deg); }
+    .d-3 { top: 150px; right: 60px; color: #ffd54f; }
+    .d-4 { bottom: 150px; left: 60px; color: #a5d6a7; }
+
+    /* 2. 各ページ */
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 3px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
+        height: 50px; /* ヘッダー高さ固定 */
+    }
+    .ph-title { font-size: 1.8em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .ph-date { font-size: 1.2em; color: #aaa; border: 1px solid #ddd; padding: 5px 20px; border-radius: 20px; }
+
+    /* グリッド調整 (A4に収めるため計算) */
+    .item-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        grid-template-rows: repeat(5, 1fr); 
+        gap: 12px;
+        /* (297mm - 30mmパディング - 50mmヘッダー - 余白) ÷ 5行 */
+        height: calc(100% - 70px); 
+    }
+
+    .item-card {
+        border: 2px dashed; 
+        border-radius: 15px;
+        padding: 5px 12px;
+        display: flex; flex-direction: column;
+        background: #fff;
+    }
+
+    .card-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 2px;
+    }
+    .target-word { font-size: 1em; font-weight: bold; color: #555; }
+    .check-circle { 
+        width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; 
+    }
+
+    .draw-space {
+        flex-grow: 1;
+        background: #fafafa; border-radius: 8px;
+        display: flex; justify-content: center; align-items: center;
+        color: #eee; font-size: 1.5em; margin-bottom: 2px;
+        border: 1px solid #f0f0f0;
+    }
+    
+    .write-space {
+        height: 30px;
+        border-bottom: 2px solid #aaa;
+        display: flex; align-items: flex-end;
+    }
+    .write-guide { font-size: 0.7em; color: #999; margin-right: 10px; margin-bottom: 2px; }
+    .write-text { font-family:'Klee One', cursive; color:#ccc; font-size:1.3em; margin-right:10px; margin-bottom: -2px; }
+
+    /* --- ボタン --- */
+    .fab {
+        position: fixed; bottom: 30px; right: 30px;
+        background: #333; color: white; padding: 15px 30px;
+        border-radius: 50px; font-weight: bold; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: none;
+        font-size: 1.2em; display: flex; align-items: center; gap: 10px;
+        z-index: 1000;
+    }
+    .fab:hover { transform: scale(1.05); }
+
+</style>
+</head>
+<body>
+
+    <button class="fab no-print" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> PDF保存 / 印刷
+    </button>
+
+    <div id="book-content">
+        </div>
+
+<script>
+    // --- データ ---
+    const GAME_DATA = {
+        stationery: {
+            title: 'ぶんぼうぐ',
+            color: '#ffd54f',
+            icon: 'fa-solid fa-pen-ruler',
+            words: [
+                { id: 'enpitsu', name: 'えんぴつ' }, { id: 'keshigomu', name: 'けしゴム' },
+                { id: 'pen', name: 'ペン' }, { id: 'note', name: 'ノート' },
+                { id: 'hasami', name: 'はさみ' }, { id: 'nori', name: 'のり' },
+                { id: 'hotchkiss', name: 'ホッチキス' }, { id: 'jougi', name: 'じょうぎ' },
+                { id: 'fudebako', name: 'ふでばこ' }, { id: 'crayon', name: 'クレヨン' }
+            ]
+        },
+        food: {
+            title: 'たべもの',
+            color: '#ffab91',
+            icon: 'fa-solid fa-utensils',
+            words: [
+                { id: 'ringo', name: 'りんご' }, { id: 'banana', name: 'バナナ' },
+                { id: 'pan', name: 'パン' }, { id: 'gyunyu', name: 'ぎゅうにゅう' },
+                { id: 'tamago', name: 'たまご' }, { id: 'onigiri', name: 'おにぎり' },
+                { id: 'mikan', name: 'みかん' }, { id: 'juice', name: 'ジュース' },
+                { id: 'cookie', name: 'クッキー' }, { id: 'tomato', name: 'トマト' }
+            ]
+        },
+        clothing: {
+            title: 'おようふく',
+            color: '#81d4fa',
+            icon: 'fa-solid fa-shirt',
+            words: [
+                { id: 'kutsu', name: 'くつ' }, { id: 'boushi', name: 'ぼうし' },
+                { id: 'tshirt', name: 'Tシャツ' }, { id: 'kutsushita', name: 'くつした' },
+                { id: 'zubon', name: 'ズボン' }, { id: 'uwagi', name: 'うわぎ' },
+                { id: 'skirt', name: 'スカート' }, { id: 'kaban', name: 'かばん' },
+                { id: 'kasa', name: 'かさ' }, { id: 'megane', name: 'めがね' }
+            ]
+        },
+        toys: {
+            title: 'おもちゃ',
+            color: '#a5d6a7',
+            icon: 'fa-solid fa-robot',
+            words: [
+                { id: 'ball', name: 'ボール' }, { id: 'kuruma', name: 'くるま' },
+                { id: 'ningyou', name: 'にんぎょう' }, { id: 'block', name: 'ブロック' },
+                { id: 'nuigurumi', name: 'ぬいぐるみ' }, { id: 'densha', name: 'でんしゃ' },
+                { id: 'hikouki', name: 'ひこうき' }, { id: 'robotto', name: 'ロボット' },
+                { id: 'ehon', name: 'えほん' }, { id: 'fuusen', name: 'ふうせん' }
+            ]
+        },
+        room: {
+            title: 'おへや',
+            color: '#ce93d8',
+            icon: 'fa-solid fa-couch',
+            words: [
+                { id: 'isu', name: 'いす' }, { id: 'tsukue', name: 'つくえ' },
+                { id: 'tokei', name: 'とけい' }, { id: 'tv', name: 'テレビ' },
+                { id: 'gomibako', name: 'ごみばこ' }, { id: 'beddo', name: 'ベッド' },
+                { id: 'doa', name: 'ドア' }, { id: 'mado', name: 'まど' },
+                { id: 'denki', name: 'でんき' }, { id: 'sofa', name: 'ソファ' }
+            ]
+        }
+    };
+
+    const container = document.getElementById('book-content');
+
+    // --- 1. 表紙 ---
+    function renderCover() {
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet';
+        sheet.innerHTML = `
+            <div class="cover-frame">
+                <i class="fa-solid fa-star deco-icon d-1"></i>
+                <i class="fa-solid fa-shapes deco-icon d-2"></i>
+                <i class="fa-solid fa-heart deco-icon d-3"></i>
+                <i class="fa-solid fa-rocket deco-icon d-4"></i>
+
+                <i class="fa-solid fa-box-open" style="font-size:6em; color:#ffcc5c; margin-bottom:20px;"></i>
+                <h1 class="cover-title">たからさがし</h1>
+                <div class="cover-sub">おうちで みつけて え を かこう！</div>
+
+                <div class="name-area">
+                    <span style="font-size:1.2em; color:#888;">なまえ</span>
+                    <div class="name-line"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(sheet);
+    }
+
+    // --- 2. ページ生成 ---
+    function renderPages() {
+        Object.keys(GAME_DATA).forEach(key => {
+            const data = GAME_DATA[key];
+            const sheet = document.createElement('div');
+            sheet.className = 'sheet';
+
+            // ヘッダー
+            const headerHtml = `
+                <div class="page-header">
+                    <div class="ph-title" style="color:${data.color}">
+                        <i class="${data.icon}"></i> ${data.title}
+                    </div>
+                    <div class="ph-date">　　月　　日</div>
+                </div>
+            `;
+
+            // グリッド (2列 x 5行 = 10個)
+            let gridHtml = '<div class="item-grid">';
+            data.words.forEach(word => {
+                gridHtml += `
+                    <div class="item-card" style="border-color:${data.color};">
+                        <div class="card-header">
+                            <span class="target-word">さがす：${word.name}</span>
+                            <div class="check-circle"></div>
+                        </div>
+                        <div class="draw-space">
+                            <i class="fa-regular fa-image" style="opacity:0.2;"></i>
+                        </div>
+                        <div class="write-space">
+                            <span class="write-guide">かこう ▶</span>
+                            <span class="write-text">${word.name}</span>
+                            <span style="flex-grow:1;"></span>
+                        </div>
+                    </div>
+                `;
+            });
+            gridHtml += '</div>';
+
+            sheet.innerHTML = headerHtml + gridHtml;
+            container.appendChild(sheet);
+        });
+    }
+
+    renderCover();
+    renderPages();
+
+</script>
+</body>
+</html>
