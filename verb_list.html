@@ -14,10 +14,10 @@
         --bg-color: #f0f8ff;
         --text-color: #333;
         
-        /* PDFに基づくグループカラー */
-        --grp1-color: #f48fb1; /* ピンク (Group I) */
-        --grp2-color: #80deea; /* 水色 (Group II) */
-        --grp3-color: #9575cd; /* 紫 (Group III) */
+        /* グループカラー */
+        --grp1-color: #f48fb1; /* Group I (Pink) */
+        --grp2-color: #80deea; /* Group II (Cyan) */
+        --grp3-color: #9575cd; /* Group III (Purple) */
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -50,116 +50,103 @@
         width: 100%; max-width: 1000px; margin: 0 auto;
     }
 
-    /* タイトルエリア */
     .page-header {
-        text-align: center; margin-bottom: 30px;
-        background: white; padding: 20px; border-radius: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        border: 2px solid var(--primary);
+        text-align: center; margin-bottom: 20px;
     }
     .page-title { font-size: 1.8em; color: var(--primary); margin: 0; font-weight: 900; }
     .page-desc { color: #666; margin-top: 10px; font-size: 0.95em; }
 
-    /* --- グループカラムレイアウト --- */
-    /* PCでは3列、スマホでは1列にする */
-    .groups-container {
+    /* --- ★切り替えタブボタン --- */
+    .tab-container {
         display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
         justify-content: center;
-        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 30px;
     }
-
-    .group-column {
-        flex: 1;
-        min-width: 300px;
+    .tab-btn {
         background: white;
-        border-radius: 20px;
-        padding: 0 0 20px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        display: flex; flex-direction: column;
-        overflow: hidden;
-        border-top: 5px solid; /* 色はインラインで指定 */
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-size: 1.2em;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        min-width: 140px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-
-    .group-header-bar {
-        padding: 15px;
-        text-align: center;
-        font-size: 1.4em; font-weight: 900;
-        background: #fafafa;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 15px;
-    }
-
-    /* 「i-masu」「e-masu」などのタグ */
-    .type-tag {
-        display: inline-block;
-        padding: 5px 20px;
-        border-radius: 15px;
+    .tab-btn:active { transform: translateY(3px); box-shadow: none; }
+    
+    /* アクティブなタブのデザイン */
+    .tab-btn.active {
+        background: var(--primary);
         color: white;
-        font-weight: bold;
-        font-family: 'Klee One', cursive;
-        font-size: 1.1em;
-        margin: 10px auto;
-        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4);
+        transform: scale(1.05);
+    }
+
+    /* --- リスト表示エリア (切り替え用) --- */
+    .view-section {
+        display: none; /* 初期状態は非表示 */
+        animation: fadeIn 0.3s;
+    }
+    .view-section.active {
+        display: block;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+    /* --- グループカラムレイアウト (前回と同じ) --- */
+    .groups-container {
+        display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start;
+    }
+    .group-column {
+        flex: 1; min-width: 300px; background: white; border-radius: 20px; padding: 0 0 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; border-top: 5px solid;
+    }
+    .group-header-bar {
+        padding: 15px; text-align: center; font-size: 1.4em; font-weight: 900; background: #fafafa; border-bottom: 1px solid #eee; margin-bottom: 15px;
+    }
+    .type-tag {
+        display: inline-block; padding: 5px 20px; border-radius: 15px; color: white; font-weight: bold;
+        font-family: 'Klee One', cursive; font-size: 1.1em; margin: 10px auto; text-align: center;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    .verb-list-area { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
 
-    /* リストエリア */
-    .verb-list-area {
-        padding: 0 15px;
-        display: flex; flex-direction: column; gap: 10px;
-    }
-
-    /* 動詞カード（横長スタイル） */
+    /* カード */
     .verb-card {
-        background: white;
-        border-radius: 12px;
-        padding: 10px 15px;
+        background: white; border-radius: 12px; padding: 10px 15px;
         display: flex; align-items: center; justify-content: space-between;
-        cursor: pointer;
-        border: 2px solid #f0f0f0;
-        transition: all 0.1s;
+        cursor: pointer; border: 2px solid #f0f0f0; transition: all 0.1s;
     }
     .verb-card:active { transform: scale(0.98); background: #f9f9f9; }
     .verb-card:hover { border-color: #ddd; }
-
     .verb-info { display: flex; align-items: center; gap: 15px; }
     .verb-icon { 
         font-size: 1.5em; width: 40px; height: 40px; 
         display: flex; justify-content: center; align-items: center;
         background: #eef; border-radius: 50%; color: #555;
     }
-    
     .verb-text-box { text-align: left; }
-    .verb-jp {
-        font-family: 'Klee One', cursive;
-        font-size: 1.2em; font-weight: 800; color: #333;
-    }
+    .verb-jp { font-family: 'Klee One', cursive; font-size: 1.2em; font-weight: 800; color: #333; }
     .verb-en { font-size: 0.8em; color: #888; }
-
     .check-btn {
         color: #ddd; font-size: 1.2em; width: 30px; height: 30px;
         display: flex; justify-content: center; align-items: center;
-        border-radius: 50%; border: 2px solid #eee;
-        transition: all 0.2s;
+        border-radius: 50%; border: 2px solid #eee; transition: all 0.2s;
     }
-    .verb-card.learned .check-btn {
-        background: #4caf50; border-color: #4caf50; color: white;
-    }
+    .verb-card.learned .check-btn { background: #4caf50; border-color: #4caf50; color: white; }
     .verb-card.learned { opacity: 0.6; }
+    .divider { height: 2px; background: #eee; margin: 15px 20px; border-radius: 2px; }
 
-    /* 区切り線 */
-    .divider {
-        height: 2px; background: #eee; margin: 15px 20px; border-radius: 2px;
-    }
-
-    /* 戻るボタン */
+    /* フッター */
     .footer-area { text-align: center; margin-top: 40px; padding-bottom: 40px; width: 100%; }
     .home-btn-large {
-        background-color: #546e7a; color: white; border: none;
-        padding: 15px 40px; border-radius: 50px; font-weight: bold;
-        font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #37474f;
+        background-color: #546e7a; color: white; border: none; padding: 15px 40px; border-radius: 50px;
+        font-weight: bold; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #37474f;
         text-decoration: none; display: inline-block;
     }
     .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
@@ -167,6 +154,7 @@
     @media (max-width: 700px) {
         .groups-container { flex-direction: column; }
         .group-column { width: 100%; }
+        .tab-btn { padding: 10px 20px; font-size: 1em; }
     }
 </style>
 </head>
@@ -180,45 +168,68 @@
 <div class="main-container">
 
     <div class="page-header">
-        <h1 class="page-title"><i class="fa-solid fa-book"></i> どうし グループ分け</h1>
-        <p class="page-desc">タップして おとを きこう！</p>
+        <h1 class="page-title"><i class="fa-solid fa-book"></i> どうし リスト</h1>
+        <p class="page-desc">「ます形」と「て形」を きりかえて みてみよう！</p>
     </div>
 
-    <div class="groups-container">
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('masu')">
+            <i class="fa-solid fa-square-check"></i> ます形
+        </button>
+        <button class="tab-btn" onclick="switchTab('te')">
+            <i class="fa-solid fa-share-nodes"></i> て形
+        </button>
+    </div>
 
-        <div class="group-column" style="border-top-color: var(--grp1-color);">
-            <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
-            
-            <div class="type-tag" style="background: var(--grp1-color);">i-masu</div>
-            
-            <div class="verb-list-area" id="list-grp1">
-                </div>
+    <div id="view-masu" class="view-section active">
+        <div class="groups-container">
+            <div class="group-column" style="border-top-color: var(--grp1-color);">
+                <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
+                <div class="type-tag" style="background: var(--grp1-color);">i-masu</div>
+                <div class="verb-list-area" id="masu-grp1"></div>
+            </div>
+            <div class="group-column" style="border-top-color: var(--grp2-color);">
+                <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
+                <div class="type-tag" style="background: var(--grp2-color);">e-masu</div>
+                <div class="verb-list-area" id="masu-grp2-e"></div>
+                <div class="divider"></div>
+                <div class="type-tag" style="background: var(--grp2-color);">i-masu</div>
+                <div class="verb-list-area" id="masu-grp2-i"></div>
+            </div>
+            <div class="group-column" style="border-top-color: var(--grp3-color);">
+                <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
+                <div class="type-tag" style="background: var(--grp3-color);">shimasu</div>
+                <div class="verb-list-area" id="masu-grp3-s"></div>
+                <div class="divider"></div>
+                <div class="type-tag" style="background: var(--grp3-color);">kimasu</div>
+                <div class="verb-list-area" id="masu-grp3-k"></div>
+            </div>
         </div>
+    </div>
 
-        <div class="group-column" style="border-top-color: var(--grp2-color);">
-            <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
-            
-            <div class="type-tag" style="background: var(--grp2-color);">e-masu</div>
-            <div class="verb-list-area" id="list-grp2-e"></div>
-
-            <div class="divider"></div>
-
-            <div class="type-tag" style="background: var(--grp2-color);">i-masu</div>
-            <div class="verb-list-area" id="list-grp2-i"></div>
+    <div id="view-te" class="view-section">
+        <div class="groups-container">
+            <div class="group-column" style="border-top-color: var(--grp1-color);">
+                <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
+                <div class="type-tag" style="background: var(--grp1-color);">Group 1</div>
+                <div class="verb-list-area" id="te-grp1"></div>
+            </div>
+            <div class="group-column" style="border-top-color: var(--grp2-color);">
+                <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
+                <div class="type-tag" style="background: var(--grp2-color);">Group 2</div>
+                <div class="verb-list-area" id="te-grp2-e"></div>
+                <div class="divider"></div>
+                <div class="type-tag" style="background: var(--grp2-color);">Exception</div>
+                <div class="verb-list-area" id="te-grp2-i"></div>
+            </div>
+            <div class="group-column" style="border-top-color: var(--grp3-color);">
+                <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
+                <div class="type-tag" style="background: var(--grp3-color);">Irregular</div>
+                <div class="verb-list-area" id="te-grp3-s"></div>
+                <div class="divider"></div>
+                <div class="verb-list-area" id="te-grp3-k"></div>
+            </div>
         </div>
-
-        <div class="group-column" style="border-top-color: var(--grp3-color);">
-            <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
-            
-            <div class="type-tag" style="background: var(--grp3-color);">shimasu</div>
-            <div class="verb-list-area" id="list-grp3-s"></div>
-
-            <div class="divider"></div>
-
-            <div class="type-tag" style="background: var(--grp3-color);">kimasu</div>
-            <div class="verb-list-area" id="list-grp3-k"></div>
-        </div>
-
     </div>
 
     <div class="footer-area">
@@ -228,8 +239,8 @@
 </div>
 
 <script>
-    // --- 動詞データ (PDFの内容を反映) ---
-    const verbs = {
+    // --- ます形データ ---
+    const masuVerbs = {
         grp1: [
             { jp: "かきます", en: "Write", icon: "fa-solid fa-pen" },
             { jp: "ききます", en: "Listen", icon: "fa-solid fa-headphones" },
@@ -277,6 +288,55 @@
         ]
     };
 
+    // --- て形データ (変換済み) ---
+    const teVerbs = {
+        grp1: [
+            { jp: "かいて", en: "Write", icon: "fa-solid fa-pen" },
+            { jp: "きいて", en: "Listen", icon: "fa-solid fa-headphones" },
+            { jp: "いって", en: "Go", icon: "fa-solid fa-person-walking-arrow-right" },
+            { jp: "およいで", en: "Swim", icon: "fa-solid fa-person-swimming" },
+            { jp: "のんで", en: "Drink", icon: "fa-solid fa-glass-water" },
+            { jp: "よんで", en: "Read", icon: "fa-solid fa-book-open" },
+            { jp: "やすんで", en: "Rest", icon: "fa-solid fa-bed" },
+            { jp: "あそんで", en: "Play", icon: "fa-solid fa-gamepad" },
+            { jp: "かって", en: "Buy", icon: "fa-solid fa-cart-shopping" },
+            { jp: "あって", en: "Meet", icon: "fa-solid fa-handshake" },
+            { jp: "まって", en: "Wait", icon: "fa-solid fa-clock" },
+            { jp: "もって", en: "Hold", icon: "fa-solid fa-bag-shopping" },
+            { jp: "とって", en: "Take photo", icon: "fa-solid fa-camera" },
+            { jp: "かえって", en: "Return", icon: "fa-solid fa-house" },
+            { jp: "わかって", en: "Understand", icon: "fa-regular fa-lightbulb" },
+            { jp: "はなして", en: "Talk", icon: "fa-solid fa-comments" }
+        ],
+        grp2_e: [
+            { jp: "ねて", en: "Sleep", icon: "fa-solid fa-moon" },
+            { jp: "たべて", en: "Eat", icon: "fa-solid fa-utensils" },
+            { jp: "あげて", en: "Give", icon: "fa-solid fa-gift" },
+            { jp: "あけて", en: "Open", icon: "fa-solid fa-door-open" },
+            { jp: "みせて", en: "Show", icon: "fa-solid fa-eye" },
+            { jp: "おしえて", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
+            { jp: "はじめて", en: "Start", icon: "fa-solid fa-play" }
+        ],
+        grp2_i: [
+            { jp: "みて", en: "Watch/See", icon: "fa-solid fa-tv" },
+            { jp: "いて", en: "Exist (Living)", icon: "fa-solid fa-person" },
+            { jp: "おきて", en: "Wake up", icon: "fa-solid fa-sun" },
+            { jp: "かりて", en: "Borrow", icon: "fa-solid fa-hand-holding" },
+            { jp: "あびて", en: "Shower", icon: "fa-solid fa-shower" },
+            { jp: "できて", en: "Can do", icon: "fa-solid fa-thumbs-up" }
+        ],
+        grp3_s: [
+            { jp: "べんきょう\nして", en: "Study", icon: "fa-solid fa-graduation-cap" },
+            { jp: "かいもの\nして", en: "Shop", icon: "fa-solid fa-basket-shopping" },
+            { jp: "さんぽ\nして", en: "Walk", icon: "fa-solid fa-tree" },
+            { jp: "コピー\nして", en: "Copy", icon: "fa-solid fa-copy" }
+        ],
+        grp3_k: [
+            { jp: "きて", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
+            { jp: "もって\nきて", en: "Bring", icon: "fa-solid fa-box-open" }
+        ]
+    };
+
     const synth = window.speechSynthesis;
 
     function speak(text) {
@@ -292,6 +352,8 @@
 
     function renderList(containerId, data) {
         const container = document.getElementById(containerId);
+        // 切り替え時に中身が重複しないようクリア
+        container.innerHTML = '';
         
         data.forEach((item) => {
             const card = document.createElement('div');
@@ -319,12 +381,37 @@
         });
     }
 
+    // タブ切り替え機能
+    window.switchTab = (tab) => {
+        const btns = document.querySelectorAll('.tab-btn');
+        const views = document.querySelectorAll('.view-section');
+        
+        btns.forEach(b => b.classList.remove('active'));
+        views.forEach(v => v.classList.remove('active'));
+        
+        if (tab === 'masu') {
+            btns[0].classList.add('active');
+            document.getElementById('view-masu').classList.add('active');
+        } else {
+            btns[1].classList.add('active');
+            document.getElementById('view-te').classList.add('active');
+        }
+    };
+
     window.onload = () => {
-        renderList('list-grp1', verbs.grp1);
-        renderList('list-grp2-e', verbs.grp2_e);
-        renderList('list-grp2-i', verbs.grp2_i);
-        renderList('list-grp3-s', verbs.grp3_s);
-        renderList('list-grp3-k', verbs.grp3_k);
+        // ます形レンダリング
+        renderList('masu-grp1', masuVerbs.grp1);
+        renderList('masu-grp2-e', masuVerbs.grp2_e);
+        renderList('masu-grp2-i', masuVerbs.grp2_i);
+        renderList('masu-grp3-s', masuVerbs.grp3_s);
+        renderList('masu-grp3-k', masuVerbs.grp3_k);
+
+        // て形レンダリング
+        renderList('te-grp1', teVerbs.grp1);
+        renderList('te-grp2-e', teVerbs.grp2_e);
+        renderList('te-grp2-i', teVerbs.grp2_i);
+        renderList('te-grp3-s', teVerbs.grp3_s);
+        renderList('te-grp3-k', teVerbs.grp3_k);
         
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = () => {};
