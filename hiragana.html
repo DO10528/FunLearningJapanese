@@ -22,50 +22,32 @@
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
+        margin: 0; padding: 0; min-height: 100vh;
+        display: flex; flex-direction: column;
     }
 
     /* --- ヘッダー --- */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        z-index: 100;
+        color: white; padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
     .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
 
     /* --- メインレイアウト --- */
     .main-container {
-        flex-grow: 1;
-        padding: 20px;
-        max-width: 700px;
-        margin: 0 auto;
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        flex-grow: 1; padding: 20px; max-width: 700px;
+        margin: 0 auto; width: 100%; box-sizing: border-box;
+        display: flex; flex-direction: column; justify-content: center;
     }
 
     /* --- カードデザイン --- */
     .quiz-card {
-        background: white;
-        border-radius: 25px;
-        padding: 30px 20px; /* 横のパディングを少し減らしてスマホで見やすく */
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        text-align: center;
-        border: 4px solid white;
-        width: 100%;
-        box-sizing: border-box;
+        background: white; border-radius: 25px; padding: 30px 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: center;
+        border: 4px solid white; width: 100%; box-sizing: border-box;
     }
 
     /* --- メニュー画面 --- */
@@ -102,86 +84,25 @@
     
     .question-text { font-size: 1.4em; font-weight: bold; color: #444; margin-bottom: 20px; }
 
-    /* ========================================== */
-    /* ★★★ ここを修正しました (選択肢の表示) ★★★ */
-    /* ========================================== */
-    
-    /* 強制的にグリッド（横並び）にする設定 */
+    /* --- 選択肢グリッド --- */
     .choices-grid {
-        display: grid;
-        /* 1fr 1fr = 常に2列にする設定です。
-           もし3つを横1列にしたい場合は repeat(3, 1fr) に変えてください 
-        */
-        grid-template-columns: 1fr 1fr; 
-        gap: 15px; /* ボタン同士の間隔 */
-        width: 100%;
-        margin-bottom: 20px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        width: 100%; margin-bottom: 20px;
     }
 
-    /* 選択肢ボタンのデザイン（枠線を強調） */
     .choice-btn {
-        /* 見た目をボタンらしく */
-        background-color: #ffffff;
-        
-        /* 枠線を太く、色をグレーにして見えやすく */
-        border: 3px solid #dce0e5; 
-        border-radius: 15px;
-        
-        /* 文字設定 */
-        color: #555;
-        font-size: 1.3em;
-        font-weight: 800;
-        
-        /* サイズ調整 */
-        padding: 15px 5px;
-        width: 100%; /* グリッド幅いっぱいに */
-        min-height: 70px; /* 高さを確保 */
-        
-        cursor: pointer;
-        box-shadow: 0 4px 0 #cfd8dc; /* 下に影をつけて立体的に */
-        transition: all 0.1s;
-        
-        /* 文字がはみ出さないように */
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        background-color: #ffffff; border: 3px solid #dce0e5; border-radius: 15px;
+        color: #555; font-size: 1.3em; font-weight: 800;
+        padding: 15px 5px; width: 100%; min-height: 70px;
+        cursor: pointer; box-shadow: 0 4px 0 #cfd8dc; transition: all 0.1s;
+        display: flex; justify-content: center; align-items: center;
     }
-
-    /* ホバー時（マウスを乗せた時） */
-    .choice-btn:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 0 #cfd8dc;
-    }
-
-    /* 押した時 */
-    .choice-btn:active {
-        transform: translateY(2px);
-        box-shadow: none;
-    }
-
-    /* 正解の色 */
-    .choice-btn.correct {
-        background-color: var(--correct-color);
-        border-color: var(--correct-color);
-        color: white;
-        box-shadow: 0 4px 0 #2e7d32;
-    }
-
-    /* 不正解の色 */
-    .choice-btn.incorrect {
-        background-color: var(--incorrect-color);
-        border-color: var(--incorrect-color);
-        color: white;
-        opacity: 0.6;
-        box-shadow: none;
-    }
+    .choice-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 #cfd8dc; }
+    .choice-btn:active { transform: translateY(2px); box-shadow: none; }
     
-    /* ボタン無効化 */
+    .choice-btn.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; box-shadow: 0 4px 0 #2e7d32; }
+    .choice-btn.incorrect { background-color: var(--incorrect-color); border-color: var(--incorrect-color); color: white; opacity: 0.6; box-shadow: none; }
     .choice-btn.disabled { pointer-events: none; }
-
-    /* ========================================== */
 
     .feedback-area { min-height: 1.5em; margin-top: 10px; font-size: 1.3em; font-weight: 900; }
     
@@ -201,44 +122,39 @@
 
     <div class="main-container">
         
+        <!-- メニュー画面 -->
         <div id="quiz-menu-area" class="pop-in">
             <div class="quiz-card">
                 <i class="fa-solid fa-shapes menu-icon"></i>
                 <h1 class="menu-title">ひらがな単語</h1>
                 <p class="menu-desc">え を みて ただしい ことば をえらぼう！</p>
-                
                 <div class="rule-box">
                     <div id="quiz-score-message">
                         ぜんぶで <strong>10もん</strong> あるよ。<br>がんばって クリアしよう！
                     </div>
                 </div>
-
-                <button id="quizStartButton" class="start-btn" onclick="startQuizGame()">
+                <button id="quizStartButton" class="start-btn" onclick="game.start()">
                     <i class="fa-solid fa-play"></i> スタート！
                 </button>
-
                 <a href="index.html" class="home-btn-text">ホームにもどる</a>
             </div>
         </div>
 
+        <!-- ゲーム画面 -->
         <div id="quiz-game-area" style="display:none;" class="pop-in">
-            
             <div class="score-board">
                 <span id="quiz-turn-message">問 1 / 10</span>
                 <span><i class="fa-solid fa-star" style="color:#f0ad4e;"></i> <span id="score-val">0</span></span>
             </div>
-
             <div class="quiz-card">
                 <div id="quiz-image-area" class="image-frame">
-                    </div>
-
+                    <!-- 画像がここに入ります -->
+                </div>
                 <h3 id="quiz-question-text" class="question-text">このイラストはどれかな？</h3>
-
                 <div id="choice-buttons-area" class="choices-grid">
-                    </div>
-
+                    <!-- ボタンがここに入ります -->
+                </div>
                 <p id="quiz-feedback" class="feedback-area"></p>
-
                 <div style="margin-top: 10px;">
                     <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
                 </div>
@@ -247,7 +163,201 @@
 
     </div>
 
-    <script src="js/hiragana.js"></script>
+    <!-- 音声ファイル -->
+    <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+    <audio id="snd-fanfare" src="assets/sounds/fanfare.mp3"></audio>
+
+<!-- ★★★ Firebase & ゲームロジック ★★★ -->
+<script type="module">
+    // Firebase SDKのインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    // Firebase設定 (あなたのプロジェクトの鍵)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --------------------------------------------------
+    // ゲームデータ (画像はassets/images/にある前提)
+    // --------------------------------------------------
+    const QUESTIONS = [
+        { id: 'apple', img: 'assets/images/apple.png', ans: 'りんご', wrong: ['みかん', 'いちご', 'バナナ'] },
+        { id: 'dog', img: 'assets/images/dog.png', ans: 'いぬ', wrong: ['ねこ', 'うし', 'うま'] },
+        { id: 'car', img: 'assets/images/car.png', ans: 'くるま', wrong: ['でんしゃ', 'バス', 'ふね'] },
+        { id: 'umbrella', img: 'assets/images/umbrella.png', ans: 'かさ', wrong: ['くつ', 'ぼうし', 'かばん'] },
+        { id: 'fish', img: 'assets/images/fish.png', ans: 'さかな', wrong: ['とり', 'むし', 'えび'] },
+        { id: 'book', img: 'assets/images/book.png', ans: 'ほん', wrong: ['ノート', 'えんぴつ', 'はさみ'] },
+        { id: 'shoe', img: 'assets/images/shoes.png', ans: 'くつ', wrong: ['くつした', 'ズボン', 'シャツ'] },
+        { id: 'cat', img: 'assets/images/cat.png', ans: 'ねこ', wrong: ['いぬ', 'さる', 'くま'] },
+        { id: 'flower', img: 'assets/images/flower.png', ans: 'はな', wrong: ['き', 'くさ', 'はっぱ'] },
+        { id: 'clock', img: 'assets/images/clock.png', ans: 'とけい', wrong: ['テレビ', 'ラジオ', 'デンワ'] }
+    ];
+
+    // --------------------------------------------------
+    // ゲームロジッククラス
+    // --------------------------------------------------
+    class HiraganaGame {
+        constructor() {
+            this.questions = [];
+            this.currentQIndex = 0;
+            this.score = 0;
+            this.isAnswering = false;
+
+            // DOM要素
+            this.menuArea = document.getElementById('quiz-menu-area');
+            this.gameArea = document.getElementById('quiz-game-area');
+            this.turnMsg = document.getElementById('quiz-turn-message');
+            this.scoreVal = document.getElementById('score-val');
+            this.imgArea = document.getElementById('quiz-image-area');
+            this.btnArea = document.getElementById('choice-buttons-area');
+            this.feedback = document.getElementById('quiz-feedback');
+
+            // 音声
+            this.sndCorrect = document.getElementById('snd-correct');
+            this.sndIncorrect = document.getElementById('snd-incorrect');
+            this.sndFanfare = document.getElementById('snd-fanfare');
+        }
+
+        start() {
+            // 問題をシャッフルしてセット
+            this.questions = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+            this.currentQIndex = 0;
+            this.score = 0;
+            this.updateScoreUI();
+
+            this.menuArea.style.display = 'none';
+            this.gameArea.style.display = 'block';
+            this.nextQuestion();
+        }
+
+        nextQuestion() {
+            if (this.currentQIndex >= this.questions.length) {
+                this.finishGame();
+                return;
+            }
+
+            this.isAnswering = true;
+            this.feedback.textContent = '';
+            this.turnMsg.textContent = `問 ${this.currentQIndex + 1} / ${this.questions.length}`;
+
+            const q = this.questions[this.currentQIndex];
+
+            // 画像表示 (ない場合はプレースホルダー)
+            const img = new Image();
+            img.src = q.img;
+            img.onerror = () => { img.src = 'https://placehold.co/200x200?text=' + q.ans; }; // フォールバック
+            this.imgArea.innerHTML = '';
+            this.imgArea.appendChild(img);
+
+            // 選択肢作成
+            const choices = [q.ans, ...q.wrong].sort(() => Math.random() - 0.5);
+            this.btnArea.innerHTML = '';
+            
+            choices.forEach(choice => {
+                const btn = document.createElement('div');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => this.checkAnswer(btn, choice, q.ans);
+                this.btnArea.appendChild(btn);
+            });
+        }
+
+        checkAnswer(btn, choice, correctAns) {
+            if (!this.isAnswering) return;
+            this.isAnswering = false;
+
+            const allBtns = document.querySelectorAll('.choice-btn');
+            allBtns.forEach(b => b.classList.add('disabled'));
+
+            if (choice === correctAns) {
+                // 正解
+                btn.classList.add('correct');
+                this.sndCorrect.currentTime = 0; 
+                this.sndCorrect.play().catch(e=>{});
+                this.feedback.textContent = 'せいかい！';
+                this.feedback.style.color = 'var(--correct-color)';
+                this.score += 10;
+                this.updateScoreUI();
+            } else {
+                // 不正解
+                btn.classList.add('incorrect');
+                this.sndIncorrect.currentTime = 0; 
+                this.sndIncorrect.play().catch(e=>{});
+                this.feedback.textContent = `ざんねん… こたえは「${correctAns}」だよ`;
+                this.feedback.style.color = 'var(--incorrect-color)';
+
+                // 正解のボタンを教えてあげる
+                allBtns.forEach(b => {
+                    if (b.textContent === correctAns) b.classList.add('correct');
+                });
+            }
+
+            // 次の問題へ
+            setTimeout(() => {
+                this.currentQIndex++;
+                this.nextQuestion();
+            }, 1500);
+        }
+
+        updateScoreUI() {
+            this.scoreVal.textContent = this.score;
+        }
+
+        async finishGame() {
+            this.imgArea.innerHTML = '<i class="fa-solid fa-crown" style="font-size:5em; color:#ffd700;"></i>';
+            this.btnArea.innerHTML = '';
+            this.feedback.textContent = `おしまい！ ${this.score}てん！`;
+            this.feedback.style.color = 'var(--primary)';
+            
+            this.sndFanfare.currentTime = 0;
+            this.sndFanfare.play().catch(e=>{});
+
+            // ★★★ Firebaseへポイント送信 ★★★
+            const user = sessionStorage.getItem('current_user');
+            if (user && user !== 'ゲスト') {
+                try {
+                    const userRef = doc(db, "users", user);
+                    await updateDoc(userRef, {
+                        points: increment(this.score)
+                    });
+                    this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">ランキングに反映しました！</span>';
+                } catch (e) {
+                    console.error("Error updating score: ", e);
+                }
+            }
+
+            // リトライボタン
+            setTimeout(() => {
+                const retryBtn = document.createElement('button');
+                retryBtn.className = 'start-btn';
+                retryBtn.textContent = 'もういちど';
+                retryBtn.onclick = () => location.reload();
+                this.btnArea.appendChild(retryBtn);
+                this.btnArea.style.display = 'flex';
+                this.btnArea.style.justifyContent = 'center';
+            }, 1000);
+        }
+    }
+
+    // グローバルに公開してHTMLから呼べるようにする
+    window.game = new HiraganaGame();
+    
+    // 画像プリロード (任意)
+    QUESTIONS.forEach(q => { const i = new Image(); i.src = q.img; });
+
+</script>
 
 </body>
 </html>

@@ -10,24 +10,22 @@
 <style>
     /* --- 共通設定 --- */
     :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
         --bg-color: #f0f4f8;
         --text-color: #333;
+        --correct-color: #4caf50;
     }
 
     /* ズレ防止の基本設定 */
-    *, *::before, *::after {
-        box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
 
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
+        margin: 0; padding: 0; min-height: 100vh;
+        display: flex; flex-direction: column;
         touch-action: manipulation;
         overflow-x: hidden;
     }
@@ -35,54 +33,32 @@
     /* --- ヘッダー --- */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white;
-        padding: 15px 20px;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        z-index: 100;
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
     .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
 
     /* --- メインコンテナ --- */
     .main-container {
-        flex-grow: 1;
-        padding: 20px;
-        max-width: 1000px;
-        margin: 0 auto;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        flex-grow: 1; padding: 20px; max-width: 1000px;
+        margin: 0 auto; width: 100%; display: flex;
+        flex-direction: column; justify-content: center; align-items: center;
     }
 
     /* --- メニュー画面 --- */
     .menu-card {
-        background: white;
-        border-radius: 25px;
-        padding: 40px 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        text-align: center;
-        width: 100%;
-        max-width: 700px;
+        background: white; border-radius: 25px; padding: 40px 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;
+        width: 100%; max-width: 700px;
     }
 
-    .menu-title {
-        font-size: 2.2em;
-        color: #1565c0;
-        margin: 0 0 30px 0;
-        font-weight: 900;
-    }
+    .menu-title { font-size: 2.2em; color: #1565c0; margin: 0 0 30px 0; font-weight: 900; }
 
     .level-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 40px;
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 20px; margin-bottom: 40px;
     }
     @media (max-width: 500px) {
         .level-grid { grid-template-columns: repeat(2, 1fr); }
@@ -111,14 +87,11 @@
     .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
 
 
-    /* --- ゲームプレイ画面 (PC設定) --- */
+    /* --- ゲームプレイ画面 --- */
     .game-play-card {
-        background: white;
-        border-radius: 25px;
-        padding: 30px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        text-align: center;
-        width: 100%;
+        background: white; border-radius: 25px; padding: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: center;
+        width: 100%; max-width: 700px;
     }
 
     .game-header {
@@ -128,56 +101,33 @@
     }
 
     .match-container {
-        display: flex;
-        flex-direction: row; /* 横並び */
-        gap: 30px; 
-        align-items: stretch; 
-        justify-content: center; 
+        display: flex; flex-direction: row; gap: 30px; 
+        align-items: stretch; justify-content: center; 
     }
 
     .illust-box, .word-box {
-        flex: 1; 
-        background: #f8fbff;
-        border-radius: 20px;
-        padding: 20px;
-        border: 3px dashed #d1e3ff;
+        flex: 1; background: #f8fbff; border-radius: 20px;
+        padding: 20px; border: 3px dashed #d1e3ff;
         display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
         min-height: 400px; 
     }
 
-    .area-title {
-        font-size: 1.2em; color: #555; margin-bottom: 20px; font-weight: bold;
-        text-align: center; width: 100%;
-    }
+    .area-title { font-size: 1.2em; color: #555; margin-bottom: 20px; font-weight: bold; text-align: center; width: 100%; }
 
-    /* --- PCでの高さ調整の肝 --- */
-    /* 右側のリスト設定 */
-    #word-list {
+    /* PC/タブレット用レイアウト調整 */
+    #word-list { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+    .illust-pool { 
         display: flex; flex-direction: column; align-items: center; 
-        gap: 20px; /* 右側の隙間は20px */
-        width: 100%;
+        gap: 38px; /* 右側の高さに合わせる */
+        padding-top: 10px; width: 100%; 
     }
 
-    /* 左側のリスト設定 (ここを調整して右に合わせる) */
-    .illust-pool {
-        display: flex; flex-direction: column; align-items: center; 
-        /* 計算：右の行の高さ 約114px + 隙間20px = 134pxピッチ
-           左の画像の高さ 96px。
-           差分を埋めるために隙間を大きくする (134 - 96 = 38px)
-        */
-        gap: 38px; 
-        /* 開始位置の微調整 (右のセンターに合わせる) */
-        padding-top: 10px;
-        width: 100%;
-    }
-
-    /* アイテム (PCサイズ) */
+    /* アイテム (イラスト側) */
     .drag-item {
-        width: 90px; height: 90px;
-        background: white; border: 3px solid #fff; border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        cursor: grab; display: flex; justify-content: center; align-items: center;
+        width: 90px; height: 90px; background: white; border: 3px solid #fff; border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: grab; display: flex; justify-content: center; align-items: center;
         touch-action: none; z-index: 10; transition: all 0.2s; flex-shrink: 0;
+        position: relative; /* ドラッグ操作用 */
     }
     .drag-item img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; }
     .drag-item:active { cursor: grabbing; transform: scale(1.05); }
@@ -188,34 +138,27 @@
         cursor: pointer; background: transparent;
     }
 
-    /* ドロップターゲット (PCサイズ) */
+    /* ドロップターゲット (ことば側) */
     .word-row {
         display: flex; align-items: center; justify-content: center;
-        background: white; padding: 10px 20px;
-        border-radius: 15px; border: 2px solid #eef2f6; box-shadow: 0 4px 0 #eef2f6;
-        width: 100%; max-width: 300px;
-        transition: transform 0.2s;
-        min-height: 114px; /* 高さを安定させる */
+        background: white; padding: 10px 20px; border-radius: 15px;
+        border: 2px solid #eef2f6; box-shadow: 0 4px 0 #eef2f6;
+        width: 100%; max-width: 300px; transition: transform 0.2s;
+        min-height: 114px; 
     }
     .word-row:hover { transform: translateY(-2px); border-color: #bbdefb; }
 
     .drop-target {
-        width: 90px; height: 90px;
-        background: #e3f2fd; border: 3px dashed #90caf9; border-radius: 15px;
+        width: 90px; height: 90px; background: #e3f2fd; border: 3px dashed #90caf9; border-radius: 15px;
         margin-right: 15px; display: flex; justify-content: center; align-items: center;
         transition: all 0.2s; position: relative; overflow: hidden; flex-shrink: 0;
     }
     .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
     .drop-target.correct { background: #e8f5e9; border: 3px solid #4caf50; border-style: solid; }
     
-    /* 文字設定 (★改行禁止 white-space: nowrap を追加) */
     .word-label { 
-        font-size: 2em; 
-        font-weight: 900; 
-        color: #444; 
-        flex-grow: 1; 
-        text-align: center;
-        white-space: nowrap; /* これで「えび」が横並びになります */
+        font-size: 2em; font-weight: 900; color: #444; flex-grow: 1; 
+        text-align: center; white-space: nowrap; 
     }
 
     .feedback-msg { font-weight: bold; font-size: 1.3em; margin-top: 15px; min-height: 1.5em; }
@@ -225,61 +168,22 @@
 
     /* --- ★スマホ専用 強力修正★ --- */
     @media (max-width: 768px) {
-        
         .main-container { padding: 10px; }
-        .game-play-card { padding: 15px 10px; }
+        .game-play-card { padding: 15px 10px; max-width: 100%; }
         
-        /* PC用の高さ調整をリセットして詰める */
         .illust-pool { gap: 10px; padding-top: 0; }
         #word-list { gap: 10px; }
         
-        /* 強制的に横並びにする */
-        .match-container {
-            flex-direction: row !important;
-            gap: 5px;
-        }
+        .match-container { flex-direction: row !important; gap: 5px; }
 
-        /* ボックスの余白を極限まで減らす */
-        .illust-box, .word-box {
-            padding: 10px 2px;
-            border-radius: 10px;
-            border-width: 2px;
-        }
-        
-        /* タイトル文字サイズ */
+        .illust-box, .word-box { padding: 10px 2px; border-radius: 10px; border-width: 2px; min-height: 300px; }
         .area-title { font-size: 0.9em; margin-bottom: 8px; }
 
-        /* --- 要素を小さくする (50px基準) --- */
-        
-        /* イラスト */
-        .drag-item {
-            width: 50px;
-            height: 50px;
-            border-width: 2px;
-            border-radius: 10px;
-        }
-
-        /* ことばの行 */
-        .word-row {
-            padding: 5px;
-            min-height: auto; /* PC用の固定高さを解除 */
-            border-radius: 10px;
-            margin-bottom: 0; /* リストのgapで制御 */
-        }
-
-        /* ドロップターゲット */
-        .drop-target {
-            width: 50px;
-            height: 50px;
-            margin-right: 5px;
-            border-width: 2px;
-            border-radius: 8px;
-        }
-
-        /* 文字サイズ縮小 */
-        .word-label {
-            font-size: 1.1em;
-        }
+        /* 要素を小さくする (50px基準) */
+        .drag-item { width: 50px; height: 50px; border-width: 2px; border-radius: 10px; }
+        .word-row { padding: 5px; min-height: auto; border-radius: 10px; margin-bottom: 0; }
+        .drop-target { width: 50px; height: 50px; margin-right: 5px; border-width: 2px; border-radius: 8px; }
+        .word-label { font-size: 1.1em; }
     }
 
     /* iPhone SE等の極小画面対応 */
@@ -292,7 +196,10 @@
     /* アニメーション */
     .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .ghost-item { 
+        position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; 
+        transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+    }
 
 </style>
 </head>
@@ -307,6 +214,8 @@
         
         <div id="level-menu-area" class="menu-card pop-in">
             <h1 class="menu-title">ひらがな単語あわせゲーム</h1>
+            <p style="color:#666; font-weight:bold;">イラストをことばの枠にドラッグ＆ドロップしてね。</p>
+            <p style="color:#333; font-size:1.1em; margin-bottom:30px;">全問正解で **100ポイント** 獲得！</p>
             <div id="level-grid" class="level-grid"></div>
             <button onclick="location.href='index.html'" class="home-btn-large">ホームにもどる</button>
         </div>
@@ -314,7 +223,8 @@
         <div id="game-play-area" style="display:none;" class="game-play-card pop-in">
             <div class="game-header">
                 <span id="level-title">レベル 1</span>
-                <button onclick="showLevelMenu()" style="background:#eee; border:none; padding:8px 15px; border-radius:15px; cursor:pointer; font-weight:bold; color:#666;">もどる</button>
+                <span id="score-display"><i class="fa-solid fa-star" style="color:#f0ad4e;"></i> 0 / 5</span>
+                <button onclick="window.showLevelMenu()" style="background:#eee; border:none; padding:8px 15px; border-radius:15px; cursor:pointer; font-weight:bold; color:#666;">もどる</button>
             </div>
 
             <div class="match-container">
@@ -334,7 +244,401 @@
 
     </div>
 
-    <script src="js/hiragana_drag_match.js"></script>
+    <!-- 音声ファイル -->
+    <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+    <audio id="snd-fanfare" src="assets/sounds/fanfare.mp3"></audio>
+
+<!-- ★★★ Firebase & ゲームロジック ★★★ -->
+<script type="module">
+    // Firebase SDKのインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    // Firebase設定 (あなたのプロジェクトの鍵)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- ゲームデータ ---
+    const WORD_LIST = [
+        { id: 'ebi', word: 'えび', img: 'assets/images/ebi.png' },
+        { id: 'ushi', word: 'うし', img: 'assets/images/ushi.png' },
+        { id: 'oni', word: 'おに', img: 'assets/images/oni.png' },
+        { id: 'ame', word: 'あめ', img: 'assets/images/ame.png' },
+        { id: 'inu', word: 'いぬ', img: 'assets/images/inu.png' },
+        { id: 'kame', word: 'かめ', img: 'assets/images/kame.png' },
+        { id: 'sake', word: 'さけ', img: 'assets/images/sake.png' },
+        { id: 'tako', word: 'たこ', img: 'assets/images/tako.png' },
+        { id: 'nabe', word: 'なべ', img: 'assets/images/nabe.png' },
+        { id: 'hosi', word: 'ほし', img: 'assets/images/hosi.png' }, // 星の画像は仮
+        { id: 'mame', word: 'まめ', img: 'assets/images/mame.png' },
+        { id: 'yama', word: 'やま', img: 'assets/images/yama.png' }
+    ];
+
+    const LEVEL_SETTINGS = [
+        { level: 1, count: 5, label: "やさしい (5組)" },
+        { level: 2, count: 7, label: "ふつう (7組)" },
+        { level: 3, count: 10, label: "むずかしい (10組)" }
+    ];
+
+    // --- ゲーム状態 ---
+    let currentLevel = 1;
+    let requiredMatches = 5;
+    let successfulMatches = 0;
+    let currentMatches = {}; // { illustId: wordId }
+    let allItems = []; // すべてのドラッグアイテムの参照
+
+    // --- DOM要素 ---
+    const dom = {
+        levelMenu: document.getElementById('level-menu-area'),
+        gamePlay: document.getElementById('game-play-area'),
+        levelGrid: document.getElementById('level-grid'),
+        levelTitle: document.getElementById('level-title'),
+        scoreDisplay: document.getElementById('score-display'),
+        illustPool: document.getElementById('illust-pool'),
+        wordList: document.getElementById('word-list'),
+        feedback: document.getElementById('feedback'),
+        sndCorrect: document.getElementById('snd-correct'),
+        // ★★★ ここを修正しました ★★★
+        sndIncorrect: document.getElementById('snd-incorrect'),
+        sndFanfare: document.getElementById('snd-fanfare')
+    };
+// ... (中略) ...
+
+    // --- ユーティリティ ---
+    function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    // --- メニュー表示 ---
+    window.showLevelMenu = () => {
+        dom.levelMenu.style.display = 'block';
+        dom.gamePlay.style.display = 'none';
+        dom.levelGrid.innerHTML = '';
+
+        LEVEL_SETTINGS.forEach(setting => {
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.textContent = setting.label;
+            btn.onclick = () => startGame(setting);
+            dom.levelGrid.appendChild(btn);
+        });
+    };
+
+    // --- ゲーム開始 ---
+    function startGame(setting) {
+        currentLevel = setting.level;
+        requiredMatches = setting.count;
+        successfulMatches = 0;
+        currentMatches = {};
+        allItems = [];
+        
+        dom.levelTitle.textContent = `レベル ${currentLevel}`;
+        dom.scoreDisplay.innerHTML = `<i class="fa-solid fa-star" style="color:#f0ad4e;"></i> ${successfulMatches} / ${requiredMatches}`;
+        dom.feedback.textContent = '';
+
+        const gameWords = shuffleArray(WORD_LIST).slice(0, requiredMatches);
+        const illusts = shuffleArray([...gameWords]); // イラスト側もシャッフル
+
+        dom.illustPool.innerHTML = '';
+        dom.wordList.innerHTML = '';
+
+        renderWordList(gameWords);
+        renderIllustPool(illusts);
+
+        dom.levelMenu.style.display = 'none';
+        dom.gamePlay.style.display = 'block';
+    }
+
+    // --- 単語リスト (ドロップターゲット) の描画 ---
+    function renderWordList(words) {
+        words.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'word-row';
+            row.dataset.wordId = item.id;
+            
+            const target = document.createElement('div');
+            target.className = 'drop-target';
+            target.dataset.targetId = item.id;
+            target.dataset.filled = 'false';
+
+            const label = document.createElement('span');
+            label.className = 'word-label';
+            label.textContent = item.word;
+
+            row.appendChild(target);
+            row.appendChild(label);
+            dom.wordList.appendChild(row);
+
+            // ドロップイベントリスナー
+            target.ondragover = (e) => { e.preventDefault(); target.classList.add('drag-over'); };
+            target.ondragleave = () => target.classList.remove('drag-over');
+            target.ondrop = (e) => handleDrop(e, target, item.id);
+            // ★タッチ操作の処理を追加
+            target.ontouchend = (e) => handleTouchDrop(e, target, item.id);
+        });
+    }
+
+    // --- イラストプール (ドラッグアイテム) の描画 ---
+    function renderIllustPool(illusts) {
+        illusts.forEach(item => {
+            const dragItem = document.createElement('div');
+            dragItem.className = 'drag-item';
+            dragItem.draggable = true;
+            dragItem.dataset.illustId = item.id;
+
+            const img = document.createElement('img');
+            img.src = item.img;
+            img.alt = item.word;
+            dragItem.appendChild(img);
+
+            dom.illustPool.appendChild(dragItem);
+            allItems.push(dragItem);
+
+            // ドラッグイベントリスナー
+            dragItem.ondragstart = (e) => handleDragStart(e, dragItem, item.id);
+            
+            // ★タッチ操作の処理を追加
+            dragItem.ontouchstart = (e) => handleTouchStart(e, dragItem, item.id);
+        });
+    }
+
+    // --- ドラッグ＆ドロップロジック ---
+
+    let currentDragItem = null;
+    let currentIllustId = null;
+
+    // 1. ドラッグ開始
+    function handleDragStart(e, item, id) {
+        if (item.classList.contains('placed')) return; // すでに配置済みのアイテムはドラッグ不可
+        
+        currentDragItem = item;
+        currentIllustId = id;
+        
+        e.dataTransfer.setData('text/plain', id); // データ転送（使わなくても良いが、標準的な記述）
+        
+        // ゴースト画像設定
+        const ghost = item.cloneNode(true);
+        ghost.classList.add('ghost-item');
+        ghost.style.position = 'absolute';
+        ghost.style.left = `${e.clientX}px`;
+        ghost.style.top = `${e.clientY}px`;
+        document.body.appendChild(ghost);
+
+        // e.dataTransfer.setDragImage(ghost, 45, 45); // 標準ドラッグ画像を設定
+        // setTimeout(() => ghost.remove(), 0); // 即座に削除（ブラウザによる動作の違いを避けるため今回はカスタムゴーストは一旦なし）
+        
+        setTimeout(() => item.style.opacity = '0.4', 0); // 元のアイテムを半透明に
+    }
+
+    // 2. ドロップ
+    function handleDrop(e, target, wordId) {
+        e.preventDefault();
+        target.classList.remove('drag-over');
+        dom.illustPool.querySelectorAll('.drag-item').forEach(item => item.style.opacity = '1'); // 元のアイテムの不透明度をリセット
+        
+        if (target.dataset.filled === 'true') {
+            dom.feedback.textContent = 'ここはうまって いるよ！';
+            dom.feedback.className = 'feedback-msg error';
+            return;
+        }
+
+        if (currentIllustId === wordId) {
+            // 正解！
+            performMatch(currentDragItem, target, currentIllustId);
+        } else {
+            // 不正解
+            dom.feedback.textContent = 'ざんねん！ちがう イラスト だよ';
+            dom.feedback.className = 'feedback-msg error';
+            dom.sndIncorrect.currentTime = 0;
+            dom.sndIncorrect.play().catch(e=>{});
+        }
+        
+        currentDragItem = null;
+        currentIllustId = null;
+    }
+
+
+    // --- タッチイベント（スマホ対応） ---
+    
+    let activeTouchItem = null;
+    let touchGhost = null;
+
+    // 1. タッチ開始
+    function handleTouchStart(e, item, id) {
+        if (item.classList.contains('placed')) return;
+        
+        e.preventDefault(); 
+        
+        currentIllustId = id;
+        activeTouchItem = item;
+        
+        // ゴーストの作成と初期位置設定
+        touchGhost = item.cloneNode(true);
+        touchGhost.classList.add('ghost-item');
+        touchGhost.style.opacity = '0.8';
+        touchGhost.style.position = 'absolute';
+        
+        const touch = e.touches[0];
+        touchGhost.style.left = `${touch.clientX - item.offsetWidth / 2}px`;
+        touchGhost.style.top = `${touch.clientY - item.offsetHeight / 2}px`;
+
+        document.body.appendChild(touchGhost);
+        
+        // 元のアイテムを隠す
+        activeTouchItem.style.visibility = 'hidden'; 
+    }
+
+    // 2. タッチ移動
+    document.addEventListener('touchmove', (e) => {
+        if (!activeTouchItem) return;
+        
+        const touch = e.touches[0];
+        // ゴーストを指の位置に追従させる
+        touchGhost.style.left = `${touch.clientX - activeTouchItem.offsetWidth / 2}px`;
+        touchGhost.style.top = `${touch.clientY - activeTouchItem.offsetHeight / 2}px`;
+
+        // ドロップターゲットのハイライト処理
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        document.querySelectorAll('.drop-target').forEach(t => t.classList.remove('drag-over'));
+        
+        if (target && target.classList.contains('drop-target')) {
+             target.classList.add('drag-over');
+        }
+    }, { passive: false }); // passive:false でpreventDefaultを許可
+
+    // 3. タッチ終了 (ドロップ処理)
+    function handleTouchDrop(e, target, wordId) {
+        if (!activeTouchItem) return;
+
+        // ゴーストと元のアイテムをクリーンアップ
+        touchGhost.remove();
+        activeTouchItem.style.visibility = 'visible'; 
+        document.querySelectorAll('.drop-target').forEach(t => t.classList.remove('drag-over'));
+
+        // ドロップされた場所の要素を再度確認
+        const finalTouch = e.changedTouches[0];
+        const finalTarget = document.elementFromPoint(finalTouch.clientX, finalTouch.clientY);
+
+        if (finalTarget && finalTarget.classList.contains('drop-target') && finalTarget === target) {
+            
+            if (target.dataset.filled === 'true') {
+                dom.feedback.textContent = 'ここはうまって いるよ！';
+                dom.feedback.className = 'feedback-msg error';
+                // タッチ状態をリセット
+                activeTouchItem = null;
+                currentIllustId = null;
+                return;
+            }
+
+            if (currentIllustId === wordId) {
+                // 正解！
+                performMatch(activeTouchItem, target, currentIllustId);
+            } else {
+                // 不正解
+                dom.feedback.textContent = 'ざんねん！ちがう イラスト だよ';
+                dom.feedback.className = 'feedback-msg error';
+                dom.sndIncorrect.currentTime = 0;
+                dom.sndIncorrect.play().catch(e=>{});
+            }
+        }
+        
+        activeTouchItem = null;
+        currentIllustId = null;
+    }
+
+    // --- マッチング実行と状態更新 ---
+    async function performMatch(illustItem, targetElement, matchedId) {
+        dom.feedback.textContent = 'やったね！せいかい！';
+        dom.feedback.className = 'feedback-msg success';
+        dom.sndCorrect.currentTime = 0;
+        dom.sndCorrect.play().catch(e=>{});
+
+        // 状態を更新
+        currentMatches[matchedId] = true;
+        successfulMatches++;
+        targetElement.dataset.filled = 'true';
+        targetElement.classList.add('correct');
+        targetElement.ondrop = null;
+        targetElement.ontouchend = null;
+
+        // イラストをターゲットに移動
+        illustItem.classList.add('placed');
+        illustItem.draggable = false;
+        illustItem.style.opacity = '1'; 
+        targetElement.innerHTML = '';
+        targetElement.appendChild(illustItem);
+        
+        // ターゲット内でのクリックを無効化
+        illustItem.onclick = (e) => e.stopPropagation();
+
+        // スコア表示更新
+        dom.scoreDisplay.innerHTML = `<i class="fa-solid fa-star" style="color:#f0ad4e;"></i> ${successfulMatches} / ${requiredMatches}`;
+        
+        // すべてマッチしたかチェック
+        if (successfulMatches === requiredMatches) {
+            await finishGame();
+        }
+    }
+
+    // --- ゲーム終了 ---
+    async function finishGame() {
+        dom.feedback.textContent = 'ぜんぶクリア！ おめでとう！';
+        dom.feedback.className = 'feedback-msg success';
+        dom.illustPool.innerHTML = ''; // 予備のアイテムを削除
+        
+        dom.sndFanfare.currentTime = 0;
+        dom.sndFanfare.play().catch(e=>{});
+
+        // 獲得ポイント (今回は固定の100ポイント)
+        const POINTS_EARNED = 100;
+
+        // Firebase送信
+        const user = sessionStorage.getItem('current_user');
+        if (user && user !== 'ゲスト') {
+            try {
+                const userRef = doc(db, "users", user);
+                await updateDoc(userRef, {
+                    points: increment(POINTS_EARNED)
+                });
+                dom.feedback.innerHTML += `<br><span style="font-size:0.8em; color:#666;">${POINTS_EARNED}ポイントをランキングに反映しました！</span>`;
+            } catch (e) {
+                console.error("Error updating score: ", e);
+            }
+        } else {
+             dom.feedback.innerHTML += '<br><span style="font-size:0.8em; color:orange;">ログインするとポイントが保存されます。</span>';
+        }
+
+        // 戻るボタンを大きく表示
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'start-btn';
+        retryBtn.textContent = 'メニューにもどる';
+        retryBtn.style.cssText = 'background:#546e7a; color:white; padding:15px 30px; border:none; border-radius:50px; margin-top:30px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 0 #37474f;';
+        retryBtn.onclick = () => window.showLevelMenu();
+        dom.gamePlay.appendChild(retryBtn);
+    }
+
+    // 初期化
+    window.showLevelMenu(); 
+    
+</script>
 
 </body>
 </html>

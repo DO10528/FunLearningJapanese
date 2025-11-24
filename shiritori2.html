@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>しりとり2 (マス埋め)</title>
+    <title>しりとり2 (マス埋め) - FunLearnJP</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
@@ -133,10 +133,7 @@
         background-color: #fff8e1; 
         text-align: center;
         
-        /* ★修正: 高さをコンテンツに合わせる */
         align-self: flex-start; 
-        /* min-height: 400px; を削除 */
-        
         overflow-y: auto;
     }
     .card-area h3 {
@@ -154,9 +151,7 @@
         background-color: white;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         
-        /* ★修正: 高さをコンテンツに合わせる */
         align-self: flex-start;
-        /* min-height: 400px; を削除 */
     }
     .grid-area h3 {
         color: var(--primary);
@@ -209,6 +204,12 @@
         color: #333;
         text-align: center;
     }
+    .cell-image {
+        width: 80%; 
+        height: auto;
+        max-height: 80%;
+        object-fit: contain;
+    }
 
     /* しりとり開始マス */
     .shiritori-start {
@@ -229,10 +230,14 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: transform 0.2s, opacity 0.3s;
         min-height: 50px;
+        user-select: none;
     }
 
     .word-card:hover {
         transform: translateY(-2px);
+    }
+    .word-card.dragging {
+        opacity: 0.5 !important;
     }
 
     .card-image {
@@ -276,7 +281,7 @@
         }
         .card-area {
             min-height: 150px;
-            max-height: none;
+            max-height: 300px; /* スクロールできるように最大高さを設定 */
             width: 100%;
             order: 2; 
         }
@@ -284,6 +289,12 @@
             width: 100%;
             order: 1; 
         }
+    }
+    .feedback-message {
+        font-weight: bold;
+        min-height: 1.5em;
+        margin-top: 10px;
+        font-size: 1.1em;
     }
 </style>
 </head>
@@ -303,7 +314,7 @@
         <div class="menu-card">
             <h2><i class="fa-solid fa-puzzle-piece" style="color:#ffb74d;"></i> しりとり2 ゲーム説明</h2>
             <p>右側のマス (全16マス) に、左の単語カード (15枚) をドラッグ＆ドロップして、しりとりを完成させましょう！</p>
-            <p>最初のマスは「しりとり」からスタートです。</p>
+            <p>最初のマスは「しりとり」からスタートです。<br><strong style="color:var(--correct-color);">全マス正解で 100ポイント ゲット！</strong></p>
             <button id="startButton2" class="start-btn" onclick="startShiritori2Game()">
                 ゲームスタート
             </button>
@@ -322,7 +333,8 @@
                 <h3 id="game-status-message">チャレンジ開始！</h3>
 
                 <div id="shiritori-grid" class="shiritori-grid"> 
-                    <div id="cell-0" class="grid-cell filled shiritori-start" data-word="しりとり" data-next-char="り">
+                    <div id="cell-0" class="grid-cell filled shiritori-start" data-word="しりとり" data-next-char="り" data-image="shiritori.png">
+                         <img src="assets/images/shiritori.png" alt="しりとり" class="cell-image" onerror="this.remove()">
                         <span class="word-text">しりとり</span>
                     </div>
                     </div>
@@ -331,7 +343,7 @@
 
                 <div id="return-card-area">
                     <button id="returnCardButton" class="control-button" style="background-color: #f0a000; display: none;">
-                        マスに置いたカードを戻す
+                        前のマスに戻す
                     </button>
                 </div>
             </div>
@@ -349,6 +361,574 @@
 
 </main>
 
-<script src="js/shiritori2.js"></script>
+<audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+<audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+
+<script type="module">
+    // Firebase SDKのインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    // Firebase設定 (他のファイルと共通)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- ゲーム設定 ---
+    const BONUS_POINTS = 100; // クリアボーナスポイント
+    const SESSION_STORAGE_KEY = 'current_user';
+    const GUEST_NAME = 'ゲスト'; 
+    
+    // ----------------------------------------------------
+    // DOM要素の定義
+    // ----------------------------------------------------
+    const MENU_AREA = document.getElementById('shiritori2-menu');
+    const GAME_AREA = document.getElementById('shiritori2-game-area');
+    const CARD_SELECTION_AREA = document.getElementById('card-selection-area');
+    const SHIRITORI_GRID = document.getElementById('shiritori-grid');
+    const FEEDBACK_MESSAGE = document.getElementById('feedback-message');
+    const GAME_STATUS_MESSAGE = document.getElementById('game-status-message');
+    const RESET_BUTTON = document.getElementById('resetButton');
+    const BACK_BUTTON = document.getElementById('backToMenuButton');
+    const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); 
+    const REMAINING_COUNT_MESSAGE = document.getElementById('remaining-count-message'); 
+
+    // 音声パス
+    const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
+    const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
+
+    let allWords = [];          
+    let gameWords = [];         
+    let currentCellIndex = 1;   
+    const MAX_WORDS = 15;       
+    
+    // ----------------------------------------------------
+    // 補助関数
+    // ----------------------------------------------------
+
+    function playSound(path) {
+        const audio = new Audio(path);
+        audio.play().catch(e => console.error("音声再生エラー:", e));
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function getNextChar(reading) {
+        if (!reading) return '';
+        let lastChar = reading.slice(-1);
+        
+        // 長音符処理
+        if (lastChar === 'ー' && reading.length > 1) {
+            lastChar = reading.slice(-2, -1);
+        }
+        
+        // 促音・拗音処理（直前の文字を返す）
+        const ignoreChars = ['ゃ', 'ゅ', 'ょ', 'っ', 'ー', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ'];
+        let cleaned = reading;
+        while (cleaned.length > 1 && ignoreChars.includes(cleaned.slice(-1))) {
+            cleaned = cleaned.slice(0, -1);
+        }
+
+        return cleaned.slice(-1);
+    }
+    
+    // ----------------------------------------------------
+    // 1. ゲームの初期化と開始
+    // ----------------------------------------------------
+
+    // ダミーデータ（実際のファイルパスを考慮）
+    const DUMMY_WORDS = [
+        { id: 1, word: 'しりとり', reading: 'しりとり', image: 'shiritori.png' },
+        { id: 2, word: 'りす', reading: 'りす', image: 'risu.png' },
+        { id: 3, word: 'すいか', reading: 'すいか', image: 'suika.png' },
+        { id: 4, word: 'かさ', reading: 'かさ', image: 'umbrella.png' },
+        { id: 5, word: 'さかな', reading: 'さかな', image: 'fish.png' },
+        { id: 6, word: 'なかま', reading: 'なかま', image: 'nakama.png' },
+        { id: 7, word: 'まくら', reading: 'まくら', image: 'makura.png' },
+        { id: 8, word: 'らっぱ', reading: 'らっぱ', image: 'rappa.png' },
+        { id: 9, word: 'ぱんだ', reading: 'ぱんだ', image: 'panda.png' },
+        { id: 10, word: 'だいこん', reading: 'だいこん', image: 'daikon.png' }, // ん
+        { id: 11, word: 'ねこ', reading: 'ねこ', image: 'cat.png' },
+        { id: 12, word: 'こま', reading: 'こま', image: 'koma.png' },
+        { id: 13, word: 'まめ', reading: 'まめ', image: 'mame.png' },
+        { id: 14, word: 'めがね', reading: 'めがね', image: 'megane.png' },
+        { id: 15, word: 'ねずみ', reading: 'ねずみ', image: 'nezumi.png' },
+        { id: 16, word: 'みかん', reading: 'みかん', image: 'mikan.png' } // ん
+    ];
+
+
+    async function loadWords() {
+        if (allWords.length > 0) return;
+        try {
+            // 実際は fetch('data/words.json') を使うが、環境依存回避のためダミーを使用
+            // const response = await fetch('data/words.json');
+            // const data = await response.json();
+            const data = DUMMY_WORDS;
+            
+            // 読み仮名があり、「ん」で終わらない単語のみを選別（ただし、最終の負け判定は必要）
+            allWords = data.filter(word => word.reading);
+            allWords.forEach(word => {
+                word.nextChar = getNextChar(word.reading);
+                word.firstChar = word.reading.charAt(0);
+            });
+
+        } catch (error) {
+            console.error('単語データの読み込みに失敗しました:', error);
+            alert('単語データを読み込めませんでした。ファイルパスとサーバー接続を確認してください。');
+        }
+    }
+
+    window.startShiritori2Game = function() {
+        if (allWords.length === 0) {
+            loadWords().then(setupGame);
+        } else {
+            setupGame();
+        }
+    };
+
+    function setupGame() {
+        if (allWords.length < MAX_WORDS) {
+            FEEDBACK_MESSAGE.textContent = `エラー: ゲームに必要な単語数 (${MAX_WORDS}語) が不足しています。`;
+            FEEDBACK_MESSAGE.style.color = 'red';
+            return;
+        }
+
+        MENU_AREA.style.display = 'none';
+        GAME_AREA.style.display = 'block';
+
+        currentCellIndex = 1;
+        // グリッドの初期化 (cell-0のしりとりはHTMLに固定)
+        SHIRITORI_GRID.innerHTML = document.getElementById('cell-0').outerHTML;
+        
+        // 残りのマス目を生成
+        for (let i = 1; i <= MAX_WORDS; i++) {
+            SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}"></div>`;
+        }
+        
+        RETURN_CARD_BUTTON.style.display = 'none';
+
+        selectAndRenderCards();
+        setupDragAndDropListeners();
+        updateUI(true);
+    }
+    
+    // ----------------------------------------------------
+    // 2. カードの選択と表示 (連鎖構築ロジック)
+    // ----------------------------------------------------
+
+    function selectAndRenderCards() {
+        const chainLength = MAX_WORDS; 
+        
+        // 開始単語のIDを固定
+        const startWord = allWords.find(w => w.word === 'しりとり');
+        if (!startWord) {
+             GAME_STATUS_MESSAGE.textContent = 'エラー：開始単語が見つかりません。';
+             return;
+        }
+
+        // 開始単語以外の単語から連鎖を探す
+        const otherWords = allWords.filter(w => w.id !== startWord.id && w.nextChar !== 'ん');
+        
+        // 最初の単語のnextCharから始まる連鎖を探す
+        let selectedChain = findShiritoriChain(chainLength, startWord.nextChar, otherWords);
+        
+        // チェーンが見つからない場合、「ん」で終わる単語を追加して連鎖を再試行する（今回は単語数確保のため省略）
+        if (selectedChain.length < chainLength) {
+            GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットして再試行してください。';
+            CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
+            return;
+        }
+
+        gameWords = selectedChain;
+        REMAINING_COUNT_MESSAGE.textContent = `残りの単語 (${gameWords.length}枚)`; 
+        CARD_SELECTION_AREA.innerHTML = REMAINING_COUNT_MESSAGE.outerHTML; // 見出しを再挿入
+        
+        shuffleArray(selectedChain).forEach(word => {
+            const card = document.createElement('div');
+            
+            card.className = 'word-card';
+            card.draggable = true;
+            card.dataset.word = word.word;
+            card.dataset.reading = word.reading;
+            card.dataset.nextChar = word.nextChar; 
+            card.dataset.firstChar = word.firstChar; 
+            
+            card.innerHTML = `
+                <img src="assets/images/${word.image}" alt="${word.word}" class="card-image" onerror="this.remove()">
+                <div class="card-label">${word.word}</div>
+            `;
+            CARD_SELECTION_AREA.appendChild(card);
+        });
+    }
+
+    function findShiritoriChain(length, startChar, availableWords) {
+        // 連鎖探索ロジック
+        let attempts = 0;
+        const maxAttempts = 500; 
+
+        // 濁音/半濁音の許容マップ
+        const SHIRITORI_MAP = {
+            'か': ['が'], 'き': ['ぎ'], 'く': ['ぐ'], 'け': ['げ'], 'こ': ['ご'],
+            'さ': ['ざ'], 'し': ['じ'], 'す': ['ず'], 'せ': ['ぜ'], 'そ': ['ぞ'],
+            'た': ['だ'], 'ち': ['ぢ'], 'つ': ['づ'], 'て': ['で'], 'と': ['ど'],
+            'は': ['ば', 'ぱ'], 'ひ': ['び', 'ぴ'], 'ふ': ['ぶ', 'ぷ'], 'へ': ['べ', 'ぺ'], 'ほ': ['ぼ', 'ぽ']
+        };
+        
+        while (attempts < maxAttempts) {
+            let usedIds = new Set();
+            let currentAvailable = shuffleArray(availableWords); 
+
+            let firstStepCandidates = currentAvailable.filter(word => word.firstChar === startChar);
+            if (firstStepCandidates.length === 0) { attempts++; continue; }
+
+            const startWord = firstStepCandidates[Math.floor(Math.random() * firstStepCandidates.length)];
+            
+            let tempChain = [startWord];
+            usedIds.add(startWord.id);
+            let currentLastChar = startWord.nextChar;
+
+            for (let i = 1; i < length; i++) {
+                let requiredChars = [currentLastChar];
+                if (SHIRITORI_MAP[currentLastChar]) {
+                    requiredChars.push(...SHIRITORI_MAP[currentLastChar]);
+                } 
+                
+                let candidates = currentAvailable.filter(word => 
+                    requiredChars.includes(word.firstChar) && 
+                    !usedIds.has(word.id)
+                );
+                
+                if (candidates.length === 0) {
+                    break;
+                }
+                
+                const nextWord = candidates[Math.floor(Math.random() * candidates.length)];
+                tempChain.push(nextWord);
+                usedIds.add(nextWord.id);
+                currentLastChar = nextWord.nextChar; 
+            }
+
+            if (tempChain.length === length) {
+                return tempChain; 
+            }
+            attempts++;
+        }
+        return []; 
+    }
+
+    // ----------------------------------------------------
+    // 3. ドラッグ＆ドロップ処理
+    // ----------------------------------------------------
+
+    function setupDragAndDropListeners() {
+        // ドラッグ開始/終了
+        CARD_SELECTION_AREA.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('.word-card');
+            if (card) {
+                e.dataTransfer.setData('text/plain', card.dataset.word); 
+                card.classList.add('dragging');
+                card.style.opacity = '0.5'; 
+            }
+        });
+        CARD_SELECTION_AREA.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.word-card');
+            if (card) {
+                card.classList.remove('dragging');
+                if (card.parentNode === CARD_SELECTION_AREA) {
+                    card.style.opacity = '1';
+                }
+            }
+        });
+        
+        // ドロップエリア設定
+        SHIRITORI_GRID.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.drop-target');
+            if (dropTarget && !dropTarget.classList.contains('filled')) {
+                dropTarget.classList.add('drag-over');
+            }
+        });
+        SHIRITORI_GRID.addEventListener('dragleave', (e) => {
+            const target = e.target.closest('.drop-target');
+            if (target) {
+                target.classList.remove('drag-over');
+            }
+        });
+
+        SHIRITORI_GRID.addEventListener('drop', handleDrop);
+
+        // ボタンのイベント
+        RESET_BUTTON.addEventListener('click', resetGame);
+        BACK_BUTTON.addEventListener('click', () => {
+            GAME_AREA.style.display = 'none';
+            MENU_AREA.style.display = 'block';
+        });
+        RETURN_CARD_BUTTON.addEventListener('click', returnCardFromCell);
+    }
+
+
+    function handleDrop(e) {
+        e.preventDefault();
+        
+        let dropTarget = e.target.closest('.drop-target');
+        
+        if (!dropTarget || dropTarget.classList.contains('filled')) return;
+
+        dropTarget.classList.remove('drag-over');
+
+        const droppedWord = e.dataTransfer.getData('text/plain');
+        const draggedCard = document.querySelector(`.word-card[data-word="${droppedWord}"]`);
+        
+        if (!draggedCard) {
+             return;
+        }
+
+        const cellIndex = parseInt(dropTarget.dataset.cellIndex, 10);
+
+        // 現在のマス目しか受け付けない
+        if (cellIndex === currentCellIndex) {
+            checkAnswer(draggedCard, dropTarget);
+        } else {
+            playSound(SOUND_INCORRECT_PATH);
+            FEEDBACK_MESSAGE.textContent = `❌ ${currentCellIndex}マス目に入れてね！`;
+            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+        }
+    }
+    
+    // ----------------------------------------------------
+    // 4. 正誤判定
+    // ----------------------------------------------------
+
+    function checkAnswer(card, dropTarget) {
+        const prevCell = document.getElementById(`cell-${currentCellIndex - 1}`);
+        const requiredChar = prevCell.dataset.nextChar; 
+        const droppedFirstChar = card.dataset.firstChar; 
+        
+        let isCorrect = false;
+
+        const SHIRITORI_ALLOW_MAP = {
+            'か': ['か', 'が'], 'き': ['き', 'ぎ'], 'く': ['く', 'ぐ'], 'け': ['け', 'げ'], 'こ': ['こ', 'ご'],
+            'さ': ['さ', 'ざ'], 'し': ['し', 'じ'], 'す': ['す', 'ず'], 'せ': ['せ', 'ぜ'], 'そ': ['そ', 'ぞ'],
+            'た': ['た', 'だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['て', 'で'], 'と': ['と', 'ど'],
+            'は': ['は', 'ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
+        };
+
+        const allowChars = SHIRITORI_ALLOW_MAP[requiredChar] || [requiredChar];
+        
+        if (allowChars.includes(droppedFirstChar)) {
+            isCorrect = true;
+        }
+
+        if (isCorrect) {
+            playSound(SOUND_CORRECT_PATH);
+            
+            // マスにカードの内容を埋め込む
+            dropTarget.innerHTML = `
+                <img src="assets/images/${gameWords.find(w => w.word === card.dataset.word).image}" alt="${card.dataset.word}" class="cell-image" onerror="this.remove()">
+                <span class="word-text">${card.dataset.word}</span>
+            `;
+            dropTarget.classList.remove('drop-target');
+            dropTarget.classList.add('filled');
+            dropTarget.dataset.word = card.dataset.word;
+            dropTarget.dataset.nextChar = card.dataset.nextChar; 
+            dropTarget.dataset.image = gameWords.find(w => w.word === card.dataset.word).image;
+
+            // 元のカードをリストから除去
+            card.remove();
+
+            currentCellIndex++;
+
+            // 最後のマスまで埋まったらクリア (MAX_WORDS + 1 になったらクリア)
+            if (currentCellIndex > MAX_WORDS) {
+                endGame(true);
+            } else if (card.dataset.nextChar === 'ん') {
+                endGame(false); // 「ん」で終了
+            } else {
+                updateUI(true); 
+            }
+
+        } else {
+            playSound(SOUND_INCORRECT_PATH);
+            
+            const HINT_CHARS = Object.keys(SHIRITORI_ALLOW_MAP);
+            let requiredDisplay;
+
+            if (HINT_CHARS.includes(requiredChar)) {
+                 const dakuOns = SHIRITORI_ALLOW_MAP[requiredChar].filter(c => c !== requiredChar).filter(c => c.length === 1).join('/'); // 濁音のみ表示
+                 requiredDisplay = `${requiredChar}（または${dakuOns}）`;
+            } else {
+                requiredDisplay = requiredChar;
+            }
+            
+            FEEDBACK_MESSAGE.textContent = `❌「${requiredDisplay}」から始まる言葉じゃないよ...。`;
+            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            
+            // 間違いの場合、カードは自動で元の場所に戻っているため、処理不要
+        }
+    }
+    
+    // ----------------------------------------------------
+    // 5. UIの更新とリセット
+    // ----------------------------------------------------
+    
+    // カードをマスから選別エリアに戻す処理 (ボタンクリック用)
+    function returnCardFromCell() {
+        if (currentCellIndex <= 1) {
+            FEEDBACK_MESSAGE.textContent = "「しりとり」のマスは戻せません。";
+            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            return;
+        }
+
+        const targetCellIndex = currentCellIndex - 1;
+        const targetCell = document.getElementById(`cell-${targetCellIndex}`);
+        
+        if (targetCell && targetCell.classList.contains('filled')) {
+            const wordName = targetCell.dataset.word;
+            const wordImage = targetCell.dataset.image;
+            const wordData = gameWords.find(w => w.word === wordName);
+            
+            if (wordData) {
+                const card = document.createElement('div');
+                card.className = 'word-card';
+                card.draggable = true;
+                
+                card.dataset.word = wordData.word;
+                card.dataset.reading = wordData.reading;
+                card.dataset.nextChar = wordData.nextChar; 
+                card.dataset.firstChar = wordData.firstChar;
+                
+                card.innerHTML = `
+                    <img src="assets/images/${wordImage}" alt="${wordData.word}" class="card-image" onerror="this.remove()">
+                    <div class="card-label">${wordData.word}</div>
+                `;
+
+                CARD_SELECTION_AREA.appendChild(card);
+            }
+
+            // セルを空に戻す
+            targetCell.innerHTML = '';
+            targetCell.classList.remove('filled');
+            targetCell.classList.add('drop-target');
+            delete targetCell.dataset.word;
+            delete targetCell.dataset.nextChar;
+            delete targetCell.dataset.image;
+
+            currentCellIndex--;
+
+            updateUI(true); 
+            FEEDBACK_MESSAGE.textContent = "カードをリストに戻しました。";
+            FEEDBACK_MESSAGE.style.color = 'var(--primary)';
+        } else {
+            FEEDBACK_MESSAGE.textContent = "戻せるカードがありません。";
+            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+        }
+    }
+
+    function updateUI(isCorrectMove) {
+        const prevCell = document.getElementById(`cell-${currentCellIndex - 1}`);
+        if (!prevCell) return; 
+
+        const prevChar = prevCell.dataset.nextChar;
+        const nextCellNumber = currentCellIndex; 
+        
+        GAME_STATUS_MESSAGE.textContent = `マス目 ${nextCellNumber} / ${MAX_WORDS}`;
+        REMAINING_COUNT_MESSAGE.textContent = `残りの単語 (${MAX_WORDS - (currentCellIndex - 1)}枚)`;
+        
+        const HINT_CHARS = ['か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'は', 'ひ', 'ふ', 'へ', 'ほ'];
+        
+        let hint = '';
+        if (HINT_CHARS.includes(prevChar)) {
+             hint = `（濁音・半濁音もOK）`;
+        } 
+
+        FEEDBACK_MESSAGE.textContent = `次は${nextCellNumber}マス目。「${prevChar}」${hint}から始まるカードをドロップしてね！`;
+        FEEDBACK_MESSAGE.style.color = 'var(--primary)';
+        
+        if (currentCellIndex > 1 && currentCellIndex <= MAX_WORDS + 1) {
+            RETURN_CARD_BUTTON.style.display = 'inline-block';
+        } else {
+            RETURN_CARD_BUTTON.style.display = 'none';
+        }
+    }
+
+    function resetGame() {
+        // location.reload() を直接呼ぶことでリセット
+        window.location.reload(); 
+    }
+
+    // ----------------------------------------------------
+    // 6. 終了処理 (Firebase統合)
+    // ----------------------------------------------------
+
+    async function endGame(isWin) {
+        
+        SHIRITORI_GRID.style.pointerEvents = 'none'; // 操作不可に
+        
+        let finalMessage;
+        let pointsToAward = 0;
+        
+        if (isWin) {
+            // 全問クリアの場合、ボーナスポイントを付与
+            playSound(SOUND_CORRECT_PATH);
+            pointsToAward = BONUS_POINTS;
+            finalMessage = `🎉 全${MAX_WORDS}問クリア！すごい！おめでとう！ (${pointsToAward} Pt) 🎉`;
+            FEEDBACK_MESSAGE.style.color = 'var(--correct-color)';
+        } else {
+            // 「ん」で終了または失敗
+            playSound(SOUND_INCORRECT_PATH);
+            const lastWord = document.getElementById(`cell-${currentCellIndex - 1}`).dataset.word;
+            finalMessage = `😭 ゲームオーバー！「${lastWord}」は「ん」で終わるから負けだよ。`;
+            FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            // 失敗時はポイントなし
+        }
+
+        FEEDBACK_MESSAGE.textContent = finalMessage;
+        GAME_STATUS_MESSAGE.textContent = 'ゲーム終了';
+        SHIRITORI_GRID.removeEventListener('drop', handleDrop);
+        RETURN_CARD_BUTTON.style.display = 'none'; 
+        RESET_BUTTON.style.backgroundColor = 'var(--correct-color)'; // リセットボタンを緑色に
+
+        // Firebaseへポイント送信
+        const user = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        const correctColor = getComputedStyle(document.documentElement).getPropertyValue('--correct-color') || '#4caf50';
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#5c7aff';
+
+        if (user && user !== GUEST_NAME && pointsToAward > 0) {
+            FEEDBACK_MESSAGE.innerHTML += '<br><span style="font-size:0.8em; color:var(--correct-color);">ポイントを送信中...</span>';
+            try {
+                const userRef = doc(db, "users", user);
+                await updateDoc(userRef, {
+                    points: increment(pointsToAward)
+                });
+                FEEDBACK_MESSAGE.innerHTML = `🎉 全${MAX_WORDS}問クリア！すごい！おめでとう！<br><span style="font-size:0.8em; color:${correctColor};">${pointsToAward} ポイントをランキングに反映しました！</span>`;
+            } catch (e) {
+                console.error("Firebase update failed:", e);
+                FEEDBACK_MESSAGE.innerHTML += `<br><span style="font-size:0.8em; color:${primaryColor};">エラー: ポイントの送信に失敗しました。</span>`;
+            }
+        } else if (isWin) {
+            FEEDBACK_MESSAGE.innerHTML += `<br><span style="font-size:0.8em; color:${primaryColor};">ログインするとボーナスポイントがもらえます。</span>`;
+        }
+    }
+
+
+    loadWords();
+</script>
 </body>
 </html>

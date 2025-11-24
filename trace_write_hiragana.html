@@ -14,6 +14,7 @@
         --bg-color: #f4f7fc;
         --text-color: #333;
         --accent: #ffcc5c;
+        --correct-color: #4caf50;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -131,6 +132,13 @@
     }
     .color-dot.active { transform: scale(1.2); border-color: #333; }
 
+    #completion-message {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: var(--correct-color);
+        margin-bottom: 20px;
+    }
+
     @media (max-width: 400px) {
         .canvas-wrapper { width: 280px; height: 280px; }
         .guide-text { font-size: 220px; }
@@ -148,6 +156,8 @@
     <div class="dojo-card">
         <h1><i class="fa-solid fa-paintbrush"></i> かきかた 道場</h1>
         <p class="sub-text">うすい もじを なぞって みよう！</p>
+        
+        <p id="completion-message" style="display:none;"></p>
 
         <div class="color-palette">
             <div class="color-dot active" style="background: #333;" onclick="setColor('#333', this)"></div>
@@ -170,11 +180,34 @@
     </div>
 </div>
 
-<script>
+<!-- ★★★ Firebase & ゲームロジック ★★★ -->
+<script type="module">
+    // Firebase SDKのインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    // Firebase設定 (あなたのプロジェクトの鍵)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     // --- 設定 ---
+    const BONUS_POINTS = 100;
     const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
     const guideEl = document.getElementById('guide-char');
+    const completionMsgEl = document.getElementById('completion-message');
+    const nextBtn = document.querySelector('.btn-next');
     
     // なぞる文字リスト
     const chars = [
@@ -193,11 +226,11 @@
     let isDrawing = false;
     let currentColor = '#333';
     let lineWidth = 12; // 線の太さ
+    let completionSent = false; // Firebase送信フラグ
 
     // --- 初期化 ---
     function init() {
         // Canvasのサイズ調整（高解像度対応）
-        // CSSサイズと実際の描画サイズを合わせる処理
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width;
         canvas.height = rect.height;
@@ -213,15 +246,30 @@
 
     // --- ガイド文字の更新 ---
     function updateGuide() {
-        guideEl.textContent = chars[currentIndex];
-        clearCanvas(); // 文字が変わったらキャンバスも綺麗に
+        if (currentIndex < chars.length) {
+            guideEl.textContent = chars[currentIndex];
+            completionMsgEl.style.display = 'none';
+            nextBtn.textContent = 'つぎへ';
+            clearCanvas(); 
+        } else {
+            // 全文字完了
+            guideEl.textContent = '完了';
+            guideEl.style.fontSize = '120px'; // 調整
+            completionMsgEl.style.display = 'block';
+            completionMsgEl.textContent = '全ひらがなクリア！おめでとう！';
+            nextBtn.textContent = 'さいしょへ';
+            clearCanvas();
+            sendCompletionPoints();
+        }
     }
 
     // --- 次の文字へ ---
-    function nextChar() {
-        currentIndex++;
+    window.nextChar = () => {
         if (currentIndex >= chars.length) {
             currentIndex = 0; // 最後まで行ったら最初に戻る
+            guideEl.style.fontSize = '240px'; // フォントサイズを戻す
+        } else {
+            currentIndex++;
         }
         updateGuide();
     }
@@ -244,6 +292,7 @@
     // --- 描画イベント処理 ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
+        // マウスまたはタッチイベントの座標を取得
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
@@ -253,6 +302,8 @@
     }
 
     function startDraw(e) {
+        if (currentIndex >= chars.length) return; // 完了時は描画を停止
+        
         e.preventDefault(); // スクロール防止
         isDrawing = true;
         const pos = getPos(e);
@@ -272,6 +323,30 @@
         isDrawing = false;
         ctx.closePath();
     }
+    
+    // --- Firebase ポイント送信 ---
+    async function sendCompletionPoints() {
+        if (completionSent) return;
+        completionSent = true;
+        
+        const user = sessionStorage.getItem('current_user');
+        if (user && user !== 'ゲスト') {
+            completionMsgEl.innerHTML += `<br><span style="font-size:0.7em; color:var(--correct-color);">ボーナス ${BONUS_POINTS} ポイントを送信中...</span>`;
+            try {
+                const userRef = doc(db, "users", user);
+                await updateDoc(userRef, {
+                    points: increment(BONUS_POINTS)
+                });
+                completionMsgEl.innerHTML = `全ひらがなクリア！おめでとう！<br><span style="font-size:0.7em; color:var(--correct-color);">ボーナス ${BONUS_POINTS} ポイントをランキングに反映しました！</span>`;
+            } catch (e) {
+                console.error("Error updating score: ", e);
+                completionMsgEl.innerHTML = `全ひらがなクリア！おめでとう！<br><span style="font-size:0.7em; color:var(--primary);">エラー: ポイントの送信に失敗しました。</span>`;
+            }
+        } else {
+            completionMsgEl.innerHTML += '<br><span style="font-size:0.7em; color:var(--primary);">ログインするとボーナスポイントがもらえます。</span>';
+        }
+    }
+
 
     // マウスイベント
     canvas.addEventListener('mousedown', startDraw);

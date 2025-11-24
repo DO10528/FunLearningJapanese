@@ -22,24 +22,17 @@
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        touch-action: manipulation; /* ダブルタップ拡大防止 */
+        margin: 0; padding: 0; min-height: 100vh;
+        display: flex; flex-direction: column;
+        touch-action: manipulation;
     }
 
     /* --- ヘッダー --- */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        z-index: 100;
+        color: white; padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
     .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
@@ -47,27 +40,16 @@
 
     /* --- メインコンテナ --- */
     .main-container {
-        flex-grow: 1;
-        padding: 20px;
-        max-width: 700px;
-        margin: 0 auto;
-        width: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        flex-grow: 1; padding: 20px; max-width: 700px;
+        margin: 0 auto; width: 100%; box-sizing: border-box;
+        display: flex; flex-direction: column; justify-content: center;
     }
 
     /* --- カードデザイン --- */
     .game-card {
-        background: white;
-        border-radius: 25px;
-        padding: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        text-align: center;
-        border: 4px solid white;
-        width: 100%;
-        box-sizing: border-box;
+        background: white; border-radius: 25px; padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: center;
+        border: 4px solid white; width: 100%; box-sizing: border-box;
     }
 
     /* --- メニュー画面 --- */
@@ -103,69 +85,44 @@
 
     .instruction-text { font-weight: bold; color: #666; margin: 10px 0 5px; font-size: 0.9em; }
 
-    /* --- 並び替えエリア (ドロップゾーン) --- */
+    /* --- ドロップゾーン --- */
     .drop-zone-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 20px;
-        min-height: 70px;
-        flex-wrap: wrap;
+        display: flex; justify-content: center; gap: 8px;
+        margin-bottom: 20px; min-height: 70px; flex-wrap: wrap;
     }
-
     .drop-slot {
-        width: 60px; height: 60px;
-        border: 3px dashed #ccc;
-        background-color: #f9f9f9;
-        border-radius: 12px;
+        width: 60px; height: 60px; border: 3px dashed #ccc;
+        background-color: #f9f9f9; border-radius: 12px;
         display: flex; justify-content: center; align-items: center;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s; cursor: pointer;
     }
-    .drop-slot.hovered { background-color: #e3f2fd; border-color: var(--primary); }
+    .drop-slot.filled { border-style: solid; border-color: var(--primary); background-color: #e3f2fd; }
 
-    /* --- 文字ピースエリア (プール) --- */
+    /* --- 文字ピース --- */
     .pool-container {
-        background: #eef6ff;
-        border-radius: 15px;
-        padding: 15px;
-        min-height: 80px;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
+        background: #eef6ff; border-radius: 15px; padding: 15px;
+        min-height: 80px; display: flex; justify-content: center;
+        gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
         border: 2px solid #bbdefb;
     }
-
-    /* --- 文字ピース (ドラッグ可能) --- */
+    
     .char-piece {
-        width: 55px; height: 55px;
-        background: white;
-        border: 3px solid var(--primary);
-        border-radius: 12px;
-        font-size: 1.8em;
-        font-weight: 900;
-        color: var(--primary);
+        width: 55px; height: 55px; background: white;
+        border: 3px solid var(--primary); border-radius: 12px;
+        font-size: 1.8em; font-weight: 900; color: var(--primary);
         display: flex; justify-content: center; align-items: center;
-        cursor: grab;
-        box-shadow: 0 4px 0 #90caf9;
+        cursor: pointer; box-shadow: 0 4px 0 #90caf9;
         user-select: none;
-        touch-action: none; /* スマホのスクロール干渉防止 */
-        z-index: 10;
     }
-    .char-piece:active { cursor: grabbing; transform: scale(1.1); }
-    .char-piece.dragging { opacity: 0.5; }
+    .char-piece:active { transform: scale(0.95); box-shadow: 0 2px 0 #90caf9; }
+    .char-piece.used { opacity: 0.3; pointer-events: none; transform: scale(0.9); box-shadow: none; border-color: #ccc; }
 
-    /* --- ボタン類 --- */
     .check-btn {
-        background: #4caf50; color: white;
-        border: none; border-radius: 50px;
+        background: #4caf50; color: white; border: none; border-radius: 50px;
         padding: 12px 40px; font-size: 1.2em; font-weight: bold;
         box-shadow: 0 4px 0 #2e7d32; cursor: pointer;
     }
     .check-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2e7d32; }
-    .check-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
-
     .feedback-msg { height: 1.5em; font-weight: bold; font-size: 1.2em; margin-top: 15px; }
 
     /* アニメーション */
@@ -194,7 +151,7 @@
                     ぜんぶで <strong>10もん</strong> あるよ！
                 </div>
 
-                <button id="startButtonGame2" class="start-btn">
+                <button id="startButtonGame2" class="start-btn" onclick="game.start()">
                     <i class="fa-solid fa-play"></i> スタート！
                 </button>
                 <a href="index.html" class="home-btn-text">ホームにもどる</a>
@@ -202,27 +159,20 @@
         </div>
 
         <div id="game-area-2" style="display:none;" class="pop-in">
-            
             <div class="score-board">
                 <span id="turn-msg">問 1 / 10</span>
                 <span><i class="fa-solid fa-star" style="color:#f0ad4e;"></i> <span id="score-val">0</span></span>
             </div>
-
             <div class="game-card">
                 <div id="image-area" class="image-frame"></div>
-
                 <div class="instruction-text">ここに もじ をいれてね</div>
                 <div id="answer-container" class="drop-zone-container"></div>
-
                 <div class="instruction-text">つかう もじ</div>
                 <div id="pool-container" class="pool-container"></div>
-
                 <div>
-                    <button id="checkButton" class="check-btn">できた！</button>
+                    <button id="checkButton" class="check-btn" onclick="game.checkAnswer()">できた！</button>
                 </div>
-
                 <p id="feedback" class="feedback-msg"></p>
-                
                 <div style="margin-top: 10px;">
                     <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
                 </div>
@@ -231,7 +181,246 @@
 
     </div>
 
-    <script src="js/hiragana2.js"></script>
+    <!-- 音声 -->
+    <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+    <audio id="snd-fanfare" src="assets/sounds/fanfare.mp3"></audio>
 
+<!-- ★★★ Firebase SDKとロジック ★★★ -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- データセット ---
+    const QUESTIONS = [
+        { id: 'apple', img: 'assets/images/apple.png', ans: 'りんご' },
+        { id: 'dog', img: 'assets/images/dog.png', ans: 'いぬ' },
+        { id: 'car', img: 'assets/images/car.png', ans: 'くるま' },
+        { id: 'shoes', img: 'assets/images/shoes.png', ans: 'くつ' },
+        { id: 'umbrella', img: 'assets/images/umbrella.png', ans: 'かさ' },
+        { id: 'book', img: 'assets/images/book.png', ans: 'ほん' },
+        { id: 'fish', img: 'assets/images/fish.png', ans: 'さかな' },
+        { id: 'flower', img: 'assets/images/flower.png', ans: 'はな' },
+        { id: 'clock', img: 'assets/images/clock.png', ans: 'とけい' },
+        { id: 'cat', img: 'assets/images/cat.png', ans: 'ねこ' },
+        { id: 'watermelon', img: 'assets/images/suika.png', ans: 'すいか' },
+        { id: 'pencil', img: 'assets/images/enpitsu.png', ans: 'えんぴつ' }
+    ];
+
+    // --- ゲームクラス ---
+    class SortGame {
+        constructor() {
+            this.questions = [];
+            this.currentQIndex = 0;
+            this.score = 0;
+            this.currentSlots = []; // 現在の入力状態
+
+            // DOM
+            this.menuArea = document.getElementById('main-menu-2');
+            this.gameArea = document.getElementById('game-area-2');
+            this.imgArea = document.getElementById('image-area');
+            this.slotArea = document.getElementById('answer-container');
+            this.poolArea = document.getElementById('pool-container');
+            this.feedback = document.getElementById('feedback');
+            this.scoreVal = document.getElementById('score-val');
+            this.turnMsg = document.getElementById('turn-msg');
+
+            this.sndCorrect = document.getElementById('snd-correct');
+            this.sndIncorrect = document.getElementById('snd-incorrect');
+            this.sndFanfare = document.getElementById('snd-fanfare');
+        }
+
+        start() {
+            this.questions = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+            this.currentQIndex = 0;
+            this.score = 0;
+            this.scoreVal.textContent = 0;
+            
+            this.menuArea.style.display = 'none';
+            this.gameArea.style.display = 'block';
+            this.nextQuestion();
+        }
+
+        nextQuestion() {
+            if (this.currentQIndex >= this.questions.length) {
+                this.finishGame();
+                return;
+            }
+
+            this.feedback.textContent = '';
+            this.feedback.style.color = '#333';
+            this.turnMsg.textContent = `問 ${this.currentQIndex + 1} / ${this.questions.length}`;
+
+            const q = this.questions[this.currentQIndex];
+            
+            // 画像
+            const img = new Image();
+            img.src = q.img;
+            img.onerror = () => { img.src = 'https://placehold.co/200x200?text=' + q.ans; };
+            this.imgArea.innerHTML = '';
+            this.imgArea.appendChild(img);
+
+            // スロット準備
+            this.slotArea.innerHTML = '';
+            const length = q.ans.length;
+            this.currentSlots = new Array(length).fill(null);
+
+            for(let i=0; i<length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'drop-slot';
+                slot.dataset.index = i;
+                slot.onclick = () => this.handleSlotClick(i);
+                this.slotArea.appendChild(slot);
+            }
+
+            // 文字プール準備 (シャッフル)
+            this.poolArea.innerHTML = '';
+            const chars = q.ans.split('').sort(() => Math.random() - 0.5);
+            
+            // 遊び心でたまにダミー文字を入れる（難易度調整: なし）
+            
+            chars.forEach((char, idx) => {
+                const piece = document.createElement('div');
+                piece.className = 'char-piece';
+                piece.textContent = char;
+                piece.dataset.char = char;
+                piece.dataset.id = idx; // 一意にする
+                piece.onclick = () => this.handlePoolClick(piece, char, idx);
+                this.poolArea.appendChild(piece);
+            });
+        }
+
+        // プールの文字をクリックした時 -> 最初の空きスロットへ
+        handlePoolClick(piece, char, id) {
+            if (piece.classList.contains('used')) return;
+
+            // 空きスロットを探す
+            const emptyIndex = this.currentSlots.findIndex(val => val === null);
+            if (emptyIndex !== -1) {
+                this.currentSlots[emptyIndex] = { char: char, poolId: id };
+                piece.classList.add('used'); // プール側は薄くする
+                this.renderSlots();
+            }
+        }
+
+        // スロットをクリックした時 -> プールに戻す
+        handleSlotClick(index) {
+            const data = this.currentSlots[index];
+            if (data) {
+                // プールの該当ピースを復活させる
+                // 同じ文字が複数ある場合に対応するため poolId で特定
+                const pieces = this.poolArea.querySelectorAll('.char-piece');
+                pieces.forEach(p => {
+                    // idは生成時に付与したものを使用（datasetは文字列になるので注意）
+                    if (p.dataset.id == data.poolId) {
+                        p.classList.remove('used');
+                    }
+                });
+
+                this.currentSlots[index] = null;
+                this.renderSlots();
+            }
+        }
+
+        renderSlots() {
+            const slots = this.slotArea.querySelectorAll('.drop-slot');
+            slots.forEach((slot, i) => {
+                const data = this.currentSlots[i];
+                if (data) {
+                    slot.textContent = data.char;
+                    slot.classList.add('filled');
+                } else {
+                    slot.textContent = '';
+                    slot.classList.remove('filled');
+                }
+            });
+        }
+
+        checkAnswer() {
+            // まだ埋まってない？
+            if (this.currentSlots.includes(null)) {
+                this.feedback.textContent = 'まだ あいている ところが あるよ！';
+                this.feedback.style.color = 'orange';
+                return;
+            }
+
+            const playerAns = this.currentSlots.map(d => d.char).join('');
+            const correctAns = this.questions[this.currentQIndex].ans;
+
+            if (playerAns === correctAns) {
+                this.sndCorrect.currentTime = 0; this.sndCorrect.play().catch(e=>{});
+                this.feedback.textContent = 'せいかい！';
+                this.feedback.style.color = 'var(--correct-color)';
+                this.score += 10;
+                this.scoreVal.textContent = this.score;
+
+                // スロットをキラキラさせる等の演出があれば良いが今回は省略
+                setTimeout(() => {
+                    this.currentQIndex++;
+                    this.nextQuestion();
+                }, 1500);
+
+            } else {
+                this.sndIncorrect.currentTime = 0; this.sndIncorrect.play().catch(e=>{});
+                this.feedback.textContent = 'おしい！ ちょっとちがうかも？';
+                this.feedback.style.color = 'var(--incorrect-color)';
+            }
+        }
+
+        async finishGame() {
+            this.imgArea.innerHTML = '<i class="fa-solid fa-crown" style="font-size:5em; color:#ffd700;"></i>';
+            this.slotArea.innerHTML = '';
+            this.poolArea.innerHTML = '';
+            
+            this.feedback.innerHTML = `おしまい！<br><span style="font-size:1.5em">${this.score}てん！</span>`;
+            this.feedback.style.color = 'var(--primary)';
+            
+            this.sndFanfare.currentTime = 0;
+            this.sndFanfare.play().catch(e=>{});
+
+            // Firebase送信
+            const user = sessionStorage.getItem('current_user');
+            if (user && user !== 'ゲスト') {
+                try {
+                    const userRef = doc(db, "users", user);
+                    await updateDoc(userRef, {
+                        points: increment(this.score)
+                    });
+                    this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">ランキングに反映しました！</span>';
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // リトライボタン
+            setTimeout(() => {
+                const btn = document.createElement('button');
+                btn.className = 'start-btn';
+                btn.textContent = 'もういちど';
+                btn.onclick = () => location.reload();
+                this.poolArea.appendChild(btn); // 場所借り
+            }, 1000);
+        }
+    }
+
+    window.game = new SortGame();
+
+    // プリロード
+    QUESTIONS.forEach(q => { const i = new Image(); i.src = q.img; });
+
+</script>
 </body>
 </html>
