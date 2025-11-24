@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>どうしリスト - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #00bcd4;
+        --bg-color: #f0f8ff;
+        --text-color: #333;
+        
+        /* PDFに基づくグループカラー */
+        --grp1-color: #f48fb1; /* ピンク (Group I) */
+        --grp2-color: #80deea; /* 水色 (Group II) */
+        --grp3-color: #9575cd; /* 紫 (Group III) */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        touch-action: manipulation;
+    }
+
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%; max-width: 1000px; margin: 0 auto;
+    }
+
+    /* タイトルエリア */
+    .page-header {
+        text-align: center; margin-bottom: 30px;
+        background: white; padding: 20px; border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border: 2px solid var(--primary);
+    }
+    .page-title { font-size: 1.8em; color: var(--primary); margin: 0; font-weight: 900; }
+    .page-desc { color: #666; margin-top: 10px; font-size: 0.95em; }
+
+    /* --- グループカラムレイアウト --- */
+    /* PCでは3列、スマホでは1列にする */
+    .groups-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .group-column {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        border-radius: 20px;
+        padding: 0 0 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex; flex-direction: column;
+        overflow: hidden;
+        border-top: 5px solid; /* 色はインラインで指定 */
+    }
+
+    .group-header-bar {
+        padding: 15px;
+        text-align: center;
+        font-size: 1.4em; font-weight: 900;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 15px;
+    }
+
+    /* 「i-masu」「e-masu」などのタグ */
+    .type-tag {
+        display: inline-block;
+        padding: 5px 20px;
+        border-radius: 15px;
+        color: white;
+        font-weight: bold;
+        font-family: 'Klee One', cursive;
+        font-size: 1.1em;
+        margin: 10px auto;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* リストエリア */
+    .verb-list-area {
+        padding: 0 15px;
+        display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* 動詞カード（横長スタイル） */
+    .verb-card {
+        background: white;
+        border-radius: 12px;
+        padding: 10px 15px;
+        display: flex; align-items: center; justify-content: space-between;
+        cursor: pointer;
+        border: 2px solid #f0f0f0;
+        transition: all 0.1s;
+    }
+    .verb-card:active { transform: scale(0.98); background: #f9f9f9; }
+    .verb-card:hover { border-color: #ddd; }
+
+    .verb-info { display: flex; align-items: center; gap: 15px; }
+    .verb-icon { 
+        font-size: 1.5em; width: 40px; height: 40px; 
+        display: flex; justify-content: center; align-items: center;
+        background: #eef; border-radius: 50%; color: #555;
+    }
+    
+    .verb-text-box { text-align: left; }
+    .verb-jp {
+        font-family: 'Klee One', cursive;
+        font-size: 1.2em; font-weight: 800; color: #333;
+    }
+    .verb-en { font-size: 0.8em; color: #888; }
+
+    .check-btn {
+        color: #ddd; font-size: 1.2em; width: 30px; height: 30px;
+        display: flex; justify-content: center; align-items: center;
+        border-radius: 50%; border: 2px solid #eee;
+        transition: all 0.2s;
+    }
+    .verb-card.learned .check-btn {
+        background: #4caf50; border-color: #4caf50; color: white;
+    }
+    .verb-card.learned { opacity: 0.6; }
+
+    /* 区切り線 */
+    .divider {
+        height: 2px; background: #eee; margin: 15px 20px; border-radius: 2px;
+    }
+
+    /* 戻るボタン */
+    .footer-area { text-align: center; margin-top: 40px; padding-bottom: 40px; width: 100%; }
+    .home-btn-large {
+        background-color: #546e7a; color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: bold;
+        font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #37474f;
+        text-decoration: none; display: inline-block;
+    }
+    .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
+
+    @media (max-width: 700px) {
+        .groups-container { flex-direction: column; }
+        .group-column { width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+    <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+</header>
+
+<div class="main-container">
+
+    <div class="page-header">
+        <h1 class="page-title"><i class="fa-solid fa-book"></i> どうし グループ分け</h1>
+        <p class="page-desc">タップして おとを きこう！</p>
+    </div>
+
+    <div class="groups-container">
+
+        <div class="group-column" style="border-top-color: var(--grp1-color);">
+            <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
+            
+            <div class="type-tag" style="background: var(--grp1-color);">i-masu</div>
+            
+            <div class="verb-list-area" id="list-grp1">
+                </div>
+        </div>
+
+        <div class="group-column" style="border-top-color: var(--grp2-color);">
+            <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
+            
+            <div class="type-tag" style="background: var(--grp2-color);">e-masu</div>
+            <div class="verb-list-area" id="list-grp2-e"></div>
+
+            <div class="divider"></div>
+
+            <div class="type-tag" style="background: var(--grp2-color);">i-masu</div>
+            <div class="verb-list-area" id="list-grp2-i"></div>
+        </div>
+
+        <div class="group-column" style="border-top-color: var(--grp3-color);">
+            <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
+            
+            <div class="type-tag" style="background: var(--grp3-color);">shimasu</div>
+            <div class="verb-list-area" id="list-grp3-s"></div>
+
+            <div class="divider"></div>
+
+            <div class="type-tag" style="background: var(--grp3-color);">kimasu</div>
+            <div class="verb-list-area" id="list-grp3-k"></div>
+        </div>
+
+    </div>
+
+    <div class="footer-area">
+        <a href="index.html" class="home-btn-large">ホームにもどる</a>
+    </div>
+
+</div>
+
+<script>
+    // --- 動詞データ (PDFの内容を反映) ---
+    const verbs = {
+        grp1: [
+            { jp: "かきます", en: "Write", icon: "fa-solid fa-pen" },
+            { jp: "ききます", en: "Listen", icon: "fa-solid fa-headphones" },
+            { jp: "いきます", en: "Go", icon: "fa-solid fa-person-walking-arrow-right" },
+            { jp: "およぎます", en: "Swim", icon: "fa-solid fa-person-swimming" },
+            { jp: "のみます", en: "Drink", icon: "fa-solid fa-glass-water" },
+            { jp: "よみます", en: "Read", icon: "fa-solid fa-book-open" },
+            { jp: "やすみます", en: "Rest", icon: "fa-solid fa-bed" },
+            { jp: "あそびます", en: "Play", icon: "fa-solid fa-gamepad" },
+            { jp: "かいます", en: "Buy", icon: "fa-solid fa-cart-shopping" },
+            { jp: "あいます", en: "Meet", icon: "fa-solid fa-handshake" },
+            { jp: "まちます", en: "Wait", icon: "fa-solid fa-clock" },
+            { jp: "もちます", en: "Hold", icon: "fa-solid fa-bag-shopping" },
+            { jp: "とります", en: "Take photo", icon: "fa-solid fa-camera" },
+            { jp: "かえります", en: "Return", icon: "fa-solid fa-house" },
+            { jp: "わかります", en: "Understand", icon: "fa-regular fa-lightbulb" },
+            { jp: "はなします", en: "Talk", icon: "fa-solid fa-comments" }
+        ],
+        grp2_e: [
+            { jp: "ねます", en: "Sleep", icon: "fa-solid fa-moon" },
+            { jp: "たべます", en: "Eat", icon: "fa-solid fa-utensils" },
+            { jp: "あげます", en: "Give", icon: "fa-solid fa-gift" },
+            { jp: "あけます", en: "Open", icon: "fa-solid fa-door-open" },
+            { jp: "みせます", en: "Show", icon: "fa-solid fa-eye" },
+            { jp: "おしえます", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
+            { jp: "はじめます", en: "Start", icon: "fa-solid fa-play" }
+        ],
+        grp2_i: [
+            { jp: "みます", en: "Watch/See", icon: "fa-solid fa-tv" },
+            { jp: "います", en: "Exist (Living)", icon: "fa-solid fa-person" },
+            { jp: "おきます", en: "Wake up", icon: "fa-solid fa-sun" },
+            { jp: "かります", en: "Borrow", icon: "fa-solid fa-hand-holding" },
+            { jp: "あびます", en: "Shower", icon: "fa-solid fa-shower" },
+            { jp: "できます", en: "Can do", icon: "fa-solid fa-thumbs-up" }
+        ],
+        grp3_s: [
+            { jp: "べんきょう\nします", en: "Study", icon: "fa-solid fa-graduation-cap" },
+            { jp: "かいもの\nします", en: "Shop", icon: "fa-solid fa-basket-shopping" },
+            { jp: "さんぽ\nします", en: "Walk", icon: "fa-solid fa-tree" },
+            { jp: "コピー\nします", en: "Copy", icon: "fa-solid fa-copy" }
+        ],
+        grp3_k: [
+            { jp: "きます", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
+            { jp: "もって\nきます", en: "Bring", icon: "fa-solid fa-box-open" }
+        ]
+    };
+
+    const synth = window.speechSynthesis;
+
+    function speak(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text.replace('\n', ''));
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 0.9;
+        const voices = synth.getVoices();
+        const jpVoice = voices.find(v => v.lang === 'ja-JP');
+        if(jpVoice) utterThis.voice = jpVoice;
+        synth.speak(utterThis);
+    }
+
+    function renderList(containerId, data) {
+        const container = document.getElementById(containerId);
+        
+        data.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'verb-card';
+            card.innerHTML = `
+                <div class="verb-info">
+                    <div class="verb-icon"><i class="${item.icon}"></i></div>
+                    <div class="verb-text-box">
+                        <div class="verb-jp">${item.jp.replace('\n', '<br>')}</div>
+                        <div class="verb-en">${item.en}</div>
+                    </div>
+                </div>
+                <div class="check-btn"><i class="fa-solid fa-check"></i></div>
+            `;
+
+            card.onclick = (e) => {
+                if (e.target.closest('.check-btn')) {
+                    e.stopPropagation();
+                    card.classList.toggle('learned');
+                    return;
+                }
+                speak(item.jp);
+            };
+            container.appendChild(card);
+        });
+    }
+
+    window.onload = () => {
+        renderList('list-grp1', verbs.grp1);
+        renderList('list-grp2-e', verbs.grp2_e);
+        renderList('list-grp2-i', verbs.grp2_i);
+        renderList('list-grp3-s', verbs.grp3_s);
+        renderList('list-grp3-k', verbs.grp3_k);
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {};
+        }
+    };
+</script>
+
+</body>
+</html>
