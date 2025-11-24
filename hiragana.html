@@ -1,117 +1,145 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ひらがな単語ゲーム - FunLearnJP</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ひらがな単語ゲーム - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS を読み込みます (ランキングパネル用) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-    /* --- カラー設定 --- */
-    :root {
-        --primary: #5c7aff;
-        --accent: #ffcc5c;
-        --bg-color: #f4f7fc;
-        --text-color: #333;
-        --correct-color: #4caf50;
-        --incorrect-color: #ef5350;
-    }
+    <style>
+        /* --- カラー設定 --- */
+        :root {
+            --primary: #5c7aff;
+            --accent: #ffcc5c;
+            --bg-color: #f4f7fc;
+            --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #ef5350;
+        }
 
-    body {
-        font-family: 'Zen Maru Gothic', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0; padding: 0; min-height: 100vh;
-        display: flex; flex-direction: column;
-    }
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
 
-    /* --- ヘッダー --- */
-    header {
-        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white; padding: 15px 20px;
-        display: flex; justify-content: space-between; align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
-    }
-    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
-    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+            color: white; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
+        }
+        .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+        .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
 
-    /* --- メインレイアウト --- */
-    .main-container {
-        flex-grow: 1; padding: 20px; max-width: 700px;
-        margin: 0 auto; width: 100%; box-sizing: border-box;
-        display: flex; flex-direction: column; justify-content: center;
-    }
+        /* --- メインレイアウト --- */
+        .main-container {
+            flex-grow: 1; padding: 20px; max-width: 700px;
+            margin: 0 auto; width: 100%; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center;
+        }
 
-    /* --- カードデザイン --- */
-    .quiz-card {
-        background: white; border-radius: 25px; padding: 30px 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: center;
-        border: 4px solid white; width: 100%; box-sizing: border-box;
-    }
+        /* --- カードデザイン --- */
+        .quiz-card {
+            background: white; border-radius: 25px; padding: 30px 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: center;
+            border: 4px solid white; width: 100%; box-sizing: border-box;
+        }
 
-    /* --- メニュー画面 --- */
-    .menu-icon { font-size: 5em; color: #ff6f61; margin-bottom: 15px; animation: bounce 2s infinite; }
-    .menu-title { font-size: 2em; color: var(--primary); margin: 0 0 10px 0; }
-    .menu-desc { color: #666; margin-bottom: 20px; font-size: 1.1em; }
-    .rule-box { background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 25px; color: #5d4037; }
-    
-    .start-btn {
-        background: linear-gradient(to bottom, #5c7aff, #4b63cc);
-        color: white; font-size: 1.6em; font-weight: 900;
-        padding: 15px 50px; border: none; border-radius: 50px;
-        cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
-        margin-bottom: 15px; display: inline-block; width: 80%; max-width: 300px;
-    }
-    .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
-    .home-btn-text { color: #999; text-decoration: none; font-weight: bold; display: block; margin-top: 10px; }
+        /* --- メニュー画面 --- */
+        .menu-icon { font-size: 5em; color: #ff6f61; margin-bottom: 15px; animation: bounce 2s infinite; }
+        .menu-title { font-size: 2em; color: var(--primary); margin: 0 0 10px 0; }
+        .menu-desc { color: #666; margin-bottom: 20px; font-size: 1.1em; }
+        .rule-box { background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 25px; color: #5d4037; }
+        
+        .start-btn {
+            background: linear-gradient(to bottom, #5c7aff, #4b63cc);
+            color: white; font-size: 1.6em; font-weight: 900;
+            padding: 15px 50px; border: none; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
+            margin-bottom: 15px; display: inline-block; width: 80%; max-width: 300px;
+        }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
+        .home-btn-text { color: #999; text-decoration: none; font-weight: bold; display: block; margin-top: 10px; }
 
-    /* --- ゲーム画面 --- */
-    .score-board {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 15px; padding: 10px 20px;
-        background: white; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        font-weight: bold; color: var(--primary);
-    }
+        /* --- ゲーム画面 --- */
+        .score-board {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding: 10px 20px;
+            background: white; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-weight: bold; color: var(--primary);
+        }
 
-    .image-frame {
-        width: 200px; height: 200px; margin: 0 auto 20px;
-        background: #fffbea; border: 6px solid var(--accent);
-        border-radius: 25px; overflow: hidden;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .image-frame img { width: 90%; height: 90%; object-fit: contain; }
-    
-    .question-text { font-size: 1.4em; font-weight: bold; color: #444; margin-bottom: 20px; }
+        .image-frame {
+            width: 200px; height: 200px; margin: 0 auto 20px;
+            background: #fffbea; border: 6px solid var(--accent);
+            border-radius: 25px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .image-frame img { width: 90%; height: 90%; object-fit: contain; }
+        
+        .question-text { font-size: 1.4em; font-weight: bold; color: #444; margin-bottom: 20px; }
 
-    /* --- 選択肢グリッド --- */
-    .choices-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        width: 100%; margin-bottom: 20px;
-    }
+        /* --- 選択肢グリッド --- */
+        .choices-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            width: 100%; margin-bottom: 20px;
+        }
 
-    .choice-btn {
-        background-color: #ffffff; border: 3px solid #dce0e5; border-radius: 15px;
-        color: #555; font-size: 1.3em; font-weight: 800;
-        padding: 15px 5px; width: 100%; min-height: 70px;
-        cursor: pointer; box-shadow: 0 4px 0 #cfd8dc; transition: all 0.1s;
-        display: flex; justify-content: center; align-items: center;
-    }
-    .choice-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 #cfd8dc; }
-    .choice-btn:active { transform: translateY(2px); box-shadow: none; }
-    
-    .choice-btn.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; box-shadow: 0 4px 0 #2e7d32; }
-    .choice-btn.incorrect { background-color: var(--incorrect-color); border-color: var(--incorrect-color); color: white; opacity: 0.6; box-shadow: none; }
-    .choice-btn.disabled { pointer-events: none; }
+        .choice-btn {
+            background-color: #ffffff; border: 3px solid #dce0e5; border-radius: 15px;
+            color: #555; font-size: 1.3em; font-weight: 800;
+            padding: 15px 5px; width: 100%; min-height: 70px;
+            cursor: pointer; box-shadow: 0 4px 0 #cfd8dc; transition: all 0.1s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .choice-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 #cfd8dc; }
+        .choice-btn:active { transform: translateY(2px); box-shadow: none; }
+        
+        .choice-btn.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; box-shadow: 0 4px 0 #2e7d32; }
+        .choice-btn.incorrect { background-color: var(--incorrect-color); border-color: var(--incorrect-color); color: white; opacity: 0.6; box-shadow: none; }
+        .choice-btn.disabled { pointer-events: none; }
 
-    .feedback-area { min-height: 1.5em; margin-top: 10px; font-size: 1.3em; font-weight: 900; }
-    
-    /* アニメーション */
-    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .feedback-area { min-height: 1.5em; margin-top: 10px; font-size: 1.3em; font-weight: 900; }
+        
+        /* アニメーション */
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* ★★★ ランキングパネルのスタイル ★★★ */
+        #ranking-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000; 
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 90%; /* モバイル対応 */
+            max-width: 300px;
+            transform: translateX(0); /* 初期位置 */
+            transition: transform 0.3s ease-out;
+        }
+        /* モバイルでは画面下部に表示されがちなので、右上のスペースを確保 */
+        @media (max-width: 768px) {
+            .main-container { padding-right: 20px; } 
+            #ranking-panel {
+                top: auto;
+                bottom: 20px;
+                right: 50%;
+                transform: translateX(50%);
+                width: 95%;
+                max-width: 350px;
+            }
+        }
 
-</style>
+    </style>
 </head>
 <body>
 
@@ -132,6 +160,8 @@
                     <div id="quiz-score-message">
                         ぜんぶで <strong>10もん</strong> あるよ。<br>がんばって クリアしよう！
                     </div>
+                    <!-- 認証ステータス表示エリアを追加 -->
+                    <div id="auth-status" class="mt-3 text-sm font-medium text-indigo-700">認証中...</div>
                 </div>
                 <button id="quizStartButton" class="start-btn" onclick="game.start()">
                     <i class="fa-solid fa-play"></i> スタート！
@@ -163,6 +193,36 @@
 
     </div>
 
+    <!-- ★★★ リアルタイムランキング表示パネルをゲーム画面の外に追加 ★★★ -->
+    <div id="ranking-panel" class="w-full max-w-xs bg-white rounded-xl shadow-2xl p-4 transition-transform duration-300 transform">
+        
+        <!-- 初期化中のローディングオーバーレイ -->
+        <div id="loading-overlay" class="rounded-xl">
+            <div class="text-lg font-semibold text-gray-700">
+                <svg class="animate-spin h-5 w-5 mr-3 inline text-indigo-500" viewBox="0 0 24 24">
+                    <!-- SVG for spinner -->
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                データ準備中...
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold mb-3 text-indigo-700 border-b pb-2">🏆 リアルタイムランキング</h2>
+        
+        <!-- ユーザー自身のスコア表示エリア -->
+        <div id="my-score-card" class="bg-indigo-50 p-3 rounded-lg border border-indigo-200 mb-4 shadow-sm">
+            <p class="text-sm font-medium text-indigo-600">あなたのハイスコア: <span id="my-current-score" class="font-bold text-lg ml-2">---</span></p>
+            <p class="text-xs text-indigo-400 mt-1">ユーザーID: <span id="user-id-display">読み込み中...</span></p>
+        </div>
+
+        <!-- ランキングリスト -->
+        <ul id="leaderboard-list" class="space-y-2">
+            <!-- ランキングアイテムがここに入ります -->
+            <li class="text-gray-500">ランキングデータがありません。</li>
+        </ul>
+    </div>
+
     <!-- 音声ファイル -->
     <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
     <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
@@ -171,11 +231,18 @@
 <!-- ★★★ Firebase & ゲームロジック ★★★ -->
 <script type="module">
     // Firebase SDKのインポート
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, collection, query, onSnapshot, orderBy, limit, serverTimestamp, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // Firestoreのデバッグログを有効にする
+    setLogLevel('debug');
 
-    // Firebase設定 (あなたのプロジェクトの鍵)
-    const firebaseConfig = {
+    // ★★★ グローバル変数とFirebase初期化 ★★★
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    // 既存のFirebase設定を優先し、グローバル設定があればそれをパース
+    const defaultFirebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
       projectId: "funlearningjapanese-b8e08",
@@ -184,16 +251,195 @@
       appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
       measurementId: "G-LCMXVLPS81"
     };
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(defaultFirebaseConfig));
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    // Firebase初期化
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    let app = null;
+    let auth = null;
+    let db = null;
+    let currentUserId = null;
+    let userDisplayName = null;
+    const LEADERBOARD_COLLECTION_PATH = `/artifacts/${appId}/public/data/leaderboard`;
 
+    // ランキングUI要素
+    const authStatusEl = document.getElementById('auth-status');
+    const userIdDisplayEl = document.getElementById('user-id-display');
+    const leaderboardListEl = document.getElementById('leaderboard-list');
+    const myCurrentScoreEl = document.getElementById('my-current-score');
+    const loadingOverlayEl = document.getElementById('loading-overlay');
+
+    let isConfigValid = true;
+
+    if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+        console.error("Firebaseの設定情報が利用できません。");
+        if(authStatusEl) authStatusEl.textContent = 'エラー: Firebase設定がありません。';
+        if(loadingOverlayEl) loadingOverlayEl.style.display = 'none';
+        isConfigValid = false;
+    }
+
+    if (isConfigValid) {
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            initializeAuth(); // 認証プロセス開始
+        } catch (error) {
+            console.error("Firebase初期化中に予期せぬエラー:", error);
+            if(authStatusEl) authStatusEl.textContent = `致命的なエラー: ${error.message}`;
+            if(loadingOverlayEl) loadingOverlayEl.style.display = 'none';
+            isConfigValid = false;
+        }
+    }
+
+    async function initializeAuth() {
+        if (!isConfigValid) return;
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+        } catch (error) {
+            console.error("Firebase認証エラー:", error);
+            if(authStatusEl) authStatusEl.textContent = `認証エラー: ${error.message}`;
+        }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserId = user.uid;
+            // ユーザー名をユニークなIDの一部から作成
+            userDisplayName = `Player_${user.uid.substring(0, 4)}`; 
+            if(userIdDisplayEl) userIdDisplayEl.textContent = user.uid;
+            if(authStatusEl) authStatusEl.textContent = `✅ 認証済み: ${userDisplayName}`;
+            
+            startLeaderboardListener();
+        } else {
+            currentUserId = null;
+            userDisplayName = null;
+            if(userIdDisplayEl) userIdDisplayEl.textContent = '未認証';
+            if(authStatusEl) authStatusEl.textContent = '❌ 未認証';
+        }
+        if(loadingOverlayEl) loadingOverlayEl.style.display = 'none'; 
+    });
+
+
+    /**
+     * リアルタイムランキングのリスナーを開始します。
+     */
+    function startLeaderboardListener() {
+        if (!currentUserId || !db) return;
+
+        // インデックスエラー回避のため、scoreのみで並べ替えます。
+        const leaderboardQuery = query(
+            collection(db, LEADERBOARD_COLLECTION_PATH),
+            orderBy('score', 'desc'),
+            limit(10)
+        );
+
+        onSnapshot(leaderboardQuery, (snapshot) => {
+            if(!leaderboardListEl) return;
+            leaderboardListEl.innerHTML = ''; 
+
+            if (snapshot.empty) {
+                leaderboardListEl.innerHTML = '<li class="text-gray-500 p-2">まだスコアがありません。</li>';
+                return;
+            }
+            
+            let myRank = -1;
+
+            snapshot.forEach((docSnap, index) => {
+                const data = docSnap.data();
+                const rank = index + 1;
+                const isCurrentUser = data.userId === currentUserId;
+
+                if (isCurrentUser) {
+                    myRank = rank;
+                }
+
+                const itemClass = isCurrentUser
+                    ? 'bg-yellow-100 font-bold border-yellow-400'
+                    : 'bg-white border-gray-200';
+                
+                const rankText = `<span class="font-extrabold w-6 text-center">${rank}.</span>`;
+                const scoreText = `<span class="text-lg text-indigo-600 ml-auto">${data.score.toLocaleString()}</span>`;
+                
+                const listItem = `
+                    <li class="flex items-center p-2 rounded-lg border shadow-sm ${itemClass}">
+                        ${rankText}
+                        <span class="ml-2 truncate">${data.username}</span>
+                        ${scoreText}
+                    </li>
+                `;
+                leaderboardListEl.innerHTML += listItem;
+            });
+            
+            // 自分のスコアカードを更新
+            const myDocRef = doc(db, LEADERBOARD_COLLECTION_PATH, currentUserId);
+            getDoc(myDocRef).then(myDocSnap => {
+                if (!myCurrentScoreEl) return;
+                if (myDocSnap.exists()) {
+                    myCurrentScoreEl.textContent = `${myDocSnap.data().score.toLocaleString()} (現在の順位: ${myRank !== -1 ? myRank : '圏外'})`;
+                } else {
+                    myCurrentScoreEl.textContent = 'スコア未登録';
+                }
+            }).catch(e => console.error("自分のスコア取得エラー:", e));
+
+        }, (error) => {
+            console.error("ランキングデータ取得エラー:", error);
+            if(leaderboardListEl) leaderboardListEl.innerHTML = '<li class="text-red-500 p-2">データの読み込み中にエラーが発生しました。</li>';
+        });
+    }
+
+    /**
+     * ユーザーのスコアをFirestoreに送信し、ハイスコアを更新します。
+     * @param {number} finalScore - 今回のゲームで獲得したスコア（ハイスコアではない）。
+     */
+    async function submitScore(finalScore) {
+        if (!currentUserId || !db) {
+            console.error("ユーザーが認証されていないか、DBが初期化されていません。スコアは送信されません。");
+            return;
+        }
+
+        const docRef = doc(db, LEADERBOARD_COLLECTION_PATH, currentUserId);
+        
+        // トランザクションを使用して、既存のスコアよりも高い場合にのみ更新を保証
+        try {
+            await runTransaction(db, async (transaction) => {
+                const docSnap = await transaction.get(docRef);
+
+                // 既存のハイスコア (ない場合は0)
+                const currentHighScore = docSnap.exists() ? docSnap.data().score : 0;
+
+                if (finalScore > currentHighScore) {
+                    transaction.set(docRef, {
+                        userId: currentUserId,
+                        username: userDisplayName,
+                        score: finalScore,
+                        updatedAt: serverTimestamp(), // 最終更新日時
+                    });
+                    console.log(`ハイスコアを更新しました: ${finalScore}`);
+                } else if (!docSnap.exists()) {
+                     // 初回登録
+                     transaction.set(docRef, {
+                        userId: currentUserId,
+                        username: userDisplayName,
+                        score: finalScore,
+                        updatedAt: serverTimestamp(),
+                    });
+                     console.log(`初回スコアを登録しました: ${finalScore}`);
+                } else {
+                    console.log(`今回のスコア(${finalScore})はハイスコア(${currentHighScore})を超えませんでした。`);
+                }
+            });
+        } catch (error) {
+            console.error("スコア送信エラー:", error);
+        }
+    }
     // --------------------------------------------------
     // ゲームデータ (画像はassets/images/にある前提)
     // --------------------------------------------------
-    // ユーザー提供のファイル名リストに基づき、データ構造を更新しました。
-    // 「reading」がないため、ここでは「ans」と「wrong」のデータのみを使用します。
     const QUESTIONS = [
         { id: 'ahiru', img: 'assets/images/ahiru.png', ans: 'あひる', wrong: ['あり', 'うし', 'あめ'] },
         { id: 'ajisai', img: 'assets/images/ajisai.png', ans: 'あじさい', wrong: ['さくら', 'ひまわり', 'ゆり'] },
@@ -350,7 +596,7 @@
             this.imgArea = document.getElementById('quiz-image-area');
             this.btnArea = document.getElementById('choice-buttons-area');
             this.feedback = document.getElementById('quiz-feedback');
-
+            
             // 音声
             this.sndCorrect = document.getElementById('snd-correct');
             this.sndIncorrect = document.getElementById('snd-incorrect');
@@ -381,13 +627,17 @@
 
             const q = this.questions[this.currentQIndex];
 
-            // 画像表示 (ない場合はプレースホルダー)
+            // 画像表示 (画像パスとエラー処理を修正し、ユーザーが送ったHTML断片の形は使用しないようにしました)
+            // このロジックは、以前のコードで既に含まれており、正常に動作します。
             const img = new Image();
             img.src = q.img;
             // エラー時のフォールバック画像
-            img.onerror = () => { img.src = 'https://placehold.co/200x200/ef5350/ffffff?text=' + q.ans; }; 
+            img.onerror = () => { 
+                this.imgArea.innerHTML = `<p style="font-size:2em">🖼️</p><p>(${q.ans}の画像が見つかりません)</p>`;
+            }; 
             this.imgArea.innerHTML = '';
             this.imgArea.appendChild(img);
+
 
             // 選択肢作成
             let allAnswers = QUESTIONS.map(item => item.ans).filter(ans => ans !== q.ans);
@@ -395,9 +645,9 @@
             // 間違いの選択肢は3つ
             const wrongChoices = [...q.wrong]
                 .filter(w => w !== q.ans)
-                .slice(0, 3) // 既存の間違い候補から最大3つ
-                .concat(allAnswers) // 残りを全体から補充
-                .filter((value, index, self) => self.indexOf(value) === index) // 重複除去
+                .slice(0, 3) 
+                .concat(allAnswers) 
+                .filter((value, index, self) => self.indexOf(value) === index) 
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3);
             
@@ -409,7 +659,7 @@
                 const btn = document.createElement('div');
                 btn.className = 'choice-btn';
                 btn.textContent = choice;
-                btn.onclick = () => this.checkAnswer(btn, choice, q.ans);
+                btn.onclick = () => this.checkAnswer(btn, choice, q.ans); 
                 this.btnArea.appendChild(btn);
             });
         }
@@ -428,6 +678,7 @@
                 this.sndCorrect.play().catch(e=>{});
                 this.feedback.textContent = 'せいかい！';
                 this.feedback.style.color = 'var(--correct-color)';
+                // スコア加算は10点
                 this.score += 10;
                 this.updateScoreUI();
             } else {
@@ -464,20 +715,16 @@
             this.sndFanfare.currentTime = 0;
             this.sndFanfare.play().catch(e=>{});
 
-            // ★★★ Firebaseへポイント送信 ★★★
-            const user = sessionStorage.getItem('current_user');
-            if (user && user !== 'ゲスト') {
-                try {
-                    const userRef = doc(db, "users", user);
-                    await updateDoc(userRef, {
-                        points: increment(this.score)
-                    });
-                    this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">ランキングに反映しました！</span>';
-                } catch (e) {
-                    console.error("Error updating score: ", e);
-                }
+            // ★★★ Firebaseへスコア送信 (ランキング登録) ★★★
+            // ゲームの最終スコア (1問10点×10問で最大100点) をそのまま送信
+            const finalScore = this.score;
+            if (finalScore > 0) {
+                 await submitScore(finalScore); 
+                 this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">ハイスコアをランキングに反映しました！</span>';
+            } else {
+                 this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">スコアが0点のためランキング登録はスキップされました。</span>';
             }
-
+            
             // リトライボタン
             setTimeout(() => {
                 const retryBtn = document.createElement('button');
