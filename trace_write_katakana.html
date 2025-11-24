@@ -11,11 +11,10 @@
 <style>
     /* --- index.html と共通のデザイン設定 --- */
     :root {
-        --primary: #ffa726; /* カタカナなのでテーマカラーをオレンジに変更 */
+        --primary: #ffa726; /* カタカナなのでテーマカラーをオレンジに変更（任意） */
         --bg-color: #f4f7fc;
         --text-color: #333;
         --accent: #ffcc5c;
-        --correct-color: #4caf50; /* 緑 */
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -32,6 +31,8 @@
     }
 
     header {
+        /* ヘッダーもカタカナテーマ（オレンジ系）に合わせるか、青のままにするか選べます。
+           ここは統一感のため青グラデーションのままにします */
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white;
         padding: 15px 20px;
@@ -132,13 +133,6 @@
         transition: transform 0.1s;
     }
     .color-dot.active { transform: scale(1.2); border-color: #333; }
-    
-    #completion-message {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: var(--correct-color);
-        margin-bottom: 20px;
-    }
 
     @media (max-width: 400px) {
         .canvas-wrapper { width: 280px; height: 280px; }
@@ -157,8 +151,6 @@
     <div class="dojo-card">
         <h1><i class="fa-solid fa-pen-nib"></i> カタカナ 道場</h1>
         <p class="sub-text">うすい カタカナを なぞって みよう！</p>
-        
-        <p id="completion-message" style="display:none;"></p>
 
         <div class="color-palette">
             <div class="color-dot active" style="background: #333;" onclick="setColor('#333', this)"></div>
@@ -181,36 +173,13 @@
     </div>
 </div>
 
-<!-- ★★★ Firebase & ゲームロジック ★★★ -->
-<script type="module">
-    // Firebase SDKのインポート
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-    // Firebase設定 (あなたのプロジェクトの鍵)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    // Firebase初期化
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
+<script>
     // --- 設定 ---
-    const BONUS_POINTS = 100;
     const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
     const guideEl = document.getElementById('guide-char');
-    const completionMsgEl = document.getElementById('completion-message');
-    const nextBtn = document.querySelector('.btn-next');
     
-    // なぞる文字リスト（カタカナ）
+    // ★カタカナリストに変更
     const chars = [
         "ア","イ","ウ","エ","オ",
         "カ","キ","ク","ケ","コ",
@@ -227,7 +196,6 @@
     let isDrawing = false;
     let currentColor = '#333';
     let lineWidth = 12; 
-    let completionSent = false; // Firebase送信フラグ
 
     // --- 初期化 ---
     function init() {
@@ -245,30 +213,15 @@
 
     // --- ガイド文字の更新 ---
     function updateGuide() {
-        if (currentIndex < chars.length) {
-            guideEl.textContent = chars[currentIndex];
-            completionMsgEl.style.display = 'none';
-            nextBtn.textContent = 'つぎへ';
-            clearCanvas(); 
-        } else {
-            // 全文字完了
-            guideEl.textContent = '完了';
-            guideEl.style.fontSize = '120px'; 
-            completionMsgEl.style.display = 'block';
-            completionMsgEl.textContent = '全カタカナクリア！おめでとう！';
-            nextBtn.textContent = 'さいしょへ';
-            clearCanvas();
-            sendCompletionPoints();
-        }
+        guideEl.textContent = chars[currentIndex];
+        clearCanvas(); 
     }
 
     // --- 次の文字へ ---
-    window.nextChar = () => {
+    function nextChar() {
+        currentIndex++;
         if (currentIndex >= chars.length) {
             currentIndex = 0; 
-            guideEl.style.fontSize = '240px'; 
-        } else {
-            currentIndex++;
         }
         updateGuide();
     }
@@ -299,8 +252,6 @@
     }
 
     function startDraw(e) {
-        if (currentIndex >= chars.length) return; // 完了時は描画を停止
-        
         e.preventDefault();
         isDrawing = true;
         const pos = getPos(e);
@@ -320,38 +271,6 @@
         isDrawing = false;
         ctx.closePath();
     }
-
-    // --- Firebase ポイント送信 ---
-    async function sendCompletionPoints() {
-        if (completionSent) return;
-        completionSent = true;
-        
-        const user = sessionStorage.getItem('current_user');
-        
-        // CSS変数から色を取得するためのヘルパー関数
-        const getCssVariable = (name) => {
-            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-        };
-        const correctColor = getCssVariable('--correct-color') || '#4caf50';
-        const primaryColor = getCssVariable('--primary') || '#ffa726';
-
-        if (user && user !== 'ゲスト') {
-            completionMsgEl.innerHTML += `<br><span style="font-size:0.7em; color:${correctColor};">ボーナス ${BONUS_POINTS} ポイントを送信中...</span>`;
-            try {
-                const userRef = doc(db, "users", user);
-                await updateDoc(userRef, {
-                    points: increment(BONUS_POINTS)
-                });
-                completionMsgEl.innerHTML = `全カタカナクリア！おめでとう！<br><span style="font-size:0.7em; color:${correctColor};">ボーナス ${BONUS_POINTS} ポイントをランキングに反映しました！</span>`;
-            } catch (e) {
-                console.error("Error updating score: ", e);
-                completionMsgEl.innerHTML = `全カタカナクリア！おめでとう！<br><span style="font-size:0.7em; color:${primaryColor};">エラー: ポイントの送信に失敗しました。</span>`;
-            }
-        } else {
-            completionMsgEl.innerHTML += `<br><span style="font-size:0.7em; color:${primaryColor};">ログインするとボーナスポイントがもらえます。</span>`;
-        }
-    }
-
 
     canvas.addEventListener('mousedown', startDraw);
     canvas.addEventListener('mousemove', draw);

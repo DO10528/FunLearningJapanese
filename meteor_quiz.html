@@ -2,523 +2,56 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>隕石ことばクイズ - FunLearnJP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隕石英単語クイズ</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> 
     
-<style>
-    /* --- V2 共通設定 --- */
-    :root {
-        --primary: #5c7aff;
-        --accent: #ffcc5c;
-        --bg-color: #f4f7fc;
-        --text-color: #333;
-        --correct-color: #4caf50;
-        --incorrect-color: #ef5350;
-        --sky-color: #0d47a1;
-        --ground-color: #388e3c;
-    }
-
-    body {
-        font-family: 'Zen Maru Gothic', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0; padding: 0; min-height: 100vh;
-        display: flex; flex-direction: column;
-        align-items: center;
-        touch-action: manipulation;
-    }
-
-    /* --- ヘッダー --- */
-    header {
-        background: linear-gradient(135deg, var(--primary) 0%, #4facfe 100%);
-        color: white; padding: 15px 20px; width: 100%;
-        display: flex; justify-content: center; align-items: center;
-        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
-        position: sticky; top: 0;
-    }
-    header h1 { margin: 0; font-size: 1.4em; }
-    .home-link {
-        color: white; text-decoration: none; font-weight: bold;
-        padding: 5px 10px; border-radius: 5px; transition: background-color 0.2s;
-        position: absolute; right: 20px;
-    }
-    .home-link:hover { background-color: rgba(255, 255, 255, 0.1); }
-
-    /* --- ゲームコンテナ --- */
-    #game-container {
-        width: 100%; max-width: 600px;
-        min-height: 500px; /* ゲームエリアの最小高さを確保 */
-        margin: 20px auto;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        position: relative;
-        background: white;
-    }
-
-    /* --- スコア・ライフ表示 --- */
-    #info-bar {
-        position: absolute; top: 10px; left: 10px; right: 10px;
-        z-index: 50; padding: 5px 15px;
-        background: rgba(255, 255, 255, 0.8); border-radius: 10px;
-        display: flex; justify-content: space-between;
-        font-weight: bold; color: var(--text-color);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #info-bar p { margin: 0; display: flex; align-items: center; gap: 5px; }
-
-    /* --- 空と地面 --- */
-    #sky-area {
-        background: var(--sky-color);
-        height: 80%; /* 空が80% */
-        position: relative;
-        overflow: hidden;
-    }
-    #ground-area {
-        background: var(--ground-color);
-        height: 20%; /* 地面が20% */
-        color: white;
-        font-weight: bold;
-        display: flex; justify-content: center; align-items: center;
-        font-size: 1.5em;
-        position: relative;
-        z-index: 20;
-    }
-    #ground-area::before {
-        content: "もんだい ちてん";
-        position: absolute;
-        bottom: 5px;
-        font-size: 0.5em;
-        opacity: 0.8;
-    }
+    <link rel="stylesheet" href="css/meteor_quiz.css">
     
-    /* --- 隕石 (Meteor) --- */
-    .meteor {
-        position: absolute;
-        width: 50px; height: 50px;
-        background: #9e9e9e; /* グレー */
-        border-radius: 50%;
-        color: white;
-        display: flex; justify-content: center; align-items: center;
-        font-weight: bold;
-        font-size: 1em;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px #f44336;
-        cursor: pointer;
-        z-index: 10;
-        transition: transform 0.1s;
-        /* SVGで隕石っぽく */
-        clip-path: polygon(50% 0%, 65% 15%, 100% 20%, 80% 50%, 100% 80%, 60% 90%, 50% 100%, 35% 85%, 0% 80%, 20% 50%, 0% 20%, 40% 10%);
-        border: 2px solid #616161;
-    }
-    .meteor:hover { transform: scale(1.1); }
-    .meteor-hit {
-        background: var(--correct-color);
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 20px var(--correct-color);
-    }
+    <script src="js/meteor_quiz.js" defer></script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
     
-    /* --- 爆発エフェクト --- */
-    .explosion {
-        position: absolute;
-        width: 80px; height: 80px;
-        background-color: transparent;
-        border-radius: 50%;
-        box-shadow: 0 0 40px 20px #ffeb3b, 0 0 20px 10px #f44336;
-        animation: explode 0.5s forwards;
-        pointer-events: none;
-        z-index: 100;
-    }
-    @keyframes explode {
-        0% { transform: scale(0.1); opacity: 1; }
-        100% { transform: scale(2); opacity: 0; }
-    }
-
-
-    /* --- モーダル (クイズ画面) --- */
-    #quiz-modal {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-        display: flex; justify-content: center; align-items: center; z-index: 200;
-    }
-    #quiz-box {
-        background: white; width: 90%; max-width: 450px;
-        padding: 30px; border-radius: 25px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        text-align: center;
-        animation: popIn 0.4s;
-    }
-    #question-text {
-        font-size: 1.8em; font-weight: 900;
-        color: var(--primary); margin: 0 0 15px 0;
-    }
-    #quiz-image-area {
-        width: 150px; height: 150px; margin: 10px auto 20px;
-        background: #e3f2fd; border-radius: 15px;
-        display: flex; justify-content: center; align-items: center;
-        overflow: hidden;
-    }
-    #quiz-image-area img { max-width: 90%; max-height: 90%; object-fit: contain; }
-    
-    #choice-buttons-area {
-        display: grid; grid-template-columns: 1fr 1fr;
-        gap: 15px; margin-top: 20px;
-    }
-    .choice-btn {
-        background: #f0f4f8; border: 3px solid #ddd;
-        border-radius: 15px; padding: 10px 5px;
-        font-size: 1.1em; font-weight: bold; cursor: pointer;
-        transition: all 0.1s;
-        box-shadow: 0 4px 0 #cfd8dc;
-    }
-    .choice-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #cfd8dc; }
-
-    .choice-btn.correct { background: var(--correct-color); color: white; border-color: #2e7d32; box-shadow: 0 4px 0 #2e7d32; }
-    .choice-btn.incorrect { background: var(--incorrect-color); color: white; border-color: #b71c1c; opacity: 0.8; box-shadow: none; }
-    
-    .feedback-message { height: 1.5em; font-weight: bold; margin-top: 15px; }
-
-    .hidden { display: none !important; }
-    @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-</style>
-</head>
+      gtag('config', 'G-0BX3DD42C1');
+    </script>
+    </head>
 <body>
-    
     <header>
-        <h1><i class="fa-solid fa-meteor"></i> 隕石ことばクイズ</h1>
-        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホームへ</a>
+        <h1>隕石英単語クイズ</h1>
     </header>
 
-    <div id="game-container">
-        
-        <!-- ゲーム開始前のメニュー -->
-        <div id="start-menu" style="position: absolute; inset: 0; z-index: 100; background:white; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-             <i class="fa-solid fa-meteor" style="font-size:4em; color:var(--primary); margin-bottom:15px;"></i>
-             <h2 style="color:var(--primary);">隕石ことばクイズ</h2>
-             <p style="color:#666; margin-bottom:25px;">おちてくることばを、すばやく こたえよう！</p>
-             <button id="start-button" onclick="game.start()" style="background:var(--accent); color:#d35400; font-size:1.5em; font-weight:bold; padding:15px 40px; border:none; border-radius:50px; cursor:pointer; box-shadow: 0 6px 0 #ffa000;">
-                <i class="fa-solid fa-play"></i> ゲームスタート
-             </button>
-             <p id="auth-status" style="margin-top:20px; font-size:0.9em; color:var(--incorrect-color);"></p>
-        </div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="index.html" class="back-button">ホームに戻る</a>
+    </div>
 
+    <div id="game-container">
         <div id="sky-area">
-            <!-- 隕石がここに入ります -->
-        </div>
+            </div>
 
         <div id="ground-area">
-            <span id="target-word-display">ことば</span>
-        </div>
+            </div>
 
         <div id="info-bar">
-            <p><i class="fa-solid fa-star" style="color:#ffd700;"></i> スコア: <span id="score">0</span></p>
-            <p><i class="fa-solid fa-heart" style="color:var(--incorrect-color);"></i> ライフ: <span id="life">3</span></p>
+            <p>スコア: <span id="score">0</span></p>
+            <p>ライフ: <span id="life">3</span></p>
         </div>
     </div>
 
-    <!-- クイズモーダル -->
     <div id="quiz-modal" class="hidden">
         <div id="quiz-box">
             <p id="question-text"></p>
             <div id="quiz-image-area"></div>
             <div id="choice-buttons-area"></div>
             <p id="quiz-feedback" class="feedback-message"></p>
-            <button id="next-quiz-button" class="choice-btn hidden" onclick="game.continueGame()" style="background:var(--primary); color:white; border-color:var(--primary); box-shadow: 0 4px 0 #3f51b5;">つぎへ</button>
-        </div>
-    </div>
-    
-    <!-- ゲームオーバーモーダル -->
-    <div id="game-over-modal" class="hidden">
-        <div id="quiz-box">
-            <h2 style="color:var(--incorrect-color);">ゲームオーバー</h2>
-            <p style="font-size:1.5em;">あなたのスコア: <span id="final-score" style="color:var(--accent);">0</span>pt</p>
-            <p id="ranking-feedback" style="font-size:0.9em; color:#666;">ランキングに送信しました！</p>
-            <button onclick="location.reload()" style="background:var(--primary); color:white; font-size:1.2em; padding:10px 30px; border:none; border-radius:50px; margin-top:20px; box-shadow: 0 4px 0 #3f51b5;">
-                もういちど あそぶ
-            </button>
-            <a href="index.html" style="display:block; margin-top:15px; color:#999;">ホームにもどる</a>
         </div>
     </div>
 
-
-<!-- ★★★ Firebase & ゲームロジック ★★★ -->
-<script type="module">
-    // Firebase SDKのインポート
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-    // Firebase設定 (あなたのプロジェクトの鍵)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    // Firebase初期化
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    // --- データセット ---
-    const WORD_DATA = [
-        { hiragana: 'いぬ', english: 'Dog', img: 'assets/images/dog.png', wrong: ['Cat', 'Horse'] },
-        { hiragana: 'くるま', english: 'Car', img: 'assets/images/car.png', wrong: ['Train', 'Bus'] },
-        { hiragana: 'りんご', english: 'Apple', img: 'assets/images/apple.png', wrong: ['Orange', 'Banana'] },
-        { hiragana: 'かさ', english: 'Umbrella', img: 'assets/images/umbrella.png', wrong: ['Hat', 'Rain'] },
-        { hiragana: 'さかな', english: 'Fish', img: 'assets/images/fish.png', wrong: ['Bird', 'Shrimp'] },
-        { hiragana: 'ほん', english: 'Book', img: 'assets/images/book.png', wrong: ['Notebook', 'Pencil'] },
-        { hiragana: 'ねこ', english: 'Cat', img: 'assets/images/cat.png', wrong: ['Dog', 'Tiger'] },
-        { hiragana: 'とけい', english: 'Clock', img: 'assets/images/clock.png', wrong: ['Watch', 'TV'] },
-        { hiragana: 'すいか', english: 'Watermelon', img: 'assets/images/suika.png', wrong: ['Melon', 'Tomato'] },
-        { hiragana: 'えんぴつ', english: 'Pencil', img: 'assets/images/enpitsu.png', wrong: ['Pen', 'Eraser'] }
-    ];
-
-    // --- ゲーム設定 ---
-    const MAX_LIFE = 3;
-    const METEOR_COUNT = 5; // 同時に降ってくる隕石の数
-
-    // --- ゲームクラス ---
-    class MeteorGame {
-        constructor() {
-            this.score = 0;
-            this.life = MAX_LIFE;
-            this.isPlaying = false;
-            this.meteorInterval = null;
-            this.meteors = []; // 現在の隕石のリスト
-
-            this.dom = {
-                score: document.getElementById('score'),
-                life: document.getElementById('life'),
-                sky: document.getElementById('sky-area'),
-                ground: document.getElementById('ground-area'),
-                targetWord: document.getElementById('target-word-display'),
-                modal: document.getElementById('quiz-modal'),
-                qText: document.getElementById('question-text'),
-                qImg: document.getElementById('quiz-image-area'),
-                qBtns: document.getElementById('choice-buttons-area'),
-                qFeedback: document.getElementById('quiz-feedback'),
-                menu: document.getElementById('start-menu'),
-                gameOverModal: document.getElementById('game-over-modal'),
-                authStatus: document.getElementById('auth-status')
-            };
-            
-            this.checkAuthStatus();
-        }
-
-        checkAuthStatus() {
-            const user = sessionStorage.getItem('current_user');
-            if (!user || user === 'ゲスト') {
-                this.dom.authStatus.textContent = '※ログインするとランキングにスコアが反映されます';
-            } else {
-                this.dom.authStatus.textContent = `ログイン中: ${user} (スコア反映)`;
-                // ★修正箇所: CSS変数ではなく、直接カラーコードを指定します
-                this.dom.authStatus.style.color = '#4caf50'; 
-            }
-        }
-
-        start() {
-            this.dom.menu.classList.add('hidden');
-            this.dom.gameOverModal.classList.add('hidden');
-            this.score = 0;
-            this.life = MAX_LIFE;
-            this.isPlaying = true;
-            this.updateUI();
-            this.dom.sky.innerHTML = '';
-            this.meteors = [];
-
-            // 隕石生成と移動のループ開始
-            this.meteorInterval = setInterval(() => {
-                this.spawnMeteor();
-                this.moveMeteors();
-            }, 50); // 20FPS
-        }
-
-        spawnMeteor() {
-            if (this.meteors.length >= METEOR_COUNT) return;
-
-            const data = WORD_DATA[Math.floor(Math.random() * WORD_DATA.length)];
-            const xPos = Math.random() * (this.dom.sky.offsetWidth - 60) + 10;
-            const duration = Math.random() * (15000 - 8000) + 8000; // 8秒〜15秒
-
-            const meteorEl = document.createElement('div');
-            meteorEl.className = 'meteor';
-            meteorEl.textContent = data.hiragana;
-            meteorEl.dataset.hiragana = data.hiragana;
-            meteorEl.style.left = `${xPos}px`;
-            meteorEl.style.top = '0px';
-
-            // クリックでクイズ開始
-            meteorEl.onclick = () => this.showQuiz(meteorEl, data);
-
-            this.dom.sky.appendChild(meteorEl);
-            this.meteors.push({ el: meteorEl, data: data, startTime: Date.now(), duration: duration });
-        }
-
-        moveMeteors() {
-            if (!this.isPlaying) return;
-
-            const skyHeight = this.dom.sky.offsetHeight;
-            const groundStart = skyHeight * 0.8; // 地面の上端
-
-            this.meteors = this.meteors.filter(m => {
-                const elapsed = Date.now() - m.startTime;
-                const progress = elapsed / m.duration;
-                const newY = skyHeight * progress;
-
-                m.el.style.top = `${newY}px`;
-
-                // 地面に到達
-                if (newY >= groundStart) {
-                    this.loseLife(m.el);
-                    return false; // フィルターから削除
-                }
-                return true;
-            });
-        }
-
-        showQuiz(meteorEl, data) {
-            if (!this.isPlaying) return;
-            this.isPlaying = false; // ゲーム一時停止
-
-            this.currentMeteorEl = meteorEl;
-            this.currentMeteorData = data;
-            
-            // UIリセット
-            this.dom.qFeedback.textContent = '';
-            this.dom.modal.classList.remove('hidden');
-            document.getElementById('next-quiz-button').classList.add('hidden');
-
-            this.dom.qText.textContent = `「${data.hiragana}」は英語で？`;
-
-            // 画像表示 (ない場合はプレースホルダー)
-            const img = new Image();
-            img.src = data.img;
-            img.onerror = () => { img.src = `https://placehold.co/150x150?text=${data.hiragana}`; };
-            this.dom.qImg.innerHTML = '';
-            this.dom.qImg.appendChild(img);
-
-            // 選択肢
-            const choices = [data.english, ...data.wrong].sort(() => Math.random() - 0.5);
-            this.dom.qBtns.innerHTML = '';
-            
-            choices.forEach(choice => {
-                const btn = document.createElement('div');
-                btn.className = 'choice-btn';
-                btn.textContent = choice;
-                btn.onclick = () => this.checkQuizAnswer(btn, choice, data.english);
-                this.dom.qBtns.appendChild(btn);
-            });
-        }
-
-        checkQuizAnswer(btn, choice, correctAns) {
-            const allBtns = this.dom.qBtns.querySelectorAll('.choice-btn');
-            allBtns.forEach(b => b.onclick = null); // 無効化
-
-            if (choice === correctAns) {
-                btn.classList.add('correct');
-                this.dom.qFeedback.textContent = 'せいかい！';
-                this.score += 10;
-                this.dom.qFeedback.style.color = 'var(--correct-color)';
-                
-                // 隕石を画面から消し、ヒットエフェクト
-                this.currentMeteorEl.classList.add('meteor-hit');
-                this.createExplosion(this.currentMeteorEl);
-                this.removeMeteor(this.currentMeteorEl);
-                
-            } else {
-                btn.classList.add('incorrect');
-                this.dom.qFeedback.textContent = `ざんねん… こたえは「${correctAns}」だよ`;
-                this.dom.qFeedback.style.color = 'var(--incorrect-color)';
-                
-                // 正解を強調
-                allBtns.forEach(b => {
-                    if (b.textContent === correctAns) b.classList.add('correct');
-                });
-            }
-
-            document.getElementById('next-quiz-button').classList.remove('hidden');
-            this.updateUI();
-        }
-
-        continueGame() {
-            this.dom.modal.classList.add('hidden');
-            this.isPlaying = true;
-        }
-
-        loseLife(meteorEl) {
-            this.life -= 1;
-            this.updateUI();
-            this.createExplosion(meteorEl, true);
-            this.removeMeteor(meteorEl);
-
-            if (this.life <= 0) {
-                this.gameOver();
-            }
-        }
-        
-        createExplosion(el, isGroundHit = false) {
-            const rect = el.getBoundingClientRect();
-            const containerRect = this.dom.sky.getBoundingClientRect();
-            
-            const explosion = document.createElement('div');
-            explosion.className = 'explosion';
-            explosion.style.top = isGroundHit ? `${containerRect.height * 0.8}px` : `${rect.top - containerRect.top + rect.height/2}px`;
-            explosion.style.left = `${rect.left - containerRect.left + rect.width/2}px`;
-
-            // 地面ヒット時は少し下げる
-            if (isGroundHit) explosion.style.top = `${containerRect.height * 0.8 + 20}px`; 
-            
-            this.dom.sky.appendChild(explosion);
-            
-            // 0.5秒後に削除
-            setTimeout(() => explosion.remove(), 500);
-        }
-
-        removeMeteor(el) {
-            el.remove();
-            this.meteors = this.meteors.filter(m => m.el !== el);
-        }
-
-        updateUI() {
-            this.dom.score.textContent = this.score;
-            this.dom.life.textContent = this.life;
-        }
-
-        async gameOver() {
-            this.isPlaying = false;
-            clearInterval(this.meteorInterval);
-            this.dom.sky.innerHTML = '';
-            
-            this.dom.gameOverModal.classList.remove('hidden');
-            document.getElementById('final-score').textContent = this.score;
-            document.getElementById('ranking-feedback').textContent = 'スコアを送信しています...';
-
-            const user = sessionStorage.getItem('current_user');
-            if (user && user !== 'ゲスト') {
-                try {
-                    const userRef = doc(db, "users", user);
-                    await updateDoc(userRef, {
-                        points: increment(this.score)
-                    });
-                    document.getElementById('ranking-feedback').textContent = 'ランキングにスコアが反映されました！';
-                } catch (e) {
-                    console.error("Error updating score: ", e);
-                    document.getElementById('ranking-feedback').textContent = 'エラー: スコアを反映できませんでした。';
-                }
-            } else {
-                 document.getElementById('ranking-feedback').textContent = '※ゲストとしてプレイしたため、スコアはランキングに反映されません。';
-            }
-        }
-    }
-
-    // グローバルに公開
-    window.game = new MeteorGame();
-
-</script>
+    <div id="explosion-template" class="explosion hidden"></div>
 
 </body>
 </html>

@@ -15,7 +15,6 @@
         --accent: #ff4081; /* ピンク */
         --bg-color: #e0f7fa; /* 薄い水色 */
         --text-color: #333;
-        --correct-color: #4caf50;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -209,7 +208,6 @@
     }
     .slot.drag-over { background: #b2ebf2; border-color: var(--primary); border-style: solid; transform: scale(1.05); }
     .pool-slot { border: none; background: transparent; }
-    .pool-slot.occupied { border: 2px solid var(--correct-color); } /* ヒントとして枠線を追加 */
 
     /* ドラッグする文字チップ (3D風デザインに変更) */
     .char-chip {
@@ -324,7 +322,7 @@
         
         <div class="game-header-info">
             <span id="level-indicator" class="level-display">レベル 1</span>
-            <button class="back-to-menu" onclick="window.showLevelMenu()">メニューへ</button>
+            <button class="back-to-menu" onclick="showLevelMenu()">メニューへ</button>
         </div>
 
         <div class="board">
@@ -343,7 +341,7 @@
         </div>
 
         <div class="controls">
-            <button class="check-btn" onclick="window.checkAnswer()">こたえあわせ！</button>
+            <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
         </div>
     </div>
 
@@ -352,35 +350,14 @@
 <div id="success-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>だいせいかい！🎉</h2>
-        <p id="modal-msg" style="margin-bottom:20px; font-size:1.1em; font-weight:bold;"></p>
-        <button class="next-btn" onclick="window.nextLevel()">つぎの レベルへ Go!</button>
+        <button class="next-btn" onclick="nextLevel()">つぎの レベルへ Go!</button>
     </div>
 </div>
 
 <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
-<!-- ★★★ Firebase & ゲームロジック ★★★ -->
-<script type="module">
-    // Firebase SDKのインポート
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-    // Firebase設定 (あなたのプロジェクトの鍵)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    // Firebase初期化
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
+<script>
     // --- データ定義 (全10レベル) ---
     const levels = [
         { id: 1, chars: [ {h:'あ',k:'ア'}, {h:'い',k:'イ'}, {h:'う',k:'ウ'}, {h:'え',k:'エ'}, {h:'お',k:'オ'} ] },
@@ -395,9 +372,6 @@
         { id: 10, chars: [ {h:'わ',k:'ワ'}, {h:'を',k:'ヲ'}, {h:'ん',k:'ン'} ] } 
     ];
 
-    const BONUS_POINTS = 500; // 全レベルクリア時のボーナス
-    const CORRECT_COLOR = '#4caf50'; // CSSの--correct-color
-
     let currentLevelIndex = 0;
 
     // DOM
@@ -410,7 +384,6 @@
     const pairArea = document.getElementById('pair-rows');
     const levelIndicator = document.getElementById('level-indicator');
     const modal = document.getElementById('success-modal');
-    const modalMsg = document.getElementById('modal-msg');
     
     const sndCorrect = document.getElementById('snd-correct');
     const sndIncorrect = document.getElementById('snd-incorrect');
@@ -429,10 +402,10 @@
             btn.onclick = () => startGame(index);
             levelGrid.appendChild(btn);
         });
-        window.showLevelMenu();
+        showLevelMenu();
     }
 
-    window.showLevelMenu = () => {
+    function showLevelMenu() {
         levelMenuArea.style.display = 'block';
         gamePlayArea.style.display = 'none';
     }
@@ -451,7 +424,8 @@
         modal.style.display = 'none';
         
         if (idx >= levels.length) {
-            finishAllLevels();
+            alert("全レベルクリア！すごい！");
+            showLevelMenu();
             return;
         }
 
@@ -509,7 +483,6 @@
     let touchOffsetY = 0;
     let ghost = null;
     let originSlot = null;
-    let isTouchMove = false;
 
     function setupDrag(el) {
         el.addEventListener('mousedown', startDrag);
@@ -518,7 +491,6 @@
 
     function startDrag(e) {
         e.preventDefault();
-        isTouchMove = false;
         draggedItem = e.target;
         originSlot = draggedItem.parentElement;
 
@@ -528,7 +500,6 @@
         touchOffsetX = clientX - rect.left;
         touchOffsetY = clientY - rect.top;
 
-        // ゴースト作成
         ghost = draggedItem.cloneNode(true);
         ghost.className += ' ghost';
         ghost.style.width = rect.width + 'px';
@@ -546,14 +517,13 @@
 
     function onMove(e) {
         e.preventDefault();
-        isTouchMove = true;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         moveGhost(clientX, clientY);
 
         const target = getTargetSlot(clientX, clientY);
         document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
-        if (target && isValidDrop(target, draggedItem) && target.children.length === 0) {
+        if (target && isValidDrop(target, draggedItem)) {
             target.classList.add('drag-over');
         }
     }
@@ -578,70 +548,25 @@
 
         const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
         const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-        
-        // タップ（移動なし）の場合は処理しない
-        if (e.touches && !isTouchMove) {
-             draggedItem = null;
-             return; 
-        }
-
         const target = getTargetSlot(clientX, clientY);
+
         document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
 
         if (target && isValidDrop(target, draggedItem)) {
-            // スロットからプールに戻す処理
-            if (target.classList.contains('pool-slot')) {
-                 if(draggedItem.parentElement !== originSlot) {
-                    originSlot.appendChild(draggedItem);
-                 }
-                 target.classList.remove('occupied');
-            } 
-            // スロットにドロップする処理
-            else if (target.children.length === 0) {
-                target.appendChild(draggedItem);
-            } 
-            // スロットが埋まっていたら、中身と入れ替え
-            else if (target.children.length > 0) {
+            if (target.children.length > 0) {
                 const existing = target.children[0];
-                originSlot.appendChild(existing); // 既存のチップを元の場所に戻す
-                target.appendChild(draggedItem); // 新しいチップをスロットに入れる
+                originSlot.appendChild(existing);
             }
-            
-            // プール側の枠線ヒントを更新
-            document.querySelectorAll('.pool-slot').forEach(ps => {
-                if(ps.children.length > 0) {
-                    ps.classList.add('occupied');
-                } else {
-                    ps.classList.remove('occupied');
-                }
-            });
-
-            // playClickSound(); // クリック音は一旦なし
-        } else {
-             // どこにもドロップされなかった場合、元の場所に戻す
-             originSlot.appendChild(draggedItem);
+            target.appendChild(draggedItem);
+            playClickSound();
         }
         draggedItem = null;
     }
 
     function getTargetSlot(x, y) {
-        // elementFromPoint はゴーストアイテムを無視するため、指の座標にある要素を正確に取得
-        if (ghost) ghost.style.visibility = 'hidden';
         const el = document.elementFromPoint(x, y);
-        if (ghost) ghost.style.visibility = 'visible';
-        
         if (!el) return null;
-        
-        // スロットまたはスロットの親要素である pair-row, pool-slot を探す
-        const slot = el.closest('.slot');
-        // pool-slot の場合は、親の pool-slot を返す
-        if (slot && slot.classList.contains('pool-slot')) return slot;
-
-        // hira-slot/kata-slot の場合は、その要素を返す
-        if (slot && (slot.classList.contains('hira-slot') || slot.classList.contains('kata-slot'))) return slot;
-        
-        // それ以外の場所の場合は、nullを返す
-        return null;
+        return el.closest('.slot');
     }
 
     function isValidDrop(slot, item) {
@@ -650,6 +575,8 @@
         if (slot.classList.contains('kata-slot') && item.dataset.type === 'kata') return true;
         return false;
     }
+
+    function playClickSound() { }
 
     // --- 判定ロジック ---
     window.checkAnswer = () => {
@@ -660,33 +587,20 @@
         rows.forEach(row => {
             const hSlot = row.querySelector('.hira-slot');
             const kSlot = row.querySelector('.kata-slot');
-            
-            // 全てのマスが埋まっているかチェック
             if (hSlot.children.length === 0 || kSlot.children.length === 0) {
                 isFull = false;
-                // 埋まっていないスロットにヒントの枠線
-                // ★修正: CSS変数ではなく、直接CSSのカスタムプロパティを値として渡す
-                if(hSlot.children.length === 0) hSlot.style.borderColor = 'var(--accent)';
-                if(kSlot.children.length === 0) kSlot.style.borderColor = 'var(--accent)';
-            } else {
-                 hSlot.style.borderColor = '#CCC'; // 正常な色は戻す
-                 kSlot.style.borderColor = '#CCC';
             }
         });
 
         if (!isFull) {
-            modalMsg.textContent = 'まだ あいてる マスがあるよ！';
-            modal.style.display = 'flex';
             sndIncorrect.currentTime = 0;
-            sndIncorrect.play().catch(e=>{});
+            sndIncorrect.play();
             return; 
         }
 
-        // 答え合わせ
         rows.forEach(row => {
             const hItem = row.querySelector('.hira-slot').children[0];
             const kItem = row.querySelector('.kata-slot').children[0];
-            
             if (hItem.dataset.pair !== kItem.dataset.value) {
                 allCorrect = false;
             }
@@ -694,25 +608,11 @@
 
         if (allCorrect) {
             sndCorrect.currentTime = 0;
-            sndCorrect.play().catch(e=>{});
-            
-            // 次のレベルへ進むボタンを有効化
-            const nextBtn = document.querySelector('.next-btn');
-            nextBtn.textContent = (currentLevelIndex + 1 >= levels.length) ? 'ぜんぶクリア！' : 'つぎの レベルへ Go!';
-            nextBtn.onclick = window.nextLevel;
-            
-            modalMsg.textContent = 'おめでとう！ レベルを クリアしたよ！';
+            sndCorrect.play();
             modal.style.display = 'flex'; 
         } else {
             sndIncorrect.currentTime = 0;
-            sndIncorrect.play().catch(e=>{});
-            modalMsg.textContent = 'ざんねん！ まだ まちがいが あるみたい…';
-            modal.style.display = 'flex';
-            
-            // 不正解の場合はモーダルを閉じると再挑戦できるようにする
-            const nextBtn = document.querySelector('.next-btn');
-            nextBtn.textContent = 'もういちど ちょうせん';
-            nextBtn.onclick = () => { modal.style.display = 'none'; };
+            sndIncorrect.play();
         }
     };
 
@@ -720,38 +620,6 @@
         currentLevelIndex++;
         loadLevel(currentLevelIndex);
     };
-    
-    // --- 全レベルクリア時の Firebase 送信処理 ---
-    async function finishAllLevels() {
-        modal.style.display = 'flex';
-        modalMsg.textContent = 'すべての レベルを クリアしました！';
-        document.querySelector('.modal-content h2').textContent = 'かんぺき！👑';
-        
-        const nextBtn = document.querySelector('.next-btn');
-        nextBtn.textContent = 'メニューにもどる';
-        nextBtn.onclick = window.showLevelMenu;
-        
-        const user = sessionStorage.getItem('current_user');
-        if (user && user !== 'ゲスト') {
-            // ★修正: CSS変数 var(--correct-color) をJSコードで使える定数に置き換え
-            modalMsg.innerHTML += `<br><span style="font-size:0.9em; color:${CORRECT_COLOR}">ボーナス ${BONUS_POINTS} ポイントを送信中...</span>`;
-            try {
-                const userRef = doc(db, "users", user);
-                await updateDoc(userRef, {
-                    points: increment(BONUS_POINTS)
-                });
-                modalMsg.innerHTML = `すべての レベルを クリアしました！<br><span style="font-size:0.9em; color:${CORRECT_COLOR}">ボーナス ${BONUS_POINTS} ポイントをランキングに反映しました！</span>`;
-            } catch (e) {
-                console.error("Firebase update failed:", e);
-                // ★修正: CSS変数 var(--accent) の値を取得して使うか、直接カラーコードを指定
-                modalMsg.innerHTML += '<br><span style="font-size:0.9em; color:#ff4081">エラー: ポイントの送信に失敗しました。</span>';
-            }
-        } else {
-            // ★修正: CSS変数 var(--accent) の値を取得して使うか、直接カラーコードを指定
-            modalMsg.innerHTML += '<br><span style="font-size:0.9em; color:#ff4081">ログインするとボーナスポイントがもらえます。</span>';
-        }
-    }
-
 
 </script>
 

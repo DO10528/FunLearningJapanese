@@ -192,17 +192,144 @@
     // --------------------------------------------------
     // ゲームデータ (画像はassets/images/にある前提)
     // --------------------------------------------------
+    // ユーザー提供のファイル名リストに基づき、データ構造を更新しました。
+    // 「reading」がないため、ここでは「ans」と「wrong」のデータのみを使用します。
     const QUESTIONS = [
-        { id: 'apple', img: 'assets/images/apple.png', ans: 'りんご', wrong: ['みかん', 'いちご', 'バナナ'] },
-        { id: 'dog', img: 'assets/images/dog.png', ans: 'いぬ', wrong: ['ねこ', 'うし', 'うま'] },
-        { id: 'car', img: 'assets/images/car.png', ans: 'くるま', wrong: ['でんしゃ', 'バス', 'ふね'] },
-        { id: 'umbrella', img: 'assets/images/umbrella.png', ans: 'かさ', wrong: ['くつ', 'ぼうし', 'かばん'] },
-        { id: 'fish', img: 'assets/images/fish.png', ans: 'さかな', wrong: ['とり', 'むし', 'えび'] },
-        { id: 'book', img: 'assets/images/book.png', ans: 'ほん', wrong: ['ノート', 'えんぴつ', 'はさみ'] },
-        { id: 'shoe', img: 'assets/images/shoes.png', ans: 'くつ', wrong: ['くつした', 'ズボン', 'シャツ'] },
-        { id: 'cat', img: 'assets/images/cat.png', ans: 'ねこ', wrong: ['いぬ', 'さる', 'くま'] },
-        { id: 'flower', img: 'assets/images/flower.png', ans: 'はな', wrong: ['き', 'くさ', 'はっぱ'] },
-        { id: 'clock', img: 'assets/images/clock.png', ans: 'とけい', wrong: ['テレビ', 'ラジオ', 'デンワ'] }
+        { id: 'ahiru', img: 'assets/images/ahiru.png', ans: 'あひる', wrong: ['あり', 'うし', 'あめ'] },
+        { id: 'ajisai', img: 'assets/images/ajisai.png', ans: 'あじさい', wrong: ['さくら', 'ひまわり', 'ゆり'] },
+        { id: 'aka', img: 'assets/images/aka.png', ans: 'あか', wrong: ['あお', 'みどり', 'くろ'] },
+        { id: 'ame', img: 'assets/images/ame.png', ans: 'あめ', wrong: ['ゆき', 'たいよう', 'くも'] },
+        { id: 'ao', img: 'assets/images/ao.png', ans: 'あお', wrong: ['あか', 'きいろ', 'しろ'] },
+        { id: 'ari', img: 'assets/images/ari.png', ans: 'あり', wrong: ['いぬ', 'ねこ', 'ぞう'] },
+        { id: 'ashi', img: 'assets/images/ashi.png', ans: 'あし', wrong: ['て', 'かお', 'くち'] },
+        { id: 'atsui', img: 'assets/images/atsui.png', ans: 'あつい', wrong: ['さむい', 'いたい', 'わるい'] },
+        { id: 'banana', img: 'assets/images/banana.png', ans: 'ばなな', wrong: ['りんご', 'みかん', 'いちご'] },
+        { id: 'batsu', img: 'assets/images/batsu.png', ans: 'ばつ', wrong: ['まる', 'しかく', 'さんかく'] },
+        { id: 'buta', img: 'assets/images/buta.png', ans: 'ぶた', wrong: ['うま', 'うし', 'しか'] },
+        { id: 'cho', img: 'assets/images/cho.png', ans: 'ちょう', wrong: ['はち', 'あり', 'せみ'] },
+        { id: 'churippu', img: 'assets/images/churippu.png', ans: 'ちゅーりっぷ', wrong: ['さくら', 'ばら', 'あじさい'] },
+        { id: 'daikon', img: 'assets/images/daikon.png', ans: 'だいこん', wrong: ['にんじん', 'たまねぎ', 'なす'] },
+        { id: 'dango', img: 'assets/images/dango.png', ans: 'だんご', wrong: ['おもち', 'おかし', 'まんじゅう'] },
+        { id: 'daruma', img: 'assets/images/daruma.png', ans: 'だるま', wrong: ['こま', 'けん玉', 'おもちゃ'] },
+        { id: 'densha', img: 'assets/images/densha.png', ans: 'でんしゃ', wrong: ['くるま', 'ひこうき', 'ふね'] },
+        { id: 'ebi', img: 'assets/images/ebi.png', ans: 'えび', wrong: ['かに', 'いか', 'たこ'] },
+        { id: 'ehon', img: 'assets/images/ehon.png', ans: 'えほん', wrong: ['ほん', 'ざっし', 'ノート'] },
+        { id: 'enpitsu', img: 'assets/images/enpitsu.png', ans: 'えんぴつ', wrong: ['ペン', 'けしごむ', 'はさみ'] },
+        { id: 'fujisan', img: 'assets/images/fujisan.png', ans: 'ふじさん', wrong: ['やま', 'かわ', 'みずうみ'] },
+        { id: 'fuku', img: 'assets/images/fuku.png', ans: 'ふく', wrong: ['ぼうし', 'くつ', 'ズボン'] },
+        { id: 'fune', img: 'assets/images/fune.png', ans: 'ふね', wrong: ['くるま', 'でんしゃ', 'ひこうき'] },
+        { id: 'gakko', img: 'assets/images/gakko.png', ans: 'がっこう', wrong: ['いえ', 'みち', 'やま'] },
+        { id: 'ginko', img: 'assets/images/ginko.png', ans: 'ぎんこう', wrong: ['がっこう', 'びょういん', 'こうえん'] },
+        { id: 'gohan', img: 'assets/images/gohan.png', ans: 'ごはん', wrong: ['パン', 'めん', 'おにぎり'] },
+        { id: 'gorira', img: 'assets/images/gorira.png', ans: 'ごりら', wrong: ['さる', 'くま', 'らいおん'] },
+        { id: 'gyoza', img: 'assets/images/gyoza.png', ans: 'ぎょうざ', wrong: ['らーめん', 'すし', 'やきにく'] },
+        { id: 'ha', img: 'assets/images/ha.png', ans: 'は', wrong: ['め', 'みみ', 'くち'] },
+        { id: 'hana', img: 'assets/images/hana.png', ans: 'はな', wrong: ['き', 'はっぱ', 'くさ'] },
+        { id: 'hanabi', img: 'assets/images/hanabi.png', ans: 'はなび', wrong: ['ほし', 'つき', 'たいよう'] },
+        { id: 'hasami', img: 'assets/images/hasami.png', ans: 'はさみ', wrong: ['ナイフ', 'フォーク', 'スプーン'] },
+        { id: 'hashi', img: 'assets/images/hashi.png', ans: 'はし', wrong: ['フォーク', 'スプーン', 'ナイフ'] },
+        { id: 'hebi', img: 'assets/images/hebi.png', ans: 'へび', wrong: ['わに', 'とかげ', 'かめ'] },
+        { id: 'hi', img: 'assets/images/hi.png', ans: 'ひ', wrong: ['みず', 'つち', 'かぜ'] },
+        { id: 'hikoki', img: 'assets/images/hikoki.png', ans: 'ひこうき', wrong: ['くるま', 'でんしゃ', 'ふね'] },
+        { id: 'himawari', img: 'assets/images/himawari.png', ans: 'ひまわり', wrong: ['さくら', 'ばら', 'ちゅーりっぷ'] },
+        { id: 'hoshi', img: 'assets/images/hoshi.png', ans: 'ほし', wrong: ['つき', 'たいよう', 'くも'] },
+        { id: 'ichi', img: 'assets/images/ichi.png', ans: 'いち', wrong: ['に', 'さん', 'よん'] },
+        { id: 'ichigo', img: 'assets/images/ichigo.png', ans: 'いちご', wrong: ['りんご', 'みかん', 'ばなな'] },
+        { id: 'ika', img: 'assets/images/ika.png', ans: 'いか', wrong: ['たこ', 'えび', 'かに'] },
+        { id: 'inu', img: 'assets/images/inu.png', ans: 'いぬ', wrong: ['ねこ', 'ぶた', 'うま'] },
+        { id: 'iruka', img: 'assets/images/iruka.png', ans: 'いるか', wrong: ['くじら', 'さかな', 'ぺんぎん'] },
+        { id: 'ishi', img: 'assets/images/ishi.png', ans: 'いし', wrong: ['き', 'みず', 'つち'] },
+        { id: 'isu', img: 'assets/images/isu.png', ans: 'いす', wrong: ['つくえ', 'テーブル', 'ベッド'] },
+        { id: 'jitensha', img: 'assets/images/jitensha.png', ans: 'じてんしゃ', wrong: ['くるま', 'でんしゃ', 'バイク'] },
+        { id: 'kaban', img: 'assets/images/kaban.png', ans: 'かばん', wrong: ['さいふ', 'ふくろ', 'くつ'] },
+        { id: 'kaeru', img: 'assets/images/kaeru.png', ans: 'かえる', wrong: ['へび', 'とかげ', 'わに'] },
+        { id: 'kagi', img: 'assets/images/kagi.png', ans: 'かぎ', wrong: ['ドア', 'かべ', 'とびら'] },
+        { id: 'kame', img: 'assets/images/kame.png', ans: 'かめ', wrong: ['とかげ', 'わに', 'へび'] },
+        { id: 'kasa', img: 'assets/images/kasa.png', ans: 'かさ', wrong: ['ぼうし', 'ふく', 'くつ'] },
+        { id: 'kawa', img: 'assets/images/kawa.png', ans: 'かわ', wrong: ['うみ', 'みずうみ', 'いけ'] },
+        { id: 'keito', img: 'assets/images/keito.png', ans: 'けいと', wrong: ['いと', 'ぬの', 'ふく'] },
+        { id: 'kocha', img: 'assets/images/kocha.png', ans: 'こうちゃ', wrong: ['おちゃ', 'みず', 'コーヒー'] },
+        { id: 'kodomo', img: 'assets/images/kodomo.png', ans: 'こども', wrong: ['おとな', 'せんせい', 'がくせい'] },
+        { id: 'koi', img: 'assets/images/koi.png', ans: 'こい', wrong: ['さかな', 'たい', 'まぐろ'] },
+        { id: 'koma', img: 'assets/images/koma.png', ans: 'こま', wrong: ['だるま', 'けん玉', 'おもちゃ'] },
+        { id: 'koppu', img: 'assets/images/koppu.png', ans: 'コップ', wrong: ['さら', 'ちゃわん', 'おわん'] },
+        { id: 'kuchi', img: 'assets/images/kuchi.png', ans: 'くち', wrong: ['め', 'はな', 'みみ'] },
+        { id: 'kuma', img: 'assets/images/kuma.png', ans: 'くま', wrong: ['ごりら', 'ぱんだ', 'らいおん'] },
+        { id: 'kumo', img: 'assets/images/kumo.png', ans: 'くも', wrong: ['たいよう', 'つき', 'ほし'] },
+        { id: 'kuro', img: 'assets/images/kuro.png', ans: 'くろ', wrong: ['しろ', 'あか', 'あお'] },
+        { id: 'kuruma', img: 'assets/images/kuruma.png', ans: 'くるま', wrong: ['でんしゃ', 'ひこうき', 'ふね'] },
+        { id: 'kutsu', img: 'assets/images/kutsu.png', ans: 'くつ', wrong: ['くつした', 'ふく', 'ぼうし'] },
+        { id: 'mado', img: 'assets/images/mado.png', ans: 'まど', wrong: ['ドア', 'かべ', 'ゆか'] },
+        { id: 'maguro', img: 'assets/images/maguro.png', ans: 'まぐろ', wrong: ['たい', 'さかな', 'えび'] },
+        { id: 'makura', img: 'assets/images/makura.png', ans: 'まくら', wrong: ['ベッド', 'ふとん', 'まっと'] },
+        { id: 'mame', img: 'assets/images/mame.png', ans: 'まめ', wrong: ['いも', 'やさい', 'きのこ'] },
+        { id: 'manga', img: 'assets/images/manga.png', ans: 'まんが', wrong: ['ほん', 'ざっし', 'しんぶん'] },
+        { id: 'megane', img: 'assets/images/megane.png', ans: 'めがね', wrong: ['コンタクト', 'ぼうし', 'くつ'] },
+        { id: 'michi', img: 'assets/images/michi.png', ans: 'みち', wrong: ['かわ', 'やま', 'うみ'] },
+        { id: 'midori', img: 'assets/images/midori.png', ans: 'みどり', wrong: ['あか', 'あお', 'きいろ'] },
+        { id: 'mikan', img: 'assets/images/mikan.png', ans: 'みかん', wrong: ['りんご', 'ばなな', 'いちご'] },
+        { id: 'mizuumi', img: 'assets/images/mizuumi.png', ans: 'みずうみ', wrong: ['うみ', 'かわ', 'いけ'] },
+        { id: 'momo', img: 'assets/images/momo.png', ans: 'もも', wrong: ['りんご', 'いちご', 'みかん'] },
+        { id: 'mori', img: 'assets/images/mori.png', ans: 'もり', wrong: ['やま', 'かわ', 'うみ'] },
+        { id: 'mushi', img: 'assets/images/mushi.png', ans: 'むし', wrong: ['いぬ', 'ねこ', 'さかな'] },
+        { id: 'nabe', img: 'assets/images/nabe.png', ans: 'なべ', wrong: ['さら', 'ちゃわん', 'コップ'] },
+        { id: 'namazu', img: 'assets/images/namazu.png', ans: 'なまず', wrong: ['さかな', 'うなぎ', 'どじょう'] },
+        { id: 'nami', img: 'assets/images/nami.png', ans: 'なみ', wrong: ['かわ', 'うみ', 'みずうみ'] },
+        { id: 'nana', img: 'assets/images/nana.png', ans: 'なな', wrong: ['ろく', 'はち', 'きゅう'] },
+        { id: 'nashi', img: 'assets/images/nashi.png', ans: 'なし', wrong: ['りんご', 'みかん', 'いちご'] },
+        { id: 'nasu', img: 'assets/images/nasu.png', ans: 'なす', wrong: ['きゅうり', 'にんじん', 'ピーマン'] },
+        { id: 'neko', img: 'assets/images/neko.png', ans: 'ねこ', wrong: ['いぬ', 'ぶた', 'うま'] },
+        { id: 'nezumi', img: 'assets/images/nezumi.png', ans: 'ねずみ', wrong: ['ねこ', 'いぬ', 'うさぎ'] },
+        { id: 'niwa', img: 'assets/images/niwa.png', ans: 'にわ', wrong: ['いえ', 'がっこう', 'こうえん'] },
+        { id: 'nori', img: 'assets/images/nori.png', ans: 'のり', wrong: ['ごはん', 'パン', 'さかな'] },
+        { id: 'nuigurumi', img: 'assets/images/nuigurumi.png', ans: 'ぬいぐるみ', wrong: ['にんぎょう', 'おもちゃ', 'だるま'] },
+        { id: 'nurie', img: 'assets/images/nurie.png', ans: 'ぬりえ', wrong: ['えほん', 'まんが', 'ざっし'] },
+        { id: 'oka', img: 'assets/images/oka.png', ans: 'おか', wrong: ['やま', 'かわ', 'みずうみ'] },
+        { id: 'okashi', img: 'assets/images/okashi.png', ans: 'おかし', wrong: ['ごはん', 'パン', 'やさい'] },
+        { id: 'omocha', img: 'assets/images/omocha.png', ans: 'おもちゃ', wrong: ['ぬいぐるみ', 'にんぎょう', 'だるま'] },
+        { id: 'oni', img: 'assets/images/oni.png', ans: 'おに', wrong: ['かみ', 'ひと', 'こども'] },
+        { id: 'onigiri', img: 'assets/images/onigiri.png', ans: 'おにぎり', wrong: ['ごはん', 'パン', 'めん'] },
+        { id: 'onsen', img: 'assets/images/onsen.png', ans: 'おんせん', wrong: ['かわ', 'うみ', 'みずうみ'] },
+        { id: 'panda', img: 'assets/images/panda.png', ans: 'ぱんだ', wrong: ['くま', 'さる', 'らいおん'] },
+        { id: 'raion', img: 'assets/images/raion.png', ans: 'らいおん', wrong: ['くま', 'とら', 'ぞう'] },
+        { id: 'ramen', img: 'assets/images/ramen.png', ans: 'ラーメン', wrong: ['うどん', 'そば', 'パスタ'] },
+        { id: 'rappa', img: 'assets/images/rappa.png', ans: 'らっぱ', wrong: ['たいこ', 'ギター', 'ピアノ'] },
+        { id: 'ringo', img: 'assets/images/ringo.png', ans: 'りんご', wrong: ['みかん', 'いちご', 'ばなな'] },
+        { id: 'risu', img: 'assets/images/risu.png', ans: 'りす', wrong: ['ねこ', 'いぬ', 'うさぎ'] },
+        { id: 'roku', img: 'assets/images/roku.png', ans: 'ろく', wrong: ['ご', 'なな', 'はち'] },
+        { id: 'sakana', img: 'assets/images/sakana.png', ans: 'さかな', wrong: ['とり', 'いぬ', 'ねこ'] },
+        { id: 'sakura', img: 'assets/images/sakura.png', ans: 'さくら', wrong: ['ひまわり', 'ちゅーりっぷ', 'ばら'] },
+        { id: 'saru', img: 'assets/images/saru.png', ans: 'さる', wrong: ['ごりら', 'くま', 'ぱんだ'] },
+        { id: 'semi', img: 'assets/images/semi.png', ans: 'せみ', wrong: ['ちょう', 'はち', 'あり'] },
+        { id: 'shiitake', img: 'assets/images/shiitake.png', ans: 'しいたけ', wrong: ['きのこ', 'まめ', 'やさい'] },
+        { id: 'shika', img: 'assets/images/shika.png', ans: 'しか', wrong: ['うま', 'うし', 'ぶた'] },
+        { id: 'shiro', img: 'assets/images/shiro.png', ans: 'しろ', wrong: ['くろ', 'あか', 'あお'] },
+        { id: 'suika', img: 'assets/images/suika.png', ans: 'すいか', wrong: ['りんご', 'みかん', 'ばなな'] },
+        { id: 'sushi', img: 'assets/images/sushi.png', ans: 'すし', wrong: ['さかな', 'ごはん', 'やさい'] },
+        { id: 'suzume', img: 'assets/images/suzume.png', ans: 'すずめ', wrong: ['とり', 'つばめ', 'はと'] },
+        { id: 'tai', img: 'assets/images/tai.png', ans: 'たい', wrong: ['まぐろ', 'さかな', 'こい'] },
+        { id: 'tako', img: 'assets/images/tako.png', ans: 'たこ', wrong: ['いか', 'えび', 'かに'] },
+        { id: 'tamago', img: 'assets/images/tamago.png', ans: 'たまご', wrong: ['ごはん', 'パン', 'やさい'] },
+        { id: 'tanuki', img: 'assets/images/tanuki.png', ans: 'たぬき', wrong: ['きつね', 'いぬ', 'ねこ'] },
+        { id: 'te', img: 'assets/images/te.png', ans: 'て', wrong: ['あし', 'かお', 'みみ'] },
+        { id: 'terebi', img: 'assets/images/terebi.png', ans: 'テレビ', wrong: ['ラジオ', 'スマホ', 'パソコン'] },
+        { id: 'tofu', img: 'assets/images/tofu.png', ans: 'とうふ', wrong: ['まめ', 'ごはん', 'パン'] },
+        { id: 'tokei', img: 'assets/images/tokei.png', ans: 'とけい', wrong: ['かぎ', 'ドア', 'かべ'] },
+        { id: 'tomato', img: 'assets/images/tomato.png', ans: 'とまと', wrong: ['きゅうり', 'なす', 'ピーマン'] },
+        { id: 'tori', img: 'assets/images/tori.png', ans: 'とり', wrong: ['いぬ', 'ねこ', 'さかな'] },
+        { id: 'tsubame', img: 'assets/images/tsubame.png', ans: 'つばめ', wrong: ['すずめ', 'はと', 'とり'] },
+        { id: 'tsuki', img: 'assets/images/tsuki.png', ans: 'つき', wrong: ['たいよう', 'ほし', 'くも'] },
+        { id: 'tsukue', img: 'assets/images/tsukue.png', ans: 'つくえ', wrong: ['いす', 'テーブル', 'ベッド'] },
+        { id: 'ude', img: 'assets/images/ude.png', ans: 'うで', wrong: ['あし', 'て', 'かお'] },
+        { id: 'uma', img: 'assets/images/uma.png', ans: 'うま', wrong: ['いぬ', 'ねこ', 'ぶた'] },
+        { id: 'umi', img: 'assets/images/umi.png', ans: 'うみ', wrong: ['かわ', 'やま', 'みずうみ'] },
+        { id: 'usagi', img: 'assets/images/usagi.png', ans: 'うさぎ', wrong: ['ねこ', 'いぬ', 'りす'] },
+        { id: 'ushi', img: 'assets/images/ushi.png', ans: 'うし', wrong: ['ぶた', 'うま', 'しか'] },
+        { id: 'wani', img: 'assets/images/wani.png', ans: 'わに', wrong: ['とかげ', 'へび', 'かめ'] },
+        { id: 'yagi', img: 'assets/images/yagi.png', ans: 'やぎ', wrong: ['ひつじ', 'うま', 'うし'] },
+        { id: 'yama', img: 'assets/images/yama.png', ans: 'やま', wrong: ['かわ', 'うみ', 'みち'] },
+        { id: 'yuki', img: 'assets/images/yuki.png', ans: 'ゆき', wrong: ['あめ', 'くも', 'たいよう'] },
+        { id: 'yubiwa', img: 'assets/images/yubiwa.png', ans: 'ゆびわ', wrong: ['くつ', 'ふく', 'ぼうし'] },
     ];
 
     // --------------------------------------------------
@@ -231,7 +358,7 @@
         }
 
         start() {
-            // 問題をシャッフルしてセット
+            // 問題をシャッフルしてセット (10問に限定)
             this.questions = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
             this.currentQIndex = 0;
             this.score = 0;
@@ -257,12 +384,25 @@
             // 画像表示 (ない場合はプレースホルダー)
             const img = new Image();
             img.src = q.img;
-            img.onerror = () => { img.src = 'https://placehold.co/200x200?text=' + q.ans; }; // フォールバック
+            // エラー時のフォールバック画像
+            img.onerror = () => { img.src = 'https://placehold.co/200x200/ef5350/ffffff?text=' + q.ans; }; 
             this.imgArea.innerHTML = '';
             this.imgArea.appendChild(img);
 
             // 選択肢作成
-            const choices = [q.ans, ...q.wrong].sort(() => Math.random() - 0.5);
+            let allAnswers = QUESTIONS.map(item => item.ans).filter(ans => ans !== q.ans);
+            
+            // 間違いの選択肢は3つ
+            const wrongChoices = [...q.wrong]
+                .filter(w => w !== q.ans)
+                .slice(0, 3) // 既存の間違い候補から最大3つ
+                .concat(allAnswers) // 残りを全体から補充
+                .filter((value, index, self) => self.indexOf(value) === index) // 重複除去
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const choices = [q.ans, ...wrongChoices].sort(() => Math.random() - 0.5);
+            
             this.btnArea.innerHTML = '';
             
             choices.forEach(choice => {
