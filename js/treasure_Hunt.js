@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------
+    // ★★★ Firebase連携設定 ★★★
+    // ----------------------------------------------------
+    // Firebase連携のグローバル関数に依存します。
+    if (typeof window.addPointsToUser !== 'function') {
+        window.addPointsToUser = async () => { return false; };
+    }
+    const POINTS_PER_CORRECT = 5; // 自己評価で正解時に加算されるポイント数 (HTML側と同期)
+    // ★★★ 古いローカルストレージベースのポイントロジックは削除しました ★★★
+    // ----------------------------------------------------
+
+    // ----------------------------------------------------
     // ★ 1. データ定義 (ここでトピックと単語を管理します)
     // ----------------------------------------------------
-    // 画像は assets/images/トピックID/画像名.png にあると想定
-    // 音声は assets/sounds/トピックID/音声名.mp3 にあると想定
-    
     const ASSETS_BASE = 'assets/';
 
     const GAME_DATA = {
@@ -38,9 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ★追加した5つ
                 { id: 'onigiri', name: 'おにぎり', img: 'onigiri.png', sound: 'onigiri.mp3' },
                 { id: 'mikan', name: 'みかん', img: 'orange.png', sound: 'orange.mp3' },
-                { id: 'juice', name: 'ジュース', img: 'juice.png', sound: 'juice.mp3' },
+                { id: 'juice', name: 'ジュース', img: 'juice.mp3', sound: 'juice.mp3' },
                 { id: 'cookie', name: 'クッキー', img: 'cookie.png', sound: 'cookie.mp3' },
-                { id: 'tomato', name: 'トマト', img: 'tomato.png', sound: 'tomato.mp3' }
+                { id: 'tomato', name: 'トマト', img: 'tomato.mp3', sound: 'tomato.mp3' }
             ]
         },
         clothing: {
@@ -51,11 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'kutsu', name: 'くつ', img: 'shoes.png', sound: 'shoes.mp3' },
                 { id: 'boushi', name: 'ぼうし', img: 'hat.png', sound: 'hat.mp3' },
                 { id: 'tshirt', name: 'Tシャツ', img: 'tshirt.png', sound: 'tshirt.mp3' },
-                { id: 'kutsushita', name: 'くつした', img: 'socks.png', sound: 'socks.mp3' },
+                { id: 'kutsushita', name: 'くつした', img: 'socks.mp3', sound: 'socks.mp3' },
                 { id: 'zubon', name: 'ズボン', img: 'pants.png', sound: 'pants.mp3' },
                 // ★追加した5つ
                 { id: 'uwagi', name: 'うわぎ', img: 'jacket.png', sound: 'jacket.mp3' },
-                { id: 'skirt', name: 'スカート', img: 'skirt.png', sound: 'skirt.mp3' },
+                { id: 'skirt', name: 'スカート', img: 'skirt.mp3', sound: 'skirt.mp3' },
                 { id: 'kaban', name: 'かばん', img: 'bag.png', sound: 'bag.mp3' },
                 { id: 'kasa', name: 'かさ', img: 'umbrella.png', sound: 'umbrella.mp3' },
                 { id: 'megane', name: 'めがね', img: 'glasses.png', sound: 'glasses.mp3' }
@@ -69,11 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'ball', name: 'ボール', img: 'ball.png', sound: 'ball.mp3' },
                 { id: 'kuruma', name: 'くるま', img: 'car.png', sound: 'car.mp3' },
                 { id: 'ningyou', name: 'にんぎょう', img: 'doll.png', sound: 'doll.mp3' },
-                { id: 'block', name: 'ブロック', img: 'block.png', sound: 'block.mp3' },
+                { id: 'block', name: 'ブロック', img: 'block.mp3', sound: 'block.mp3' },
                 { id: 'nuigurumi', name: 'ぬいぐるみ', img: 'plush.png', sound: 'plush.mp3' },
                 // ★追加した5つ
                 { id: 'densha', name: 'でんしゃ', img: 'train.png', sound: 'train.mp3' },
-                { id: 'hikouki', name: 'ひこうき', img: 'airplane.png', sound: 'airplane.mp3' },
+                { id: 'hikouki', name: 'ひこうき', img: 'airplane.mp3', sound: 'airplane.mp3' },
                 { id: 'robotto', name: 'ロボット', img: 'robot.png', sound: 'robot.mp3' },
                 { id: 'ehon', name: 'えほん', img: 'book.png', sound: 'book.mp3' },
                 { id: 'fuusen', name: 'ふうせん', img: 'balloon.png', sound: 'balloon.mp3' }
@@ -94,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'doa', name: 'ドア', img: 'door.png', sound: 'door.mp3' },
                 { id: 'mado', name: 'まど', img: 'window.png', sound: 'window.mp3' },
                 { id: 'denki', name: 'でんき', img: 'light.png', sound: 'light.mp3' },
-                { id: 'sofa', name: 'ソファ', img: 'sofa.png', sound: 'sofa.mp3' }
+                { id: 'sofa', name: 'ソファ', img: 'sofa.mp3', sound: 'sofa.mp3' }
             ]
         }
     };
@@ -107,11 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentWord = null;
     let videoStream = null;
     const audioCache = {};
-
-    // ポイントシステム用定数
-    const GAME_ID_TREASURE_HUNT = 'treasure_hunt_game';
-    const USER_STORAGE_KEY = 'user_accounts'; 
-    const SESSION_STORAGE_KEY = 'current_user'; 
 
     // ----------------------------------------------------
     // ★ 3. DOM要素の取得
@@ -144,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resUserImg = document.getElementById('sc-result-image');
     const btnCorrect = document.getElementById('sc-correct-button');
     const btnIncorrect = document.getElementById('sc-incorrect-button');
+    const pointFeedback = document.getElementById('sc-point-feedback'); // フィードバック表示用
 
     const backToTopicBtns = document.querySelectorAll('.sc-back-to-topic');
 
@@ -167,30 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.play().catch(e => console.log('Audio Play Error:', e));
     }
 
-    // ポイント加算
-    function checkAndAwardPoints(topicId, wordId) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (!currentUser || currentUser === 'ゲスト') return "guest"; 
-
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
-        let users = usersJson ? JSON.parse(usersJson) : {};
-        let user = users[currentUser];
-        if (!user) return "error"; 
-
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const progressKey = `${GAME_ID_SCAVENGER}_${topicId}_${wordId}`;
-
-        user.progress = user.progress || {};
-        user.progress[progressKey] = user.progress[progressKey] || {};
-
-        if (user.progress[progressKey][today] === true) return "already_scored"; 
-
-        user.points = (user.points || 0) + 1;
-        user.progress[progressKey][today] = true;
-        
-        users[currentUser] = user;
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-        return "scored"; 
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
     }
 
     // ----------------------------------------------------
@@ -262,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playSoundBtn.onclick = () => {
         const path = `${ASSETS_BASE}sounds/${currentTopicId}/${currentWord.sound}`;
         playSound(path);
-        gamePrompt.textContent = `「${currentWord.name}」を さがしてね！`;
+        gamePrompt.textContent = `「${currentWord.name}」をさがしてね！`;
         openCameraBtn.style.display = 'block';
     };
 
@@ -279,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ★ 7. カメラロジック
     // ----------------------------------------------------
     openCameraBtn.onclick = async () => {
+        // streamが既に存在する場合は終了 (isCameraOpenのチェックを簡略化)
         if (videoStream) return;
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -291,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvasEl.width = videoEl.videoWidth;
                 canvasEl.height = videoEl.videoHeight;
             };
+            await videoEl.play(); // ビデオ再生開始
             showScreen(screenCamera);
         } catch (err) {
             console.error(err);
@@ -325,28 +314,50 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // ★ 8. 結果ロジック
+    // ★ 8. 結果ロジック (ポイント連携を修正)
     // ----------------------------------------------------
-    btnCorrect.onclick = () => {
-        const result = checkAndAwardPoints(currentTopicId, currentWord.id);
-        if (result === "scored") {
-            alert("せいかい！ (+1 ポイント！)");
+    
+    async function handleSelfAssessment(isCorrect) { // ★ async関数に変更
+        
+        // 自己評価ボタンを無効化
+        btnCorrect.disabled = true;
+        btnIncorrect.disabled = true;
+
+        if (isCorrect) {
+            // ★★★ Firebaseポイント付与ロジック ★★★
+            const wordKey = currentWord.word; // 単語名をキーにする
+            const success = await window.addPointsToUser(POINTS_PER_CORRECT, wordKey);
+            
+            let message = `⭕️ せいかい！おめでとう！`;
+            if (success) {
+                message += ` (+${POINTS_PER_CORRECT} ポイント記録)`;
+                pointFeedback.style.color = 'var(--correct-color)';
+            } else {
+                message += ' (ポイント記録エラー)';
+                pointFeedback.style.color = 'var(--accent)';
+            }
+            pointFeedback.textContent = message;
+            // ★★★ Firebaseポイント付与ロジック 終了 ★★★
+
         } else {
-            alert("せいかい！");
+            pointFeedback.textContent = '❌ ざんねん！ちがったみたい。がんばろうね。';
+            pointFeedback.style.color = 'var(--incorrect-color)';
         }
         
-        // 次の問題へ (リセット)
-        resUserImg.src = '';
-        resProbImg.src = '';
-        setupNewProblem();
-    };
+        // 次の問題へ遷移 (ボタン操作を許可)
+        setTimeout(() => {
+            resUserImg.src = '';
+            resProbImg.src = '';
+            btnCorrect.disabled = false; // 有効化
+            btnIncorrect.disabled = false; // 有効化
+            setupNewProblem();
+        }, 1500);
+    }
+    
+    // イベントリスナーを修正
+    btnCorrect.onclick = () => handleSelfAssessment(true);
+    btnIncorrect.onclick = () => handleSelfAssessment(false);
 
-    btnIncorrect.onclick = () => {
-        alert("ざんねん！ つぎは がんばろう！");
-        resUserImg.src = '';
-        resProbImg.src = '';
-        setupNewProblem();
-    };
 
     // 初期化実行
     initTopicScreen();
