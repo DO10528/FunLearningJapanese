@@ -159,6 +159,11 @@
         font-family: 'Zen Maru Gothic', sans-serif;
     }
     .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
+    
+    /* 認証ステータス */
+    #auth-status-particle {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--secondary);
+    }
 
     /* スマホ対応 */
     @media (max-width: 500px) {
@@ -177,6 +182,8 @@
 
 <div class="game-container">
     
+    <div id="auth-status-particle">認証中...</div>
+
     <div class="quiz-card">
         <div class="question-title">
             ただしい <b>「て・に・を・は」</b> を いれてね！
@@ -198,6 +205,61 @@
 
 <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status-particle');
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            const userDocRef = doc(db, "users", window.currentUserId);
+            const userDocSnap = await getDoc(userDocRef);
+            let displayName = 'ユーザー';
+            if (userDocSnap.exists()) {
+                displayName = userDocSnap.data().displayName || 'ユーザー';
+            }
+            authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = '❌ ゲストモード (ポイントはつきません)';
+        }
+    });
+
+    // ポイント加算関数
+    window.addPointsToUser = async function(points, questionId) { 
+        if (!window.currentUserId || points <= 0) return false;
+        try {
+            const userRef = doc(db, "users", window.currentUserId);
+            // 助詞ゲーム用ID
+            const logId = `particle_q${questionId}`; 
+            await updateDoc(userRef, { points: increment(points) });
+            console.log(`+${points}pt (QID: ${questionId})`);
+            return true;
+        } catch (e) {
+            console.error("ポイントエラー:", e);
+            return false;
+        }
+    }
+</script>
 
 <script>
     // --- 問題データ (JLPT N5レベル) ---
@@ -330,6 +392,12 @@
     let currentQIndex = 0;
     let currentQuestion = null;
     let filledCount = 0; // 埋まった数
+    
+    // Firebase関数ダミー
+    if (typeof window.addPointsToUser !== 'function') {
+        window.addPointsToUser = async () => false;
+    }
+    const POINTS_PER_QUESTION = 1;
 
     const sentenceArea = document.getElementById('sentence-area');
     const choicesArea = document.getElementById('choices-area');
@@ -415,7 +483,7 @@
 
     function startDrag(e) {
         e.preventDefault();
-        // 既に配置済みのアイテムは動かせない（簡易化）
+        // 既に配置済みのアイテムは動かせない
         if(e.target.classList.contains('placed')) return;
 
         draggedItem = e.target;
@@ -487,22 +555,17 @@
             if (droppedChar === correctAnswer) {
                 // 正解！
                 playCorrect();
-                // クローンをターゲットに置く
                 const placedItem = draggedItem.cloneNode(true);
                 placedItem.style.opacity = '1';
                 placedItem.style.cursor = 'default';
-                placedItem.classList.add('placed'); // 再ドラッグ不可
+                placedItem.classList.add('placed'); 
                 
-                // チップのデザインを変更（枠線なし、背景透過など）して馴染ませる
                 placedItem.style.border = 'none';
                 placedItem.style.boxShadow = 'none';
                 placedItem.style.background = 'transparent';
                 
                 target.appendChild(placedItem);
                 target.classList.add('filled', 'correct-anim');
-                
-                // 元のチップは消さない（別の穴でも使うかもしれないので？今回は消さない仕様）
-                // ただし、同じ文字を複数回使う問題もあるため、プールには残す。
                 
                 filledCount++;
                 checkCompletion();
@@ -540,9 +603,19 @@
         feedbackMsg.style.color = "red";
     }
 
-    function checkCompletion() {
+    // ★ async に変更してポイント加算を待機 (しなくても動作はするが、非同期処理であることを明示)
+    async function checkCompletion() {
         if (filledCount >= currentQuestion.answers.length) {
-            feedbackMsg.textContent = "よくできました！";
+            // ★★★ Firebaseポイント加算 ★★★
+            // 全ての穴埋めが完了したらポイント付与
+            const result = await window.addPointsToUser(POINTS_PER_QUESTION, currentQIndex);
+            let msg = "よくできました！";
+            if (result) {
+                msg += " (+1pt)";
+            }
+            feedbackMsg.textContent = msg;
+            // ★★★★★★★★★★★★★★★★★
+            
             nextBtn.style.display = 'inline-block';
         }
     }
