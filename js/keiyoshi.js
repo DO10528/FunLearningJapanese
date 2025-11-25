@@ -1,61 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------
-    // ★★★ ポイントシステム設定 (単語ごとに1日1回) ★★★
+    // ★★★ Firebase連携設定 ★★★
     // ----------------------------------------------------
-    const GAME_ID_ADJ_V2 = 'keiyoshi_quiz_v2'; // ゲームID
-    
-    const USER_STORAGE_KEY_ADJ_V2 = 'user_accounts'; 
-    const SESSION_STORAGE_KEY_ADJ_V2 = 'current_user'; 
-    const GUEST_NAME_ADJ_V2 = 'ゲスト'; 
-
-    function getTodayDateString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    // HTML側のモジュールで定義された関数がない場合のフォールバック
+    if (typeof window.addPointsToUser !== 'function') {
+        window.addPointsToUser = async () => { return false; };
     }
-
-    // ポイント加算・チェック関数 (単語IDまたは漢字をキーにする)
-    function checkAndAwardPoints(wordKey) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_ADJ_V2);
-        if (!currentUser || currentUser === GUEST_NAME_ADJ_V2) return "guest"; 
-
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY_ADJ_V2);
-        let users = usersJson ? JSON.parse(usersJson) : {};
-        let user = users[currentUser];
-        if (!user) return "error"; 
-
-        const today = getTodayDateString();
-        // キーを「ゲームID + 単語キー(漢字など)」にする
-        const progressKey = `${GAME_ID_ADJ_V2}_word_${wordKey}`;
-
-        user.progress = user.progress || {};
-        user.progress[progressKey] = user.progress[progressKey] || {};
-
-        // その単語で、今日すでにポイントをもらっているかチェック
-        if (user.progress[progressKey][today] === true) return "already_scored"; 
-
-        // ポイント加算
-        user.points = (user.points || 0) + 1;
-        user.progress[progressKey][today] = true;
-        
-        users[currentUser] = user;
-        localStorage.setItem(USER_STORAGE_KEY_ADJ_V2, JSON.stringify(users));
-        console.log(`[Game] ${currentUser} gained 1 point for word "${wordKey}". Total: ${user.points}`);
-        return "scored"; 
-    }
-    // ----------------------------------------------------
-    // ★★★ ポイントシステム設定 (ここまで) ★★★
-    // ----------------------------------------------------
+    const POINTS_PER_QUESTION = 1;
 
     // ----------------------------------------------------
     // 設定・変数
     // ----------------------------------------------------
     const DATA_PATH = 'data/keiyoshi.json';
     
-    // ★画像パスの配列 (必要に応じて変更)
+    // 画像パスの配列 (JSONに画像指定がない場合のランダム表示用)
     const IMAGE_PATHS = [
         'assets/images/keiyoshi_quiz_1.png', 
         'assets/images/keiyoshi_quiz_2.jpg',
@@ -71,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;              
     const QUIZ_TOTAL_QUESTIONS = 5; 
     const CHOICES_COUNT = 3;    
+    let isAnswering = false; // 連打防止フラグ
 
     // ----------------------------------------------------
     // DOM要素の取得
@@ -102,8 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     async function initializeQuiz() {
         try {
-            // ★JSONデータ構造に合わせて読み込み方を変える必要があるかもしれません
-            // ここでは { "adjectives": [...] } という構造を想定しています
             const response = await fetch(DATA_PATH);
             const data = await response.json();
             
@@ -139,6 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { kanji: "賑やか", hiragana: "にぎやか", meaning: "Lively", type: "na" },
                 { kanji: "熱い", hiragana: "あつい", meaning: "Hot", type: "i" }
             ];
+            // 仮データも足りない場合は停止
+            if (adjectives.length < CHOICES_COUNT) {
+                questionMeaningElement.textContent = "データ読込エラー";
+                return;
+            }
             startNewQuiz();
         }
     }
@@ -164,7 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const questions = [];
         const usedAdjectives = new Set(); 
         
-        while (questions.length < QUIZ_TOTAL_QUESTIONS && adjectives.length >= CHOICES_COUNT) {
+        // データの安全装置 (無限ループ防止)
+        let loopSafety = 0;
+
+        while (questions.length < QUIZ_TOTAL_QUESTIONS && loopSafety < 1000) {
+            loopSafety++;
+
             // 1. 正解を選ぶ
             let correctAdjective;
             let attempts = 0;
@@ -182,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const randomIndex = Math.floor(Math.random() * adjectives.length);
                 const dummyAdjective = adjectives[randomIndex];
                 
+                // 意味が違い、かつ既に選ばれていないもの
                 if (dummyAdjective.meaning !== correctAdjective.meaning && 
                     !wrongAdjectives.some(adj => adj.meaning === dummyAdjective.meaning)) {
                     wrongAdjectives.push(dummyAdjective);
@@ -213,21 +182,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayQuestion() {
-        if (currentQuestionIndex >= QUIZ_TOTAL_QUESTIONS) {
+        if (currentQuestionIndex >= quizQuestions.length) {
             endQuiz();
             return;
         }
 
         const question = quizQuestions[currentQuestionIndex];
+        isAnswering = false; // 回答可能状態にする
         
         quizImageElement.src = question.image;
         quizImageElement.alt = `クイズ画像 ${currentQuestionIndex + 1}`;
-        quizImageElement.style.objectFit = 'contain'; // 画像が切れないように
+        quizImageElement.style.objectFit = 'contain'; 
 
         // 画像ロードエラー時のハンドリング
         quizImageElement.onerror = function() {
-             this.src = 'assets/images/placeholder.png'; // 代替画像があれば
-             // または this.style.display = 'none';
+             // 代替画像を表示するか、非表示にする
+             // this.style.display = 'none'; 
+             this.src = 'assets/images/placeholder.png'; // プレースホルダーがあれば
         };
 
         questionNumberElement.textContent = `第 ${currentQuestionIndex + 1} 問 (全 ${QUIZ_TOTAL_QUESTIONS} 問)`;
@@ -240,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const suffix = adjective.type === 'na' ? ' (な)' : '';
             button.textContent = `${adjective.kanji}（${adjective.hiragana}）${suffix}`;
             
+            // 漢字IDを渡す
             button.addEventListener('click', () => checkAnswer(button, adjective.kanji));
             
             choicesContainer.appendChild(button);
@@ -249,23 +221,27 @@ document.addEventListener('DOMContentLoaded', () => {
         resultMessageElement.className = 'result-message'; 
     }
 
-    function checkAnswer(clickedButton, selectedKanji) {
+    // ★ async に変更
+    async function checkAnswer(clickedButton, selectedKanji) {
+        if (isAnswering) return; // 連打防止
+        isAnswering = true;
+
         const question = quizQuestions[currentQuestionIndex];
         const isCorrect = (selectedKanji === question.correctKanji);
         
-        disableAllButtons(); // 連打防止のため先に無効化
+        disableAllButtons(); 
 
         if (isCorrect) {
             playSound(SOUND_CORRECT_PATH);
             
-            // ★★★ ポイント付与 (漢字をキーとして渡す) ★★★
-            const result = checkAndAwardPoints(selectedKanji);
+            // ★★★ Firebase ポイント加算 ★★★
+            const success = await window.addPointsToUser(POINTS_PER_QUESTION, selectedKanji);
             
             let msg = "✅ 正解です！";
-            if (result === "scored") {
-                msg += " (+1 ポイント！)";
+            if (success) {
+                msg += " (+1 ポイント)";
             }
-            // ★★★★★★★★★★★★★★★★★★★★★★★
+            // ★★★★★★★★★★★★★★★★★
 
             score++;
             resultMessageElement.textContent = msg;
@@ -282,16 +258,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             playSound(SOUND_INCORRECT_PATH);
             
-            resultMessageElement.textContent = "❌ 不正解です。もう一度挑戦してください。";
+            resultMessageElement.textContent = "❌ 不正解です...";
             resultMessageElement.classList.remove('correct');
             resultMessageElement.classList.add('incorrect');
-            clickedButton.style.backgroundColor = '#ff6b6b'; 
-            clickedButton.style.borderColor = '#ff6b6b';
             
-            // 不正解の場合は、そのボタンだけ無効のままにして、他は有効に戻す（再挑戦させる場合）
-            // 今回の仕様では「不正解」→「もう一度」となっているので、ボタンを有効に戻す
+            // どのボタンを押したかわかるようにスタイル適用 (HTML側のCSSに依存)
+            clickedButton.style.opacity = '0.7'; 
+            
+            // 今回は不正解でも次に進まない仕様（あるいは進む仕様）に合わせて調整
+            // ここでは「不正解メッセージを出して、もう一度ボタンを押させる」のではなく
+            // 「正解を教えて次に進む」または「もう一度選ばせる」のどちらかになりますが、
+            // 元のコードの挙動（ボタン無効化してメッセージ表示）を維持しつつ、
+            // シンプルに「再挑戦」させるためボタンを有効に戻します。
+            
             enableAllButtons();
-            clickedButton.disabled = true; // 押したボタンだけ無効化
+            clickedButton.disabled = true; // 間違えたボタンだけ無効化
+            isAnswering = false; // 再回答可能に
 
             resultMessageElement.style.display = 'block';
         }
@@ -311,12 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function endQuiz() {
         questionNumberElement.textContent = "クイズ終了！";
-        questionMeaningElement.textContent = "全問終了しました。お疲れ様でした！";
+        questionMeaningElement.textContent = "お疲れ様でした！";
         choicesContainer.innerHTML = ''; 
-        choicesContainer.style.display = 'none'; 
+        // choicesContainer.style.display = 'none'; 
 
         quizImageElement.src = ''; 
         quizImageElement.alt = '';
+        // quizImageElement.style.display = 'none';
 
         resultMessageElement.style.display = 'none'; 
 
