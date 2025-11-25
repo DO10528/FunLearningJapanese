@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 設定 & ポイントシステム ---
-    const GAME_ID = 'hiragana_drag_match';
-    const USER_STORAGE_KEY = 'user_accounts';
-    const SESSION_STORAGE_KEY = 'current_user';
-    const GUEST_NAME = 'ゲスト'; 
+    // --- 設定 ---
+    const GAME_ID = 'hiragana_drag_match'; // ゲームID (将来的な拡張用)
 
     // DOM
     const MENU_AREA = document.getElementById('level-menu-area');
@@ -14,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ILLUST_POOL = document.getElementById('illust-pool');
     const WORD_LIST = document.getElementById('word-list');
     const FEEDBACK = document.getElementById('feedback');
+    const AUTH_STATUS = document.getElementById('auth-status'); // HTMLから取得
 
     // 音声
     const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
@@ -23,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const IMG_PATH = 'assets/images/hiragana_words/';
     
     // --- データ (元のコードから移植) ---
+    // ポイントはレベルクリアで10点とします。
+    const POINTS_PER_LEVEL = 10; 
+    
     const gameLevels = [
         { level: 1, words: [ { hira: 'あめ', file: 'あめ' }, { hira: 'いぬ', file: 'いぬ' }, { hira: 'うし', file: 'うし' }, { hira: 'えび', file: 'えび' }, { hira: 'おに', file: 'おに' } ] },
         { level: 2, words: [ { hira: 'かに', file: 'かに' }, { hira: 'き', file: 'き' },{ hira: 'くるま', file: 'くるま' }, { hira: 'けむし', file: 'けむし' }, { hira: 'こま', file: 'こま' } ] },
@@ -38,33 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentLevelData = null;
     let currentDragItem = null;
-
-    // --- ポイント関数 ---
-    function getTodayDateString() {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-    }
-    function checkAndAwardPoints(level) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY);
-        let users = usersJson ? JSON.parse(usersJson) : {};
-        let user = users[currentUser];
-        if (!user) return "error"; 
-
-        const today = getTodayDateString();
-        const levelKey = `${GAME_ID}_level_${level}`;
-        user.progress = user.progress || {};
-        user.progress[levelKey] = user.progress[levelKey] || {};
-
-        if (user.progress[levelKey][today] === true) return "already_scored"; 
-
-        user.points = (user.points || 0) + 1;
-        user.progress[levelKey][today] = true;
-        users[currentUser] = user;
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-        return "scored"; 
-    }
+    let isLevelClear = false; // 二重ポイント加算防止
 
     // --- 初期化 ---
     function initGame() {
@@ -81,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- レベルロード ---
     function loadLevel(levelData) {
         currentLevelData = levelData;
+        isLevelClear = false; // レベル開始時にリセット
         
         MENU_AREA.style.display = 'none';
         GAME_AREA.style.display = 'block';
@@ -103,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = document.createElement('div');
             target.className = 'drop-target';
             target.dataset.word = w.hira;
+            // 正解済み状態で再ロードされた場合に備え、クラスをリセット
+            target.classList.remove('correct'); 
             setupDropZone(target);
 
             const label = document.createElement('span');
@@ -141,17 +119,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDragItem(item) {
         // クリックで戻す (配置済みの場合)
         item.addEventListener('click', () => {
+            if(isLevelClear) return; // クリア後は操作不可
+
             if (item.parentElement && item.parentElement.classList.contains('drop-target')) {
-                if (!item.parentElement.classList.contains('correct')) { // 正解済みでなければ戻せる
+                if (!item.parentElement.classList.contains('correct')) { 
                     ILLUST_POOL.appendChild(item);
                     item.classList.remove('placed');
                     FEEDBACK.textContent = '';
+                    // 正解が崩れたらロックを外す
+                    const parentTarget = item.parentElement;
+                    parentTarget.classList.remove('correct');
                 }
             }
         });
 
         // PC ドラッグ
         item.addEventListener('dragstart', (e) => {
+            if(isLevelClear) {
+                e.preventDefault();
+                return;
+            }
             currentDragItem = item;
             setTimeout(() => item.style.opacity = '0.5', 0);
         });
@@ -162,9 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // スマホ タッチ
         item.addEventListener('touchstart', (e) => {
-            // すでに配置済みでロックされている場合は無視
-            if (item.parentElement.classList.contains('correct')) return;
-
+             if(isLevelClear) return;
             currentDragItem = item;
             item.style.opacity = '0.5';
         }, {passive: true});
@@ -172,6 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('touchend', (e) => {
             item.style.opacity = '1';
             
+            if(isLevelClear) return;
+
             // タッチ終了位置にある要素を取得
             const touch = e.changedTouches[0];
             const target = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -185,6 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // プールに戻す
                     ILLUST_POOL.appendChild(item);
                     item.classList.remove('placed');
+                    FEEDBACK.textContent = '';
+                    // プールに戻したら、以前配置されていたスロットから 'correct' クラスを削除
+                    const targets = document.querySelectorAll('.drop-target');
+                    targets.forEach(t => t.classList.remove('correct')); 
                 }
             }
             currentDragItem = null;
@@ -194,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDropZone(zone) {
         zone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            if (!zone.querySelector('.drag-item')) {
+            if (!isLevelClear && !zone.querySelector('.drag-item')) {
                 zone.classList.add('drag-over');
             }
         });
@@ -204,20 +195,34 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.addEventListener('drop', (e) => {
             e.preventDefault();
             zone.classList.remove('drag-over');
-            if (!zone.querySelector('.drag-item') && currentDragItem) {
+            if (!isLevelClear && !zone.querySelector('.drag-item') && currentDragItem) {
                 handleDrop(zone);
             }
         });
     }
 
     function handleDrop(zone) {
+        // もし配置しようとしているスロットにすでにアイテムがある場合、それをプールに戻す
+        if (zone.querySelector('.drag-item')) {
+            const existingItem = zone.querySelector('.drag-item');
+            ILLUST_POOL.appendChild(existingItem);
+            existingItem.classList.remove('placed');
+        }
+
+        // ドロップ前に、現在のアイテムが配置されていたスロットから 'correct' クラスを削除
+        if (currentDragItem.parentElement && currentDragItem.parentElement.classList.contains('drop-target')) {
+             currentDragItem.parentElement.classList.remove('correct');
+        }
+
         zone.appendChild(currentDragItem);
         currentDragItem.classList.add('placed');
         checkAnswers();
     }
 
     // --- 判定 ---
-    function checkAnswers() {
+    async function checkAnswers() {
+        if (isLevelClear) return; // クリア済みなら再実行しない
+
         const targets = document.querySelectorAll('.drop-target');
         const total = targets.length;
         let filled = 0;
@@ -227,7 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (filled < total) {
-            FEEDBACK.textContent = `あと ${total - filled} こ`;
+            FEEDBACK.textContent = `あと ${total - filled} こ のイラストをあわせてね`;
+            FEEDBACK.className = 'feedback-msg';
             return;
         }
 
@@ -241,31 +247,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (allCorrect) {
-            // 正解
+            isLevelClear = true; // クリアフラグを立てる
             SOUND_CORRECT.currentTime = 0;
             SOUND_CORRECT.play();
-            FEEDBACK.textContent = 'ぜんぶ せいかい！';
+            FEEDBACK.textContent = 'せいかい！ おめでとう！';
             FEEDBACK.className = 'feedback-msg success';
             
             // ロックする
             targets.forEach(t => t.classList.add('correct'));
 
-            // ポイント付与
-            const res = checkAndAwardPoints(currentLevelData.level);
-            if (res === 'scored') FEEDBACK.textContent += ' (+1 pt)';
+            // ★★★ Firebaseポイント加算ロジック (HTML側で定義されたグローバル関数を使用) ★★★
+            if (typeof window.addPointsToUser === 'function') {
+                 const success = await window.addPointsToUser(POINTS_PER_LEVEL);
+                 if (success) {
+                     FEEDBACK.textContent += ` (+${POINTS_PER_LEVEL}pt 記録)`;
+                 } else if (window.currentUserId) {
+                     FEEDBACK.textContent += ' (ポイント記録エラー)';
+                 } else {
+                     FEEDBACK.textContent += ' (ゲストモードのためポイント記録なし)';
+                 }
+            } else {
+                 FEEDBACK.textContent += ' (ポイントシステム未初期化)';
+            }
+            // ★★★ Firebaseポイント加算ロジック 終了 ★★★
             
-            // 次のレベルへ自動遷移の準備など (ここではメッセージのみ)
+            // 次のレベルへ自動遷移の準備など
             setTimeout(() => {
                 // 全クリアかチェック
-                if (currentLevelData.level < 10) {
-                    FEEDBACK.textContent += ' -> つぎのレベルへいくよ！';
+                if (currentLevelData.level < gameLevels.length) {
+                    FEEDBACK.textContent += ' -> つぎのレベルへ！';
                     setTimeout(() => {
                         // 次のレベルを探してロード
                         const nextLvl = gameLevels.find(l => l.level === currentLevelData.level + 1);
                         if(nextLvl) loadLevel(nextLvl);
                     }, 2000);
                 } else {
-                    FEEDBACK.textContent = 'すごい！ぜんぶのレベルをクリアしたよ！';
+                    FEEDBACK.textContent = 'すごい！ぜんぶのレベルをクリアしたよ！ ホームにもどろう！';
                 }
             }, 1000);
 

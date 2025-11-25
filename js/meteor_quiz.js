@@ -1,72 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------
-    // ★★★ ポイントシステム設定 (単語ごとに1日1回) ★★★
-    // ----------------------------------------------------
-    const GAME_ID_METEOR = 'meteor_shooting_game'; // ゲームID
-    
-    const USER_STORAGE_KEY_METEOR = 'user_accounts'; 
-    const SESSION_STORAGE_KEY_METEOR = 'current_user'; 
-    const GUEST_NAME_METEOR = 'ゲスト'; 
-
-    // 日付取得
-    function getTodayDateString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // ポイント加算・チェック関数 (単語をキーにする)
-    function checkAndAwardPoints(wordKey) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_METEOR);
-        if (!currentUser || currentUser === GUEST_NAME_METEOR) return "guest"; 
-
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY_METEOR);
-        let users = usersJson ? JSON.parse(usersJson) : {};
-        let user = users[currentUser];
-        if (!user) return "error"; 
-
-        const today = getTodayDateString();
-        // キーを「ゲームID + 単語」にする
-        const progressKey = `${GAME_ID_METEOR}_word_${wordKey}`;
-
-        user.progress = user.progress || {};
-        user.progress[progressKey] = user.progress[progressKey] || {};
-
-        // その単語で、今日すでにポイントをもらっているかチェック
-        if (user.progress[progressKey][today] === true) return "already_scored"; 
-
-        // ポイント加算
-        user.points = (user.points || 0) + 1;
-        user.progress[progressKey][today] = true;
-        
-        users[currentUser] = user;
-        localStorage.setItem(USER_STORAGE_KEY_METEOR, JSON.stringify(users));
-        console.log(`[Game] ${currentUser} gained 1 point for word "${wordKey}". Total: ${user.points}`);
-        return "scored"; 
-    }
-    // ----------------------------------------------------
-    // ★★★ ポイントシステム設定 (ここまで) ★★★
-    // ----------------------------------------------------
-
-
+    // ★★★ ゲームロジック用定数 ★★★
     // ----------------------------------------------------
     // DOM要素の定義
-    // ----------------------------------------------------
     const skyArea = document.getElementById('sky-area');
     const scoreDisplay = document.getElementById('score');
     const lifeDisplay = document.getElementById('life');
     const explosionTemplate = document.getElementById('explosion-template');
-    
     const gameContainer = document.getElementById('game-container'); 
 
-    // ----------------------------------------------------
     // ゲーム定数と状態
-    // ----------------------------------------------------
     const INITIAL_LIFE = 3;
     const METEOR_INTERVAL = 4000; 
+    const POINTS_PER_CORRECT_ANSWER = 1; // 正解時のポイント
     
     const IMAGE_BASE_PATH = 'assets/images/'; 
     
@@ -78,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMeteorElement = null; 
     let currentQuizData = null; 
     let currentChoiceButtons = []; 
-
+    
    // ★★★ 問題データ ★★★
     const QUIZ_DATA = [
         { "word": "いぬ", "english": "dog", "image": "inu.png" },
@@ -307,6 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
      * 新しい隕石を生成する
      */
     function createMeteor() {
+        if (life <= 0) return;
+
         const meteor = document.createElement('div');
         meteor.classList.add('meteor');
         
@@ -329,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // タイプ2: 隕石に「イラスト」を表示
             meteor.classList.add('meteor-image'); // CSSスタイルを適用
+            // ★画像パスを調整
             meteor.style.backgroundImage = `url('${IMAGE_BASE_PATH}${quizData.image}')`; 
         }
 
@@ -340,10 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * 落下アニメーションループ
      */
     function fallLoop() {
-        if (life <= 0) return;
+        if (life <= 0) {
+            return; 
+        }
         
         const allMeteors = document.querySelectorAll('.meteor');
-        
         const groundY = gameContainer.offsetHeight * 0.9; 
 
         allMeteors.forEach(meteor => {
@@ -380,13 +331,13 @@ document.addEventListener('DOMContentLoaded', () => {
      * 隕石がクリックされたときの処理
      */
     function handleMeteorClick(e) {
-        if (isQuestionActive) return; 
+        if (isQuestionActive || life <= 0) return; 
         
         isQuestionActive = true; 
         currentMeteorElement = e.target; 
         
         const quizData = QUIZ_DATA[currentMeteorElement.dataset.quizIndex];
-        const quizType = currentMeteorElement.dataset.quizType; // 隕石からクイズタイプを取得
+        const quizType = currentMeteorElement.dataset.quizType;
         currentQuizData = quizData; 
 
         createAnimatedChoiceButtons(currentMeteorElement, currentQuizData, quizType);
@@ -403,25 +354,42 @@ document.addEventListener('DOMContentLoaded', () => {
         let wrongChoice = '';
         
         if (quizType === 'word') {
-            // タイプ1: 隕石が「言葉」の場合 -> 答えは「英語」
+            // タイプ1: 隕石が「言葉」(日本語) の場合 -> 答えは「英語」
             correctChoice = quizData.english;
             
+            // ★★★ 修正ロジック ★★★
             const allEnglishWords = QUIZ_DATA.map(q => q.english);
+            
+            // 正解と異なる単語のリストを作成
             const incorrects = allEnglishWords.filter(w => w !== correctChoice);
-            wrongChoice = shuffleArray(incorrects)[0] || "Wrong"; // デフォルトの不正解
+            
+            // リストが空でないことを確認し、ランダムに1つ選ぶ
+            if (incorrects.length > 0) {
+                wrongChoice = shuffleArray(incorrects)[0];
+            } else {
+                 // 万が一不正解の選択肢がない場合 (データが重複している場合など)、フォールバックする
+                 // 実際には約100個のデータがあるので起こらないはず
+                 wrongChoice = "NO CHOICE"; 
+            }
 
         } else {
             // タイプ2: 隕石が「イラスト」の場合 -> 答えは「日本語」
-            correctChoice = quizData.word; // 正解は "いぬ", "すし" など
+            correctChoice = quizData.word; 
 
+            // ★★★ 修正ロジック ★★★
             const allJapaneseWords = QUIZ_DATA.map(q => q.word);
             const incorrects = allJapaneseWords.filter(w => w !== correctChoice);
-            wrongChoice = shuffleArray(incorrects)[0] || "ちがう";
+            
+            if (incorrects.length > 0) {
+                 wrongChoice = shuffleArray(incorrects)[0];
+            } else {
+                 wrongChoice = "ちがう";
+            }
         }
 
-        const choices = shuffleArray([correctChoice, wrongChoice]); // 正解と不正解をシャッフル
+        const choices = shuffleArray([correctChoice, wrongChoice]);
 
-        currentChoiceButtons = []; // ボタン配列をリセット
+        currentChoiceButtons = []; 
 
         choices.forEach((choice, index) => {
             const button = document.createElement('button');
@@ -433,22 +401,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const meteorCenterX = meteorElement.offsetLeft + meteorElement.offsetWidth / 2;
             const meteorCenterY = meteorElement.offsetTop + meteorElement.offsetHeight / 2;
             
-            button.style.setProperty('--button-start-top', `${meteorCenterY}px`);
-            button.style.setProperty('--button-start-left', `${meteorCenterX}px`);
-
-            let endTopOffset = 0;
-            if (index === 0) { 
-                endTopOffset = -150; // 隕石より上
-            } else { 
-                endTopOffset = -50; // 隕石の少し上
-            }
-            button.style.setProperty('--button-end-top', `${meteorCenterY + endTopOffset}px`);
-            
-            button.style.animationDelay = `${index * 0.1}s`;
-            button.style.animation = `choiceButtonPopUp 0.4s ease-out forwards ${index * 0.1}s`;
+            // スタイルを設定
+            button.style.position = 'absolute';
+            button.style.left = `${meteorCenterX - 50}px`; // ボタンを隕石の中心から少し左に寄せる
+            button.style.top = `${meteorCenterY + (index === 0 ? -150 : -50)}px`;
+            button.style.zIndex = '50';
+            button.style.opacity = '0'; // アニメーションのために初期値0
 
             skyArea.appendChild(button);
             currentChoiceButtons.push(button);
+
+            // アニメーションを適用
+            setTimeout(() => {
+                 button.style.transition = 'opacity 0.2s, transform 0.2s';
+                 button.style.opacity = '1';
+                 button.style.transform = 'translateY(0)';
+            }, index * 100);
+
 
             button.addEventListener('click', handleChoiceButtonClick);
         });
@@ -457,12 +426,13 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * 選択肢ボタンがクリックされたときの処理
      */
-    function handleChoiceButtonClick(e) {
+    async function handleChoiceButtonClick(e) { 
         if (!isQuestionActive) return; 
 
         const selectedAnswer = e.target.dataset.answer;
         const isCorrect = e.target.dataset.correct === 'true';
-
+        
+        // 全ボタンを無効化
         currentChoiceButtons.forEach(btn => {
             btn.style.pointerEvents = 'none';
             if (btn.dataset.correct === 'true') {
@@ -474,14 +444,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const meteorX = currentMeteorElement.offsetLeft + currentMeteorElement.offsetWidth / 2;
         const meteorY = currentMeteorElement.offsetTop + currentMeteorElement.offsetHeight / 2;
-
+        
+        let scoreMessage = '';
         if (isCorrect) {
-            updateScore(10);
+            updateScore(POINTS_PER_CORRECT_ANSWER);
             triggerExplosion(meteorX, meteorY, false); // 黄色い爆発
 
-            // ★★★ ポイント付与 (正解した単語をキーとして渡す) ★★★
-            if (currentQuizData) {
-                checkAndAwardPoints(currentQuizData.word);
+            // ★★★ Firebaseポイント加算 ★★★
+            if (typeof window.addPointsToUser === 'function') {
+                const success = await window.addPointsToUser(POINTS_PER_CORRECT_ANSWER);
+                scoreMessage = success ? ` (+${POINTS_PER_CORRECT_ANSWER}pt 記録)` : ' (ポイント記録エラー)';
+            } else {
+                scoreMessage = ' (ゲストモード/ポイント未記録)';
             }
             // ★★★★★★★★★★★★★★★★★★★★★★★★★
 
@@ -489,6 +463,9 @@ document.addEventListener('DOMContentLoaded', () => {
             updateLife(-1);
             triggerExplosion(meteorX, meteorY, true); // 赤い爆発
         }
+        
+        console.log(`[Quiz Result] ${isCorrect ? 'Correct' : 'Incorrect'}! ${scoreMessage}`);
+
 
         setTimeout(() => {
             currentChoiceButtons.forEach(btn => btn.remove());
@@ -527,7 +504,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
 
     function startGame() {
-        // ゲームオーバー画面が表示されていれば削除する
         const gameOverScreen = document.getElementById('game-over-screen');
         if (gameOverScreen) {
             gameOverScreen.remove();
@@ -542,17 +518,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isQuestionActive = false;
 
+        if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(createMeteor, METEOR_INTERVAL);
         
         requestAnimationFrame(fallLoop);
     }
 
-    function endGame() {
+    async function endGame() {
         clearInterval(gameInterval);
         isQuestionActive = true; 
         
+        document.querySelectorAll('.meteor').forEach(m => m.remove());
+
+        const finalScore = score;
+        let scoreRecordMsg = 'ポイントは記録されません。';
+        
+        // ★★★ Firebaseポイント加算 (最終スコアをまとめて記録) ★★★
+        if (finalScore > 0 && typeof window.addPointsToUser === 'function') {
+             const success = await window.addPointsToUser(finalScore);
+             if (success) {
+                 scoreRecordMsg = `スコア ${finalScore} 点をランキングに記録しました！`;
+             } else if (window.currentUserId) {
+                 scoreRecordMsg = 'ポイント記録中にエラーが発生しました。';
+             }
+        }
+        // ★★★ Firebaseポイント加算 終了 ★★★
+
+        // --- ゲームオーバー画面の作成 ---
         const overlay = document.createElement('div');
         overlay.id = 'game-over-screen'; 
+        // スタイルは省略。CSSファイルに移動するのがベストです。
         overlay.style.position = 'absolute';
         overlay.style.top = '0';
         overlay.style.left = '0';
@@ -572,13 +567,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverText.style.marginBottom = '10px';
 
         const scoreText = document.createElement('p');
-        scoreText.textContent = `スコア: ${score}`;
+        scoreText.innerHTML = `最終スコア: ${finalScore}<br><span style="font-size: 0.8em;">${scoreRecordMsg}</span>`;
         scoreText.style.color = 'white';
         scoreText.style.fontSize = '1.5em';
         scoreText.style.marginBottom = '30px';
 
         const restartButton = document.createElement('button');
         restartButton.textContent = 'もう一度プレイ';
+        // スタイルは省略。CSSファイルに移動するのがベストです。
         restartButton.style.padding = '12px 25px';
         restartButton.style.fontSize = '1.2em';
         restartButton.style.color = '#333';

@@ -307,6 +307,7 @@
         
         <div id="level-menu-area" class="menu-card pop-in">
             <h1 class="menu-title">ひらがな単語あわせゲーム</h1>
+            <div id="auth-status" style="margin-bottom: 20px; font-weight: bold; color: #1565c0;">認証中...</div>
             <div id="level-grid" class="level-grid"></div>
             <button onclick="location.href='index.html'" class="home-btn-large">ホームにもどる</button>
         </div>
@@ -336,5 +337,91 @@
 
     <script src="js/hiragana_drag_match.js"></script>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+        // あなたのFirebase設定 (index.htmlと同じものをコピー)
+        const firebaseConfig = {
+          apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+          authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+          projectId: "funlearningjapanese-b8e08",
+          storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+          messagingSenderId: "1055688629268",
+          appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+          measurementId: "G-LCMXVLPS81"
+        };
+
+        // Firebaseサービスの初期化とグローバル変数
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // グローバルスコープに公開される変数
+        window.currentUserId = null;
+        window.userDisplayName = null;
+        const authStatusEl = document.getElementById('auth-status');
+
+        // 認証状態の監視とUIDの取得
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUserId = user.uid;
+                
+                // ユーザーの displayName を取得
+                const userDocRef = doc(db, "users", window.currentUserId);
+                const userDocSnap = await getDoc(userDocRef);
+                
+                if (userDocSnap.exists()) {
+                    window.userDisplayName = userDocSnap.data().displayName || `ユーザー_${user.uid.substring(0, 4)}`;
+                } else {
+                    window.userDisplayName = `ユーザー_${user.uid.substring(0, 4)}`;
+                }
+                authStatusEl.textContent = `✅ ログイン中: ${window.userDisplayName}`;
+
+            } else {
+                window.currentUserId = null;
+                window.userDisplayName = 'ゲスト';
+                authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
+            }
+            
+            // ★重要: 外部JSファイルに認証状態を伝えるトリガー (もし外部JSがこれを待っている場合)
+            if (typeof window.onAuthReady === 'function') {
+                window.onAuthReady(window.currentUserId);
+            }
+        });
+
+
+        /**
+         * グローバルなポイント加算関数
+         * 外部JSファイルからポイントを加算するために、windowスコープに定義します。
+         * @param {number} points - 加算するポイント数
+         * @returns {Promise<boolean>} 成功/失敗
+         */
+        window.addPointsToUser = async function(points) {
+            if (!window.currentUserId || points <= 0) {
+                console.warn("ポイント加算スキップ: ユーザーが未認証またはポイントが0以下です。");
+                return false;
+            }
+            
+            try {
+                const userRef = doc(db, "users", window.currentUserId);
+                // Firestoreのincrementを使って、既存の値に安全に加算
+                await updateDoc(userRef, {
+                    points: increment(points) 
+                });
+                console.log(`[Firebase] ${points} ポイントを加算しました。`);
+                return true;
+
+            } catch (e) {
+                console.error("ポイント更新エラー:", e);
+                // 権限エラーの場合、セキュリティルールに問題がある可能性が高い
+                if (e.code === 'permission-denied') {
+                     alert('ポイント加算に失敗しました。セキュリティルールを確認してください。');
+                }
+                return false;
+            }
+        }
+    </script>
 </body>
 </html>
