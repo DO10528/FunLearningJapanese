@@ -280,6 +280,11 @@
             box-shadow: 0 3px 0 #cc9a00;
         }
         #restart-button:active { top: 3px; box-shadow: 0 0 0 #cc9a00; }
+        
+        /* 認証ステータスのスタイル */
+        #auth-status-kanji {
+            text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: var(--kanji-dark);
+        }
 
     </style>
 </head>
@@ -294,6 +299,8 @@
 
     <div class="quiz-main-container">
         <div class="quiz-container">
+            
+            <div id="auth-status-kanji">認証中...</div> 
             
             <div class="mode-selection">
                 <p style="font-weight: bold; margin-bottom: 15px; color: var(--kanji-dark);">出題する読み方を選んでください：</p>
@@ -333,6 +340,83 @@
     </div>
 
     <script src="js/kanji_quiz.js"></script>
+    
+    <script type="module">
+        // 1. Firebase SDKのインポート
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
+
+        // 2. あなたのFirebase設定 (index.htmlなどからコピー)
+        const firebaseConfig = {
+          apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+          authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+          projectId: "funlearningjapanese-b8e08",
+          storageBucket: "funlearningjapanese-b8e08.appspot.com",
+          messagingSenderId: "1055688629268",
+          appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+          measurementId: "G-LCMXVLPS81"
+        };
+
+        // 3. Firebaseサービスの初期化とグローバル変数
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        window.currentUserId = null;
+        const authStatusEl = document.getElementById('auth-status-kanji');
+        
+        // ポイントルール: 各問題の正解で1ポイント
+        const POINTS_PER_QUESTION = 1; 
+        
+        // 4. 認証状態の監視
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUserId = user.uid;
+                const userDocRef = doc(db, "users", window.currentUserId);
+                const userDocSnap = await getDoc(userDocRef);
+                let displayName = 'ユーザー';
+                if (userDocSnap.exists()) {
+                    displayName = userDocSnap.data().displayName || 'ユーザー';
+                }
+                authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
+
+            } else {
+                window.currentUserId = null;
+                authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
+            }
+        });
+
+
+        /**
+         * ポイント加算関数 (Firestoreに記録)
+         * @param {number} points - 加算するポイント数
+         * @param {string} kanjiId - 漢字のID (例: 'ichi', 'hito')
+         * @returns {Promise<boolean>} 成功/失敗
+         */
+        window.addPointsToUser = async function(points, kanjiId) { 
+            if (!window.currentUserId || points <= 0) {
+                return false;
+            }
+            
+            try {
+                const userRef = doc(db, "users", window.currentUserId);
+                const progressKey = `kanji_quiz_id_${kanjiId}`; // 漢字IDごとのキー
+
+                // 2. ポイントを加算
+                await updateDoc(userRef, {
+                    points: increment(points) 
+                });
+                
+                console.log(`${points} ポイントを Firestore に加算しました (漢字ID: ${kanjiId})。`);
+                return true;
+
+            } catch (e) {
+                console.error("ポイント更新エラー:", e);
+                return false;
+            }
+        }
+    </script>
 </body>
 </html>
