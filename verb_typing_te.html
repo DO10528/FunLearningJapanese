@@ -86,6 +86,11 @@
         cursor: pointer; box-shadow: 0 4px 0 #ef6c00;
     }
     .submit-btn:active { transform: translateY(3px); box-shadow: none; }
+    
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
+    }
 
 </style>
 </head>
@@ -97,6 +102,8 @@
 </header>
 
 <div class="container">
+
+    <div id="auth-status">認証中...</div>
 
     <div id="menu-screen">
         <h1 class="title">て形 タイピング</h1>
@@ -132,6 +139,62 @@
 <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            const userDocRef = doc(db, "users", window.currentUserId);
+            const userDocSnap = await getDoc(userDocRef);
+            let displayName = 'ユーザー';
+            if (userDocSnap.exists()) {
+                displayName = userDocSnap.data().displayName || 'ユーザー';
+            }
+            authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = '❌ ゲストモード (ポイントはつきません)';
+        }
+    });
+
+    // ポイント加算関数
+    window.addPointsToUser = async function(points, verbText) { 
+        if (!window.currentUserId || points <= 0) return false;
+        try {
+            const userRef = doc(db, "users", window.currentUserId);
+            // IDとして「ます形」をローマ字化したりハッシュ化するのが理想ですが
+            // 簡易的に接頭辞をつけて利用 (日本語キーはFirestoreで許容されるが管理上注意)
+            // ここではログ用としてシンプルに処理
+            await updateDoc(userRef, { points: increment(points) });
+            console.log(`+${points}pt (Word: ${verbText})`);
+            return true;
+        } catch (e) {
+            console.error("ポイントエラー:", e);
+            return false;
+        }
+    }
+</script>
+
 <script>
     // データセット（ます形 -> て形）
     const verbData = {
@@ -160,6 +223,12 @@
     let currentQueue = [];
     let currentQ = null;
     let totalQ = 0;
+    
+    // Firebase関数ダミー
+    if (typeof window.addPointsToUser !== 'function') {
+        window.addPointsToUser = async () => false;
+    }
+    const POINTS_PER_QUESTION = 1;
     
     const menuScreen = document.getElementById('menu-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -206,7 +275,8 @@
         progressBar.style.width = percent + '%';
     }
 
-    function checkAnswer() {
+    // ★ async に変更
+    async function checkAnswer() {
         const userVal = input.value.trim();
         
         if (userVal === currentQ.te) {
@@ -214,6 +284,10 @@
             sndCorrect.play();
             feedback.style.color = "green";
             feedback.textContent = "せいかい！";
+
+            // ★Firebaseポイント加算
+            await window.addPointsToUser(POINTS_PER_QUESTION, currentQ.masu); // ます形をID代わりに
+
             setTimeout(nextQuestion, 800);
         } else {
             sndIncorrect.currentTime = 0;
