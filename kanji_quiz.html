@@ -11,11 +11,11 @@
     <style>
         /* --- デザイン設定 --- */
         :root {
-            --primary: #5c7aff; /* メインの青色 */
+            --primary: #5c7aff;
             --bg-color: #f4f7fc;
             --text-color: #333;
-            --correct-color: #4caf50; /* 緑 */
-            --incorrect-color: #ef5350; /* 赤 */
+            --correct-color: #4caf50;
+            --incorrect-color: #ef5350;
             --card-bg: #ffffff;
         }
 
@@ -30,7 +30,6 @@
             flex-direction: column;
         }
 
-        /* ヘッダー */
         header {
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
             color: white;
@@ -47,7 +46,6 @@
         .header-container h1 { margin: 0; font-size: 1.4em; }
         .home-link { color: white; text-decoration: none; font-weight: bold; }
 
-        /* メインエリア */
         .quiz-main {
             flex-grow: 1;
             padding: 20px;
@@ -65,35 +63,27 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             border: 4px solid white;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
-        /* 認証ステータス */
-        #auth-status-kanji {
-            font-size: 0.9em;
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        /* モード選択 */
         .mode-select {
             margin-bottom: 20px;
             background: #e3f2fd;
-            padding: 15px;
+            padding: 10px;
             border-radius: 15px;
             display: inline-block;
         }
         .mode-select label {
-            margin: 0 15px;
+            margin: 0 10px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.1em;
-            color: #333;
+            color: #555;
         }
-        .mode-select input { margin-right: 5px; }
+        .mode-select input:checked + span {
+            color: var(--primary);
+            text-decoration: underline;
+        }
 
-        /* 漢字表示エリア */
         .kanji-display {
             font-size: 8rem;
             font-weight: 900;
@@ -101,19 +91,16 @@
             line-height: 1.2;
             margin: 10px 0 30px 0;
             text-shadow: 2px 2px 0px #eee;
-            background-color: #fff;
+            background-color: #fafafa;
             border-radius: 20px;
-            display: inline-block;
-            padding: 10px 40px;
-            border: 3px dashed var(--primary);
+            padding: 20px;
+            border: 2px dashed #ddd;
         }
 
-        /* 選択肢ボタン */
         .choices-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
-            margin-bottom: 20px;
         }
         
         .choice-btn {
@@ -121,7 +108,7 @@
             border: 3px solid #e0e0e0;
             border-radius: 50px;
             padding: 15px;
-            font-size: 1.4em;
+            font-size: 1.3em;
             font-weight: bold;
             color: var(--text-color);
             cursor: pointer;
@@ -129,44 +116,41 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             box-shadow: 0 4px 0 #ccc;
         }
-        .choice-btn:active {
-            transform: translateY(4px);
-            box-shadow: none;
-        }
+        .choice-btn:active { transform: translateY(4px); box-shadow: none; }
         .choice-btn:hover:not(:disabled) {
             background-color: #f0f8ff;
             border-color: var(--primary);
             color: var(--primary);
         }
 
-        /* 正解・不正解 */
         .choice-btn.correct {
             background-color: var(--correct-color); color: white; border-color: var(--correct-color); box-shadow: 0 4px 0 #388e3c;
         }
         .choice-btn.incorrect {
             background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); box-shadow: 0 4px 0 #d32f2f;
         }
-        .choice-btn:disabled { opacity: 0.8; cursor: default; }
+        
+        #result-message { margin-top: 20px; font-size: 1.4em; font-weight: bold; min-height: 1.5em; }
 
-        /* 結果メッセージ */
-        #result-message { margin-top: 10px; font-size: 1.3em; font-weight: bold; min-height: 1.5em; }
-
-        /* ナビゲーション */
         .nav-buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
         .nav-btn {
-            padding: 12px 25px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; text-decoration: none; font-size: 1em;
+            padding: 12px 25px; border-radius: 12px; border: none; font-weight: bold; font-size: 1em;
+            cursor: pointer; color: white; text-decoration: none; display: inline-block;
         }
         .btn-restart { background-color: #ffb74d; box-shadow: 0 4px 0 #f57c00; }
         .btn-home { background-color: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
         .btn-restart:active, .btn-home:active { transform: translateY(4px); box-shadow: none; }
 
+        #auth-status-kanji { font-size: 0.9em; color: var(--primary); margin-bottom: 15px; font-weight: bold; }
+
+        @media (max-width: 400px) { .kanji-display { font-size: 6rem; } }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-container">
-            <h1>かんじクイズ (1ねんせい)</h1>
+            <h1>かんじクイズ</h1>
             <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
         </div>
     </header>
@@ -179,30 +163,34 @@
             <div id="quiz-area">
                 <div class="mode-select">
                     モード: 
-                    <label><input type="radio" name="mode" value="kun" checked> くんよみ (Kun)</label>
-                    <label><input type="radio" name="mode" value="on"> オンヨミ (On)</label>
+                    <label><input type="radio" name="mode" value="kun" checked> <span>くんよみ</span></label>
+                    <label><input type="radio" name="mode" value="on"> <span>オンヨミ</span></label>
                 </div>
 
-                <div id="question-info">だい <span id="q-num">1</span> もん</div>
+                <div id="question-info" style="color:#666; font-weight:bold;">
+                    だい <span id="q-num" style="font-size:1.2em; color:var(--primary);">1</span> もん
+                </div>
 
                 <div id="kanji-display" class="kanji-display">?</div>
 
-                <div id="choices-container" class="choices-grid">
-                    </div>
+                <div id="choices-container" class="choices-grid"></div>
 
                 <div id="result-message"></div>
             </div>
 
             <div id="score-area" style="display: none;">
-                <h2 style="font-size: 2em; color: var(--primary);">おつかれさま！</h2>
-                <p style="font-size: 1.5em; margin: 30px 0;">
-                    <span id="score-text" style="font-size: 2em; font-weight:900; color: var(--incorrect-color);">0</span> もん せいかい！
-                </p>
+                <h2 style="font-size:2em; color:var(--primary);">おつかれさま！</h2>
+                <div style="font-size: 5rem; font-weight:900; color:var(--correct-color); margin: 20px 0;">
+                    <span id="score-text">0</span><span style="font-size:0.4em; color:#333;">てん</span>
+                </div>
+                <div class="nav-buttons">
+                    <button id="btn-restart" class="nav-btn btn-restart">もういちど</button>
+                    <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
+                </div>
             </div>
-
-            <div class="nav-buttons">
-                <button id="btn-restart" class="nav-btn btn-restart" style="display: none;">もういちど</button>
-                <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
+            
+            <div class="nav-buttons" id="ingame-nav">
+                 <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
             </div>
 
         </div>
@@ -216,7 +204,6 @@
         import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // あなたのFirebase設定
         const firebaseConfig = {
           apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
           authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -246,21 +233,18 @@
                 authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
             } else {
                 window.currentUserId = null;
-                authStatusEl.textContent = '❌ ゲストモード (ポイントはつきません)';
+                authStatusEl.textContent = '❌ ゲストモード (ポイントなし)';
             }
         });
 
-        // ポイント加算関数 (グローバル定義)
         window.addPointsToUser = async function(points, kanjiId) { 
             if (!window.currentUserId || points <= 0) return false;
             try {
                 const userRef = doc(db, "users", window.currentUserId);
-                // 漢字ごとに進捗キーを作る例: kanji_quiz_id_ichi
-                const progressKey = `kanji_quiz_id_${kanjiId}`;
-                await updateDoc(userRef, { 
-                    points: increment(points)
-                });
-                console.log(`+${points}pt (ID: ${kanjiId})`);
+                // 漢字そのものをIDとして記録する
+                const logId = `kanji_${kanjiId}`;
+                await updateDoc(userRef, { points: increment(points) });
+                console.log(`+${points}pt (Kanji: ${kanjiId})`);
                 return true;
             } catch (e) {
                 console.error("ポイントエラー:", e);
