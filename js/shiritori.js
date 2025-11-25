@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- 設定 ---
     const GAME_ID = 'shiritori_game'; 
-    const POINTS_PER_CORRECT_ANSWER = 5; // 正解ごとに5ポイント加算
+    const POINTS_PER_CORRECT_ANSWER = 1; // 正解ごとに1ポイント加算
     
     // --- DOM要素 ---
     const MENU_AREA = document.getElementById('shiritori-menu');
