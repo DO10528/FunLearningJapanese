@@ -249,7 +249,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { 
         getFirestore, doc, setDoc, updateDoc, getDocs, collection, 
-        query, orderBy, limit, onSnapshot, where 
+        query, orderBy, limit, onSnapshot, where, getDoc 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { 
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
@@ -318,6 +318,7 @@
                     return; 
                 }
                 const usersRef = collection(db, "users");
+                // データベースからdisplayNameの重複をチェック
                 const q = query(usersRef, where("displayName", "==", displayName), limit(1));
                 const snap = await getDocs(q);
                 if (!snap.empty) {
@@ -346,8 +347,24 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
-                // ログイン成功時にFirestoreのlastLoginを更新 (任意)
-                await updateDoc(doc(db, "users", user.uid), { lastLogin: new Date().toISOString() });
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef); 
+
+                if (!userSnap.exists()) {
+                    // ★★★ ログイン成功時にFirestoreデータが存在しない場合、自動生成する ★★★
+                    // 以前の [code=not-found] エラー対策
+                    await setDoc(userRef, {
+                        email: email,
+                        // 既に認証済みだがFirestoreにデータがない場合、メールの@前を仮のゲーム名とする
+                        displayName: email.split('@')[0] || 'UnknownUser', 
+                        points: 0,
+                        streak: 1,
+                        lastLogin: new Date().toISOString()
+                    });
+                } else {
+                    // データがある場合、最終ログイン日時を更新
+                    await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+                }
 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
@@ -405,7 +422,7 @@
                 if (doc.exists()) {
                     const data = doc.data();
                     
-                    // ★★★ Firestoreに保存したdisplayNameを表示 ★★★
+                    // Firestoreに保存したdisplayNameを表示
                     document.getElementById('user-name').textContent = data.displayName || 'ユーザー'; 
                     
                     document.getElementById('streak-val').textContent = data.streak || 0;
@@ -449,7 +466,7 @@
             let rank = 1;
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                // ★★★ Firestoreに保存されているdisplayNameをランキング名として表示 ★★★
+                // Firestoreに保存されているdisplayNameをランキング名として表示
                 const name = data.displayName || 'Unknown'; 
                 const pt = data.points || 0;
                 
