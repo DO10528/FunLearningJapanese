@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-        /* --- 共通設定 (V2デザイン) --- */
+        /* --- Common Settings (V2 Design) --- */
         :root {
             --primary: #5c7aff;
             --accent: #ffcc5c;
@@ -29,7 +29,7 @@
             touch-action: manipulation;
         }
 
-        /* --- ヘッダー（V2統一デザイン） --- */
+        /* --- Header (V2 Unified Design) --- */
         header {
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
             color: white;
@@ -61,7 +61,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- メインコンテナ --- */
+        /* --- Main Container --- */
         .main-container {
             flex-grow: 1;
             padding: 20px;
@@ -74,7 +74,7 @@
             justify-content: center;
         }
 
-        /* --- カードデザイン (旧 #dv-container) --- */
+        /* --- Card Design --- */
         #dv-container-card {
             width: 100%;
             padding: 30px; 
@@ -105,7 +105,7 @@
         h2 { font-size: 1.8em; margin-bottom: 20px; }
         p { text-align: center; font-size: 1.1em; color: #666; }
 
-        /* --- ボタン共通 (V2 3Dスタイル) --- */
+        /* --- Button Common (V2 3D Style) --- */
         .dv-button {
             display: block;
             width: 90%;
@@ -129,7 +129,7 @@
             box-shadow: 0 2px 0 rgba(0,0,0,0.15); 
         }
 
-        /* --- メニューボタンの色分け --- */
+        /* --- Menu Button Colors --- */
         #dv-menu-game1 {
             background-color: #66bb6a; /* Green */
             box-shadow: 0 6px 0 #388e3c;
@@ -149,7 +149,7 @@
         #dv-menu-game3:active { box-shadow: 0 2px 0 #0288d1; }
 
 
-        /* --- ホームに戻るボタン (小型統一) --- */
+        /* --- Secondary Buttons --- */
         .dv-button-secondary {
              background-color: #90a4ae;
              box-shadow: 0 4px 0 #546e7a;
@@ -162,11 +162,18 @@
              justify-content: center;
              align-items: center;
              gap: 8px;
+             border: none;
+             color: white;
+             font-weight: bold;
+             cursor: pointer;
+             position: relative;
+             top: 0;
+             transition: all 0.1s;
         }
         .dv-button-secondary:active { box-shadow: 0 2px 0 #546e7a; top: 4px; }
 
 
-        /* --- フィードバック --- */
+        /* --- Feedback --- */
         .dv-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
             margin-top: 20px; min-height: 1.3em; color: var(--incorrect-color); 
@@ -181,7 +188,7 @@
         @keyframes popIn { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
 
 
-        /* --- ゲーム1 (アクション) --- */
+        /* --- Game 1 (Action) --- */
         #dv-game1-char-area {
             width: 90%;
             height: 150px;
@@ -212,6 +219,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             background: #fff;
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
         }
         .dv-game1-option-card:hover {
             background-color: #fff8e1;
@@ -230,7 +238,7 @@
         }
 
 
-        /* --- 2. ゲーム2 (時制) --- */
+        /* --- Game 2 (Tense) --- */
         #dv-game2-anim-area {
             width: 90%;
             height: 200px;
@@ -279,7 +287,7 @@
         }
 
 
-        /* --- 3. ゲーム3 (文づくり) --- */
+        /* --- Game 3 (Sentence) --- */
         #dv-game3-drop-zone {
             display: flex;
             justify-content: center;
@@ -304,6 +312,9 @@
             border: 3px dashed #ccc;
             border-radius: 8px;
             background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .dv-game3-card-container {
             display: flex;
@@ -342,6 +353,8 @@
             margin: 0;
             transform: scale(1);
             box-shadow: none;
+            border: none;
+            background: transparent;
         }
         .dv-game3-card[data-type="noun"] {
             border-color: #4fc3f7;
@@ -385,8 +398,10 @@
                     </div>
                 
                 <div id="dv-game1-feedback" class="dv-feedback"></div>
-                <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                <div style="text-align: center;">
+                    <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
+                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                </div>
             </div>
 
             <div id="dv-screen-game2" class="dv-screen">
@@ -404,8 +419,10 @@
                 </div>
 
                 <div id="dv-game2-feedback" class="dv-feedback"></div>
-                <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                <div style="text-align: center;">
+                    <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
+                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                </div>
             </div>
 
             <div id="dv-screen-game3" class="dv-screen">
@@ -428,8 +445,10 @@
 
                 <button id="dv-game3-check-button" class="dv-button">できた！</button>
                 <div id="dv-game3-feedback" class="dv-feedback"></div>
-                <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                <div style="text-align: center;">
+                    <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
+                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
+                </div>
             </div>
         </div>
     </div>
@@ -441,7 +460,7 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // ----------------------------------------------------
-            // ★★★ ポイントシステム設定 ★★★
+            // ★★★ Point System Settings ★★★
             // ----------------------------------------------------
             const GAME_ID_VERB = 'verb_game'; 
             
@@ -486,7 +505,7 @@
             }
 
             // ----------------------------------------------------
-            // データ定義
+            // Data Definitions
             // ----------------------------------------------------
             const IMG_PATH = 'assets/images/verbs/';
             const SOUND_PATH = 'assets/sounds/verbs/';
@@ -521,7 +540,11 @@
                 const verb = verbData.find(v => v.id === id);
                 if (!verb) return;
                 const file = (type === 'masu') ? verb.masu : verb.mashita;
-                const path = `${SOUND_PATH}${file}.mp3`;
+                // Note: File names are presumed to match the Japanese characters.
+                // In a real scenario, map these correctly or rename files to match ids.
+                // For this example, assuming file names match the 'id' + '_masu' pattern might be safer, 
+                // but following original logic:
+                const path = `${SOUND_PATH}${file}.mp3`; 
                 if (!audioCache[path]) {
                     audioCache[path] = new Audio(path);
                 }
@@ -531,10 +554,9 @@
             const soundIncorrect = document.getElementById('dv-sound-incorrect');
 
             // ----------------------------------------------------
-            // DOM要素の取得
+            // DOM Elements
             // ----------------------------------------------------
             const screens = document.querySelectorAll('.dv-screen');
-            // ★修正: ホームボタンとメニューボタンを分離
             const backToMenuButtons = document.querySelectorAll('.dv-back-to-menu');
             const homeButtons = document.querySelectorAll('.dv-home-button');
 
@@ -543,14 +565,14 @@
             const menuGame2Btn = document.getElementById('dv-menu-game2');
             const menuGame3Btn = document.getElementById('dv-menu-game3');
 
-            // ゲーム1
+            // Game 1 Elements
             const game1Screen = document.getElementById('dv-screen-game1');
             const game1Prompt = document.getElementById('dv-game1-prompt');
             const game1CharImg = document.getElementById('dv-game1-char-img');
             const game1Options = document.getElementById('dv-game1-options');
             const game1Feedback = document.getElementById('dv-game1-feedback');
 
-            // ゲーム2
+            // Game 2 Elements
             const game2Screen = document.getElementById('dv-screen-game2');
             const game2AnimImg = document.getElementById('dv-game2-anim-img');
             const game2TenseIcon = document.getElementById('dv-game2-tense-icon');
@@ -558,7 +580,7 @@
             let game2Option2 = document.getElementById('dv-game2-option2');
             const game2Feedback = document.getElementById('dv-game2-feedback');
 
-            // ゲーム3
+            // Game 3 Elements
             const game3Screen = document.getElementById('dv-screen-game3');
             const game3SlotNoun = document.getElementById('dv-game3-slot-noun');
             const game3SlotVerb = document.getElementById('dv-game3-slot-verb');
@@ -568,7 +590,7 @@
             const game3Feedback = document.getElementById('dv-game3-feedback');
 
             // ----------------------------------------------------
-            // 汎用関数
+            // Utility Functions
             // ----------------------------------------------------
             
             function showScreen(screenElement) {
@@ -578,7 +600,7 @@
 
             function playSound(audioElement) {
                 audioElement.currentTime = 0;
-                audioElement.play().catch(e => console.error("音声再生エラー:", e));
+                audioElement.play().catch(e => console.error("Sound play error:", e));
             }
 
             function shuffleArray(array) {
@@ -591,7 +613,7 @@
             }
 
             // ----------------------------------------------------
-            // メニュー画面のロジック
+            // Menu Logic
             // ----------------------------------------------------
             
             menuGame1Btn.onclick = () => { setupGame1(); showScreen(game1Screen); };
@@ -606,7 +628,6 @@
                 };
             });
             
-            // ★修正: ホームボタン処理 (外部ページ遷移)
             homeButtons.forEach(btn => {
                 btn.onclick = () => {
                     window.location.href = 'index.html'; 
@@ -614,7 +635,7 @@
             });
             
             // ----------------------------------------------------
-            // ゲーム1 (アクション) のロジック
+            // Game 1 Logic (Action Association)
             // ----------------------------------------------------
             let game1AnswerId = '';
 
@@ -623,7 +644,7 @@
 
                 game1Options.innerHTML = '';
                 game1Feedback.textContent = '';
-                game1Feedback.classList.remove('show'); // フィードバック非表示
+                game1Feedback.classList.remove('show');
                 game1CharImg.src = `${IMG_PATH}char_idle.png`;
 
                 const shuffledVerbs = shuffleArray(verbData);
@@ -632,6 +653,8 @@
                 const correctVerb = currentOptions[Math.floor(Math.random() * 4)];
                 game1AnswerId = correctVerb.id;
 
+                // Playing sound logic needs checking against file naming convention
+                // Assuming sound files are named after the kana in the data e.g. "たべます.mp3"
                 const sound = loadAudio(correctVerb.id, 'masu');
                 game1Prompt.textContent = `おとを きいて、おなじ アクション を えらぼう！`;
                 if(sound) {
@@ -690,7 +713,7 @@
             }
 
             // ----------------------------------------------------
-            // ゲーム2 (時制) のロジック
+            // Game 2 Logic (Tense)
             // ----------------------------------------------------
             let game2Answer = '';
             let game2CurrentVerbId = '';
@@ -712,7 +735,7 @@
                     { text: verb.mashita, tense: 'mashita' }
                 ]);
 
-                // ボタンのリスナーを削除してから再設定する
+                // Replacing buttons to clear event listeners
                 const oldBtn1 = document.getElementById('dv-game2-option1');
                 const oldBtn2 = document.getElementById('dv-game2-option2');
                 
@@ -779,7 +802,7 @@
 
 
             // ----------------------------------------------------
-            // ゲーム3 (文づくり) のロジック
+            // Game 3 Logic (Sentence Building)
             // ----------------------------------------------------
             
             function setupGame3() {
@@ -906,6 +929,5 @@
             showScreen(menuScreen); 
         });
     </script>
-
 </body>
 </html>
