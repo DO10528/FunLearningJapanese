@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>漢字クイズ (小学1年生)</title>
+    <title>かんじクイズ (1ねんせい) - FunLearnJP</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 共通設定 (V2デザイン) --- */
+        /* --- デザイン設定 --- */
         :root {
-            --primary: #5c7aff; /* Blue (Header) */
-            --accent: #ffcc5c;  /* Yellow */
+            --primary: #5c7aff; /* メインの青色 */
             --bg-color: #f4f7fc;
             --text-color: #333;
-            --correct-color: #4caf50; /* Green */
-            --incorrect-color: #ef5350; /* Red */
-            
-            /* ★漢字ゲームテーマカラー (Green/Lime) */
-            --kanji-theme: #66bb6a;
-            --kanji-dark: #388e3c;
-            --kanji-light-bg: #f1f8e9;
+            --correct-color: #4caf50; /* 緑 */
+            --incorrect-color: #ef5350; /* 赤 */
+            --card-bg: #ffffff;
         }
 
         body {
@@ -33,258 +28,137 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            touch-action: manipulation;
         }
 
-        /* --- ヘッダー（V2統一デザイン） --- */
+        /* ヘッダー */
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, #4facfe 100%);
+            background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
             color: white;
             padding: 15px 20px;
             box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-            z-index: 100;
         }
         .header-container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .header-container h1 {
-            margin: 0;
-            font-size: 1.4em;
-            color: white;
-        }
-        .home-link {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .home-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+        .header-container h1 { margin: 0; font-size: 1.4em; }
+        .home-link { color: white; text-decoration: none; font-weight: bold; }
 
-        /* --- メインコンテナ / カードデザイン --- */
-        .quiz-main-container {
+        /* メインエリア */
+        .quiz-main {
             flex-grow: 1;
             padding: 20px;
-            max-width: 700px; 
-            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .quiz-card {
+            background-color: var(--card-bg);
             width: 100%;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .quiz-container { 
-            background-color: #ffffff; 
-            padding: 30px; 
-            border-radius: 25px; 
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 25px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            border: 4px solid white; 
+            border: 4px solid white;
             text-align: center;
-        }
-        h2 { 
-            text-align: center; 
-            color: var(--kanji-dark); 
-            margin-bottom: 20px;
-            font-size: 1.8em;
+            margin-top: 20px;
         }
 
-        /* 画像エリア */
-        .image-box { 
-            text-align: center; 
-            margin-bottom: 20px; 
-            border: 3px dashed var(--kanji-theme); 
-            border-radius: 15px; 
-            padding: 15px; 
-            background-color: var(--kanji-light-bg);
-        }
-        .image-box img { 
-            max-width: 100%; 
-            height: auto; 
-            max-height: 150px;
-            border-radius: 5px; 
-            object-fit: contain; 
-            background: white;
-            padding: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* 質問エリア (漢字表示部分) */
-        .question-area { 
-            margin-bottom: 25px; 
-            text-align: center;
-        }
-        #question-number { 
-            font-size: 1.1em; 
-            color: #666; 
-            margin-bottom: 10px;
-        }
-        
-        /* 漢字表示のスタイル */
-        #question-text { 
-            font-family: 'Zen Maru Gothic', sans-serif; 
-            font-size: 80px; 
-            line-height: 1.0;
-            font-weight: 900; 
-            color: var(--kanji-dark);
-            padding: 15px 30px;
-            background-color: #e8f5e9; /* Light Green */
-            border: 4px solid var(--kanji-theme);
-            border-radius: 15px;
-            display: inline-block; 
-            margin-top: 5px;
-            min-width: 120px; 
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        /* ★★★ 読み方選択モードのボタン (V2スタイル) ★★★ */
-        .mode-selection {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 15px 0;
-        }
-        .mode-options {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .mode-selection label {
-            /* V2ボタンベース */
-            display: block; 
-            padding: 12px 20px;
-            width: 130px;
-            text-align: center;
+        /* 認証ステータス */
+        #auth-status-kanji {
+            font-size: 0.9em;
+            color: var(--primary);
+            margin-bottom: 15px;
             font-weight: bold;
+        }
+
+        /* モード選択 */
+        .mode-select {
+            margin-bottom: 20px;
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        .mode-select label {
+            margin: 0 15px;
+            font-weight: bold;
+            cursor: pointer;
             font-size: 1.1em;
-            color: var(--kanji-dark); 
+            color: #333;
+        }
+        .mode-select input { margin-right: 5px; }
+
+        /* 漢字表示エリア */
+        .kanji-display {
+            font-size: 8rem;
+            font-weight: 900;
+            color: #333;
+            line-height: 1.2;
+            margin: 10px 0 30px 0;
+            text-shadow: 2px 2px 0px #eee;
             background-color: #fff;
-            border: 3px solid #ddd;
-            border-radius: 10px;
+            border-radius: 20px;
+            display: inline-block;
+            padding: 10px 40px;
+            border: 3px dashed var(--primary);
+        }
+
+        /* 選択肢ボタン */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .choice-btn {
+            background-color: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 15px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--text-color);
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 3px 0 #ccc;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 4px 0 #ccc;
         }
-        .mode-selection input[type="radio"] {
-            display: none; 
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
         }
-        /* 選択されたモードのスタイル */
-        .mode-selection input[type="radio"]:checked + label {
-            color: white; 
-            background-color: var(--kanji-theme); 
-            border-color: var(--kanji-dark);
-            transform: translateY(3px); /* 押し込み効果 */
-            box-shadow: 0 0 0 #ccc; /* 影を消す */
-        }
-        .mode-selection label:hover {
-             border-color: var(--kanji-theme); 
-        }
-        /* ★★★★★★★★★★★★★★★★★★★★★★★★★ */
-        
-        /* 選択肢ボタン */
-        .choices { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-            margin-bottom: 20px;
-        }
-        /* V2 3Dボタン風の選択肢 */
-        .choices button {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.2em;
-            cursor: pointer;
-            border: none;
-            background-color: var(--kanji-theme); /* Green theme */
-            color: white;
-            border-radius: 50px; 
-            transition: all 0.1s ease-out;
-            box-shadow: 0 4px 0 var(--kanji-dark); 
-            position: relative;
-            top: 0;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
-        }
-        .choices button:active { 
-            top: 4px; 
-            box-shadow: 0 0 0 var(--kanji-dark); 
-        }
-        .choices button:hover:not(:disabled) { 
-            background-color: #5cb85c;
-        }
-        
-        /* 回答結果のフィードバック */
-        .choices button.correct-answer { background-color: var(--correct-color); box-shadow: 0 4px 0 #2b842e; }
-        .choices button:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
-            background-color: #ccc !important; 
-            box-shadow: 0 4px 0 #999; 
-            color: #666;
-        }
-        
-        /* 結果メッセージ */
-        .result-message { 
-            text-align: center; 
-            margin-top: 20px; 
-            padding: 15px; 
-            border-radius: 10px; 
-            font-size: 1.2em; 
-            font-weight: bold; 
-            animation: pop-in 0.3s;
-        }
-        .result-message.correct { background-color: #d4edda; color: #155724; }
-        .result-message.incorrect { background-color: #f8d7da; color: #721c24; }
-        @keyframes pop-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        
-        /* 最終スコア */
-        #final-score { 
-            text-align: center; 
-            font-size: 1.8em; 
-            color: var(--kanji-dark); 
-            margin-top: 30px; 
-            background-color: var(--kanji-light-bg); 
-            padding: 20px; 
-            border-radius: 15px; 
+        .choice-btn:hover:not(:disabled) {
+            background-color: #f0f8ff;
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
-        /* ナビゲーションボタン */
-        .navigation-buttons { text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
-        .navigation-buttons button { 
-            padding: 12px 25px; 
-            font-size: 1em; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: all 0.1s; 
-            position: relative;
-            top: 0;
-            box-shadow: 0 3px 0 #5a6268;
+        /* 正解・不正解 */
+        .choice-btn.correct {
+            background-color: var(--correct-color); color: white; border-color: var(--correct-color); box-shadow: 0 4px 0 #388e3c;
         }
-        /* V2セカンダリボタンに合わせる */
-        #home-button { background-color: #6c757d; color: white; }
-        #home-button:active { top: 3px; box-shadow: 0 0 0 #5a6268; }
-        
-        /* 再スタートボタン */
-        #restart-button { 
-            background-color: #ffc107; 
-            color: #333; 
-            box-shadow: 0 3px 0 #cc9a00;
+        .choice-btn.incorrect {
+            background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); box-shadow: 0 4px 0 #d32f2f;
         }
-        #restart-button:active { top: 3px; box-shadow: 0 0 0 #cc9a00; }
-        
-        /* 認証ステータスのスタイル */
-        #auth-status-kanji {
-            text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: var(--kanji-dark);
+        .choice-btn:disabled { opacity: 0.8; cursor: default; }
+
+        /* 結果メッセージ */
+        #result-message { margin-top: 10px; font-size: 1.3em; font-weight: bold; min-height: 1.5em; }
+
+        /* ナビゲーション */
+        .nav-buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .nav-btn {
+            padding: 12px 25px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; text-decoration: none; font-size: 1em;
         }
+        .btn-restart { background-color: #ffb74d; box-shadow: 0 4px 0 #f57c00; }
+        .btn-home { background-color: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
+        .btn-restart:active, .btn-home:active { transform: translateY(4px); box-shadow: none; }
 
     </style>
 </head>
@@ -292,63 +166,57 @@
 
     <header>
         <div class="header-container">
-            <h1>漢字クイズ</h1>
-            <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホームへ</a>
+            <h1>かんじクイズ (1ねんせい)</h1>
+            <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
         </div>
     </header>
 
-    <div class="quiz-main-container">
-        <div class="quiz-container">
+    <div class="quiz-main">
+        <div class="quiz-card">
             
-            <div id="auth-status-kanji">認証中...</div> 
-            
-            <div class="mode-selection">
-                <p style="font-weight: bold; margin-bottom: 15px; color: var(--kanji-dark);">出題する読み方を選んでください：</p>
-                <div class="mode-options">
-                    <input type="radio" id="mode_kun" name="readingMode" value="kun" checked>
-                    <label for="mode_kun"><i class="fa-solid fa-cloud"></i> 訓読み (Kun)</label>
-                    
-                    <input type="radio" id="mode_on" name="readingMode" value="on">
-                    <label for="mode_on"><i class="fa-solid fa-sun"></i> 音読み (On)</label>
-                </div>
-            </div>
-            
-            <div class="image-box">
-                <img id="quiz-image" src="" alt="クイズ画像">
-            </div>
+            <div id="auth-status-kanji">認証中...</div>
 
-            <div class="question-area">
-                <p id="question-number">第 1 問</p>
-                <p id="question-prompt">この漢字の読み方を選びなさい：</p> 
-                <h2 id="question-text">漢字が表示されます...</h2> 
-            </div>
-
-            <div class="choices" id="choices-container">
+            <div id="quiz-area">
+                <div class="mode-select">
+                    モード: 
+                    <label><input type="radio" name="mode" value="kun" checked> くんよみ (Kun)</label>
+                    <label><input type="radio" name="mode" value="on"> オンヨミ (On)</label>
                 </div>
 
-            <div id="result-message" class="result-message" style="display: none;">
-                </div>
-            
-            <div id="final-score" style="display: none;">
-                </div>
+                <div id="question-info">だい <span id="q-num">1</span> もん</div>
 
-            <div class="navigation-buttons">
-                <button id="home-button">ホームに戻る</button>
-                <button id="restart-button" style="display: none;">もう一度プレイ</button>
+                <div id="kanji-display" class="kanji-display">?</div>
+
+                <div id="choices-container" class="choices-grid">
+                    </div>
+
+                <div id="result-message"></div>
             </div>
+
+            <div id="score-area" style="display: none;">
+                <h2 style="font-size: 2em; color: var(--primary);">おつかれさま！</h2>
+                <p style="font-size: 1.5em; margin: 30px 0;">
+                    <span id="score-text" style="font-size: 2em; font-weight:900; color: var(--incorrect-color);">0</span> もん せいかい！
+                </p>
+            </div>
+
+            <div class="nav-buttons">
+                <button id="btn-restart" class="nav-btn btn-restart" style="display: none;">もういちど</button>
+                <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
+            </div>
+
         </div>
     </div>
 
-    <script src="js/kanji_quiz.js"></script>
-    
+    <audio id="seikai-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="bubu-sound" src="assets/sounds/bubu.mp3"></audio>
+
     <script type="module">
-        // 1. Firebase SDKのインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-        // 2. あなたのFirebase設定 (index.htmlなどからコピー)
+        // あなたのFirebase設定
         const firebaseConfig = {
           apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
           authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -359,7 +227,6 @@
           measurementId: "G-LCMXVLPS81"
         };
 
-        // 3. Firebaseサービスの初期化とグローバル変数
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -367,10 +234,6 @@
         window.currentUserId = null;
         const authStatusEl = document.getElementById('auth-status-kanji');
         
-        // ポイントルール: 各問題の正解で1ポイント
-        const POINTS_PER_QUESTION = 1; 
-        
-        // 4. 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUserId = user.uid;
@@ -381,42 +244,32 @@
                     displayName = userDocSnap.data().displayName || 'ユーザー';
                 }
                 authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
-
             } else {
                 window.currentUserId = null;
-                authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
+                authStatusEl.textContent = '❌ ゲストモード (ポイントはつきません)';
             }
         });
 
-
-        /**
-         * ポイント加算関数 (Firestoreに記録)
-         * @param {number} points - 加算するポイント数
-         * @param {string} kanjiId - 漢字のID (例: 'ichi', 'hito')
-         * @returns {Promise<boolean>} 成功/失敗
-         */
+        // ポイント加算関数 (グローバル定義)
         window.addPointsToUser = async function(points, kanjiId) { 
-            if (!window.currentUserId || points <= 0) {
-                return false;
-            }
-            
+            if (!window.currentUserId || points <= 0) return false;
             try {
                 const userRef = doc(db, "users", window.currentUserId);
-                const progressKey = `kanji_quiz_id_${kanjiId}`; // 漢字IDごとのキー
-
-                // 2. ポイントを加算
-                await updateDoc(userRef, {
-                    points: increment(points) 
+                // 漢字ごとに進捗キーを作る例: kanji_quiz_id_ichi
+                const progressKey = `kanji_quiz_id_${kanjiId}`;
+                await updateDoc(userRef, { 
+                    points: increment(points)
                 });
-                
-                console.log(`${points} ポイントを Firestore に加算しました (漢字ID: ${kanjiId})。`);
+                console.log(`+${points}pt (ID: ${kanjiId})`);
                 return true;
-
             } catch (e) {
-                console.error("ポイント更新エラー:", e);
+                console.error("ポイントエラー:", e);
                 return false;
             }
         }
     </script>
+
+    <script src="js/kanji_quiz.js"></script>
+
 </body>
 </html>
