@@ -236,20 +236,28 @@
     <div class="modal-box">
         <h2 id="modal-title">ログイン</h2>
         <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
-        <input type="text" id="auth-name" placeholder="ユーザー名">
+        <input type="email" id="auth-email" placeholder="メールアドレス">
         <input type="password" id="auth-pass" placeholder="パスワード">
+        <input type="text" id="auth-display-name" placeholder="ゲーム名 (ランキングに表示)" class="hidden">
         <button id="modal-submit" class="btn-auth btn-login" style="width:100%; margin-top:10px;">実行</button>
         <button id="modal-close" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
     </div>
 </div>
 
-<!-- ★★★ Firebase SDKとロジック ★★★ -->
 <script type="module">
     // Firebase SDKのインポート (ES Modules)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { 
+        getFirestore, doc, setDoc, updateDoc, getDocs, collection, 
+        query, orderBy, limit, onSnapshot, where 
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { 
+        getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+        signOut, onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    // あなたのFirebase Config
+
+    // あなたのFirebase Config (※実際の値に置き換えてください)
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -263,119 +271,159 @@
     // Firebase初期化
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app); 
 
     // --- グローバル変数 ---
-    const SESS_KEY = 'current_user';
+    const SESS_KEY = 'user_mode'; // 'guest' または 'authenticated' のフラグとして使用
     let currentUserDocUnsubscribe = null;
 
-    // --- 認証機能 ---
+    // --- 認証モーダル制御 ---
     window.openAuthModal = (mode) => {
         window.authMode = mode;
         const modal = document.getElementById('auth-modal');
+        const displayNameInput = document.getElementById('auth-display-name');
+        
         modal.style.display = 'flex';
         document.getElementById('modal-title').textContent = mode === 'login' ? 'ログイン' : '新規登録';
+        
+        // ★★★ 登録時のみゲーム名フィールドを表示 ★★★
+        displayNameInput.classList.toggle('hidden', mode === 'login');
+
+        // フィールドをクリア
         document.getElementById('modal-msg').textContent = '';
-        document.getElementById('auth-name').value = '';
+        document.getElementById('auth-email').value = ''; 
         document.getElementById('auth-pass').value = '';
+        displayNameInput.value = '';
     };
 
     window.closeAuthModal = () => {
         document.getElementById('auth-modal').style.display = 'none';
     };
 
+    // --- 認証実行 (メールアドレス、パスワード、ゲーム名を使用) ---
     window.submitAuth = async () => {
-        const name = document.getElementById('auth-name').value.trim();
+        const email = document.getElementById('auth-email').value.trim(); 
         const pass = document.getElementById('auth-pass').value.trim();
+        const displayName = document.getElementById('auth-display-name').value.trim();
         const msg = document.getElementById('modal-msg');
         
-        if (!name || !pass) { msg.textContent = '名前とパスワードを入力してください'; return; }
+        if (!email || !pass) { msg.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+        if (pass.length < 6) { msg.textContent = 'パスワードは6文字以上にする必要があります。'; return; }
 
         try {
-            const userRef = doc(db, "users", name);
-            const userSnap = await getDoc(userRef);
-
             if (window.authMode === 'signup') {
-                if (userSnap.exists()) {
-                    msg.textContent = 'その名前はすでに使われています';
+                // ★★★ ゲーム名バリデーションと重複チェック ★★★
+                if (!displayName || displayName.length < 2) { 
+                    msg.textContent = 'ゲーム名を入力してください（2文字以上）。'; 
+                    return; 
+                }
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("displayName", "==", displayName), limit(1));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    msg.textContent = 'そのゲーム名は既に使用されています。';
                     return;
                 }
-                // 新規登録 (Firestoreに書き込み)
-                await setDoc(userRef, {
-                    password: pass,
+
+                // 新規登録 (Firebase Authを使用)
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+                
+                // Firestoreにユーザーデータを作成（UIDをドキュメントIDとして使用）
+                await setDoc(doc(db, "users", user.uid), {
+                    email: email, 
+                    displayName: displayName, // ゲーム名を保存
                     points: 0,
                     streak: 1,
                     lastLogin: new Date().toISOString()
                 });
-                sessionStorage.setItem(SESS_KEY, name);
+                
+                sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
-                updateUI();
-                alert('登録しました！');
 
             } else {
-                // ログイン
-                if (!userSnap.exists()) {
-                    msg.textContent = 'ユーザーが見つかりません';
-                    return;
-                }
-                const userData = userSnap.data();
-                if (userData.password !== pass) {
-                    msg.textContent = 'パスワードが違います';
-                    return;
-                }
-                sessionStorage.setItem(SESS_KEY, name);
+                // ログイン (Firebase Authを使用)
+                const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+
+                // ログイン成功時にFirestoreのlastLoginを更新 (任意)
+                await updateDoc(doc(db, "users", user.uid), { lastLogin: new Date().toISOString() });
+
+                sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
-                updateUI();
             }
-        } catch (e) {
-            console.error(e);
-            msg.textContent = 'エラーが発生しました。インターネット接続を確認してください。';
+        } catch (error) {
+            console.error(error);
+            
+            let errorMsg = '認証中にエラーが発生しました。';
+            if (error.code === 'auth/email-already-in-use') {
+                errorMsg = 'そのメールアドレスは既に使用されています。';
+            } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                errorMsg = 'メールアドレスまたはパスワードが正しくありません。';
+            }
+            msg.textContent = errorMsg;
         }
     };
 
-    window.logout = () => {
-        if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); // リスナー解除
-        sessionStorage.removeItem(SESS_KEY);
-        updateUI();
+    window.logout = async () => {
+        if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
+        sessionStorage.removeItem(SESS_KEY); // セッション情報を削除
+        await signOut(auth); // Firebase Authからログアウト
+        updateUI(null); // UIを未ログイン状態に更新
     };
 
     window.loginAsGuest = () => {
-        sessionStorage.setItem(SESS_KEY, 'ゲスト');
-        updateUI();
+        if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
+        sessionStorage.setItem(SESS_KEY, 'guest');
+        updateUI('guest');
     };
 
     // --- UI更新機能 ---
-    async function updateUI() {
-        const userName = sessionStorage.getItem(SESS_KEY);
+    function updateUI(userState) {
         const dash = document.getElementById('user-dashboard');
         const welcome = document.getElementById('guest-welcome');
 
-        if (userName) {
+        if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
+        
+        if (userState === 'guest') {
             welcome.classList.add('hidden');
             dash.classList.remove('hidden');
-            document.getElementById('user-name').textContent = userName;
+            document.getElementById('user-name').textContent = 'ゲスト';
+            document.getElementById('user-lvl').textContent = 1;
+            document.getElementById('level-fill').style.width = '0%';
+            document.getElementById('streak-val').textContent = 0;
+            document.getElementById('point-val').textContent = 0;
+            
+        } else if (userState && userState.uid) { // 認証済みユーザー
+            welcome.classList.add('hidden');
+            dash.classList.remove('hidden');
 
-            if (userName === 'ゲスト') {
-                document.getElementById('streak-val').textContent = 0;
-                document.getElementById('point-val').textContent = 0;
-            } else {
-                // Firestoreのリアルタイム更新をリッスン
-                if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
-                
-                currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userName), (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        document.getElementById('streak-val').textContent = data.streak || 0;
-                        document.getElementById('point-val').textContent = data.points || 0;
-                        
-                        // レベル計算
-                        const pts = data.points || 0;
-                        const level = Math.floor(pts / 100) + 1;
-                        document.getElementById('user-lvl').textContent = level;
-                        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
-                    }
-                });
-            }
+            const userId = userState.uid;
+            
+            // Firestoreのリアルタイム更新をリッスン (UIDでドキュメントを参照)
+            currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    
+                    // ★★★ Firestoreに保存したdisplayNameを表示 ★★★
+                    document.getElementById('user-name').textContent = data.displayName || 'ユーザー'; 
+                    
+                    document.getElementById('streak-val').textContent = data.streak || 0;
+                    document.getElementById('point-val').textContent = data.points || 0;
+                    
+                    // レベル計算
+                    const pts = data.points || 0;
+                    const level = Math.floor(pts / 100) + 1;
+                    document.getElementById('user-lvl').textContent = level;
+                    document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+                } else {
+                    // AuthはあるがFirestoreデータがない場合
+                    document.getElementById('user-name').textContent = 'エラー';
+                }
+            });
+
         } else {
+            // 未ログイン状態
             welcome.classList.remove('hidden');
             dash.classList.add('hidden');
         }
@@ -401,7 +449,8 @@
             let rank = 1;
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                const name = doc.id;
+                // ★★★ Firestoreに保存されているdisplayNameをランキング名として表示 ★★★
+                const name = data.displayName || 'Unknown'; 
                 const pt = data.points || 0;
                 
                 const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
@@ -423,10 +472,22 @@
         }
     };
 
-    // 初期化
-    updateUI();
+    // --- 初期化と認証状態の監視 ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // ログイン済み (Firebase Authがセッションを保持している)
+            sessionStorage.setItem(SESS_KEY, 'authenticated');
+            updateUI(user);
+        } else if (sessionStorage.getItem(SESS_KEY) === 'guest') {
+            // ゲストモードが選択されている
+            updateUI('guest');
+        } else {
+            // 未ログイン状態
+            updateUI(null);
+        }
+    });
     
-    // イベントリスナー設定 (Moduleスコープ外から呼べるようにwindowに紐付けた関数を使用)
+    // イベントリスナー設定
     document.getElementById('login-btn').onclick = () => window.openAuthModal('login');
     document.getElementById('signup-btn').onclick = () => window.openAuthModal('signup');
     document.getElementById('guest-btn').onclick = () => window.loginAsGuest();
@@ -434,13 +495,12 @@
     document.getElementById('modal-close').onclick = () => window.closeAuthModal();
     document.getElementById('modal-submit').onclick = () => window.submitAuth();
 
-    // ゲームカテゴリ表示 (既存ロジック)
+    // ゲームカテゴリ表示 (既存ロジックを維持)
     window.renderGameCategories(); 
 </script>
 
 <script>
-    // --- 既存のゲームデータと表示ロジック (変更なし) ---
-    const i18nData = {
+    const i18nData = { /* ... 既存のi18nData */
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", group_game: "ゲーム",
