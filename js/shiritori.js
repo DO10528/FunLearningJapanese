@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TURN_MESSAGE = document.getElementById('turn-message');
     const CURRENT_WORD_DISPLAY = document.getElementById('current-word-display');
     const IMAGE_AREA = document.getElementById('image-area'); 
-    const CHOICE_AREA = document.getElementById('choice-buttons-area');
+    const CHOICE_AREA = document.getElementById('choice-buttons-area'); // 正しい変数名
     const FEEDBACK = document.getElementById('feedback');
     const END_CONTROLS = document.getElementById('endGameControls');
     const QUESTION_TEXT = document.getElementById('question-text');
@@ -157,6 +157,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (neededChoices > 0) {
             usedWrongOptions = shuffleArray(usedWrongOptions);
             choices.push(...usedWrongOptions.slice(0, neededChoices));
+            neededChoices = NUM_CHOICES - choices.length;
+        }
+
+        // 最終手段：まだ足りない場合は allWrongCandidates から重複なく追加（重複チェック）
+        if (neededChoices > 0) {
+            const remainingPool = shuffleArray(allWrongCandidates.filter(w => !choices.find(c => c.id === w.id)));
+            choices.push(...remainingPool.slice(0, neededChoices));
+        }
+
+        // 安全策：choices が NUM_CHOICES に満たない場合でも進める（稀なデータ不足時）
+        if (choices.length === 0) {
+            console.error("選択肢が作成できませんでした。データを確認してください。");
+            endGame(true, score);
+            return;
         }
 
         choices = shuffleArray(choices);
@@ -177,37 +191,46 @@ document.addEventListener('DOMContentLoaded', () => {
         IMAGE_AREA.innerHTML = `
             <img src="assets/images/${currentWord.image}" 
                  class="current-image"
-                 alt="${currentWord.word}"
+                 alt="${currentWord.word || currentWord.reading}"
                  onerror="this.src='assets/images/placeholder.png';">
         `;
     }
 
     function renderChoices(choices, lastChar) {
-        CHOICE_AREA.innerHTML = '';
-        QUESTION_TEXT.textContent = `「${lastChar}」から はじまるのは？`;
-        
-        choices.forEach(word => {
-            const card = document.createElement('div');
-            card.className = 'choice-card';
-            card.dataset.id = word.id; 
-            card.onclick = handleAnswer;
-            
-            // 画像と単語名を表示 (フォールバック込み)
-            card.innerHTML = `
-                <img src="assets/images/${word.image}" 
-                     alt="${word.word}"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="choice-card-text">${word.word || word.reading}</div>
-            `;
-            choiceButtonsArea.appendChild(card);
-        });
-    }
+    CHOICE_AREA.innerHTML = '';
+    QUESTION_TEXT.textContent = `「${lastChar}」から はじまるのは？`;
+
+    choices.forEach(word => {
+        const card = document.createElement('div');
+        card.className = 'choice-card';
+        card.dataset.id = word.id;
+        card.onclick = handleAnswer;
+
+        card.innerHTML = `
+            <img src="assets/images/${word.image}" 
+                 alt=""
+                 class="choice-image"
+                 onerror="this.src='assets/images/placeholder.png';">
+        `;
+
+        CHOICE_AREA.appendChild(card);
+    });
+}
+
 
     // --- 回答処理 ---
     async function handleAnswer(e) { 
-        const card = e.currentTarget;
-        const selectedId = card.dataset.id; 
-        const selectedWord = gameData.find(w => w.id === selectedId);
+        const card = e.currentTarget || e.target.closest('.choice-card');
+        if (!card) return;
+        const selectedId = String(card.dataset.id); 
+        const selectedWord = gameData.find(w => String(w.id) === selectedId);
+
+        // 安全ガード: selectedWord が見つからない場合
+        if (!selectedWord) {
+            console.warn('選択した単語が見つかりませんでした:', selectedId);
+            return;
+        }
+
         const lastChar = getCleanLastChar(currentWord.reading);
 
         const allCards = document.querySelectorAll('.choice-card');
@@ -216,8 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 正解判定：しりとりが繋がる AND まだ使っていないこと
         if (selectedWord.reading.startsWith(lastChar) && !gameHistoryIds.has(selectedId)) {
             // ★正解
-            SOUND_CORRECT.currentTime = 0;
-            SOUND_CORRECT.play();
+            try { SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play(); } catch(e){/* ignore */ }
             
             card.style.borderColor = 'var(--correct-color)';
             card.style.backgroundColor = '#e8f5e9';
@@ -251,13 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderCurrentWord();
                     showNextQuestion();
                     FEEDBACK.textContent = '';
-                }, 1500);
+                }, 1000);
             }
 
         } else {
             // ★不正解 (ルール違反/既出/しりとりが繋がらない)
-            SOUND_INCORRECT.currentTime = 0;
-            SOUND_INCORRECT.play();
+            try { SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play(); } catch(e){/* ignore */ }
             
             card.style.borderColor = 'var(--incorrect-color)';
             card.style.opacity = '0.5';
@@ -289,11 +310,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let reasonMsg = '';
         if (isWin) {
-            SOUND_CORRECT.play();
+            try { SOUND_CORRECT.play(); } catch(e){/* ignore */ }
             reasonMsg = 'すごい！ これいじょう つづかないよ！ ぜんぶクリア！？🎉';
             TURN_MESSAGE.textContent = `クリア！ (${turnCount}かい つづいた)`;
         } else {
-            SOUND_INCORRECT.play();
+            try { SOUND_INCORRECT.play(); } catch(e){/* ignore */ }
             reasonMsg = currentWord ? 'あ！「ん」がついたから おしまい！' : 'ルールいはん！ ゲームオーバーだよ。';
             FEEDBACK.style.color = '#ef5350';
             TURN_MESSAGE.textContent = `ゲームオーバー (${turnCount}かい つづいた)`;
