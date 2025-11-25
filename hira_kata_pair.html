@@ -282,6 +282,10 @@
         font-family: 'Zen Maru Gothic', sans-serif;
     }
     .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
+    
+    .point-feedback {
+        font-size: 1em; color: var(--correct-color); font-weight: bold; margin-top: 10px;
+    }
 
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
@@ -312,6 +316,8 @@
         <h1 class="menu-title">ひらカタあわせ</h1>
         <p style="color:#666; margin-bottom:10px;">あそびたい レベルを えらんでね</p>
         
+        <div id="auth-status" style="margin-bottom: 20px; font-weight: bold; color: var(--primary);">認証中...</div>
+
         <div id="level-grid" class="level-grid">
             </div>
         
@@ -350,6 +356,7 @@
 <div id="success-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>だいせいかい！🎉</h2>
+        <p id="modal-point-feedback" class="point-feedback"></p>
         <button class="next-btn" onclick="nextLevel()">つぎの レベルへ Go!</button>
     </div>
 </div>
@@ -357,7 +364,81 @@
 <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
 <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
-<script>
+<script type="module">
+    // 1. Firebase SDKのインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+
+    // 2. あなたのFirebase設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // 3. Firebaseサービスの初期化とグローバル変数
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    let currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+    const POINTS_PER_LEVEL = 1; // ★★★ レベルクリアで1ポイントに設定 ★★★
+    let isLevelClear = false; // 二重ポイント加算防止フラグ
+
+    // 4. 認証状態の監視
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUserId = user.uid;
+            const userDocRef = doc(db, "users", currentUserId);
+            const userDocSnap = await getDoc(userDocRef);
+            let displayName = 'ユーザー';
+            if (userDocSnap.exists()) {
+                displayName = userDocSnap.data().displayName || 'ユーザー';
+            }
+            authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
+
+        } else {
+            currentUserId = null;
+            authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
+        }
+    });
+
+
+    /**
+     * ポイント加算関数 (Firestoreに記録)
+     * @param {number} points - 加算するポイント数
+     */
+    async function addPointsToUser(points) {
+        if (!currentUserId || points <= 0 || isLevelClear) {
+            if(isLevelClear) console.log("ポイント加算スキップ: レベルはすでにクリアされています。");
+            return false;
+        }
+        
+        try {
+            const userRef = doc(db, "users", currentUserId);
+            await updateDoc(userRef, {
+                points: increment(points) 
+            });
+            console.log(`${points} ポイントを Firestore に加算しました。`);
+            isLevelClear = true; // 成功時にフラグを立てる
+            return true;
+
+        } catch (e) {
+            console.error("ポイント更新エラー:", e);
+            return false;
+        }
+    }
+    
+    // ----------------------------------------------------
+    // ★★★ ゲームロジック (DOMContentLoadedで実行されていた部分) ★★★
+    // ----------------------------------------------------
     // --- データ定義 (全10レベル) ---
     const levels = [
         { id: 1, chars: [ {h:'あ',k:'ア'}, {h:'い',k:'イ'}, {h:'う',k:'ウ'}, {h:'え',k:'エ'}, {h:'お',k:'オ'} ] },
@@ -384,14 +465,26 @@
     const pairArea = document.getElementById('pair-rows');
     const levelIndicator = document.getElementById('level-indicator');
     const modal = document.getElementById('success-modal');
+    const modalPointFeedback = document.getElementById('modal-point-feedback');
     
     const sndCorrect = document.getElementById('snd-correct');
     const sndIncorrect = document.getElementById('snd-incorrect');
 
+    // --- ユーティリティ ---
+    function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+
     // --- 初期化 ---
-    window.onload = () => {
+    window.addEventListener('load', () => {
         initLevelMenu();
-    };
+    });
 
     function initLevelMenu() {
         levelGrid.innerHTML = '';
@@ -422,6 +515,7 @@
         kataPool.innerHTML = '';
         pairArea.innerHTML = '';
         modal.style.display = 'none';
+        isLevelClear = false; // ★レベル開始時にフラグをリセット★
         
         if (idx >= levels.length) {
             alert("全レベルクリア！すごい！");
@@ -449,8 +543,8 @@
         });
 
         // チップ作成 (シャッフル)
-        const hiraChips = [...levelData.chars].sort(() => Math.random() - 0.5);
-        const kataChips = [...levelData.chars].sort(() => Math.random() - 0.5);
+        const hiraChips = shuffleArray([...levelData.chars]);
+        const kataChips = shuffleArray([...levelData.chars]);
 
         hiraChips.forEach(c => createChip(c.h, 'hira', c.k, hiraPool));
         kataChips.forEach(c => createChip(c.k, 'kata', c.h, kataPool));
@@ -467,7 +561,7 @@
         chip.className = `char-chip char-${type}`;
         chip.textContent = text;
         chip.dataset.value = text;
-        chip.dataset.pair = pairValue;
+        chip.dataset.pair = pairValue; // このチップの対になる文字
         chip.dataset.type = type;
 
         const poolSlot = createSlot('pool-slot');
@@ -490,6 +584,7 @@
     }
 
     function startDrag(e) {
+        if(isLevelClear) return;
         e.preventDefault();
         draggedItem = e.target;
         originSlot = draggedItem.parentElement;
@@ -558,7 +653,7 @@
                 originSlot.appendChild(existing);
             }
             target.appendChild(draggedItem);
-            playClickSound();
+            // playClickSound(); // クリック音が未定義のためコメントアウト
         }
         draggedItem = null;
     }
@@ -571,15 +666,15 @@
 
     function isValidDrop(slot, item) {
         if (slot.classList.contains('pool-slot')) return true;
-        if (slot.classList.contains('hira-slot') && item.dataset.type === 'hira') return true;
-        if (slot.classList.contains('kata-slot') && item.dataset.type === 'kata') return true;
+        if (slot.classList.contains('hira-slot') && item.dataset.type === 'hira' && slot.children.length === 0) return true;
+        if (slot.classList.contains('kata-slot') && item.dataset.type === 'kata' && slot.children.length === 0) return true;
         return false;
     }
 
-    function playClickSound() { }
-
     // --- 判定ロジック ---
-    window.checkAnswer = () => {
+    window.checkAnswer = async () => { // ★ async関数に変更
+        if(isLevelClear) return; // 二重チェック防止
+
         const rows = document.querySelectorAll('.pair-row');
         let allCorrect = true;
         let isFull = true;
@@ -593,26 +688,41 @@
         });
 
         if (!isFull) {
-            sndIncorrect.currentTime = 0;
-            sndIncorrect.play();
+            try { sndIncorrect.currentTime = 0; sndIncorrect.play(); } catch(e){}
             return; 
         }
 
         rows.forEach(row => {
             const hItem = row.querySelector('.hira-slot').children[0];
             const kItem = row.querySelector('.kata-slot').children[0];
-            if (hItem.dataset.pair !== kItem.dataset.value) {
+            
+            // hItemのペア値（カタカナ）とkItemの値（カタカナ）を比較
+            if (hItem.dataset.pair !== kItem.dataset.value) { 
                 allCorrect = false;
             }
         });
 
         if (allCorrect) {
-            sndCorrect.currentTime = 0;
-            sndCorrect.play();
+            try { sndCorrect.currentTime = 0; sndCorrect.play(); } catch(e){}
+            
+            // ★★★ Firebaseポイント加算 ★★★
+            let ptMsg = 'ポイントは記録されません。';
+            if (typeof addPointsToUser === 'function') {
+                const success = await addPointsToUser(POINTS_PER_LEVEL);
+                if (success) {
+                    ptMsg = `ボーナス +${POINTS_PER_LEVEL}pt ゲット！`;
+                } else if (currentUserId) {
+                    ptMsg = 'ポイント記録エラーが発生しました。';
+                }
+            } else {
+                 ptMsg = 'ゲストモードのためポイント記録なし。';
+            }
+            modalPointFeedback.textContent = ptMsg;
+            // ★★★ Firebaseポイント加算 終了 ★★★
+
             modal.style.display = 'flex'; 
         } else {
-            sndIncorrect.currentTime = 0;
-            sndIncorrect.play();
+            try { sndIncorrect.currentTime = 0; sndIncorrect.play(); } catch(e){}
         }
     };
 
