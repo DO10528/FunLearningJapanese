@@ -662,8 +662,8 @@
                 this.sndCorrect.play().catch(e=>{});
                 this.feedback.textContent = 'せいかい！';
                 this.feedback.style.color = 'var(--correct-color)';
-                // スコア加算は10点
-                this.score += 10;
+                // スコア加算は1点
+                this.score += 1;
                 this.updateScoreUI();
             } else {
                 // 不正解
