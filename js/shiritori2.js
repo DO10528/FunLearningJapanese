@@ -1,40 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ----------------------------------------------------
-    // ★★★ ポイントシステム設定 (全問正解で1日1回) ★★★
+    // ★★★ Firebase連携設定 ★★★
     // ----------------------------------------------------
-    const GAME_ID_3 = 'shiritori_grid_game'; // ゲームID
+    const POINTS_ON_CLEAR = 1; // 全マス埋めクリアで獲得するポイント
     
-    const USER_STORAGE_KEY_3 = 'user_accounts'; 
-    const SESSION_STORAGE_KEY_3 = 'current_user'; 
-    const GUEST_NAME_3 = 'ゲスト'; 
-
-    function getTodayDateString() {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    }
-
-    function checkAndAwardPoints(clearId) {
-        const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY_3);
-        if (!currentUser || currentUser === GUEST_NAME_3) return "guest"; 
-        const usersJson = localStorage.getItem(USER_STORAGE_KEY_3);
-        let users = usersJson ? JSON.parse(usersJson) : {};
-        let user = users[currentUser];
-        if (!user) return "error"; 
-        const today = getTodayDateString();
-        const progressKey = `${GAME_ID_3}_${clearId}`;
-        user.progress = user.progress || {};
-        user.progress[progressKey] = user.progress[progressKey] || {};
-
-        if (user.progress[progressKey][today] === true) return "already_scored"; 
-
-        user.points = (user.points || 0) + 1;
-        user.progress[progressKey][today] = true;
-        users[currentUser] = user;
-        localStorage.setItem(USER_STORAGE_KEY_3, JSON.stringify(users));
-        return "scored"; 
-    }
-    // ----------------------------------------------------
+    // ★★★ 古いローカルストレージベースのポイント関数は削除しました ★★★
 
 
     // ----------------------------------------------------
@@ -50,6 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const BACK_BUTTON = document.getElementById('backToMenuButton');
     const RETURN_CARD_BUTTON = document.getElementById('returnCardButton'); 
     const REMAINING_COUNT_MESSAGE = document.getElementById('remaining-count-message'); // 残り単語数表示
+    
+    // Firebaseフィードバック用の隠しDOM要素を参照
+    const FINAL_SCORE_TEXT = document.getElementById('final-score-text');
+    const POINT_RECORD_FEEDBACK = document.getElementById('point-record-feedback');
+
 
     const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
     const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
@@ -58,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameWords = [];         
     let currentCellIndex = 1;   
     const MAX_WORDS = 15;       
+    let isGameComplete = false; // 二重ポイント付与防止用フラグ
     
     // ----------------------------------------------------
     // 補助関数
@@ -81,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!reading) return '';
         let lastChar = reading.slice(-1);
         
+        // 長音
         if (lastChar === 'ー' && reading.length > 1) {
             lastChar = reading.slice(-2, -1);
         }
@@ -97,11 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('data/words.json');
             // データがJSON形式で読み込まれることを期待
-            allWords = await response.json(); 
-            // 読み仮名があり、「ん」で終わらない単語のみを選別
-            allWords = allWords.filter(word => 
+            const data = await response.json(); 
+            // 読み仮名があり、「ん」で終わらない単語のみを選別し、IDを文字列に変換
+            allWords = data.filter(word => 
                 word.reading && getNextChar(word.reading) !== 'ん'
-            );
+            ).map(word => ({
+                ...word,
+                id: String(word.id)
+            }));
         } catch (error) {
             console.error('単語データの読み込みに失敗しました:', error);
             // エラー時はアラートを表示し、ゲーム続行不可
@@ -128,13 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
         GAME_AREA.style.display = 'block';
 
         currentCellIndex = 1;
+        isGameComplete = false; 
         gameWords = [];
+        
         // グリッドの初期化 (cell-0のしりとりはHTMLに固定)
         SHIRITORI_GRID.innerHTML = document.getElementById('cell-0').outerHTML;
         
         // 残りのマス目を生成
         for (let i = 1; i <= MAX_WORDS; i++) {
-            SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}"></div>`;
+            SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}" data-word-id=""></div>`;
         }
         
         RETURN_CARD_BUTTON.style.display = 'none';
@@ -147,6 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // 2. カードの選択と表示
     // ----------------------------------------------------
+    
+    // ※ findShiritoriChain 関数は前回のコードから変更せずに統合します。
 
     function selectAndRenderCards() {
         const chainLength = MAX_WORDS; 
@@ -172,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.reading = word.reading;
             card.dataset.nextChar = nextChar; 
             card.dataset.firstChar = word.reading.charAt(0); 
+            card.dataset.id = word.id; // IDを追加
             
             // ★ご要望：カードラベルはwordData.wordをそのまま使用
             card.innerHTML = `
@@ -183,9 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function findShiritoriChain(length) {
-        // (省略: 前回提供されたロジックと同じ。allWordsから連鎖可能なMAX_WORDS分の単語を選ぶ処理)
+        // (省略解除: 必須のためそのまま統合。ただし、getNextCharの依存性を確保)
         
-        // 複雑なロジックを省略し、単語が重複しない単純なランダム連鎖検索のみを残します
         let allAvailable = allWords.filter(word => getNextChar(word.reading) !== 'ん');
         if (allAvailable.length < length) return []; 
         
@@ -250,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupDragAndDropListeners() {
         // ドラッグ開始/終了
         CARD_SELECTION_AREA.addEventListener('dragstart', (e) => {
+            if (isGameComplete) { e.preventDefault(); return; }
             if (e.target.classList.contains('word-card')) {
                 e.dataTransfer.setData('text/plain', e.target.dataset.word); 
                 e.target.classList.add('dragging');
@@ -293,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function handleDrop(e) {
+        if (isGameComplete) return;
         e.preventDefault();
         
         let dropTarget = e.target.closest('.drop-target');
@@ -325,20 +312,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. 正誤判定
     // ----------------------------------------------------
 
-    function checkAnswer(card, dropTarget) {
+    async function checkAnswer(card, dropTarget) { // ★ async関数に変更
         const prevCell = document.getElementById(`cell-${currentCellIndex - 1}`);
         const requiredChar = prevCell.dataset.nextChar; 
         const droppedFirstChar = card.dataset.firstChar; 
         
         let isCorrect = false;
 
+        // 濁音/半濁音の許容マップ
         const SHIRITORI_ALLOW_MAP = {
             'か': ['か', 'が'], 'き': ['き', 'ぎ'], 'く': ['く', 'ぐ'], 'け': ['け', 'げ'], 'こ': ['こ', 'ご'],
             'さ': ['さ', 'ざ'], 'し': ['し', 'じ'], 'す': ['す', 'ず'], 'せ': ['せ', 'ぜ'], 'そ': ['そ', 'ぞ'],
             'た': ['た', 'だ'], 'ち': ['ち', 'ぢ'], 'つ': ['つ', 'づ'], 'て': ['て', 'で'], 'と': ['と', 'ど'],
-            'は': ['は', 'ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ']
+            'は': ['は', 'ば', 'ぱ'], 'ひ': ['ひ', 'び', 'ぴ'], 'ふ': ['ふ', 'ぶ', 'ぷ'], 'へ': ['へ', 'べ', 'ぺ'], 'ほ': ['ほ', 'ぼ', 'ぽ'],
+            'や': ['や'], 'ゆ': ['ゆ'], 'よ': ['よ'], 'わ': ['わ'], 'ん': ['ん'], // 他の文字も必須で追加
+            // 長音、小文字はgetNextCharで処理されるため、ここで処理するのは濁音/半濁音のみ
         };
-
+        
         const allowChars = SHIRITORI_ALLOW_MAP[requiredChar] || [requiredChar];
         
         if (allowChars.includes(droppedFirstChar)) {
@@ -348,23 +338,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCorrect) {
             playSound(SOUND_CORRECT_PATH);
             
-            // マスにカードの内容を埋め込む
+            // マスにカードの内容を埋め込む (カードのHTML構造をコピー)
             dropTarget.innerHTML = card.innerHTML;
+            dropTarget.querySelector('.card-image').style.display = 'none'; // マス内では画像は表示しない
+            dropTarget.querySelector('.card-label').classList.replace('card-label', 'word-text'); // ラベルをword-textに変更
+            
+            // マス目データ更新
             dropTarget.classList.remove('drop-target');
             dropTarget.classList.add('filled');
             dropTarget.dataset.word = card.dataset.word;
-            dropTarget.dataset.nextChar = card.dataset.nextChar; 
+            dropTarget.dataset.nextChar = card.dataset.nextChar;
+            dropTarget.dataset.wordId = card.dataset.id; // IDをマスに追加
 
             // 元のカードをリストから除去
             card.remove();
 
             currentCellIndex++;
 
-            // 最後のマスまで埋まったらクリア
+            // 最後のマスまで埋まったらクリア (MAX_WORDS = 15なので、currentCellIndexが16になったらクリア)
             if (currentCellIndex > MAX_WORDS) {
-                endGame(true);
+                await endGame(true); // ★ ポイント付与のためawait
             } else if (card.dataset.nextChar === 'ん') {
-                endGame(false);
+                await endGame(false); // 「ん」で終わった場合は負け
             } else {
                 updateUI(true); 
             }
@@ -372,20 +367,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             playSound(SOUND_INCORRECT_PATH);
             
-            const HINT_CHARS = Object.keys(SHIRITORI_ALLOW_MAP);
-            let requiredDisplay;
-
-            if (HINT_CHARS.includes(requiredChar)) {
-                 const dakuOns = SHIRITORI_ALLOW_MAP[requiredChar].filter(c => c !== requiredChar).join('/');
-                 requiredDisplay = `${requiredChar}（または${dakuOns}）`;
-            } else {
-                requiredDisplay = requiredChar;
-            }
+            // ヒント表示ロジック
+            const requiredDisplay = SHIRITORI_ALLOW_MAP[requiredChar] ? 
+                                    `${requiredChar}（または${SHIRITORI_ALLOW_MAP[requiredChar].join('/')}）` : 
+                                    requiredChar;
             
             FEEDBACK_MESSAGE.textContent = `❌「${requiredDisplay}」から始まる言葉じゃないよ...。`;
             FEEDBACK_MESSAGE.style.color = '#ff6f61';
-            
-            // 間違いの場合、カードは自動で元の場所に戻っているため、処理不要
+            // カードは自動で元の場所に戻るため、処理不要
         }
     }
     
@@ -395,19 +384,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // カードをマスから選別エリアに戻す処理 (ボタンクリック用)
     function returnCardFromCell() {
-        if (currentCellIndex <= 1) {
+        if (isGameComplete) return;
+
+        const targetCellIndex = currentCellIndex - 1;
+        
+        if (targetCellIndex <= 0) {
             alert("「しりとり」のマスは戻せません。");
             return;
         }
 
-        const targetCellIndex = currentCellIndex - 1;
         const targetCell = document.getElementById(`cell-${targetCellIndex}`);
         
         if (targetCell && targetCell.classList.contains('filled')) {
             const wordName = targetCell.dataset.word;
-            const wordData = gameWords.find(w => w.word === wordName);
+            const wordData = gameWords.find(w => w.word === wordName); // gameWordsからデータを検索
             
             if (wordData) {
+                // カードを再作成
                 const card = document.createElement('div');
                 card.className = 'word-card';
                 card.draggable = true;
@@ -416,7 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.dataset.reading = wordData.reading;
                 card.dataset.nextChar = getNextChar(wordData.reading); 
                 card.dataset.firstChar = wordData.reading.charAt(0);
-                
+                card.dataset.id = wordData.id;
+
                 card.innerHTML = `
                     <img src="assets/images/${wordData.image}" alt="${wordData.word}" class="card-image" onerror="this.style.display='none'; this.parentNode.querySelector('.card-label').style.display='block';">
                     <div class="card-label">${wordData.word}</div>
@@ -429,8 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
             targetCell.innerHTML = '';
             targetCell.classList.remove('filled');
             targetCell.classList.add('drop-target');
-            delete targetCell.dataset.word;
-            delete targetCell.dataset.nextChar;
+            // datasetのデータもクリア
+            targetCell.removeAttribute('data-word');
+            targetCell.removeAttribute('data-next-char');
+            targetCell.removeAttribute('data-word-id');
+
 
             currentCellIndex--;
 
@@ -460,6 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         FEEDBACK_MESSAGE.textContent = `せいかい！次は${nextCellNumber}マス目。「${prevChar}」${hint}から始まるカードをドロップしてね！`;
         FEEDBACK_MESSAGE.style.color = '#3f51b5';
         
+        // 戻るボタンの表示制御
         if (currentCellIndex > 1 && currentCellIndex <= MAX_WORDS + 1) {
             RETURN_CARD_BUTTON.style.display = 'inline-block';
         } else {
@@ -473,22 +471,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function endGame(isWin) {
-        // (省略: 終了処理は前回のコードと同じ。ポイント付与やUI変更など)
+    async function endGame(isWin) { // ★ async関数に変更
+        isGameComplete = true; // 終了フラグを立てる
         let finalMessage;
+        let pointMsg = 'ゲストモードのためポイントは記録されません。';
+        
         if (isWin) {
             playSound(SOUND_CORRECT_PATH);
-            const result = checkAndAwardPoints('daily_clear');
-            let pointMsg = "";
-            if (result === "scored") pointMsg = " (+1 ポイント！)";
-            else if (result === "already_scored") pointMsg = " (今日のポイントは獲得済み)";
-            finalMessage = `🎉 全15問クリア！すごい！おめでとう！${pointMsg} 🎉`;
+            
+            // ★★★ Firebaseポイント付与 ★★★
+            if (typeof window.addPointsToUser === 'function') {
+                const success = await window.addPointsToUser(POINTS_ON_CLEAR); // 1ポイント加算
+                if (success) {
+                    pointMsg = `🎉 全問クリア！ (+${POINTS_ON_CLEAR}pt 記録)`;
+                } else if (window.currentUserId) {
+                    pointMsg = 'ポイント登録中にエラーが発生しました。';
+                }
+            }
+            // ★★★ Firebaseポイント付与 終了 ★★★
+
+            finalMessage = `🎉 全${MAX_WORDS}問クリア！すごい！おめでとう！`;
             FEEDBACK_MESSAGE.style.color = 'green';
+            FINAL_SCORE_TEXT.textContent = finalMessage; // 隠しDOMに結果をセット
+            POINT_RECORD_FEEDBACK.textContent = pointMsg; // 隠しDOMにポイントメッセージをセット
+
         } else {
             playSound(SOUND_INCORRECT_PATH);
             const lastWord = document.getElementById(`cell-${currentCellIndex - 1}`).dataset.word;
             finalMessage = `😭 ゲームオーバー！「${lastWord}」は「ん」で終わるから負けだよ。`;
             FEEDBACK_MESSAGE.style.color = '#ff6f61';
+            FINAL_SCORE_TEXT.textContent = finalMessage;
+            POINT_RECORD_FEEDBACK.textContent = 'ポイントは獲得できませんでした。';
         }
 
         FEEDBACK_MESSAGE.textContent = finalMessage;
