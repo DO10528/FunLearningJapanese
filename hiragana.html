@@ -6,7 +6,6 @@
     <title>ひらがな単語ゲーム - FunLearnJP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS を読み込みます (ランキングパネル用) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -150,7 +149,6 @@
 
     <div class="main-container">
         
-        <!-- メニュー画面 -->
         <div id="quiz-menu-area" class="pop-in">
             <div class="quiz-card">
                 <i class="fa-solid fa-shapes menu-icon"></i>
@@ -160,7 +158,6 @@
                     <div id="quiz-score-message">
                         ぜんぶで <strong>10もん</strong> あるよ。<br>がんばって クリアしよう！
                     </div>
-                    <!-- 認証ステータス表示エリアを追加 -->
                     <div id="auth-status" class="mt-3 text-sm font-medium text-indigo-700">認証中...</div>
                 </div>
                 <button id="quizStartButton" class="start-btn" onclick="game.start()">
@@ -170,7 +167,6 @@
             </div>
         </div>
 
-        <!-- ゲーム画面 -->
         <div id="quiz-game-area" style="display:none;" class="pop-in">
             <div class="score-board">
                 <span id="quiz-turn-message">問 1 / 10</span>
@@ -178,12 +174,10 @@
             </div>
             <div class="quiz-card">
                 <div id="quiz-image-area" class="image-frame">
-                    <!-- 画像がここに入ります -->
-                </div>
+                    </div>
                 <h3 id="quiz-question-text" class="question-text">このイラストはどれかな？</h3>
                 <div id="choice-buttons-area" class="choices-grid">
-                    <!-- ボタンがここに入ります -->
-                </div>
+                    </div>
                 <p id="quiz-feedback" class="feedback-area"></p>
                 <div style="margin-top: 10px;">
                     <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
@@ -193,14 +187,11 @@
 
     </div>
 
-    <!-- ★★★ リアルタイムランキング表示パネルをゲーム画面の外に追加 ★★★ -->
     <div id="ranking-panel" class="w-full max-w-xs bg-white rounded-xl shadow-2xl p-4 transition-transform duration-300 transform">
         
-        <!-- 初期化中のローディングオーバーレイ -->
         <div id="loading-overlay" class="rounded-xl">
             <div class="text-lg font-semibold text-gray-700">
                 <svg class="animate-spin h-5 w-5 mr-3 inline text-indigo-500" viewBox="0 0 24 24">
-                    <!-- SVG for spinner -->
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -210,39 +201,31 @@
 
         <h2 class="text-xl font-bold mb-3 text-indigo-700 border-b pb-2">🏆 リアルタイムランキング</h2>
         
-        <!-- ユーザー自身のスコア表示エリア -->
         <div id="my-score-card" class="bg-indigo-50 p-3 rounded-lg border border-indigo-200 mb-4 shadow-sm">
             <p class="text-sm font-medium text-indigo-600">あなたのハイスコア: <span id="my-current-score" class="font-bold text-lg ml-2">---</span></p>
             <p class="text-xs text-indigo-400 mt-1">ユーザーID: <span id="user-id-display">読み込み中...</span></p>
         </div>
 
-        <!-- ランキングリスト -->
         <ul id="leaderboard-list" class="space-y-2">
-            <!-- ランキングアイテムがここに入ります -->
             <li class="text-gray-500">ランキングデータがありません。</li>
         </ul>
     </div>
 
-    <!-- 音声ファイル -->
     <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
     <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
     <audio id="snd-fanfare" src="assets/sounds/fanfare.mp3"></audio>
 
-<!-- ★★★ Firebase & ゲームロジック ★★★ -->
 <script type="module">
+    // =========================================================
+    // ★★★ Firebaseのインポートと初期化 ★★★
+    // =========================================================
     // Firebase SDKのインポート
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, collection, query, onSnapshot, orderBy, limit, serverTimestamp, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, collection, query, onSnapshot, orderBy, limit, serverTimestamp, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
-    // Firestoreのデバッグログを有効にする
-    setLogLevel('debug');
-
-    // ★★★ グローバル変数とFirebase初期化 ★★★
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    // 既存のFirebase設定を優先し、グローバル設定があればそれをパース
-    const defaultFirebaseConfig = {
+    // ★★★ あなたのFirebase Config (index.htmlと同じものをコピー) ★★★
+    const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
       projectId: "funlearningjapanese-b8e08",
@@ -251,15 +234,13 @@
       appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
       measurementId: "G-LCMXVLPS81"
     };
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(defaultFirebaseConfig));
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
     let app = null;
     let auth = null;
     let db = null;
     let currentUserId = null;
     let userDisplayName = null;
-    const LEADERBOARD_COLLECTION_PATH = `/artifacts/${appId}/public/data/leaderboard`;
+    const LEADERBOARD_COLLECTION_PATH = "users"; // ★★★ index.htmlの 'users' コレクションを使用する ★★★
 
     // ランキングUI要素
     const authStatusEl = document.getElementById('auth-status');
@@ -271,7 +252,6 @@
     let isConfigValid = true;
 
     if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
-        console.error("Firebaseの設定情報が利用できません。");
         if(authStatusEl) authStatusEl.textContent = 'エラー: Firebase設定がありません。';
         if(loadingOverlayEl) loadingOverlayEl.style.display = 'none';
         isConfigValid = false;
@@ -282,9 +262,7 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            initializeAuth(); // 認証プロセス開始
         } catch (error) {
-            console.error("Firebase初期化中に予期せぬエラー:", error);
             if(authStatusEl) authStatusEl.textContent = `致命的なエラー: ${error.message}`;
             if(loadingOverlayEl) loadingOverlayEl.style.display = 'none';
             isConfigValid = false;
@@ -292,63 +270,17 @@
     }
 
     /**
-     * 認証を初期化し、ユーザー情報を設定します。
-     * await キーワードを追加し、処理が確実に完了するのを待つように修正しました。
-     */
-    async function initializeAuth() {
-        if (!isConfigValid) return;
-        try {
-            // setPersistenceは非同期なのでawaitを追加
-            await setPersistence(auth, browserSessionPersistence); 
-            
-            if (initialAuthToken) {
-                // signInWithCustomTokenは非同期なのでawaitを追加
-                await signInWithCustomToken(auth, initialAuthToken); 
-                console.log("カスタムトークンでサインインしました。");
-            } else {
-                // signInAnonymouslyは非同期なのでawaitを追加
-                await signInAnonymously(auth); 
-                console.log("匿名でサインインしました。");
-            }
-        } catch (error) {
-            console.error("Firebase認証エラー:", error);
-            // エラーが発生した場合、UIにも表示
-            if(authStatusEl) authStatusEl.textContent = `認証エラー: ${error.message}`;
-        }
-    }
-
-    onAuthStateChanged(auth, (user) => {
-        // userがnull（ログアウト状態）の場合でも安全に処理できるようにチェックを強化
-        if (user) {
-            currentUserId = user.uid;
-            // ユーザー名をユニークなIDの一部から作成
-            userDisplayName = `Player_${user.uid.substring(0, 4)}`; 
-            if(userIdDisplayEl) userIdDisplayEl.textContent = user.uid;
-            if(authStatusEl) authStatusEl.textContent = `✅ 認証済み: ${userDisplayName}`;
-            
-            startLeaderboardListener();
-        } else {
-            currentUserId = null;
-            userDisplayName = null;
-            if(userIdDisplayEl) userIdDisplayEl.textContent = '未認証';
-            if(authStatusEl) authStatusEl.textContent = '❌ 未認証';
-            // ログアウト状態でもロード画面を隠す
-        }
-        if(loadingOverlayEl) loadingOverlayEl.style.display = 'none'; 
-    });
-
-
-    /**
      * リアルタイムランキングのリスナーを開始します。
+     * ★★★ Firestoreの'users'コレクションを使用するように修正 ★★★
      */
     function startLeaderboardListener() {
-        if (!currentUserId || !db) return;
+        if (!db) return;
 
-        // インデックスエラー回避のため、scoreのみで並べ替えます。
+        // scoreの代わりにpointsを使用し、limit(5)で表示
         const leaderboardQuery = query(
             collection(db, LEADERBOARD_COLLECTION_PATH),
-            orderBy('score', 'desc'),
-            limit(10)
+            orderBy('points', 'desc'), // index.htmlの'points'フィールドを使用
+            limit(5)
         );
 
         onSnapshot(leaderboardQuery, (snapshot) => {
@@ -365,7 +297,11 @@
             snapshot.forEach((docSnap, index) => {
                 const data = docSnap.data();
                 const rank = index + 1;
-                const isCurrentUser = data.userId === currentUserId;
+                const score = data.points || 0;
+                const name = data.displayName || 'UnknownUser';
+                
+                // ドキュメントID (UID) が現在のユーザーと一致するかチェック
+                const isCurrentUser = docSnap.id === currentUserId;
 
                 if (isCurrentUser) {
                     myRank = rank;
@@ -376,12 +312,12 @@
                     : 'bg-white border-gray-200';
                 
                 const rankText = `<span class="font-extrabold w-6 text-center">${rank}.</span>`;
-                const scoreText = `<span class="text-lg text-indigo-600 ml-auto">${data.score.toLocaleString()}</span>`;
+                const scoreText = `<span class="text-lg text-indigo-600 ml-auto">${score.toLocaleString()} Pt</span>`;
                 
                 const listItem = `
                     <li class="flex items-center p-2 rounded-lg border shadow-sm ${itemClass}">
                         ${rankText}
-                        <span class="ml-2 truncate">${data.username}</span>
+                        <span class="ml-2 truncate">${name}</span>
                         ${scoreText}
                     </li>
                 `;
@@ -393,52 +329,54 @@
             getDoc(myDocRef).then(myDocSnap => {
                 if (!myCurrentScoreEl) return;
                 if (myDocSnap.exists()) {
-                    myCurrentScoreEl.textContent = `${myDocSnap.data().score.toLocaleString()} (現在の順位: ${myRank !== -1 ? myRank : '圏外'})`;
+                    const score = myDocSnap.data().points || 0;
+                    myCurrentScoreEl.textContent = `${score.toLocaleString()} Pt (順位: ${myRank !== -1 ? myRank : '圏外'})`;
                 } else {
                     myCurrentScoreEl.textContent = 'スコア未登録';
                 }
             }).catch(e => console.error("自分のスコア取得エラー:", e));
 
-        }, (error) => {
-            console.error("ランキングデータ取得エラー:", error);
-            if(leaderboardListEl) leaderboardListEl.innerHTML = '<li class="text-red-500 p-2">データの読み込み中にエラーが発生しました。</li>';
         });
     }
 
     /**
      * ユーザーのスコアをFirestoreに送信し、ハイスコアを更新します。
-     * @param {number} finalScore - 今回のゲームで獲得したスコア（ハイスコアではない）。
+     * ★★★ index.htmlの'users'コレクションの'points'を更新するように修正 ★★★
+     * @param {number} finalScore - 今回のゲームで獲得した最終スコア。
      */
     async function submitScore(finalScore) {
         if (!currentUserId || !db) {
-            console.error("ユーザーが認証されていないか、DBが初期化されていません。スコアは送信されません。");
+            // ログインしていない場合はスキップ
+            console.warn("ユーザーが認証されていないか、DBが初期化されていません。スコアは送信されません。");
             return;
         }
 
-        const docRef = doc(db, LEADERBOARD_COLLECTION_PATH, currentUserId);
+        const docRef = doc(db, "users", currentUserId);
         
-        // トランザクションを使用して、既存のスコアよりも高い場合にのみ更新を保証
+        // トランザクションを使用して、既存のハイスコアよりも高い場合にのみ更新を保証
         try {
             await runTransaction(db, async (transaction) => {
                 const docSnap = await transaction.get(docRef);
 
                 // 既存のハイスコア (ない場合は0)
-                const currentHighScore = docSnap.exists() ? docSnap.data().score : 0;
+                // index.htmlのダッシュボードで使われている'points'フィールドを使用
+                const currentHighScore = docSnap.exists() ? docSnap.data().points : 0; 
+                const displayName = docSnap.exists() ? docSnap.data().displayName : userDisplayName;
 
                 if (finalScore > currentHighScore) {
-                    transaction.set(docRef, {
-                        userId: currentUserId,
-                        username: userDisplayName,
-                        score: finalScore,
-                        updatedAt: serverTimestamp(), // 最終更新日時
+                    transaction.update(docRef, {
+                        points: finalScore, // 今回のスコアをハイスコアとして上書き
+                        updatedAt: serverTimestamp(), 
+                        displayName: displayName // 名前を維持
                     });
                     console.log(`ハイスコアを更新しました: ${finalScore}`);
                 } else if (!docSnap.exists()) {
-                     // 初回登録
+                     // 念のため、データがない場合の初回登録（index.htmlのロジックが優先されるが、安全策として）
                      transaction.set(docRef, {
                         userId: currentUserId,
-                        username: userDisplayName,
-                        score: finalScore,
+                        displayName: displayName,
+                        points: finalScore,
+                        streak: 1, // ストリーク初期値も設定
                         updatedAt: serverTimestamp(),
                     });
                      console.log(`初回スコアを登録しました: ${finalScore}`);
@@ -448,11 +386,53 @@
             });
         } catch (error) {
             console.error("スコア送信エラー:", error);
+            // 権限エラーの場合、ユーザーに知らせる
+            if (error.code === 'permission-denied') {
+                alert('スコアの登録に失敗しました。Firestoreのセキュリティルールが正しく設定されているか確認してください。');
+            }
         }
     }
-    // --------------------------------------------------
-    // ゲームデータ (画像はassets/images/にある前提)
-    // --------------------------------------------------
+
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUserId = user.uid;
+            
+            // index.htmlの'users'コレクションから displayNameを取得
+            const userDocSnap = await getDoc(doc(db, "users", currentUserId));
+            if (userDocSnap.exists()) {
+                userDisplayName = userDocSnap.data().displayName || `Player_${user.uid.substring(0, 4)}`;
+            } else {
+                // index.htmlでデータが自動生成されなかった場合
+                userDisplayName = `Player_${user.uid.substring(0, 4)}`; 
+            }
+            
+            if(userIdDisplayEl) userIdDisplayEl.textContent = userDisplayName;
+            if(authStatusEl) authStatusEl.textContent = `✅ 認証済み: ${userDisplayName}`;
+            
+            startLeaderboardListener();
+        } else {
+            currentUserId = null;
+            userDisplayName = 'ゲスト';
+            if(userIdDisplayEl) userIdDisplayEl.textContent = 'ゲスト (スコア登録不可)';
+            if(authStatusEl) authStatusEl.textContent = '❌ ゲストモード';
+            if(myCurrentScoreEl) myCurrentScoreEl.textContent = 'ログインが必要です';
+        }
+        if(loadingOverlayEl) loadingOverlayEl.style.display = 'none'; 
+    });
+
+    // =========================================================
+    // ゲームデータとロジック (変更なし)
+    // =========================================================
+
+    const QUESTIONS = [
+        { id: 'ahiru', img: 'assets/images/ahiru.png', ans: 'あひる', wrong: ['あり', 'うし', 'あめ'] },
+        // ... (中略: QUESTIONSデータは元のまま)
+        { id: 'yubiwa', img: 'assets/images/yubiwa.png', ans: 'ゆびわ', wrong: ['くつ', 'ふく', 'ぼうし'] },
+    ];
+    //... (元のQUESTIONSデータ全体を貼り付けてください)
+
+    // QUESTIONSデータは長いため、元のコードの通りに全て貼り付けてください
     const QUESTIONS = [
         { id: 'ahiru', img: 'assets/images/ahiru.png', ans: 'あひる', wrong: ['あり', 'うし', 'あめ'] },
         { id: 'ajisai', img: 'assets/images/ajisai.png', ans: 'あじさい', wrong: ['さくら', 'ひまわり', 'ゆり'] },
@@ -592,7 +572,7 @@
     ];
 
     // --------------------------------------------------
-    // ゲームロジッククラス
+    // ゲームロジッククラス (変更なし)
     // --------------------------------------------------
     class HiraganaGame {
         constructor() {
@@ -641,7 +621,6 @@
             const q = this.questions[this.currentQIndex];
 
             // 画像表示 (画像パスとエラー処理を修正し、ユーザーが送ったHTML断片の形は使用しないようにしました)
-            // このロジックは、以前のコードで既に含まれており、正常に動作します。
             const img = new Image();
             img.src = q.img;
             // エラー時のフォールバック画像
@@ -732,6 +711,7 @@
             // ゲームの最終スコア (1問10点×10問で最大100点) をそのまま送信
             const finalScore = this.score;
             if (finalScore > 0) {
+                 // 修正後の submitScore 関数を呼び出す
                  await submitScore(finalScore); 
                  this.feedback.innerHTML += '<br><span style="font-size:0.8em; color:#666;">ハイスコアをランキングに反映しました！</span>';
             } else {
