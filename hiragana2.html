@@ -835,7 +835,7 @@
                 this.sndCorrect.currentTime = 0; this.sndCorrect.play().catch(e=>{});
                 this.feedback.textContent = 'せいかい！';
                 this.feedback.style.color = 'var(--correct-color)';
-                this.score += 10;
+                this.score += 1;
                 this.scoreVal.textContent = this.score;
 
                 setTimeout(() => {
