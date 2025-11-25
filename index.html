@@ -473,8 +473,18 @@
                 const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
                 
                 const li = document.createElement('li');
+                // 安全なHTML生成
                 li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
-                li.innerHTML = `<span>${icon} ${name}</span> <span style="color:#f0ad4e;">${pt}pt</span>`;
+                
+                const leftSpan = document.createElement('span');
+                leftSpan.textContent = `${icon} ${name}`;
+                
+                const rightSpan = document.createElement('span');
+                rightSpan.style.color = "#f0ad4e";
+                rightSpan.textContent = `${pt}pt`;
+                
+                li.appendChild(leftSpan);
+                li.appendChild(rightSpan);
                 list.appendChild(li);
                 rank++;
             });
@@ -512,25 +522,35 @@
     document.getElementById('modal-close').onclick = () => window.closeAuthModal();
     document.getElementById('modal-submit').onclick = () => window.submitAuth();
 
+    // ログイン入力でのEnterキー対応
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') window.submitAuth();
+    };
+    document.getElementById('auth-email').onkeydown = handleEnter;
+    document.getElementById('auth-pass').onkeydown = handleEnter;
+    document.getElementById('auth-display-name').onkeydown = handleEnter;
+
     // ゲームカテゴリ表示 (既存ロジックを維持)
     window.renderGameCategories(); 
 </script>
 
 <script>
-    const i18nData = { /* ... 既存のi18nData */
+    const i18nData = {
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", group_game: "ゲーム",
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
-            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし",cat_sentence: "ぶんしょう"
+            cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
+            cat_practice: "じっせん" // ★追加
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
             group_kiso: "Basics", group_game: "Games",
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
-            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs",cat_sentence: "Sentence"
+            cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
+            cat_practice: "Practice" // ★追加
         }
     };
 
@@ -574,6 +594,9 @@
             { url: "particle_sorter.html", title: "助詞・仕分け道場", icon: "fa-solid fa-filter" },
             { url: "particle_quiz.html", title: "てにをはマスター", icon: "fa-solid fa-filter" },
             { url: "sentence_puzzle.html", title: "ぶんづくり", icon: "fa-solid fa-layer-group" }
+        ]},
+        { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ // ★追加
+            { url: "shopping_talk.html", title: "お買い物トーク", icon: "fa-solid fa-cart-shopping" }
         ]}
     ];
 

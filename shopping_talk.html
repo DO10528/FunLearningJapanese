@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>実戦！お買い物トーク - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- メインindex.htmlと共通のデザイン定義 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 50px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+    /* メインコンテナ */
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column;
+    }
+
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- メニューグリッド --- */
+    .menu-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    .scenario-card {
+        background: white; border-radius: 20px; padding: 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        border: 2px solid transparent; transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scenario-card:hover { transform: translateY(-3px); }
+    .scenario-card:active { transform: scale(0.98); }
+    .card-icon { font-size: 2.5em; margin-bottom: 5px; }
+    .card-title { font-weight: 800; font-size: 1.1em; color: #555; }
+
+    /* --- 練習リスト --- */
+    .practice-list {
+        display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;
+    }
+    .practice-item {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--primary);
+    }
+    .practice-row {
+        display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+    }
+    .role-badge {
+        font-size: 0.7em; padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; width: 60px; text-align: center; flex-shrink: 0;
+    }
+    .badge-clerk { background: #90a4ae; }
+    .badge-you { background: var(--primary); }
+    
+    .text-content { flex-grow: 1; }
+    .text-jp { font-weight: bold; font-size: 1.1em; color: #333; }
+    .text-en { font-size: 0.9em; color: #888; margin-top: 2px; }
+    
+    .play-btn-mini {
+        background: none; border: 1px solid #ddd; color: var(--primary);
+        width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
+        display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+    }
+    .play-btn-mini:hover { background: #e3f2fd; }
+
+    /* --- シミュレーション画面 --- */
+    .sim-header {
+        text-align: center; margin-bottom: 20px;
+        background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px;
+    }
+    
+    /* 店員エリア */
+    .clerk-area { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 30px; }
+    .clerk-icon {
+        width: 70px; height: 70px; background: white; border-radius: 50%;
+        border: 3px solid var(--accent); display: flex; justify-content: center; align-items: center;
+        font-size: 2em; color: var(--accent); flex-shrink: 0;
+    }
+    .speech-bubble {
+        background: white; padding: 20px; border-radius: 20px; border-top-left-radius: 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; flex-grow: 1;
+    }
+    
+    /* 選択肢 */
+    .option-btn {
+        width: 100%; padding: 15px; margin-bottom: 12px;
+        background: white; border: 2px solid #e0e0e0; border-radius: 15px;
+        font-size: 1.1em; font-weight: bold; color: #555;
+        cursor: pointer; text-align: left; transition: all 0.2s;
+        box-shadow: 0 4px 0 #eee;
+    }
+    .option-btn:active { transform: translateY(3px); box-shadow: none; }
+    .option-btn.correct { background: #e8f5e9; border-color: var(--correct-color); color: var(--correct-color); }
+    .option-btn.incorrect { background: #ffebee; border-color: var(--incorrect-color); color: var(--incorrect-color); }
+
+    /* フィードバック */
+    .feedback-area {
+        background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 20px;
+        text-align: center; border: 2px solid #ffe082; display: none; animation: popIn 0.3s;
+    }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* 共通ボタン */
+    .action-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 12px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1em;
+        cursor: pointer; box-shadow: 0 4px 0 #3949ab; width: 100%; max-width: 300px;
+        margin: 10px auto; display: block; text-align: center;
+    }
+    .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    .btn-secondary { background: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+    <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+</header>
+
+<div class="container">
+    <div id="auth-status">認証中...</div>
+
+    <div id="menu-screen" class="screen active">
+        <h2 style="text-align:center; color:#555;"><i class="fa-solid fa-store"></i> お店を選んでね</h2>
+        <div class="menu-grid">
+            <div class="scenario-card" onclick="loadScenario('konbini')" style="border-bottom: 4px solid #ffcc5c;">
+                <i class="fa-solid fa-store card-icon" style="color:#ffcc5c;"></i>
+                <span class="card-title">コンビニ</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('burger')" style="border-bottom: 4px solid #ef5350;">
+                <i class="fa-solid fa-burger card-icon" style="color:#ef5350;"></i>
+                <span class="card-title">ハンバーガー</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('cafe')" style="border-bottom: 4px solid #8d6e63;">
+                <i class="fa-solid fa-mug-hot card-icon" style="color:#8d6e63;"></i>
+                <span class="card-title">カフェ</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('restaurant')" style="border-bottom: 4px solid #66bb6a;">
+                <i class="fa-solid fa-utensils card-icon" style="color:#66bb6a;"></i>
+                <span class="card-title">レストラン</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="practice-screen" class="screen">
+        <div class="sim-header">
+            <h2 id="practice-title" style="margin:0; color:var(--primary);"></h2>
+            <p style="margin:5px 0 0; font-size:0.9em; color:#777;">会話を練習しましょう！音声ボタンを押して聞いてみてね。</p>
+        </div>
+
+        <div id="practice-list" class="practice-list">
+            </div>
+
+        <button class="action-btn" onclick="startSimulation()">
+            <i class="fa-solid fa-gamepad"></i> ゲームスタート！
+        </button>
+        <button class="action-btn btn-secondary" onclick="showScreen('menu-screen')" style="margin-top:10px;">
+            もどる
+        </button>
+    </div>
+
+    <div id="sim-screen" class="screen">
+        <div class="sim-header">
+            Step <span id="step-count">1</span> / <span id="total-step">3</span>
+        </div>
+
+        <div class="clerk-area">
+            <div class="clerk-icon"><i class="fa-solid fa-user-tie"></i></div>
+            <div class="speech-bubble">
+                <div style="font-size:0.8em; color:#999; font-weight:bold; margin-bottom:5px;">店員 (Clerk)</div>
+                <div id="clerk-text-jp" style="font-size:1.2em; font-weight:bold; margin-bottom:5px;"></div>
+                <div id="clerk-text-en" style="font-size:0.9em; color:#888;"></div>
+                <button onclick="replayClerkVoice()" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-top:10px; font-weight:bold;">
+                    <i class="fa-solid fa-volume-high"></i> もう一度聞く
+                </button>
+            </div>
+        </div>
+
+        <div id="feedback-area" class="feedback-area">
+            <div id="fb-msg" style="font-weight:bold; font-size:1.1em; margin-bottom:5px;"></div>
+            <div id="fb-detail" style="font-size:0.9em; color:#666;"></div>
+            <button class="action-btn" onclick="nextStep()" style="margin-top:10px; width:auto; padding:8px 20px; font-size:1em;">次へ</button>
+        </div>
+
+        <div id="options-container"></div>
+    </div>
+
+    <div id="result-screen" class="screen" style="text-align:center; padding-top:40px;">
+        <i class="fa-solid fa-flag-checkered" style="font-size:4em; color:var(--primary);"></i>
+        <h2 style="color:var(--primary);">Clear!</h2>
+        <p style="font-size:1.2em;">お買い物できました！</p>
+        <div id="final-score" style="font-size:2em; font-weight:900; margin:20px 0; color:var(--accent); text-shadow: 1px 1px 0 #999;"></div>
+        
+        <button class="action-btn" onclick="location.reload()">メニューに戻る</button>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            authStatusEl.textContent = `✅ ログイン中`;
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = '❌ ゲストモード';
+        }
+    });
+
+    window.addPointsToUser = async function(points, scenarioId) { 
+        if (!window.currentUserId || points <= 0) return false;
+        try {
+            const userRef = doc(db, "users", window.currentUserId);
+            await updateDoc(userRef, { points: increment(points) });
+            return true;
+        } catch (e) {
+            console.error("ポイントエラー:", e);
+            return false;
+        }
+    }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const synth = window.speechSynthesis;
+    let voices = [];
+    
+    // 音声リスト読み込み待ち
+    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+    setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+    // --- シナリオデータ (日本語・英語 対応) ---
+    const scenarios = {
+        'konbini': {
+            name: "コンビニ (Convenience Store)",
+            steps: [
+                {
+                    clerk: { jp: "いらっしゃいませ。お弁当は温めますか？", en: "Welcome. Would you like your bento warmed up?" },
+                    correctAnswer: { jp: "はい、お願いします。", en: "Yes, please." },
+                    options: [
+                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true, fb: "丁寧な言い方です！ (Polite)" },
+                        { jp: "温めます。", en: "I will warm it.", correct: false, fb: "それだと自分が温めることになります。" },
+                        { jp: "いいえ、結構です。", en: "No, thank you.", correct: true, fb: "断る時はこれでOK！" }
+                    ]
+                },
+                {
+                    clerk: { jp: "ポイントカードはお持ちですか？", en: "Do you have a point card?" },
+                    correctAnswer: { jp: "はい、持っています。", en: "Yes, I have it." },
+                    options: [
+                        { jp: "はい、これです。", en: "Yes, here it is.", correct: true, fb: "スムーズです！" },
+                        { jp: "カードです。", en: "It is a card.", correct: false, fb: "会話として少し不自然です。" },
+                        { jp: "大丈夫です（＝ないです）。", en: "No, I'm fine.", correct: true, fb: "「持っていません」の意味で使えます。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "レジ袋はご利用ですか？", en: "Do you need a plastic bag?" },
+                    correctAnswer: { jp: "はい、お願いします。", en: "Yes, please." },
+                    options: [
+                        { jp: "はい、一枚お願いします。", en: "Yes, one please.", correct: true, fb: "Good!" },
+                        { jp: "いりません。", en: "I don't need it.", correct: true, fb: "はっきり伝えるのは良いことです。" },
+                        { jp: "袋があります。", en: "There is a bag.", correct: false, fb: "「持っています(I have)」ならOKですが..." }
+                    ]
+                }
+            ]
+        },
+        'burger': {
+            name: "ハンバーガー (Burger Shop)",
+            steps: [
+                {
+                    clerk: { jp: "いらっしゃいませ。店内でお召し上がりですか？", en: "Welcome. For here or to go?" },
+                    correctAnswer: { jp: "はい、店内で。", en: "For here, please." },
+                    options: [
+                        { jp: "はい、店内で。", en: "For here.", correct: true, fb: "お店で食べるならこれ！" },
+                        { jp: "持ち帰りで。", en: "To go.", correct: true, fb: "持って帰るならこれ！" },
+                        { jp: "食べます。", en: "I eat.", correct: false, fb: "どこで食べるか聞かれています。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "ご一緒にポテトはいかがですか？", en: "Would you like fries with that?" },
+                    correctAnswer: { jp: "じゃあ、お願いします。", en: "Yes, please." },
+                    options: [
+                        { jp: "お願いします。", en: "Please.", correct: true, fb: "セットにしましょう！" },
+                        { jp: "ポテトです。", en: "It is potato.", correct: false, fb: "不自然です。" },
+                        { jp: "いえ、大丈夫です。", en: "No, thanks.", correct: true, fb: "いらない時は丁寧に断りましょう。" }
+                    ]
+                }
+            ]
+        },
+        'cafe': {
+            name: "カフェ (Cafe)",
+            steps: [
+                {
+                    clerk: { jp: "ご注文をどうぞ。", en: "May I take your order?" },
+                    correctAnswer: { jp: "ホットコーヒーを一つ。", en: "One hot coffee, please." },
+                    options: [
+                        { jp: "ホットコーヒーをください。", en: "Hot coffee please.", correct: true, fb: "Good!" },
+                        { jp: "コーヒーがあります。", en: "There is coffee.", correct: false, fb: "注文になっていません。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "サイズはどうなさいますか？", en: "Which size would you like?" },
+                    correctAnswer: { jp: "Mサイズで。", en: "Medium size." },
+                    options: [
+                        { jp: "Mサイズでお願いします。", en: "Medium, please.", correct: true, fb: "わかりやすいです！" },
+                        { jp: "大きいです。", en: "It is big.", correct: false, fb: "Lサイズ(Large)のことかな？" }
+                    ]
+                }
+            ]
+        },
+        'restaurant': {
+            name: "レストラン (Restaurant)",
+            steps: [
+                {
+                    clerk: { jp: "何名様ですか？", en: "How many people?" },
+                    correctAnswer: { jp: "二人です。", en: "Two people." },
+                    options: [
+                        { jp: "二人です。", en: "Two.", correct: true, fb: "人数を言えましたね。" },
+                        { jp: "二つです。", en: "Two things.", correct: false, fb: "人の数え方は「ひとり、ふたり」です。" }
+                    ]
+                }
+            ]
+        }
+    };
+
+    let currentScenarioId = '';
+    let currentData = null;
+    let stepIndex = 0;
+    let score = 0;
+
+    // --- 画面操作 ---
+    window.showScreen = (id) => {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    // --- 音声再生 ---
+    window.speak = (text) => {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 1.0;
+        // 声の選択（日本語の音声を探す）
+        const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        if(jpVoice) utterThis.voice = jpVoice;
+        synth.speak(utterThis);
+    };
+
+    // --- 1. メニュー選択 → 練習画面ロード ---
+    window.loadScenario = (id) => {
+        currentScenarioId = id;
+        currentData = scenarios[id];
+        
+        // 練習リスト生成
+        const listEl = document.getElementById('practice-list');
+        listEl.innerHTML = '';
+        document.getElementById('practice-title').textContent = currentData.name;
+
+        currentData.steps.forEach((step, idx) => {
+            const div = document.createElement('div');
+            div.className = 'practice-item';
+            div.innerHTML = `
+                <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
+                <div class="practice-row">
+                    <div class="role-badge badge-clerk">店員</div>
+                    <div class="text-content">
+                        <div class="text-jp">${step.clerk.jp}</div>
+                        <div class="text-en">${step.clerk.en}</div>
+                    </div>
+                    <button class="play-btn-mini" onclick="speak('${step.clerk.jp}')"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+                <div class="practice-row">
+                    <div class="role-badge badge-you">あなた</div>
+                    <div class="text-content">
+                        <div class="text-jp" style="color:var(--primary);">${step.correctAnswer.jp}</div>
+                        <div class="text-en">${step.correctAnswer.en}</div>
+                    </div>
+                    <button class="play-btn-mini" onclick="speak('${step.correctAnswer.jp}')"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+            `;
+            listEl.appendChild(div);
+        });
+
+        window.showScreen('practice-screen');
+    };
+
+    // --- 2. シミュレーション開始 ---
+    window.startSimulation = () => {
+        stepIndex = 0;
+        score = 0;
+        document.getElementById('total-step').textContent = currentData.steps.length;
+        window.showScreen('sim-screen');
+        loadStep();
+    };
+
+    function loadStep() {
+        const step = currentData.steps[stepIndex];
+        document.getElementById('step-count').textContent = stepIndex + 1;
+        
+        // 店員
+        document.getElementById('clerk-text-jp').textContent = step.clerk.jp;
+        document.getElementById('clerk-text-en').textContent = step.clerk.en;
+        window.speak(step.clerk.jp);
+
+        // UIリセット
+        document.getElementById('feedback-area').style.display = 'none';
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        // 選択肢 (シャッフル)
+        const opts = [...step.options].sort(() => Math.random() - 0.5);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `
+                <div style="font-weight:bold;">${opt.jp}</div>
+                <div style="font-size:0.8em; font-weight:normal; opacity:0.8;">${opt.en}</div>
+            `;
+            btn.onclick = () => checkAnswer(opt, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    window.replayClerkVoice = () => {
+        const text = currentData.steps[stepIndex].clerk.jp;
+        window.speak(text);
+    };
+
+    async function checkAnswer(opt, btn) {
+        // ボタン無効化
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        
+        // フィードバック表示
+        const fbArea = document.getElementById('feedback-area');
+        const fbMsg = document.getElementById('fb-msg');
+        const fbDetail = document.getElementById('fb-detail');
+        
+        fbArea.style.display = 'block';
+        fbDetail.textContent = opt.fb;
+
+        if (opt.correct) {
+            btn.classList.add('correct');
+            fbMsg.textContent = "◎ Great!";
+            fbMsg.style.color = "green";
+            score++;
+            // Firebaseポイント
+            if(window.addPointsToUser) await window.addPointsToUser(1, currentScenarioId);
+        } else {
+            btn.classList.add('incorrect');
+            fbMsg.textContent = "△ Try again next time";
+            fbMsg.style.color = "#d32f2f";
+        }
+    }
+
+    window.nextStep = () => {
+        stepIndex++;
+        if (stepIndex < currentData.steps.length) {
+            loadStep();
+        } else {
+            // 結果画面
+            document.getElementById('final-score').textContent = `${score} / ${currentData.steps.length} Pts`;
+            window.showScreen('result-screen');
+        }
+    };
+
+});
+</script>
+</body>
+</html>
