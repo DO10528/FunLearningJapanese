@@ -9,302 +9,143 @@
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 共通設定 (V2デザイン - 修正版) --- */
+        /* --- 共通設定 --- */
         :root {
-            --primary: #5c7aff; /* Blue */
-            --accent: #ffcc5c;  /* Yellow */
+            --primary: #5c7aff;
+            --accent: #ffcc5c;
             --bg-color: #f4f7fc;
             --text-color: #333;
             --correct-color: #4caf50;
             --incorrect-color: #ef5350;
         }
 
-        /* ★重要: 全要素のサイズ計算を統一してズレを防ぐ */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; flex-direction: column;
+            overflow-x: hidden; width: 100%;
             touch-action: manipulation;
-            /* 横スクロール防止 */
-            overflow-x: hidden;
-            width: 100%;
         }
 
-        /* --- ヘッダー（V2統一デザイン） --- */
+        /* ヘッダー */
         header {
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-            color: white;
-            /* パディングをメインメニューと統一 */
-            padding: 15px 20px;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-            z-index: 100;
+            color: white; padding: 15px 20px; width: 100%;
+            box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
         }
         .header-container {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
+            max-width: 900px; margin: 0 auto; display: flex;
+            justify-content: space-between; align-items: center; width: 100%;
         }
-        .header-container h1 {
-            margin: 0;
-            font-size: 1.4em;
-            color: white;
-        }
+        .header-container h1 { margin: 0; font-size: 1.4em; color: white; }
         .home-link {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .home-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none; color: white; font-weight: bold;
+            padding: 5px 10px; border-radius: 5px; display: flex; align-items: center;
         }
         
-        /* --- メインコンテナ / カードデザイン --- */
+        /* メインコンテナ */
         .aq-main-container {
-            flex-grow: 1;
-            /* 左右のパディングをヘッダー(20px)と合わせる */
-            padding: 20px;
-            max-width: 650px;
-            margin: 0 auto;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            flex-grow: 1; padding: 20px; max-width: 650px;
+            margin: 0 auto; width: 100%; display: flex;
+            flex-direction: column; justify-content: center;
         }
 
         #aq-container {
-            width: 100%;
-            padding: 30px; 
-            background-color: #ffffff;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-            border-radius: 25px; 
-            border: 4px solid white;
-            animation: pop-in 0.4s;
+            width: 100%; padding: 30px; background-color: #ffffff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-radius: 25px; 
+            border: 4px solid white; animation: pop-in 0.4s;
         }
         @keyframes pop-in { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* 画面切り替え */
         .aq-screen { display: none; }
         .aq-screen.active { display: block; }
 
-        h1, h2 { text-align: center; color: var(--primary); }
-        h1 { font-size: 2.2em; margin-bottom: 20px; }
-        h2 { font-size: 1.8em; margin-bottom: 20px; }
+        h1 { text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 20px; }
         p { text-align: center; font-size: 1.1em; color: #666; }
 
-        /* --- ボタン共通 (V2 3Dスタイル) --- */
+        /* ボタン */
         .aq-button {
             display: block; width: 90%; max-width: 350px;
             margin: 15px auto; padding: 15px; font-size: 1.4em;
             font-weight: 700; color: #fff; background-color: var(--correct-color); 
             border: none; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 6px 0 #388e3c; /* Green Shadow */
-            transition: all 0.1s ease-out; position: relative; top: 0;
-            text-decoration: none;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 6px 0 #388e3c; transition: all 0.1s;
+            text-decoration: none; text-align: center;
         }
         .aq-button:active { top: 4px; box-shadow: 0 2px 0 #388e3c; }
         
         .aq-button-secondary {
-             background-color: #90a4ae;
-             box-shadow: 0 4px 0 #546e7a;
-             font-size: 1.1em;
-             width: 200px;
-             border-radius: 10px;
-             margin-top: 20px;
-        }
-        .aq-button-secondary:active {
-             top: 3px;
-             box-shadow: 0 2px 0 #546e7a;
+             background-color: #90a4ae; box-shadow: 0 4px 0 #546e7a;
+             font-size: 1.1em; width: 200px; border-radius: 10px; margin-top: 20px;
         }
 
-        /* --- 1. 勉強スクリーン --- */
+        /* 勉強画面グリッド */
         #aq-study-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px; margin-bottom: 25px;
         }
         .aq-study-item {
-            border: 2px solid #e3f2fd;
-            border-radius: 10px;
-            background-color: #ffffff;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
+            border: 2px solid #e3f2fd; border-radius: 10px; background-color: #ffffff;
+            text-align: center; padding: 10px; cursor: pointer; transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .aq-study-item:hover { background-color: #e3f2fd; transform: translateY(-2px); }
-        .aq-study-item img {
-            width: 100%; max-width: 70px; height: 70px; object-fit: contain;
-        }
-        .aq-study-item p {
-            font-size: 1.1em; font-weight: bold; margin: 5px 0 0 0; color: #444;
-        }
+        .aq-study-item img { width: 100%; max-width: 70px; height: 70px; object-fit: contain; }
+        .aq-study-item p { font-size: 1.1em; font-weight: bold; margin: 5px 0 0 0; color: #444; }
 
-        /* --- 2. クイズスクリーン --- */
+        /* クイズ画面 */
+        #aq-question-number { font-size: 1.1em; color: var(--primary); margin-bottom: 10px; }
         
-        #aq-question-number { 
-            font-size: 1.1em; 
-            color: var(--primary); 
-            margin-bottom: 10px;
-        }
-        
-        /* タイマー表示エリア */
         #aq-timer-box {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: white;
-            background-color: var(--incorrect-color); /* Red */
-            margin: 15px auto;
-            padding: 5px 15px; 
-            border-radius: 10px;
-            display: inline-block; 
+            font-size: 1.5em; font-weight: bold; color: white;
+            background-color: var(--incorrect-color); margin: 15px auto;
+            padding: 5px 15px; border-radius: 10px; display: inline-block; 
         }
 
-        /* 問題プロンプト */
         .question-prompt-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px; 
-            margin-top: 5px;
-            padding: 15px;
-            background: #e3f2fd; /* Light Blue Background */
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: center; gap: 15px; 
+            margin-top: 5px; padding: 15px; background: #e3f2fd; 
+            border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        #aq-question-text { 
-            font-size: 1.2em; 
-            font-weight: bold; 
-            color: #444;
-            margin: 0;
-            text-align: left;
-            flex-grow: 1;
-        }
+        #aq-question-text { font-size: 1.2em; font-weight: bold; color: #444; margin: 0; text-align: left; flex-grow: 1; }
 
-        /* 音声再生ボタン */
         .sound-button {
-            width: 55px; height: 55px; padding: 0;
-            font-size: 1.8em; background-color: var(--primary);
-            color: white; border: none; border-radius: 50%;
-            cursor: pointer; flex-shrink: 0;
+            width: 55px; height: 55px; font-size: 1.8em; background-color: var(--primary);
+            color: white; border: none; border-radius: 50%; cursor: pointer; flex-shrink: 0;
             box-shadow: 0 3px 0 #3f51b5;
         }
-        .sound-button:active { 
-            box-shadow: 0 1px 0 #3f51b5; 
-            transform: translateY(2px);
-        }
-        .sound-button:hover:not(:disabled) { background-color: #4b63cc; }
-        .sound-button:disabled { background-color: #cccccc; opacity: 0.7; }
+        .sound-button:active { box-shadow: 0 1px 0 #3f51b5; transform: translateY(2px); }
         
-        /* 選択肢 */
-        .choices { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-            margin-top: 25px;
-        }
+        .choices { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 25px; }
         .choices button {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.4em; 
-            font-weight: 700;
-            cursor: pointer;
-            background-color: #fff;
-            color: var(--primary);
-            border: 3px solid #ddd;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-            text-align: center;
-        }
-        .choices button:hover:not(:disabled) { 
-            background-color: #f0f4f8; 
-            border-color: var(--primary);
-            transform: scale(1.01);
-        }
-        .choices button:disabled { opacity: 0.7; cursor: not-allowed; }
-        
-        /* 正解・不正解表示 */
-        .choices button.correct { 
-            border-color: var(--correct-color);
-            background-color: #e8f5e9;
-            box-shadow: 0 0 10px var(--correct-color);
-            color: #1b5e20;
-        }
-        .choices button.incorrect {
-            border-color: var(--incorrect-color);
-            background-color: #fbe9e7;
-            opacity: 0.8;
-            color: #b71c1c;
+            width: 100%; padding: 15px 20px; font-size: 1.4em; font-weight: 700;
+            cursor: pointer; background-color: #fff; color: var(--primary);
+            border: 3px solid #ddd; border-radius: 15px; text-align: center;
         }
         
-        /* 結果メッセージ */
+        .choices button.correct-answer { 
+            border-color: var(--correct-color); background-color: #e8f5e9; color: #1b5e20;
+        }
+        
         .result-message { 
             text-align: center; margin-top: 20px; padding: 15px; 
-            border-radius: 10px; font-size: 1.2em; font-weight: bold;
-            display: none; 
-            animation: pop-in 0.3s;
+            border-radius: 10px; font-size: 1.2em; font-weight: bold; display: none; 
         }
         .result-message.correct { background-color: #d4edda; color: #155724; }
         .result-message.incorrect { background-color: #f8d7da; color: #721c24; }
         
-        /* 最終スコア */
         #aq-final-score { 
-            text-align: center; font-size: 1.8em; 
-            color: var(--primary); margin-top: 30px; 
-            background-color: #e3f2fd; padding: 20px; border-radius: 15px;
-            display: none; 
+            text-align: center; font-size: 1.8em; color: var(--primary); 
+            margin-top: 30px; background-color: #e3f2fd; padding: 20px; 
+            border-radius: 15px; display: none; 
         }
 
-        .navigation-buttons { text-align: center; margin-top: 20px; }
-        
-        /* ボタン配置の調整 */
-        #aq-screen-quiz .navigation-buttons {
-            display: flex; justify-content: center; gap: 15px;
-        }
-        #aq-screen-quiz .navigation-buttons a, 
-        #aq-screen-quiz .navigation-buttons button {
-            display: block; width: auto; max-width: 200px; margin: 0;
-        }
-        
-        /* 認証ステータスのスタイル */
-        #auth-status-aisatsu {
-             text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: var(--primary);
-        }
-
-        @media (max-width: 400px) {
-            #aq-study-grid { grid-template-columns: repeat(2, 1fr); }
-            h1 { font-size: 1.8em; }
-            #aq-question-text { font-size: 1.1em; }
-        }
+        #auth-status-aisatsu { text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: var(--primary); }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-0BX3DD42C1');
-    </script>
 </head>
 <body>
     
@@ -337,25 +178,21 @@
                     <p style="color:#444; font-size:1.1em;">ただしい あいさつを えらんでね：</p>
                     
                     <div class="question-prompt-container">
-                        <h2 id="aq-question-text">もんだいぶんが ひょうじされます...</h2> 
+                        <h2 id="aq-question-text">もんだい...</h2> 
                         <button id="aq-play-sound-button" class="sound-button"><i class="fa-solid fa-volume-up"></i></button>
                     </div>
                 </div>
 
-                <div class="choices" id="aq-choices-container">
-                    </div>
+                <div class="choices" id="aq-choices-container"></div>
 
-                <div id="aq-result-message" class="result-message">
-                    </div>
-                
-                <div id="aq-final-score">
-                    </div>
+                <div id="aq-result-message" class="result-message"></div>
+                <div id="aq-final-score"></div>
 
-                <div class="navigation-buttons">
-                    <button id="aq-restart-button" class="aq-button aq-button-secondary" style="background-color: #00bcd4; box-shadow: 0 4px 0 #008ba3;">
+                <div class="navigation-buttons" style="text-align:center; margin-top:20px;">
+                    <button id="aq-restart-button" class="aq-button aq-button-secondary" style="background-color: #00bcd4; display:none; margin: 0 auto;">
                         <i class="fa-solid fa-rotate-right"></i> もういちど あそぶ
                     </button>
-                    <a href="index.html" id="aq-home-button" class="aq-button aq-button-secondary">
+                    <a href="index.html" id="aq-home-button" class="aq-button aq-button-secondary" style="margin: 20px auto; display:none;">
                         <i class="fa-solid fa-house"></i> ホームにもどる
                     </a>
                 </div>
@@ -363,17 +200,11 @@
         </div>
     </div>
 
-    <audio id="aq-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
-    <audio id="aq-sound-incorrect" src="assets/sounds/bubu.mpode.js" preload="auto"></audio>
-
     <script type="module">
-        // 1. Firebase SDKのインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-        // 2. あなたのFirebase設定 (index.htmlなどからコピー)
         const firebaseConfig = {
           apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
           authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -384,7 +215,6 @@
           measurementId: "G-LCMXVLPS81"
         };
 
-        // 3. Firebaseサービスの初期化とグローバル変数
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -392,52 +222,25 @@
         window.currentUserId = null;
         const authStatusEl = document.getElementById('auth-status-aisatsu');
         
-        // ポイントルール: 各問題の正解で1ポイント
-        const POINTS_PER_QUESTION = 1; 
-        
-        // 4. 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUserId = user.uid;
-                const userDocRef = doc(db, "users", window.currentUserId);
-                const userDocSnap = await getDoc(userDocRef);
-                let displayName = 'ユーザー';
-                if (userDocSnap.exists()) {
-                    displayName = userDocSnap.data().displayName || 'ユーザー';
-                }
-                authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
-
+                authStatusEl.textContent = `✅ ログイン中`;
             } else {
                 window.currentUserId = null;
-                authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
+                authStatusEl.textContent = '❌ ゲストモード';
             }
         });
 
-
-        /**
-         * ポイント加算関数 (Firestoreに記録)
-         * @param {number} points - 加算するポイント数
-         * @returns {Promise<boolean>} 成功/失敗
-         */
         window.addPointsToUser = async function(points, wordKey) { 
-            if (!window.currentUserId || points <= 0) {
-                return false;
-            }
-            
+            if (!window.currentUserId || points <= 0) return false;
             try {
                 const userRef = doc(db, "users", window.currentUserId);
-                const progressKey = `aisatsu_word_${wordKey}`; // 単語ごとのキー
-
-                // 2. ポイントを加算
-                await updateDoc(userRef, {
-                    points: increment(points) 
-                });
-                
-                console.log(`${points} ポイントを Firestore に加算しました (単語: ${wordKey})。`);
+                await updateDoc(userRef, { points: increment(points) });
+                console.log(`+${points}pt (Word: ${wordKey})`);
                 return true;
-
             } catch (e) {
-                console.error("ポイント更新エラー:", e);
+                console.error("ポイントエラー:", e);
                 return false;
             }
         }
@@ -446,22 +249,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ----------------------------------------------------
-            // ★★★ Firebase連携ポイント関数を再定義 (ダミー) ★★★
-            // モジュールロードが遅れた場合のエラー回避のためのダミー関数
-            if (typeof window.addPointsToUser !== 'function') {
-                window.addPointsToUser = async () => { return false; };
-            }
-            const POINTS_PER_QUESTION = 1; // Firebase連携スクリプトと同期
-            // ----------------------------------------------------
-
-            // ----------------------------------------------------
-            // データ定義
-            // ----------------------------------------------------
+            // --- 設定・データ ---
             const SOUND_PATH_AISATSU = 'assets/sounds/aisatsu/';
             const IMAGE_PATH_AISATSU = 'assets/images/aisatsu/'; 
+            const POINTS_PER_QUESTION = 1;
+            
+            // Web Speech API の初期化
+            const synth = window.speechSynthesis;
 
-            // ★ id を使って音声ファイルを指定します
             const greetingsData = [
                 { "id": 1, "situation": "あさ、おきたとき、または あったひとに いう あいさつは？ (朝)", "correct": "おはよう", "image": "ohayou.png", "wrongs": ["こんにちは", "こんばんは", "おやすみなさい"] },
                 { "id": 2, "situation": "ひるま、ひとに あったときの あいさつは？ (昼)", "correct": "こんにちは", "image": "konnichiwa.png", "wrongs": ["おはよう", "こんばんは", "さようなら"] },
@@ -479,21 +274,14 @@
                 { "id": 14, "situation": "かぞくや ともだちと わかれるときの あいさつは？", "correct": "さようなら", "image": "sayounara.png", "wrongs": ["こんにちは", "おかえりなさい", "おやすみなさい"] }
             ];
 
-            // --- 音声キャッシュ ---
+            // --- 音声キャッシュ (ファイル再生用) ---
             const audioCache = {};
             function loadAudio(path) {
                 if (!audioCache[path]) {
-                    const audio = new Audio(path);
-                    audio.onerror = () => {
-                        console.error("音声ファイルが見つかりません: " + path);
-                    };
-                    audioCache[path] = audio;
+                    audioCache[path] = new Audio(path);
                 }
                 return audioCache[path];
             }
-            
-            const soundCorrect = document.getElementById('aq-sound-correct');
-            const soundIncorrect = document.getElementById('aq-sound-incorrect');
             
             // --- DOM取得 ---
             const screens = document.querySelectorAll('.aq-screen');
@@ -511,9 +299,9 @@
             const resultMessageEl = document.getElementById('aq-result-message');
             const finalScoreEl = document.getElementById('aq-final-score');
             const restartButton = document.getElementById('aq-restart-button');
+            const homeButton = document.getElementById('aq-home-button');
 
-            // --- ゲーム状態変数 ---
-            let allQuestions = []; 
+            // --- ゲーム変数 ---
             let currentQuestions = []; 
             let currentQuestionIndex = 0;
             let score = 0;
@@ -522,29 +310,43 @@
             let currentSituationSound = null;
 
             // ----------------------------------------------------
-            // 汎用関数
+            // ★ Web Speech API 読み上げ関数 (練習モード用)
+            // ----------------------------------------------------
+            function speak(text) {
+                if (synth.speaking) synth.cancel(); // 前の音声をキャンセル
+
+                const utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.lang = 'ja-JP';
+                utterThis.rate = 0.9; // 少しゆっくり
+
+                // 声のリスト取得 (非同期対策)
+                const voices = synth.getVoices();
+                const jpVoice = voices.find(v => v.lang === 'ja-JP');
+                if(jpVoice) utterThis.voice = jpVoice;
+
+                synth.speak(utterThis);
+            }
+
+            // ----------------------------------------------------
+            // 画面切り替え
             // ----------------------------------------------------
             function showScreen(screenElement) {
                 screens.forEach(s => s.classList.remove('active'));
                 screenElement.classList.add('active');
             }
-            function playSound(audioElement) {
-                if (audioElement) {
-                    audioElement.currentTime = 0;
-                    audioElement.play().catch(e => console.error("再生エラー:", e));
-                }
-            }
+
             function shuffleArray(array) {
-                let newArray = [...array];
-                for (let i = newArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-                }
-                return newArray;
+                return array.sort(() => Math.random() - 0.5);
+            }
+
+            function playFileSound(path) {
+                const audio = loadAudio(path);
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("再生エラー(ファイル):", e));
             }
 
             // ----------------------------------------------------
-            // ★ 1. 勉強スクリーンのロジック
+            // 1. 練習モード初期化
             // ----------------------------------------------------
             function initStudyScreen() {
                 studyGridEl.innerHTML = '';
@@ -552,11 +354,9 @@
                     const item = document.createElement('div');
                     item.className = 'aq-study-item';
                     
+                    // ★ ここで Web Speech API を呼び出す
                     item.onclick = () => {
-                        // word.id を使って 'situation' + id + '.mp3' を再生
-                        const soundPath = `${SOUND_PATH_AISATSU}situation${word.id}.mp3`;
-                        const answerSound = loadAudio(soundPath);
-                        playSound(answerSound);
+                        speak(word.correct);
                     };
                     
                     const img = document.createElement('img');
@@ -573,13 +373,10 @@
             }
 
             // ----------------------------------------------------
-            // ★ 2. クイズのメインロジック
+            // 2. クイズモード (ロジックは以前のままファイル再生)
             // ----------------------------------------------------
-
             function startGame() {
-                allQuestions = shuffleArray([...greetingsData]);
-                // クイズは全データを使用し、10問に制限する
-                currentQuestions = allQuestions.slice(0, 10); 
+                currentQuestions = shuffleArray([...greetingsData]).slice(0, 10);
                 currentQuestionIndex = 0;
                 score = 0;
                 
@@ -587,8 +384,8 @@
                 resultMessageEl.style.display = 'none';
                 choicesContainerEl.style.display = 'grid';
                 restartButton.style.display = 'none';
-                playSoundButton.disabled = true; // 初期状態では音声を無効
-
+                homeButton.style.display = 'none';
+                
                 loadQuestion();
             }
 
@@ -607,37 +404,31 @@
                 questionTextEl.textContent = problem.situation;
                 timerBoxEl.style.display = 'none'; 
 
+                // 選択肢作成
                 const wrongOptions = shuffleArray(problem.wrongs).slice(0, 2); 
                 const options = shuffleArray([problem.correct, ...wrongOptions]);
                 
                 choicesContainerEl.innerHTML = '';
                 options.forEach(optionText => {
                     const button = document.createElement('button');
-                    button.className = 'aq-button aq-option'; 
-                    button.dataset.key = problem.correct; // 正解のキーをセット
-                    button.style.fontSize = '1.2em';
-                    button.style.margin = '0 auto';
                     button.textContent = optionText;
                     button.onclick = (e) => checkAnswer(e, problem.correct);
                     choicesContainerEl.appendChild(button);
                 });
                 
-                // 問題の音声も situation + ID .mp3
+                // ★ クイズの問題文はファイル再生 (situation1.mp3)
                 const soundFile = `situation${problem.id}.mp3`;
-                currentSituationSound = loadAudio(SOUND_PATH_AISATSU + soundFile);
-                playSoundButton.onclick = () => playSound(currentSituationSound);
+                const soundPath = SOUND_PATH_AISATSU + soundFile;
                 
-                disableChoices(true);
-                playSoundButton.disabled = true;
+                // ボタン設定
+                playSoundButton.onclick = () => playFileSound(soundPath);
+                
+                // 自動再生
+                playFileSound(soundPath);
 
-                // 音声が終わったらタイマー開始＆選択肢有効化
-                currentSituationSound.onended = () => {
-                    startTimer(); 
-                    disableChoices(false); 
-                    playSoundButton.disabled = false;
-                };
-                
-                playSound(currentSituationSound);
+                // ボタン無効化 (音声終了を待たずにタイマー開始する簡易実装)
+                disableChoices(false);
+                startTimer();
             }
 
             function startTimer() {
@@ -646,80 +437,54 @@
                 timerBoxEl.style.display = 'inline-block';
                 
                 clearInterval(timer); 
-                timer = setInterval(updateTimer, 1000);
+                timer = setInterval(() => {
+                    timeLeft--;
+                    timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        showResult(false, currentQuestions[currentQuestionIndex].correct);
+                    }
+                }, 1000);
             }
 
-            function updateTimer() {
-                timeLeft--;
-                timerBoxEl.textContent = `のこり ${timeLeft} びょう`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    showResult(false, currentQuestions[currentQuestionIndex].correct);
-                }
-            }
-
-            async function checkAnswer(event, correctAnswer) { // ★ async関数に変更
+            async function checkAnswer(event, correctAnswer) {
                 clearInterval(timer); 
-                
                 const chosenButton = event.target;
                 const chosenAnswer = chosenButton.textContent;
                 
-                // 正解のキーをポイント記録に使用
-                const wordKey = chosenButton.dataset.key; 
-
-                // 選択した答えに対応する ID を逆引きして音声を再生
-                const chosenWordData = greetingsData.find(w => w.correct === chosenAnswer);
-                
-                if (chosenWordData) {
-                    // 選んだ答えに対応する correct ファイルを再生
-                    const answerSoundPath = `${SOUND_PATH_AISATSU}${chosenWordData.correct}.mp3`;
-                    const answerSound = loadAudio(answerSoundPath);
-                    playSound(answerSound);
-                }
-
                 disableChoices(true); 
-                playSoundButton.disabled = true; 
 
                 if (chosenAnswer === correctAnswer) {
                     score++;
-                    chosenButton.classList.add('correct'); 
-                    chosenButton.style.color = 'white';
+                    chosenButton.classList.add('correct-answer');
                     
-                    // ★★★ Firebase連携ポイント処理 ★★★
-                    const success = await window.addPointsToUser(POINTS_PER_QUESTION, wordKey);
-                    const pointResult = success ? "scored" : "error";
-                    showResult(true, correctAnswer, pointResult);
-                    // ★★★ Firebase連携ポイント処理 終了 ★★★
-                    
+                    // Firebaseポイント加算
+                    if (typeof window.addPointsToUser === 'function') {
+                        await window.addPointsToUser(POINTS_PER_QUESTION, correctAnswer);
+                    }
+                    showResult(true, correctAnswer, "scored");
                 } else {
-                    chosenButton.classList.add('incorrect'); 
-                    chosenButton.style.color = 'white';
+                    chosenButton.style.backgroundColor = '#fbe9e7';
+                    chosenButton.style.color = '#c62828';
+                    chosenButton.style.borderColor = '#ef5350';
                     showResult(false, correctAnswer);
                 }
             }
 
-            function showResult(isCorrect, correctAnswer, pointResult = null) {
+            function showResult(isCorrect, correctAnswer, pointResult) {
                 if (isCorrect) {
-                    let msg = 'せいかい！';
-                    if (pointResult === "scored") {
-                        msg += ` (+${POINTS_PER_QUESTION} ポイント記録)`;
-                    } else if (pointResult === "error") {
-                        msg += ' (ポイント記録エラー)';
-                    }
-                    
-                    resultMessageEl.textContent = msg;
+                    resultMessageEl.textContent = 'せいかい！ (+1pt)';
                     resultMessageEl.className = 'result-message correct';
-                    playSound(soundCorrect);
+                    playFileSound('assets/sounds/seikai.mp3');
                 } else {
                     resultMessageEl.textContent = `ざんねん... せいかいは「${correctAnswer}」`;
                     resultMessageEl.className = 'result-message incorrect';
-                    playSound(soundIncorrect);
+                    playFileSound('assets/sounds/bubu.mp3');
                     
-                    // 正解をハイライト
-                    Array.from(choicesContainerEl.children).forEach(button => {
-                        if (button.textContent === correctAnswer) {
-                            button.classList.add('correct');
+                    // 正解を表示
+                    Array.from(choicesContainerEl.children).forEach(btn => {
+                        if (btn.textContent === correctAnswer) {
+                            btn.classList.add('correct-answer');
                         }
                     });
                 }
@@ -732,13 +497,11 @@
             }
 
             function disableChoices(disabled) {
-                Array.from(choicesContainerEl.children).forEach(button => {
-                    button.disabled = disabled;
-                });
+                Array.from(choicesContainerEl.children).forEach(btn => btn.disabled = disabled);
             }
 
             function endGame() {
-                finalScoreEl.innerHTML = `おわり！<br>${currentQuestions.length}もんちゅう <span style="font-size:1.2em; color:var(--incorrect-color);">${score}</span> もん せいかい！`;
+                finalScoreEl.innerHTML = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
                 finalScoreEl.style.display = 'block';
                 
                 questionNumberEl.textContent = 'おつかれさま';
@@ -748,27 +511,24 @@
                 resultMessageEl.style.display = 'none';
                 
                 restartButton.style.display = 'block';
-                playSoundButton.disabled = true;
+                homeButton.style.display = 'block';
+                playSoundButton.disabled = true; 
             }
 
-            // ----------------------------------------------------
-            // イベントリスナー
-            // ----------------------------------------------------
-            
+            // --- イベント設定 ---
             startQuizButton.onclick = () => {
                 startGame();
                 showScreen(quizScreen);
             };
-            
-            restartButton.addEventListener('click', startGame);
+            restartButton.onclick = startGame;
 
-            // ----------------------------------------------------
-            // ゲーム初期化
-            // ----------------------------------------------------
+            // --- 初期化 ---
             initStudyScreen();
             showScreen(studyScreen);
-
+            
+            // ページ読み込み時にvoicesを一度取得しておく（Chrome対策）
+            synth.getVoices();
         });
     </script>
-    </body>
+</body>
 </html>
