@@ -103,6 +103,17 @@
     }
     .play-btn-mini:hover { background: #e3f2fd; }
 
+    /* 複数の答えリスト用 */
+    .answer-list {
+        display: flex; flex-direction: column; gap: 8px; width: 100%;
+    }
+    .answer-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 5px; border-bottom: 1px dashed #eee;
+    }
+    .answer-item:last-child { border-bottom: none; }
+
+
     /* --- シミュレーション画面 --- */
     .sim-header {
         text-align: center; margin-bottom: 20px;
@@ -187,7 +198,7 @@
     <div id="practice-screen" class="screen">
         <div class="sim-header">
             <h2 id="practice-title" style="margin:0; color:var(--primary);"></h2>
-            <p style="margin:5px 0 0; font-size:0.9em; color:#777;">会話を練習しましょう！音声ボタンを押して聞いてみてね。</p>
+            <p style="margin:5px 0 0; font-size:0.9em; color:#777;">会話を練習しましょう！答え方は一つではありません。</p>
         </div>
 
         <div id="practice-list" class="practice-list">
@@ -293,14 +304,13 @@ document.addEventListener('DOMContentLoaded', () => {
     synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     setTimeout(() => { voices = synth.getVoices(); }, 500);
 
-    // --- シナリオデータ (日本語・英語 対応) ---
+    // --- シナリオデータ ---
     const scenarios = {
         'konbini': {
             name: "コンビニ (Convenience Store)",
             steps: [
                 {
                     clerk: { jp: "いらっしゃいませ。お弁当は温めますか？", en: "Welcome. Would you like your bento warmed up?" },
-                    correctAnswer: { jp: "はい、お願いします。", en: "Yes, please." },
                     options: [
                         { jp: "はい、お願いします。", en: "Yes, please.", correct: true, fb: "丁寧な言い方です！ (Polite)" },
                         { jp: "温めます。", en: "I will warm it.", correct: false, fb: "それだと自分が温めることになります。" },
@@ -309,16 +319,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 {
                     clerk: { jp: "ポイントカードはお持ちですか？", en: "Do you have a point card?" },
-                    correctAnswer: { jp: "はい、持っています。", en: "Yes, I have it." },
                     options: [
-                        { jp: "はい、これです。", en: "Yes, here it is.", correct: true, fb: "スムーズです！" },
+                        { jp: "はい、持っています。", en: "Yes, I have it.", correct: true, fb: "スムーズです！" },
                         { jp: "カードです。", en: "It is a card.", correct: false, fb: "会話として少し不自然です。" },
                         { jp: "大丈夫です（＝ないです）。", en: "No, I'm fine.", correct: true, fb: "「持っていません」の意味で使えます。" }
                     ]
                 },
                 {
                     clerk: { jp: "レジ袋はご利用ですか？", en: "Do you need a plastic bag?" },
-                    correctAnswer: { jp: "はい、お願いします。", en: "Yes, please." },
                     options: [
                         { jp: "はい、一枚お願いします。", en: "Yes, one please.", correct: true, fb: "Good!" },
                         { jp: "いりません。", en: "I don't need it.", correct: true, fb: "はっきり伝えるのは良いことです。" },
@@ -332,7 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
             steps: [
                 {
                     clerk: { jp: "いらっしゃいませ。店内でお召し上がりですか？", en: "Welcome. For here or to go?" },
-                    correctAnswer: { jp: "はい、店内で。", en: "For here, please." },
                     options: [
                         { jp: "はい、店内で。", en: "For here.", correct: true, fb: "お店で食べるならこれ！" },
                         { jp: "持ち帰りで。", en: "To go.", correct: true, fb: "持って帰るならこれ！" },
@@ -341,7 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 {
                     clerk: { jp: "ご一緒にポテトはいかがですか？", en: "Would you like fries with that?" },
-                    correctAnswer: { jp: "じゃあ、お願いします。", en: "Yes, please." },
                     options: [
                         { jp: "お願いします。", en: "Please.", correct: true, fb: "セットにしましょう！" },
                         { jp: "ポテトです。", en: "It is potato.", correct: false, fb: "不自然です。" },
@@ -355,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
             steps: [
                 {
                     clerk: { jp: "ご注文をどうぞ。", en: "May I take your order?" },
-                    correctAnswer: { jp: "ホットコーヒーを一つ。", en: "One hot coffee, please." },
                     options: [
                         { jp: "ホットコーヒーをください。", en: "Hot coffee please.", correct: true, fb: "Good!" },
                         { jp: "コーヒーがあります。", en: "There is coffee.", correct: false, fb: "注文になっていません。" }
@@ -363,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 {
                     clerk: { jp: "サイズはどうなさいますか？", en: "Which size would you like?" },
-                    correctAnswer: { jp: "Mサイズで。", en: "Medium size." },
                     options: [
                         { jp: "Mサイズでお願いします。", en: "Medium, please.", correct: true, fb: "わかりやすいです！" },
                         { jp: "大きいです。", en: "It is big.", correct: false, fb: "Lサイズ(Large)のことかな？" }
@@ -376,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
             steps: [
                 {
                     clerk: { jp: "何名様ですか？", en: "How many people?" },
-                    correctAnswer: { jp: "二人です。", en: "Two people." },
                     options: [
                         { jp: "二人です。", en: "Two.", correct: true, fb: "人数を言えましたね。" },
                         { jp: "二つです。", en: "Two things.", correct: false, fb: "人の数え方は「ひとり、ふたり」です。" }
@@ -403,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
         utterThis.rate = 1.0;
-        // 声の選択（日本語の音声を探す）
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
         if(jpVoice) utterThis.voice = jpVoice;
         synth.speak(utterThis);
@@ -414,14 +416,33 @@ document.addEventListener('DOMContentLoaded', () => {
         currentScenarioId = id;
         currentData = scenarios[id];
         
-        // 練習リスト生成
         const listEl = document.getElementById('practice-list');
         listEl.innerHTML = '';
         document.getElementById('practice-title').textContent = currentData.name;
 
         currentData.steps.forEach((step, idx) => {
+            // 正解の選択肢のみを抽出
+            const correctOptions = step.options.filter(opt => opt.correct);
+
             const div = document.createElement('div');
             div.className = 'practice-item';
+            
+            // 複数の正解リストのHTML作成
+            let answersHtml = '';
+            correctOptions.forEach(opt => {
+                answersHtml += `
+                    <div class="answer-item">
+                        <div class="text-content">
+                            <div class="text-jp" style="color:var(--primary);">${opt.jp}</div>
+                            <div class="text-en">${opt.en}</div>
+                        </div>
+                        <button class="play-btn-mini" onclick="speak('${opt.jp}')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
             div.innerHTML = `
                 <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
                 <div class="practice-row">
@@ -432,13 +453,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <button class="play-btn-mini" onclick="speak('${step.clerk.jp}')"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
-                <div class="practice-row">
-                    <div class="role-badge badge-you">あなた</div>
-                    <div class="text-content">
-                        <div class="text-jp" style="color:var(--primary);">${step.correctAnswer.jp}</div>
-                        <div class="text-en">${step.correctAnswer.en}</div>
+                <div class="practice-row" style="align-items: flex-start;">
+                    <div class="role-badge badge-you" style="margin-top:8px;">あなた</div>
+                    <div class="answer-list">
+                        ${answersHtml}
                     </div>
-                    <button class="play-btn-mini" onclick="speak('${step.correctAnswer.jp}')"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
             `;
             listEl.appendChild(div);
