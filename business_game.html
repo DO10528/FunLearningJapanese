@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お仕事・敬語マスター - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #3f51b5; /* ビジネスライクな濃い青 */
+        --accent: #00bcd4;  /* 明るい青 */
+        --bg-color: #e8eaf6;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #f44336;
+        --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 50px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+    /* メインコンテナ */
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column;
+    }
+
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- メニューグリッド --- */
+    .menu-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    .scenario-card {
+        background: white; border-radius: 20px; padding: 25px 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        border-bottom: 5px solid #ccc; /* 下線で色分け */
+        transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scenario-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+    .scenario-card:active { transform: scale(0.98); }
+    
+    .card-icon-box {
+        width: 60px; height: 60px; border-radius: 50%;
+        background: #f5f5f5; display: flex; justify-content: center; align-items: center;
+        margin-bottom: 5px; font-size: 1.8em;
+    }
+    .card-title { font-weight: 800; font-size: 1.2em; color: #444; }
+    .card-desc { font-size: 0.85em; color: #777; }
+
+    /* --- 練習リスト --- */
+    .practice-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    .practice-item {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--primary);
+    }
+    
+    .phrase-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .phrase-content { flex-grow: 1; }
+    .phrase-jp { font-weight: bold; font-size: 1.2em; color: #333; margin-bottom: 3px; }
+    .phrase-en { font-size: 0.9em; color: #888; }
+    
+    .play-btn-mini {
+        background: #e3f2fd; border: none; color: var(--primary);
+        width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+        display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+        transition: background 0.2s;
+    }
+    .play-btn-mini:hover { background: #bbdefb; }
+
+    /* --- シミュレーション画面 --- */
+    .sim-header {
+        text-align: center; margin-bottom: 20px;
+        background: white; padding: 15px; border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .step-indicator {
+        display: inline-block; background: #e8eaf6; color: var(--primary);
+        padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;
+    }
+    .sim-situation { font-weight: bold; color: #555; font-size: 1.1em; }
+
+    /* キャラクターエリア */
+    .char-area {
+        display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
+        animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .char-icon {
+        font-size: 4em; color: #5c6bc0; margin-bottom: 10px;
+        background: white; width: 100px; height: 100px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        border: 4px solid #c5cae9; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .speech-bubble {
+        background: white; padding: 20px; border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative;
+        width: 100%; text-align: center; border: 2px solid #e8eaf6;
+    }
+    .speech-bubble::after {
+        content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+        border-width: 10px; border-style: solid;
+        border-color: transparent transparent #e8eaf6 transparent;
+    }
+    .question-text { font-size: 1.3em; font-weight: bold; color: #333; margin: 10px 0; }
+    
+    /* 選択肢 */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; width: 100%; }
+    .option-btn {
+        width: 100%; padding: 18px;
+        background: white; border: 2px solid #e0e0e0; border-radius: 15px;
+        font-size: 1.1em; font-weight: bold; color: #555;
+        cursor: pointer; text-align: left; transition: all 0.2s;
+        box-shadow: 0 4px 0 #eee; position: relative;
+    }
+    .option-btn:active { transform: translateY(3px); box-shadow: none; }
+    .option-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    .option-btn.correct { background: #e8f5e9; border-color: var(--correct-color); color: var(--correct-color); }
+    .option-btn.incorrect { background: #ffebee; border-color: var(--incorrect-color); color: var(--incorrect-color); }
+
+    /* フィードバック */
+    .feedback-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); display: none; z-index: 1000;
+        justify-content: center; align-items: center; padding: 20px;
+        backdrop-filter: blur(3px);
+    }
+    .fb-content {
+        background: white; width: 100%; max-width: 400px;
+        border-radius: 20px; padding: 30px; text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: popIn 0.3s;
+    }
+    .fb-icon { font-size: 4em; margin-bottom: 15px; }
+    .fb-title { font-size: 1.8em; font-weight: 900; margin-bottom: 10px; }
+    .fb-text { font-size: 1.1em; color: #666; margin-bottom: 20px; line-height: 1.5; }
+
+    /* ボタン */
+    .action-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2em;
+        cursor: pointer; box-shadow: 0 5px 0 #303f9f; width: 100%; max-width: 300px;
+        margin: 10px auto; display: block; text-align: center; transition: transform 0.1s;
+    }
+    .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    .btn-secondary { background: #78909c; box-shadow: 0 5px 0 #546e7a; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-briefcase"></i> お仕事・敬語マスター</a>
+    <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+</header>
+
+<div class="container">
+    <div id="auth-status">認証中...</div>
+
+    <div id="menu-screen" class="screen active">
+        <div style="text-align:center; margin-bottom:30px;">
+            <h1 style="color:var(--primary); margin-bottom:5px;">ビジネス日本語</h1>
+            <p style="color:#666;">しごとの ことばを れんしゅうしよう！</p>
+        </div>
+        
+        <div class="menu-grid">
+            <div class="scenario-card" onclick="loadScenario('office')" style="border-bottom-color: #3f51b5;">
+                <div class="card-icon-box" style="color:#3f51b5;"><i class="fa-solid fa-building"></i></div>
+                <div class="card-title">オフィス・挨拶</div>
+                <div class="card-desc">社長、上司、退社</div>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('phone')" style="border-bottom-color: #00bcd4;">
+                <div class="card-icon-box" style="color:#00bcd4;"><i class="fa-solid fa-phone"></i></div>
+                <div class="card-title">電話・対応</div>
+                <div class="card-desc">少々お待ちください</div>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('visit')" style="border-bottom-color: #ff9800;">
+                <div class="card-icon-box" style="color:#ff9800;"><i class="fa-solid fa-handshake"></i></div>
+                <div class="card-title">訪問・マナー</div>
+                <div class="card-desc">失礼します、名刺</div>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('phrases')" style="border-bottom-color: #4caf50;">
+                <div class="card-icon-box" style="color:#4caf50;"><i class="fa-solid fa-book"></i></div>
+                <div class="card-title">便利なことば</div>
+                <div class="card-desc">よく使う敬語リスト</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="practice-screen" class="screen">
+        <div class="sim-header">
+            <h2 id="practice-title" style="margin:0; color:var(--primary);"></h2>
+            <p style="margin:5px 0 0; color:#777;">まずは 音声をきいて 覚えましょう。</p>
+        </div>
+
+        <div id="word-list" class="practice-list"></div>
+
+        <button class="action-btn" onclick="startQuiz()">
+            <i class="fa-solid fa-gamepad"></i> 実践クイズへ！
+        </button>
+        <button class="action-btn btn-secondary" onclick="showScreen('menu-screen')">もどる</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="sim-header">
+            <span class="step-indicator">Q <span id="q-current">1</span> / <span id="q-total">3</span></span>
+            <div class="sim-situation" id="sim-situation">状況説明</div>
+        </div>
+
+        <div class="char-area">
+            <div class="char-icon" id="char-icon"><i class="fa-solid fa-user-tie"></i></div>
+            <div class="speech-bubble">
+                <div style="font-size:0.8em; color:#999; margin-bottom:5px;" id="char-role">相手</div>
+                <div class="question-text" id="question-text">...</div>
+                <button onclick="replayVoice()" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">
+                    <i class="fa-solid fa-volume-high"></i> 音声を聞く
+                </button>
+            </div>
+        </div>
+
+        <div class="options-grid" id="options-container"></div>
+    </div>
+
+    <div id="result-screen" class="screen" style="text-align:center; padding-top:40px;">
+        <i class="fa-solid fa-award" style="font-size:5em; color:#ffcc5c; margin-bottom:20px;"></i>
+        <h2 style="color:var(--primary); font-size:2em; margin:0;">おつかれさまです！</h2>
+        <p style="font-size:1.2em; color:#555;">ビジネススキルが アップしました！</p>
+        
+        <div style="background:white; padding:20px; border-radius:15px; margin:20px 0; font-size:1.5em; font-weight:bold; color:var(--primary);">
+            スコア: <span id="final-score">0</span> 点
+        </div>
+        
+        <button class="action-btn" onclick="location.reload()">メニューに戻る</button>
+    </div>
+    
+    <div id="fb-modal" class="feedback-modal">
+        <div class="fb-content">
+            <div id="fb-icon" class="fb-icon"></div>
+            <div id="fb-title" class="fb-title"></div>
+            <div id="fb-text" class="fb-text"></div>
+            <button class="action-btn" id="fb-next-btn" onclick="nextQuestion()">次へ</button>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+    
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            authStatusEl.textContent = `✅ ログイン中`;
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = '❌ ゲストモード';
+        }
+    });
+
+    window.addPoints = async function(points) { 
+        if (!window.currentUserId) return;
+        try {
+            await updateDoc(doc(db, "users", window.currentUserId), { points: increment(points) });
+        } catch (e) { console.error(e); }
+    }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const synth = window.speechSynthesis;
+    let voices = [];
+    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+    setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+    // --- データセット ---
+    const scenarios = {
+        'office': {
+            title: "オフィス・挨拶",
+            // 練習用リスト
+            words: [
+                { jp: "社長 (しゃちょう)", en: "President / CEO" },
+                { jp: "部長 (ぶちょう)", en: "Department Manager" },
+                { jp: "おはようございます", en: "Good morning (Polite)" },
+                { jp: "お先に失礼します", en: "Excuse me for leaving first (Goodbye)" },
+                { jp: "お疲れ様です", en: "Thank you for your hard work (Hello/Goodbye)" }
+            ],
+            // クイズ
+            quizzes: [
+                {
+                    situation: "朝、廊下で「社長」に会いました。",
+                    role: "社長",
+                    icon: "fa-user-tie",
+                    question: "おはよう。（にこやか）",
+                    voice: "おはよう。",
+                    options: [
+                        { text: "社長、おはようございます！", correct: true, fb: "正解！相手が社長なので、丁寧な挨拶が必要です。" },
+                        { text: "社長、おはよう！", correct: false, fb: "「おはよう」は友達や部下に使う言葉です。" },
+                        { text: "やあ、社長。", correct: false, fb: "失礼になります。" }
+                    ]
+                },
+                {
+                    situation: "仕事が終わりました。先に帰ります。",
+                    role: "同僚・上司",
+                    icon: "fa-users",
+                    question: "（みんな、まだ仕事をしています）",
+                    voice: "", // 無音の状況
+                    options: [
+                        { text: "お先に失礼します。", correct: true, fb: "正解！「先に帰ってごめんなさい」という気持ちを込めた挨拶です。" },
+                        { text: "さようなら。", correct: false, fb: "学校ではOKですが、会社ではあまり使いません。" },
+                        { text: "バイバイ！", correct: false, fb: "友達言葉です。" }
+                    ]
+                }
+            ]
+        },
+        'phone': {
+            title: "電話・対応",
+            words: [
+                { jp: "少々お待ちください", en: "Please wait a moment." },
+                { jp: "お電話ありがとうございます", en: "Thank you for calling." },
+                { jp: "あいにく席を外しております", en: "He/She is not at their desk right now." }
+            ],
+            quizzes: [
+                {
+                    situation: "電話で、担当の人を確認します。",
+                    role: "電話の相手",
+                    icon: "fa-phone",
+                    question: "田中さんをお願いします。",
+                    voice: "田中さんをお願いします。",
+                    options: [
+                        { text: "はい、少々お待ちください。", correct: true, fb: "正解！保留にして確認するときに使います。" },
+                        { text: "はい、ちょっと待って。", correct: false, fb: "ビジネスでは丁寧語を使いましょう。" },
+                        { text: "はい、待ちます。", correct: false, fb: "あなたが待つわけではありません。" }
+                    ]
+                },
+                {
+                    situation: "田中さんは今、トイレに行っていて席にいません。",
+                    role: "電話の相手",
+                    icon: "fa-phone",
+                    question: "田中さんはいらっしゃいますか？",
+                    voice: "田中さんはいらっしゃいますか？",
+                    options: [
+                        { text: "あいにく、席を外しております。", correct: true, fb: "正解！具体的な場所（トイレなど）は言わず、「席にいない」と伝えます。" },
+                        { text: "トイレに行っています。", correct: false, fb: "お客様にトイレと言うのは失礼になります。" },
+                        { text: "田中はいません。", correct: false, fb: "少しぶっきらぼうです。" }
+                    ]
+                }
+            ]
+        },
+        'visit': {
+            title: "訪問・マナー",
+            words: [
+                { jp: "失礼します (しつれいします)", en: "Excuse me (Entering/Leaving)" },
+                { jp: "お世話になっております", en: "Thank you for your continued support" },
+                { jp: "名刺 (めいし)", en: "Business Card" }
+            ],
+            quizzes: [
+                {
+                    situation: "会議室に入ります。ドアをノックしました。",
+                    role: "あなた",
+                    icon: "fa-door-open",
+                    question: "（中に入るときの言葉は？）",
+                    voice: "", 
+                    options: [
+                        { text: "失礼します。", correct: true, fb: "正解！入るときも出るときも使えます。" },
+                        { text: "お邪魔します。", correct: false, fb: "友達の家に行くときに使います。" },
+                        { text: "ごめんください。", correct: false, fb: "お店や他人の家で使いますが、会議室では使いません。" }
+                    ]
+                },
+                {
+                    situation: "取引先の人に会いました。最初の挨拶は？",
+                    role: "取引先",
+                    icon: "fa-user-group",
+                    question: "（名刺を出しながら...）",
+                    voice: "",
+                    options: [
+                        { text: "いつもお世話になっております。", correct: true, fb: "正解！ビジネスの定番の挨拶です。" },
+                        { text: "はじめまして、元気ですか？", correct: false, fb: "ビジネスではあまり使いません。" },
+                        { text: "やあ、こんにちは。", correct: false, fb: "馴れ馴れしすぎます。" }
+                    ]
+                }
+            ]
+        },
+        'phrases': {
+            title: "便利なことば",
+            words: [
+                { jp: "かしこまりました", en: "Certainly / Understood (Very polite)" },
+                { jp: "承知いたしました", en: "I understand (Polite)" },
+                { jp: "申し訳ありません", en: "I am very sorry" },
+                { jp: "とんでもございません", en: "Not at all / You're welcome" }
+            ],
+            quizzes: [
+                {
+                    situation: "上司に「この仕事をやっておいて」と頼まれました。",
+                    role: "上司",
+                    icon: "fa-user-tie",
+                    question: "これ、15時までにお願い。",
+                    voice: "これ、15時までにお願い。",
+                    options: [
+                        { text: "かしこまりました。", correct: true, fb: "正解！とても丁寧な了解の返事です。" },
+                        { text: "了解です。", correct: false, fb: "目上の人に「了解」は使いません。" },
+                        { text: "うん、わかった。", correct: false, fb: "友達言葉です。" }
+                    ]
+                },
+                {
+                    situation: "お客様にお礼を言われました。「ありがとう！」",
+                    role: "お客様",
+                    icon: "fa-user",
+                    question: "手伝ってくれてありがとう。",
+                    voice: "手伝ってくれてありがとう。",
+                    options: [
+                        { text: "とんでもございません。", correct: true, fb: "正解！「どういたしまして」より丁寧です。" },
+                        { text: "いいえ、いいえ。", correct: false, fb: "悪くはありませんが、ビジネスでは別の表現がいいでしょう。" },
+                        { text: "当たり前です。", correct: false, fb: "失礼に聞こえます。" }
+                    ]
+                }
+            ]
+        }
+    };
+
+    let currentMode = null; // 'office', 'phone', etc.
+    let quizIndex = 0;
+    let score = 0;
+    let currentQuizData = [];
+
+    // --- 音声再生 ---
+    window.speak = (text) => {
+        if (!text) return;
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        
+        // 日本語音声を探す
+        const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        if(jpVoice) utterThis.voice = jpVoice;
+        
+        synth.speak(utterThis);
+    };
+
+    // --- 画面操作 ---
+    window.showScreen = (id) => {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    // --- シナリオ選択 ---
+    window.loadScenario = (key) => {
+        currentMode = key;
+        const data = scenarios[key];
+        
+        // タイトルセット
+        document.getElementById('practice-title').textContent = data.title;
+        
+        // 練習リスト生成
+        const listEl = document.getElementById('word-list');
+        listEl.innerHTML = '';
+        data.words.forEach(w => {
+            const div = document.createElement('div');
+            div.className = 'practice-item';
+            div.innerHTML = `
+                <div class="phrase-row">
+                    <div class="phrase-content">
+                        <div class="phrase-jp">${w.jp}</div>
+                        <div class="phrase-en">${w.en}</div>
+                    </div>
+                    <button class="play-btn-mini" onclick="speak('${w.jp}')">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            `;
+            listEl.appendChild(div);
+        });
+
+        window.showScreen('practice-screen');
+    };
+
+    // --- クイズ開始 ---
+    window.startQuiz = () => {
+        currentQuizData = scenarios[currentMode].quizzes;
+        quizIndex = 0;
+        score = 0;
+        document.getElementById('q-total').textContent = currentQuizData.length;
+        window.showScreen('quiz-screen');
+        loadQuestion();
+    };
+
+    function loadQuestion() {
+        const q = currentQuizData[quizIndex];
+        document.getElementById('q-current').textContent = quizIndex + 1;
+        document.getElementById('sim-situation').textContent = q.situation;
+        document.getElementById('char-role').textContent = q.role;
+        document.getElementById('question-text').textContent = q.question;
+        
+        // アイコン変更
+        const iconEl = document.getElementById('char-icon');
+        iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
+
+        // 選択肢生成
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        // シャッフル
+        const options = [...q.options].sort(() => Math.random() - 0.5);
+        
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => handleAnswer(opt, btn);
+            container.appendChild(btn);
+        });
+
+        // 音声自動再生
+        if(q.voice) window.speak(q.voice);
+    }
+
+    window.replayVoice = () => {
+        const q = currentQuizData[quizIndex];
+        if(q.voice) window.speak(q.voice);
+    };
+
+    function handleAnswer(opt, btn) {
+        // 全ボタン無効化
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+
+        const modal = document.getElementById('fb-modal');
+        const icon = document.getElementById('fb-icon');
+        const title = document.getElementById('fb-title');
+        const text = document.getElementById('fb-text');
+        
+        if(opt.correct) {
+            btn.classList.add('correct');
+            icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
+            title.textContent = "正解！";
+            title.style.color = "#4caf50";
+            score += 10;
+            // Firebaseポイント
+            if(window.addPoints) window.addPoints(10);
+        } else {
+            btn.classList.add('incorrect');
+            icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
+            title.textContent = "おしい！";
+            title.style.color = "#f44336";
+        }
+        
+        text.textContent = opt.fb;
+        
+        // モーダル表示
+        modal.style.display = 'flex';
+    }
+
+    window.nextQuestion = () => {
+        document.getElementById('fb-modal').style.display = 'none';
+        quizIndex++;
+        if(quizIndex < currentQuizData.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        document.getElementById('final-score').textContent = score;
+        window.showScreen('result-screen');
+    }
+
+});
+</script>
+</body>
+</html>
