@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>たからさがしワークブック</title>
+<title>たからさがしワークブック (自由記入版)</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
 
@@ -116,30 +116,35 @@
         background: #fff;
     }
 
+    /* 上部のチェックエリア（言葉指定なし） */
     .card-header {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 2px;
+        display: flex; justify-content: flex-end; align-items: center;
+        margin-bottom: 2px; height: 20px;
     }
-    .target-word { font-size: 1em; font-weight: bold; color: #555; }
     .check-circle { 
         width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; 
     }
 
+    /* お絵かきスペース */
     .draw-space {
         flex-grow: 1;
         background: #fafafa; border-radius: 8px;
         display: flex; justify-content: center; align-items: center;
-        color: #eee; font-size: 1.5em; margin-bottom: 2px;
+        color: #eee; font-size: 1.2em; margin-bottom: 5px;
         border: 1px solid #f0f0f0;
+        position: relative;
     }
+    /* ガイド用アイコン（うっすら表示） */
+    .draw-icon { opacity: 0.3; color: #ddd; font-size: 2em; }
     
+    /* 書き込みスペース（自由記入） */
     .write-space {
-        height: 30px;
+        height: 35px;
         border-bottom: 2px solid #aaa;
         display: flex; align-items: flex-end;
     }
-    .write-guide { font-size: 0.7em; color: #999; margin-right: 10px; margin-bottom: 2px; }
-    .write-text { font-family:'Klee One', cursive; color:#ccc; font-size:1.3em; margin-right:10px; margin-bottom: -2px; }
+    .write-guide { font-size: 0.8em; color: #999; margin-right: 5px; margin-bottom: 2px; }
+    .write-line { flex-grow: 1; } /* 空白行 */
 
     /* --- ボタン --- */
     .fab {
@@ -164,67 +169,38 @@
         </div>
 
 <script>
-    // --- データ ---
+    // --- データ (言葉指定を削除し、カテゴリのみに) ---
+    // count: ページ内の枠の数 (10個)
     const GAME_DATA = {
         stationery: {
             title: 'ぶんぼうぐ',
             color: '#ffd54f',
             icon: 'fa-solid fa-pen-ruler',
-            words: [
-                { id: 'enpitsu', name: 'えんぴつ' }, { id: 'keshigomu', name: 'けしゴム' },
-                { id: 'pen', name: 'ペン' }, { id: 'note', name: 'ノート' },
-                { id: 'hasami', name: 'はさみ' }, { id: 'nori', name: 'のり' },
-                { id: 'hotchkiss', name: 'ホッチキス' }, { id: 'jougi', name: 'じょうぎ' },
-                { id: 'fudebako', name: 'ふでばこ' }, { id: 'crayon', name: 'クレヨン' }
-            ]
+            count: 10
         },
         food: {
             title: 'たべもの',
             color: '#ffab91',
             icon: 'fa-solid fa-utensils',
-            words: [
-                { id: 'ringo', name: 'りんご' }, { id: 'banana', name: 'バナナ' },
-                { id: 'pan', name: 'パン' }, { id: 'gyunyu', name: 'ぎゅうにゅう' },
-                { id: 'tamago', name: 'たまご' }, { id: 'onigiri', name: 'おにぎり' },
-                { id: 'mikan', name: 'みかん' }, { id: 'juice', name: 'ジュース' },
-                { id: 'cookie', name: 'クッキー' }, { id: 'tomato', name: 'トマト' }
-            ]
+            count: 10
         },
         clothing: {
             title: 'おようふく',
             color: '#81d4fa',
             icon: 'fa-solid fa-shirt',
-            words: [
-                { id: 'kutsu', name: 'くつ' }, { id: 'boushi', name: 'ぼうし' },
-                { id: 'tshirt', name: 'Tシャツ' }, { id: 'kutsushita', name: 'くつした' },
-                { id: 'zubon', name: 'ズボン' }, { id: 'uwagi', name: 'うわぎ' },
-                { id: 'skirt', name: 'スカート' }, { id: 'kaban', name: 'かばん' },
-                { id: 'kasa', name: 'かさ' }, { id: 'megane', name: 'めがね' }
-            ]
+            count: 10
         },
         toys: {
             title: 'おもちゃ',
             color: '#a5d6a7',
             icon: 'fa-solid fa-robot',
-            words: [
-                { id: 'ball', name: 'ボール' }, { id: 'kuruma', name: 'くるま' },
-                { id: 'ningyou', name: 'にんぎょう' }, { id: 'block', name: 'ブロック' },
-                { id: 'nuigurumi', name: 'ぬいぐるみ' }, { id: 'densha', name: 'でんしゃ' },
-                { id: 'hikouki', name: 'ひこうき' }, { id: 'robotto', name: 'ロボット' },
-                { id: 'ehon', name: 'えほん' }, { id: 'fuusen', name: 'ふうせん' }
-            ]
+            count: 10
         },
         room: {
             title: 'おへや',
             color: '#ce93d8',
             icon: 'fa-solid fa-couch',
-            words: [
-                { id: 'isu', name: 'いす' }, { id: 'tsukue', name: 'つくえ' },
-                { id: 'tokei', name: 'とけい' }, { id: 'tv', name: 'テレビ' },
-                { id: 'gomibako', name: 'ごみばこ' }, { id: 'beddo', name: 'ベッド' },
-                { id: 'doa', name: 'ドア' }, { id: 'mado', name: 'まど' },
-                { id: 'denki', name: 'でんき' }, { id: 'sofa', name: 'ソファ' }
-            ]
+            count: 10
         }
     };
 
@@ -243,7 +219,7 @@
 
                 <i class="fa-solid fa-box-open" style="font-size:6em; color:#ffcc5c; margin-bottom:20px;"></i>
                 <h1 class="cover-title">たからさがし</h1>
-                <div class="cover-sub">おうちで みつけて え を かこう！</div>
+                <div class="cover-sub">みつけて かいてみよう！</div>
 
                 <div class="name-area">
                     <span style="font-size:1.2em; color:#888;">なまえ</span>
@@ -271,26 +247,24 @@
                 </div>
             `;
 
-            // グリッド (2列 x 5行 = 10個)
+            // グリッド (言葉指定なしの空枠を10個生成)
             let gridHtml = '<div class="item-grid">';
-            data.words.forEach(word => {
+            for(let i=0; i < data.count; i++) {
                 gridHtml += `
                     <div class="item-card" style="border-color:${data.color};">
                         <div class="card-header">
-                            <span class="target-word">さがす：${word.name}</span>
                             <div class="check-circle"></div>
                         </div>
                         <div class="draw-space">
-                            <i class="fa-regular fa-image" style="opacity:0.2;"></i>
+                            <i class="fa-regular fa-image draw-icon"></i>
                         </div>
                         <div class="write-space">
-                            <span class="write-guide">かこう ▶</span>
-                            <span class="write-text">${word.name}</span>
-                            <span style="flex-grow:1;"></span>
+                            <span class="write-guide">なまえ：</span>
+                            <div class="write-line"></div>
                         </div>
                     </div>
                 `;
-            });
+            }
             gridHtml += '</div>';
 
             sheet.innerHTML = headerHtml + gridHtml;
