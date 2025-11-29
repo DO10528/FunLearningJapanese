@@ -137,11 +137,6 @@
     }
     .info-label { font-size: 0.8em; color: #888; font-weight: bold; margin-bottom: 5px; }
     .info-text { font-size: 1.1em; font-weight: bold; color: #333; line-height: 1.4; }
-    .big-preview {
-        font-family: 'Klee One', cursive;
-        font-size: 8em; color: #333; text-align: center;
-        display: none; /* スマホではCanvas内に表示するので隠すかも */
-    }
 
     /* 右：練習エリア */
     .practice-panel {
@@ -182,7 +177,7 @@
 
     /* コントロール */
     .controls {
-        display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 10px;
+        display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 10px; flex-wrap: wrap;
     }
     .btn {
         padding: 10px 20px; border-radius: 30px; border: none;
@@ -192,6 +187,7 @@
     }
     .btn:active { transform: translateY(3px); box-shadow: none; }
     
+    .btn-audio { background: #ff9800; color: white; box-shadow: 0 4px 0 #e65100; }
     .btn-clear { background: #f44336; color: white; box-shadow: 0 4px 0 #d32f2f; }
     .btn-done { background: #4caf50; color: white; box-shadow: 0 4px 0 #388e3c; font-size: 1.2em; padding: 12px 40px; }
 
@@ -202,12 +198,10 @@
         .practice-panel { width: 100%; order: 1; }
         .canvas-container { width: 280px; height: 280px; }
         .canvas-guide { font-size: 200px; }
-        .big-preview { display: none; }
         .kanji-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
     }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { from { transform: scale(0.8); } to { transform: scale(1); } }
 
 </style>
 </head>
@@ -250,6 +244,7 @@
                 </div>
                 
                 <div class="controls">
+                    <button class="btn btn-audio" onclick="playAudio()"><i class="fa-solid fa-volume-high"></i> きく</button>
                     <button class="btn btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-eraser"></i> けす</button>
                     <button class="btn btn-done" onclick="finishPractice()"><i class="fa-regular fa-circle-check"></i> できた！</button>
                 </div>
@@ -320,6 +315,10 @@
 </script>
 
 <script>
+    const synth = window.speechSynthesis;
+    let voices = [];
+    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+
     // --- データ ---
     const kanjiList = [
         { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" },
@@ -423,8 +422,7 @@
 
     // --- 初期化 ---
     function init() {
-        // グリッド生成
-        kanjiList.forEach((item, index) => {
+        kanjiList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
             card.innerHTML = `
@@ -434,25 +432,50 @@
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
-
-        // キャンバスイベント設定 (マウス/タッチ)
         setupCanvas();
     }
+
+    // --- 音声再生 ---
+    window.playAudio = () => {
+        if (!currentKanji) return;
+        if (synth.speaking) synth.cancel();
+
+        const onText = currentKanji.on !== 'なし' ? currentKanji.on : '';
+        const kunText = currentKanji.kun !== 'なし' ? currentKanji.kun : '';
+        
+        // 読み上げテキスト: "漢字。音読み、〇〇。訓読み、〇〇。"
+        const utterText = `${currentKanji.kanji}。音読み、${onText}。訓読み、${kunText}`;
+        
+        const utterThis = new SpeechSynthesisUtterance(utterText);
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 0.9;
+        
+        // 女性声優先
+        const femaleKeywords = ['Google', 'Microsoft', 'Kyoko', 'O-Ren', 'Haruka', 'Ayumi', 'Female'];
+        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        let targetVoice = null;
+        for (const keyword of femaleKeywords) {
+            targetVoice = jpVoices.find(v => v.name.includes(keyword));
+            if (targetVoice) break;
+        }
+        if (targetVoice) utterThis.voice = targetVoice;
+        
+        synth.speak(utterThis);
+    };
 
     // --- モーダル操作 ---
     window.openModal = (item) => {
         currentKanji = item;
         
-        // 情報をセット
         document.getElementById('info-on').textContent = item.on;
         document.getElementById('info-kun').textContent = item.kun;
         document.getElementById('info-mean').textContent = item.meaning;
         document.getElementById('guide-char').textContent = item.kanji;
         
-        // キャンバスクリア
         clearCanvas();
-
         modal.classList.add('active');
+        
+        // 自動再生はせず、ユーザーがボタンを押す形式にしています
     };
 
     window.closeModal = () => {
@@ -462,15 +485,13 @@
 
     // --- キャンバスロジック ---
     function setupCanvas() {
-        // マウス
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDraw);
         canvas.addEventListener('mouseout', stopDraw);
 
-        // タッチ
         canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // スクロール防止
+            e.preventDefault();
             startDraw(e.touches[0]);
         }, { passive: false });
         canvas.addEventListener('touchmove', (e) => {
@@ -483,12 +504,11 @@
     function startDraw(e) {
         isDrawing = true;
         const rect = canvas.getBoundingClientRect();
-        // 描画設定
-        ctx.lineWidth = 12; // 太めのペン
+        ctx.lineWidth = 12;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#333'; // 黒色
-        ctx.globalAlpha = 0.8; // 少し透明
+        ctx.strokeStyle = '#333';
+        ctx.globalAlpha = 0.8;
 
         ctx.beginPath();
         const x = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -515,12 +535,11 @@
     };
 
     window.finishPractice = () => {
-        // ここでポイント加算
+        // ★修正点：1ポイント加算
         if (window.addPoints) {
-            window.addPoints(5); // 5ポイント加算
+            window.addPoints(1);
         }
         
-        // 褒める演出（簡易）
         const btn = document.querySelector('.btn-done');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-star"></i> すごい！';
@@ -528,7 +547,6 @@
         
         setTimeout(() => {
             closeModal();
-            // ボタンを戻す
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.style.background = '#4caf50';
@@ -536,7 +554,6 @@
         }, 800);
     };
 
-    // 初期化実行
     init();
 
 </script>

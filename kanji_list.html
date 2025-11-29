@@ -3,104 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>漢字 一覧表 (小学1年生)</title>
-    <link rel="stylesheet" href="assets/css/style.css"> 
+    <title>漢字 一覧表 (小学1年生) - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; color: #cc6600; }
-        .table-container { 
-            margin-top: 20px; 
-            overflow-x: auto; 
-            border: 1px solid #ccc; 
-            border-radius: 8px;
+        /* --- 共通設定 (V2デザイン) --- */
+        :root {
+            --primary: #42a5f5;
+            --accent: #ffcc5c;
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --card-bg: #ffffff;
         }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 600px; 
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
         }
-        th, td { 
-            padding: 12px 15px; 
-            border: 1px solid #ddd; 
-            text-align: left;
-            font-size: 16px;
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #42a5f5 0%, #4facfe 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
-        th { 
-            background-color: #f2f2f2; 
-            font-weight: bold; 
+        .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            text-decoration: none; font-weight: bold;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+
+        /* --- 漢字グリッド (カードデザイン) --- */
+        .kanji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .kanji-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; flex-direction: row;
+            align-items: center; gap: 15px;
+            border-left: 5px solid var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kanji-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* 左側：大きな漢字 */
+        .char-box {
+            background: #e3f2fd;
             color: #333;
-        }
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-        tr:hover { 
-            background-color: #eef; 
-        }
-        .kanji-char { font-size: 2.0em; font-weight: bold; }
-        .reading-kun { color: #007bff; } 
-        .reading-on { color: #dc3545; } 
-
-        /* ★追加: 番号列のスタイル */
-        .kanji-number { 
-            text-align: center; 
-            font-weight: bold; 
-            width: 50px; 
-            background-color: #e6f7ff;
+            width: 80px; height: 80px;
+            border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Klee One', cursive; /* 教科書体 */
+            font-size: 3.5em;
+            flex-shrink: 0;
         }
 
-        .home-button-container {
-            text-align: center;
-            margin-top: 20px;
+        /* 中央：情報 */
+        .info-box {
+            flex-grow: 1;
+            display: flex; flex-direction: column; gap: 5px;
         }
-        .home-button-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .meaning {
+            font-weight: 900; font-size: 1.1em; color: #555;
+            border-bottom: 2px solid #eee; padding-bottom: 2px; margin-bottom: 2px;
+        }
+        .reading-row { font-size: 0.9em; display: flex; align-items: baseline; gap: 5px; }
+        .label { font-size: 0.75em; color: #999; width: 30px; display: inline-block;}
+        
+        .kun { color: #1e88e5; font-weight: bold; } /* 青系 */
+        .on  { color: #e53935; font-weight: bold; } /* 赤系 */
+
+        /* 右側：音声ボタン */
+        .sound-btn {
+            background: var(--accent);
+            color: white; border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em;
+            box-shadow: 0 3px 0 #ffb300;
+            transition: all 0.1s;
+        }
+        .sound-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        /* 検索バー */
+        .search-area {
+            margin-bottom: 20px; text-align: center;
+        }
+        #search-input {
+            padding: 10px 20px; border-radius: 25px; border: 2px solid #ddd;
+            width: 80%; max-width: 400px; font-size: 1em; outline: none;
+        }
+        #search-input:focus { border-color: var(--primary); }
+
+        @media (max-width: 500px) {
+            .kanji-grid { grid-template-columns: 1fr; } /* スマホは1列 */
+            .kanji-card { padding: 15px; }
+            .char-box { width: 70px; height: 70px; font-size: 3em; }
         }
     </style>
-
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-0BX3DD42C1');
     </script>
-    </head>
+</head>
 <body>
 
-    <h1>📝 漢字 一覧表 (小学1年生)</h1>
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-book"></i> 漢字リスト</a>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
 
-    <div class="home-button-container">
-        <button onclick="window.location.href='index.html'">ホームに戻る</button>
+    <div class="container">
+        <h1>小学1年生の漢字 (80字)</h1>
+        
+        <div class="search-area">
+            <input type="text" id="search-input" placeholder="漢字や読み方でさがす...">
+        </div>
+
+        <div class="kanji-grid" id="kanji-container">
+            </div>
     </div>
 
-    <div class="table-container">
-        <table id="kanji-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>漢字</th>
-                    <th>訓読み (Kun-yomi)</th>
-                    <th>音読み (On-yomi)</th>
-                    <th>意味 (Meaning)</th>
-                </tr>
-            </thead>
-            <tbody id="kanji-tbody">
-                </tbody>
-        </table>
-    </div>
+    <script>
+        // データ定義 (JSON形式で埋め込み)
+        const kanjiData = [
+            { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" },
+            { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
+            { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" },
+            { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
+            { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" },
+            { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
+            { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" },
+            { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
+            { "kanji": "九", "kun": "ここの", "on": "く・きゅう", "meaning": "Nine" },
+            { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
+            { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" },
+            { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
+            { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "Ten Thousand" },
+            { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen, Circle" },
+            { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
+            { "kanji": "月", "kun": "つき", "on": "げつ・がつ", "meaning": "Month, Moon" },
+            { "kanji": "日", "kun": "ひ・か", "on": "にち・じつ", "meaning": "Day, Sun" },
+            { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" },
+            { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
+            { "kanji": "木", "kun": "き", "on": "もく・ぼく", "meaning": "Tree, Wood" },
+            { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold, Money" },
+            { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Earth, Soil" },
+            { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
+            { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" },
+            { "kanji": "田", "kun": "た", "on": "でん", "meaning": "Rice field" },
+            { "kanji": "人", "kun": "ひと", "on": "じん・にん", "meaning": "Person" },
+            { "kanji": "大", "kun": "おお", "on": "だい・たい", "meaning": "Big, Large" },
+            { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small, Little" },
+            { "kanji": "上", "kun": "うえ・あ", "on": "じょう", "meaning": "Up, Above" },
+            { "kanji": "下", "kun": "した・さ", "on": "か・げ", "meaning": "Down, Below" },
+            { "kanji": "口", "kun": "くち", "on": "こう・く", "meaning": "Mouth" },
+            { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
+            { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
+            { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
+            { "kanji": "力", "kun": "ちから", "on": "りょく・りき", "meaning": "Power, Strength" },
+            { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
+            { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" },
+            { "kanji": "子", "kun": "こ", "on": "し・す", "meaning": "Child" },
+            { "kanji": "女", "kun": "おんな", "on": "じょ・にょ", "meaning": "Woman" },
+            { "kanji": "男", "kun": "おとこ", "on": "だん・なん", "meaning": "Man" },
+            { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Ahead, Previous" },
+            { "kanji": "生", "kun": "い・う・なま", "on": "せい・しょう", "meaning": "Life, Birth" },
+            { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study, Learning" },
+            { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
+            { "kanji": "文", "kun": "ふみ", "on": "ぶん・もん", "meaning": "Sentence, Writing" },
+            { "kanji": "字", "kun": "あざ", "on": "じ", "meaning": "Character, Letter" },
+            { "kanji": "語", "kun": "かた", "on": "ご", "meaning": "Word, Language" },
+            { "kanji": "前", "kun": "まえ", "on": "ぜん", "meaning": "Before, Front" },
+            { "kanji": "後", "kun": "のち・うし・あと", "on": "ご・こう", "meaning": "After, Back" },
+            { "kanji": "外", "kun": "そと・ほか", "on": "がい・げ", "meaning": "Outside" },
+            { "kanji": "右", "kun": "みぎ", "on": "う・ゆう", "meaning": "Right" },
+            { "kanji": "左", "kun": "ひだり", "on": "さ", "meaning": "Left" },
+            { "kanji": "入", "kun": "い・はい", "on": "にゅう・じゅ", "meaning": "Enter, Insert" },
+            { "kanji": "出", "kun": "で・だ", "on": "しゅつ・すい", "meaning": "Go out, Exit" },
+            { "kanji": "立", "kun": "た", "on": "りつ・りゅう", "meaning": "Stand" },
+            { "kanji": "休", "kun": "やす", "on": "きゅう", "meaning": "Rest, Day off" },
+            { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See, Look" },
+            { "kanji": "行", "kun": "い・ゆ", "on": "こう・ぎょう", "meaning": "Go, Travel" },
+            { "kanji": "来", "kun": "く・きた", "on": "らい", "meaning": "Come, Next" },
+            { "kanji": "気", "kun": "なし", "on": "き・け", "meaning": "Spirit, Air, Mood" },
+            { "kanji": "空", "kun": "そら・あ・から", "on": "くう", "meaning": "Sky, Empty" },
+            { "kanji": "天", "kun": "あめ・あま", "on": "てん", "meaning": "Heaven, Sky" },
+            { "kanji": "雨", "kun": "あめ・あま", "on": "う", "meaning": "Rain" },
+            { "kanji": "早", "kun": "はや", "on": "そう", "meaning": "Early" },
+            { "kanji": "草", "kun": "くさ", "on": "そう", "meaning": "Grass" },
+            { "kanji": "虫", "kun": "むし", "on": "ちゅう", "meaning": "Insect" },
+            { "kanji": "犬", "kun": "いぬ", "on": "けん", "meaning": "Dog" },
+            { "kanji": "竹", "kun": "たけ", "on": "ちく", "meaning": "Bamboo" },
+            { "kanji": "林", "kun": "はやし", "on": "りん", "meaning": "Woods" },
+            { "kanji": "森", "kun": "もり", "on": "しん", "meaning": "Forest" },
+            { "kanji": "石", "kun": "いし", "on": "せき", "meaning": "Stone" },
+            { "kanji": "王", "kun": "なし", "on": "おう", "meaning": "King" },
+            { "kanji": "玉", "kun": "たま", "on": "ぎょく", "meaning": "Ball, Jewel" },
+            { "kanji": "車", "kun": "くるま", "on": "しゃ", "meaning": "Car, Vehicle" },
+            { "kanji": "町", "kun": "まち", "on": "ちょう", "meaning": "Town, Village" },
+            { "kanji": "村", "kun": "むら", "on": "そん", "meaning": "Village" },
+            { "kanji": "音", "kun": "おと・ね", "on": "おん", "meaning": "Sound" },
+            { "kanji": "糸", "kun": "いと", "on": "し", "meaning": "Thread" },
+            { "kanji": "中", "kun": "なか", "on": "ちゅう", "meaning": "Middle, Inside" },
+            { "kanji": "北", "kun": "きた", "on": "ほく", "meaning": "North" },
+            { "kanji": "南", "kun": "みなみ", "on": "なん", "meaning": "South" },
+            { "kanji": "西", "kun": "にし", "on": "せい・さい", "meaning": "West" },
+            { "kanji": "東", "kun": "ひがし", "on": "とう", "meaning": "East" },
+            { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book, Origin" },
+            { "kanji": "名", "kun": "な", "on": "めい・みょう", "meaning": "Name" },
+            { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot, Leg" },
+            { "kanji": "赤", "kun": "あか", "on": "せき・しゃく", "meaning": "Red" },
+            { "kanji": "青", "kun": "あお", "on": "せい・しょう", "meaning": "Blue" },
+            { "kanji": "白", "kun": "しろ", "on": "はく", "meaning": "White" }
+        ];
 
-    <div class="home-button-container">
-        <button onclick="window.location.href='index.html'">ホームに戻る</button>
-    </div>
+        // ページ読み込み完了時
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('kanji-container');
+            const searchInput = document.getElementById('search-input');
+            const synth = window.speechSynthesis;
+            let voices = [];
+            
+            // 音声ロード
+            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+            setTimeout(() => { voices = synth.getVoices(); }, 500);
 
-    <script src="js/kanji_list.js"></script>
+            // リスト描画関数
+            function renderList(list) {
+                container.innerHTML = '';
+                if (list.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
+                    return;
+                }
+
+                list.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'kanji-card';
+                    card.innerHTML = `
+                        <div class="char-box">${item.kanji}</div>
+                        <div class="info-box">
+                            <div class="meaning">${item.meaning}</div>
+                            <div class="reading-row">
+                                <span class="label">訓</span>
+                                <span class="kun">${item.kun}</span>
+                            </div>
+                            <div class="reading-row">
+                                <span class="label">音</span>
+                                <span class="on">${item.on}</span>
+                            </div>
+                        </div>
+                        <button class="sound-btn" onclick="speak('${item.kanji}', '${item.kun}', '${item.on}')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // 音声再生関数 (Global)
+            window.speak = (kanji, kun, on) => {
+                if (synth.speaking) synth.cancel();
+
+                // 読みやすいテキストを作成 (例: "一。訓読み、ひと。音読み、いち")
+                // 'なし' の場合は読み飛ばす
+                let text = `${kanji}。`;
+                if(kun !== 'なし') text += `くん、${kun}。`;
+                if(on !== 'なし') text += `おん、${on}。`;
+
+                const utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.lang = 'ja-JP';
+                utterThis.rate = 0.9;
+
+                // 女性の声を探す
+                const femaleKeywords = ['Google', 'Microsoft', 'Kyoko', 'O-Ren', 'Haruka', 'Ayumi', 'Female'];
+                const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+                let targetVoice = jpVoices.find(v => femaleKeywords.some(k => v.name.includes(k)));
+                if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+                if (targetVoice) utterThis.voice = targetVoice;
+
+                synth.speak(utterThis);
+            };
+
+            // 検索フィルタ機能
+            searchInput.addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const filtered = kanjiData.filter(item => {
+                    return item.kanji.includes(val) || 
+                           item.meaning.toLowerCase().includes(val) ||
+                           item.kun.includes(val) ||
+                           item.on.includes(val);
+                });
+                renderList(filtered);
+            });
+
+            // 初回表示
+            renderList(kanjiData);
+        });
+    </script>
 
 </body>
 </html>
