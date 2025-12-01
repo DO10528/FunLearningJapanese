@@ -234,18 +234,17 @@
 
 <div id="auth-modal" class="modal-overlay">
     <div class="modal-box">
-        <h2 id="modal-title">ログイン</h2>
-        <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
-        <input type="email" id="auth-email" placeholder="メールアドレス">
-        <input type="password" id="auth-pass" placeholder="パスワード">
-        <input type="text" id="auth-display-name" placeholder="ゲーム名 (ランキングに表示)" class="hidden">
-        <button id="modal-submit" class="btn-auth btn-login" style="width:100%; margin-top:10px;">実行</button>
-        <button id="modal-close" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
+        <h2 id="modal-title"></h2> <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
+        
+        <input type="email" id="auth-email" data-i18n-placeholder="ph_email">
+        <input type="password" id="auth-pass" data-i18n-placeholder="ph_pass">
+        <input type="text" id="auth-display-name" data-i18n-placeholder="ph_name" class="hidden">
+        
+        <button id="modal-submit" class="btn-auth btn-login" style="width:100%; margin-top:10px;"></button> <button id="modal-close" data-i18n="btn_cancel" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
     </div>
 </div>
 
 <script type="module">
-    // Firebase SDKのインポート (ES Modules)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { 
         getFirestore, doc, setDoc, updateDoc, getDocs, collection, 
@@ -256,8 +255,6 @@
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-    // あなたのFirebase Config (※実際の値に置き換えてください)
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -268,28 +265,30 @@
       measurementId: "G-LCMXVLPS81"
     };
 
-    // Firebase初期化
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app); 
 
-    // --- グローバル変数 ---
-    const SESS_KEY = 'user_mode'; // 'guest' または 'authenticated' のフラグとして使用
+    const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
-    // --- 認証モーダル制御 ---
+    // --- 認証モーダル制御 (多言語対応) ---
     window.openAuthModal = (mode) => {
         window.authMode = mode;
         const modal = document.getElementById('auth-modal');
         const displayNameInput = document.getElementById('auth-display-name');
         
         modal.style.display = 'flex';
-        document.getElementById('modal-title').textContent = mode === 'login' ? 'ログイン' : '新規登録';
         
-        // ★★★ 登録時のみゲーム名フィールドを表示 ★★★
+        // 言語に応じたテキストをセット
+        const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
+        document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
+        document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
+        
+        // 登録時のみゲーム名フィールドを表示
         displayNameInput.classList.toggle('hidden', mode === 'login');
 
-        // フィールドをクリア
+        // フィールドクリア
         document.getElementById('modal-msg').textContent = '';
         document.getElementById('auth-email').value = ''; 
         document.getElementById('auth-pass').value = '';
@@ -300,27 +299,28 @@
         document.getElementById('auth-modal').style.display = 'none';
     };
 
-    // --- 認証実行 (メールアドレス、パスワード、ゲーム名を使用) ---
+    // --- 認証実行 ---
     window.submitAuth = async () => {
         const email = document.getElementById('auth-email').value.trim(); 
         const pass = document.getElementById('auth-pass').value.trim();
         const displayName = document.getElementById('auth-display-name').value.trim();
         const msg = document.getElementById('modal-msg');
+        const errs = i18nData[currentLang]; // 現在の言語のエラーメッセージ集
         
-        if (!email || !pass) { msg.textContent = 'メールアドレスとパスワードを入力してください'; return; }
-        if (pass.length < 6) { msg.textContent = 'パスワードは6文字以上にする必要があります。'; return; }
+        if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
+        if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
 
         try {
             if (window.authMode === 'signup') {
                 if (!displayName || displayName.length < 2) { 
-                    msg.textContent = 'ゲーム名を入力してください（2文字以上）。'; 
+                    msg.textContent = errs.err_name_req; 
                     return; 
                 }
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("displayName", "==", displayName), limit(1));
                 const snap = await getDocs(q);
                 if (!snap.empty) {
-                    msg.textContent = 'そのゲーム名は既に使用されています。';
+                    msg.textContent = errs.err_name_taken;
                     return;
                 }
 
@@ -353,9 +353,6 @@
                         streak: 1,
                         lastLogin: new Date().toISOString()
                     });
-                } else {
-                    // 通常のログイン時はここで日時を更新するが、
-                    // 下の onAuthStateChanged 内で月次チェックを行うため、ここでは何もしなくてOK
                 }
 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
@@ -363,9 +360,9 @@
             }
         } catch (error) {
             console.error(error);
-            let errorMsg = '認証中にエラーが発生しました。';
-            if (error.code === 'auth/email-already-in-use') errorMsg = 'そのメールアドレスは既に使用されています。';
-            else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = 'メールアドレスまたはパスワードが正しくありません。';
+            let errorMsg = errs.err_generic;
+            if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
+            else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
             msg.textContent = errorMsg;
         }
     };
@@ -383,7 +380,6 @@
         updateUI('guest');
     };
 
-    // --- 月次リセットチェック関数 (新規追加) ---
     const checkMonthlyReset = async (user) => {
         const userRef = doc(db, "users", user.uid);
         const snapshot = await getDoc(userRef);
@@ -391,26 +387,17 @@
         if (snapshot.exists()) {
             const data = snapshot.data();
             const now = new Date();
-            const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0); // データがない場合は古い日付扱い
+            const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
 
-            // 現在の「年」か「月」が、前回のログインと違う場合
             if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-                // ポイントを0にリセットし、ログイン日時を更新
-                await updateDoc(userRef, {
-                    points: 0,
-                    lastLogin: now.toISOString()
-                });
+                await updateDoc(userRef, { points: 0, lastLogin: now.toISOString() });
                 console.log("月が変わったため、ポイントをリセットしました。");
             } else {
-                // 月が同じなら、最終ログイン日時のみ更新
-                await updateDoc(userRef, {
-                    lastLogin: now.toISOString()
-                });
+                await updateDoc(userRef, { lastLogin: now.toISOString() });
             }
         }
     };
 
-    // --- UI更新機能 ---
     function updateUI(userState) {
         const dash = document.getElementById('user-dashboard');
         const welcome = document.getElementById('guest-welcome');
@@ -426,13 +413,12 @@
             document.getElementById('streak-val').textContent = 0;
             document.getElementById('point-val').textContent = 0;
             
-        } else if (userState && userState.uid) { // 認証済みユーザー
+        } else if (userState && userState.uid) {
             welcome.classList.add('hidden');
             dash.classList.remove('hidden');
 
             const userId = userState.uid;
             
-            // Firestoreのリアルタイム更新をリッスン
             currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
                 if (doc.exists()) {
                     const data = doc.data();
@@ -450,13 +436,11 @@
             });
 
         } else {
-            // 未ログイン状態
             welcome.classList.remove('hidden');
             dash.classList.add('hidden');
         }
     }
 
-    // --- ランキング機能 ---
     window.toggleRanking = async () => {
         const modal = document.getElementById('ranking-modal');
         const list = document.getElementById('ranking-list');
@@ -506,14 +490,10 @@
         }
     };
 
-    // --- 初期化と認証状態の監視 ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             sessionStorage.setItem(SESS_KEY, 'authenticated');
-            
-            // ★ログイン時に月次リセットチェックを実行
             await checkMonthlyReset(user);
-
             updateUI(user);
         } else if (sessionStorage.getItem(SESS_KEY) === 'guest') {
             updateUI('guest');
@@ -522,7 +502,6 @@
         }
     });
     
-    // イベントリスナー設定
     document.getElementById('login-btn').onclick = () => window.openAuthModal('login');
     document.getElementById('signup-btn').onclick = () => window.openAuthModal('signup');
     document.getElementById('guest-btn').onclick = () => window.loginAsGuest();
@@ -530,7 +509,6 @@
     document.getElementById('modal-close').onclick = () => window.closeAuthModal();
     document.getElementById('modal-submit').onclick = () => window.submitAuth();
 
-    // ログイン入力でのEnterキー対応
     const handleEnter = (e) => {
         if (e.key === 'Enter') window.submitAuth();
     };
@@ -538,7 +516,6 @@
     document.getElementById('auth-pass').onkeydown = handleEnter;
     document.getElementById('auth-display-name').onkeydown = handleEnter;
 
-    // ゲームカテゴリ表示
     window.renderGameCategories(); 
 </script>
 
@@ -552,15 +529,11 @@
             cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
             cat_practice: "じっせん",
             
-            // ★ Hiragana Game Titles (ひらがなゲームタイトル)
+            // ゲームタイトル
             btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
             btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
-            
-            // ★ Katakana Game Titles (カタカナゲームタイトル)
             btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", 
             btn_k_pair: "ひらカタあわせ",
-            
-            // ★ Other Game Titles (その他のゲームタイトル)
             btn_shiri1: "しりとり1", btn_shiri2: "しりとり2",
             btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
             btn_clock1: "とけい1", btn_clock2: "とけい2",
@@ -568,7 +541,19 @@
             btn_kei1: "けいようし1",
             btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング",
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
-            btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク"
+            btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
+
+            // ★ 認証モーダル
+            modal_login: "ログイン", modal_signup: "新規登録",
+            ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
+            btn_exec: "実行", btn_cancel: "キャンセル",
+            err_input_req: "メールアドレスとパスワードを入力してください",
+            err_pass_len: "パスワードは6文字以上にする必要があります。",
+            err_name_req: "ゲーム名を入力してください（2文字以上）。",
+            err_name_taken: "そのゲーム名は既に使用されています。",
+            err_generic: "認証中にエラーが発生しました。",
+            err_email_taken: "そのメールアドレスは既に使用されています。",
+            err_auth_fail: "メールアドレスまたはパスワードが正しくありません。"
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
@@ -578,15 +563,11 @@
             cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
             cat_practice: "Practice",
 
-            // ★ Hiragana Game Titles (ひらがなゲームタイトル)
+            // Game Titles
             btn_h_write: "Writing Practice", btn_h_sound: "Sound Quiz", btn_h_match: "Hiragana Match",
             btn_h_vocab: "Hiragana Vocab", btn_h_reorder: "Reordering", btn_h_meteor: "Meteor Quiz",
-            
-            // ★ Katakana Game Titles (カタカナゲームタイトル)
             btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Katakana Match",
             btn_k_pair: "Hira/Kata Pair",
-
-            // ★ Other Game Titles (その他のゲームタイトル)
             btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2",
             btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
             btn_clock1: "Clock 1", btn_clock2: "Clock 2",
@@ -594,7 +575,19 @@
             btn_kei1: "Adjective Quiz 1",
             btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing",
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
-            btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk"
+            btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
+
+            // ★ Auth Modal
+            modal_login: "Login", modal_signup: "Sign Up",
+            ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
+            btn_exec: "Submit", btn_cancel: "Cancel",
+            err_input_req: "Please enter email and password.",
+            err_pass_len: "Password must be at least 6 characters.",
+            err_name_req: "Please enter a game name (2+ chars).",
+            err_name_taken: "That game name is already taken.",
+            err_generic: "An error occurred during authentication.",
+            err_email_taken: "Email is already in use.",
+            err_auth_fail: "Incorrect email or password."
         }
     };
 
@@ -688,7 +681,6 @@
             a.className = 'game-card';
             a.style.borderColor = category.color;
 
-            // ★ 修正点: titleKeyを使用して翻訳をルックアップ
             const gameTitle = i18nData[currentLang][game.titleKey] || game.title;
             
             a.innerHTML = `
@@ -704,14 +696,30 @@
 
     window.setLanguage = (lang) => {
         currentLang = lang;
+        // 通常のテキスト更新
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
             if(i18nData[lang][key]) el.textContent = i18nData[lang][key];
         });
+        // ★ プレースホルダー更新
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.dataset.i18nPlaceholder;
+            if(i18nData[lang][key]) el.placeholder = i18nData[lang][key];
+        });
+
         document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        
+        // カテゴリまたはゲーム一覧を再描画
         if(backBtn.style.display === 'none') renderGameCategories();
         else renderGameCategories(); 
+
+        // モーダルが開いていたらテキスト更新
+        if(document.getElementById('auth-modal').style.display === 'flex') {
+             const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
+             document.getElementById('modal-title').textContent = i18nData[lang][modeKey];
+             document.getElementById('modal-submit').textContent = i18nData[lang]['btn_exec'];
+        }
     };
     
     // 初回レンダリング
