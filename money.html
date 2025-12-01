@@ -26,7 +26,7 @@
         min-height: 100vh;
         display: flex; flex-direction: column;
         user-select: none;
-        overflow: hidden; /* ドラッグ操作のため */
+        overflow: hidden; /* ドラッグ操作のため基本は隠す */
     }
 
     header {
@@ -34,16 +34,17 @@
         color: white; padding: 15px 20px;
         box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); z-index: 100;
         display: flex; justify-content: space-between; align-items: center;
+        flex-shrink: 0; /* ヘッダーが縮まないように */
     }
     .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
     .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
 
     .container {
-        flex-grow: 1; padding: 20px;
+        flex-grow: 1; padding: 10px; /* パディングを少し減らして画面を広く */
         width: 100%; max-width: 800px; margin: 0 auto;
         display: flex; flex-direction: column; align-items: center;
-        overflow-y: auto;
-        padding-bottom: 120px; /* 下部ボタン用スペース確保 */
+        overflow-y: auto; /* コンテンツが多い場合はスクロール */
+        padding-bottom: 80px;
         position: relative;
     }
 
@@ -58,17 +59,17 @@
 
     /* 硬貨 */
     .coin { border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); }
-    .coin-1 { width: 45px; height: 45px; background: #e0e0e0; color: #555; font-size: 0.9em; }
-    .coin-5 { width: 48px; height: 48px; background: #ffd700; color: #555; font-size: 0.9em; }
-    .coin-5::after { content:''; position:absolute; width:12px; height:12px; background:var(--bg-color); border-radius:50%; } /* 穴 */
-    .coin-10 { width: 50px; height: 50px; background: #cd7f32; color: white; font-size: 1em; }
-    .coin-50 { width: 49px; height: 49px; background: #e0e0e0; color: #555; font-size: 0.9em; border: 3px solid #ccc; }
-    .coin-50::after { content:''; position:absolute; width:12px; height:12px; background:var(--bg-color); border-radius:50%; }
-    .coin-100 { width: 52px; height: 52px; background: #e0e0e0; color: #555; font-size: 1em; border: 2px dashed #bbb; }
-    .coin-500 { width: 56px; height: 56px; background: #d4af37; color: white; font-size: 1.1em; border: 3px solid #e0e0e0; }
+    .coin-1 { width: 42px; height: 42px; background: #e0e0e0; color: #555; font-size: 0.9em; }
+    .coin-5 { width: 45px; height: 45px; background: #ffd700; color: #555; font-size: 0.9em; }
+    .coin-5::after { content:''; position:absolute; width:10px; height:10px; background:var(--bg-color); border-radius:50%; }
+    .coin-10 { width: 46px; height: 46px; background: #cd7f32; color: white; font-size: 1em; }
+    .coin-50 { width: 45px; height: 45px; background: #e0e0e0; color: #555; font-size: 0.9em; border: 3px solid #ccc; }
+    .coin-50::after { content:''; position:absolute; width:10px; height:10px; background:var(--bg-color); border-radius:50%; }
+    .coin-100 { width: 48px; height: 48px; background: #e0e0e0; color: #555; font-size: 1em; border: 2px dashed #bbb; }
+    .coin-500 { width: 52px; height: 52px; background: #d4af37; color: white; font-size: 1.1em; border: 3px solid #e0e0e0; }
 
     /* 紙幣 */
-    .bill { width: 110px; height: 55px; border-radius: 4px; font-size: 1em; margin: 5px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .bill { width: 100px; height: 50px; border-radius: 4px; font-size: 0.9em; margin: 3px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
     .bill-1000 { background: #64b5f6; border: 2px solid #1e88e5; }
     .bill-5000 { background: #ba68c8; border: 2px solid #8e24aa; }
     .bill-10000 { background: #a1887f; border: 2px solid #5d4037; }
@@ -76,12 +77,12 @@
     .money-label { pointer-events: none; }
 
     /* --- 画面切り替え --- */
-    .screen { display: none; width: 100%; animation: fadeIn 0.4s; }
+    .screen { display: none; width: 100%; animation: fadeIn 0.4s; position: relative; }
     .screen.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     /* --- メニュー --- */
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 40px; }
     .game-btn {
         background: white; border-radius: 15px; padding: 20px;
         text-align: center; cursor: pointer;
@@ -91,51 +92,54 @@
 
     /* --- 練習モード --- */
     .practice-grid {
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
-        background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px;
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+        background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px;
+        margin-top: 10px;
     }
     .practice-item { text-align: center; display: flex; flex-direction: column; align-items: center; }
 
     /* --- Level 1: ドラッグ --- */
     .wallet-area {
-        background: #795548; padding: 15px; border-radius: 0 0 15px 15px;
-        width: 100%; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+        background: #795548; padding: 10px; border-radius: 0 0 15px 15px;
+        width: 100%; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
         box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
     .tray-area {
-        background: #f5f5f5; border: 4px dashed #999; border-radius: 15px;
-        width: 100%; height: 180px; margin: 10px 0;
+        background: #f5f5f5; border: 3px dashed #999; border-radius: 15px;
+        width: 100%; height: 160px; /* 高さを少し縮小 */
+        margin: 10px 0;
         display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px;
         position: relative;
     }
     .target-display {
-        background: white; padding: 10px 30px; border-radius: 30px;
+        background: white; padding: 8px 30px; border-radius: 30px;
         font-size: 1.5em; font-weight: 900; color: var(--primary);
-        border: 3px solid var(--primary); margin-bottom: 10px;
+        border: 3px solid var(--primary); margin-bottom: 5px; margin-top: 20px; /* ボタンと重ならないよう余白 */
     }
 
     /* --- Level 2 & 3: 入力エリア --- */
     .quiz-card {
-        background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px;
+        background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px;
         text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         display: flex; flex-direction: column; align-items: center;
+        margin-top: 25px; /* ボタンと重ならないよう余白 */
     }
-    .product-img { font-size: 4em; color: #ff7043; margin-bottom: 20px; }
+    .product-img { font-size: 3.5em; color: #ff7043; margin-bottom: 10px; }
     
     .input-money {
-        font-size: 2em; padding: 10px; width: 220px; text-align: right;
-        border: 3px solid #ccc; border-radius: 10px; margin: 20px auto;
+        font-size: 1.8em; padding: 5px 10px; width: 200px; text-align: right;
+        border: 3px solid #ccc; border-radius: 10px; margin: 10px auto;
         background: #fafafa;
     }
     
     .numpad {
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
         margin: 10px auto; 
-        width: 100%; max-width: 280px;
+        width: 100%; max-width: 260px;
     }
     .num-btn {
-        background: #fff; border: 1px solid #ccc; padding: 15px; font-size: 1.4em; border-radius: 10px; cursor: pointer;
+        background: #fff; border: 1px solid #ccc; padding: 12px; font-size: 1.3em; border-radius: 10px; cursor: pointer;
         box-shadow: 0 3px 0 #ddd; font-weight: bold; color: #555;
     }
     .num-btn:active { transform: translateY(2px); box-shadow: none; }
@@ -157,7 +161,7 @@
     /* 固定ボタンエリア */
     .start-btn-area {
         position: fixed; 
-        bottom: 30px; 
+        bottom: 20px; 
         left: 0; right: 0;
         display: flex; justify-content: center;
         z-index: 500;
@@ -174,17 +178,16 @@
     }
     .big-start-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    /* ★戻るボタン（トップ配置用）★ */
-    .top-nav {
-        width: 100%; display: flex; justify-content: flex-start; margin-bottom: 10px;
-    }
-    .btn-return-top {
-        background: white; color: #546e7a; border: 2px solid #cfd8dc;
-        padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;
+    /* ★修正: 戻るボタンを絶対配置にしてレイアウトを崩さない★ */
+    .btn-return-fixed {
+        position: absolute;
+        top: 0; left: 0; z-index: 50;
+        background: white; color: #546e7a; border: 1px solid #cfd8dc;
+        padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85em;
         cursor: pointer; display: flex; align-items: center; gap: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s;
     }
-    .btn-return-top:active { transform: translateY(2px); background: #eceff1; }
+    .btn-return-fixed:active { transform: translateY(2px); background: #eceff1; }
 
 </style>
 </head>
@@ -196,11 +199,11 @@
 </header>
 
 <div class="container">
-    <div id="auth-status" style="font-size:0.8em; color:#666; margin-bottom:10px;">認証中...</div>
+    <div id="auth-status" style="font-size:0.8em; color:#666; margin-bottom:5px;">認証中...</div>
 
     <div id="practice-screen" class="screen active">
-        <h2 style="color:var(--primary);"><i class="fa-solid fa-book-open"></i> おかねの れんしゅう</h2>
-        <p style="margin-top:0;">おかねを タッチして おぼえよう！</p>
+        <h2 style="color:var(--primary); margin:10px 0;"><i class="fa-solid fa-book-open"></i> おかねの れんしゅう</h2>
+        <p style="margin:0 0 10px;">おかねを タッチして おぼえよう！</p>
         
         <div class="practice-grid" id="practice-list">
             </div>
@@ -213,13 +216,12 @@
     </div>
 
     <div id="menu-screen" class="screen">
-        <div class="top-nav">
-            <button class="btn-return-top" onclick="showScreen('practice-screen')">
-                <i class="fa-solid fa-arrow-left"></i> れんしゅうに もどる
-            </button>
-        </div>
-        <h2 style="color:var(--primary);">ゲームを えらんでね</h2>
-        <div class="menu-grid">
+        <button class="btn-return-fixed" onclick="showScreen('practice-screen')">
+            <i class="fa-solid fa-arrow-left"></i> れんしゅう
+        </button>
+        
+        <h2 style="color:var(--primary); margin-top:30px;">ゲームを えらんでね</h2>
+        <div class="menu-grid" style="margin-top:10px;">
             <div class="game-btn" onclick="startLevel(1)">
                 <i class="fa-solid fa-hand-holding-dollar fa-2x" style="color:var(--primary);"></i>
                 <h3>Level 1</h3>
@@ -239,14 +241,12 @@
     </div>
 
     <div id="level1-screen" class="screen">
-        <div class="top-nav">
-            <button class="btn-return-top" onclick="showScreen('practice-screen')">
-                <i class="fa-solid fa-arrow-left"></i> 練習に戻る
-            </button>
-        </div>
+        <button class="btn-return-fixed" onclick="showMenu()">
+            <i class="fa-solid fa-arrow-left"></i> ゲームせんたく
+        </button>
 
         <div class="target-display" id="lv1-target">0円</div>
-        <button onclick="speakPrice(currentLv1Target)" style="margin-bottom:10px; border:none; background:#e3f2fd; color:#2196f3; padding:5px 15px; border-radius:20px;">
+        <button onclick="speakPrice(currentLv1Target)" style="margin-bottom:5px; border:none; background:#e3f2fd; color:#2196f3; padding:5px 15px; border-radius:20px;">
             <i class="fa-solid fa-volume-high"></i> もういちど
         </button>
 
@@ -261,15 +261,13 @@
     </div>
 
     <div id="level2-screen" class="screen">
-        <div class="top-nav">
-            <button class="btn-return-top" onclick="showScreen('practice-screen')">
-                <i class="fa-solid fa-arrow-left"></i> 練習に戻る
-            </button>
-        </div>
+        <button class="btn-return-fixed" onclick="showMenu()">
+            <i class="fa-solid fa-arrow-left"></i> ゲームせんたく
+        </button>
 
         <div class="quiz-card">
             <div class="product-img"><i class="fa-solid fa-apple-whole"></i></div>
-            <button onclick="speakPrice(currentLv2Target)" style="border:none; background:#e3f2fd; color:#2196f3; padding:10px 20px; border-radius:20px; font-size:1.2em;">
+            <button onclick="speakPrice(currentLv2Target)" style="border:none; background:#e3f2fd; color:#2196f3; padding:8px 20px; border-radius:20px; font-size:1.1em;">
                 <i class="fa-solid fa-volume-high"></i> きく
             </button>
             
@@ -296,25 +294,23 @@
     </div>
 
     <div id="level3-screen" class="screen">
-        <div class="top-nav">
-            <button class="btn-return-top" onclick="showScreen('practice-screen')">
-                <i class="fa-solid fa-arrow-left"></i> 練習に戻る
-            </button>
-        </div>
+        <button class="btn-return-fixed" onclick="showMenu()">
+            <i class="fa-solid fa-arrow-left"></i> ゲームせんたく
+        </button>
 
         <div class="quiz-card">
-            <div style="font-size:1.2em; margin-bottom:10px; font-weight:bold; color:var(--primary);">おつりは いくら？</div>
-            <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:20px; width:100%;">
+            <div style="font-size:1.1em; margin-bottom:5px; font-weight:bold; color:var(--primary);">おつりは いくら？</div>
+            <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:15px; width:100%;">
                 <div style="text-align:center;">
-                    <div style="font-size:2em; color:#e91e63;"><i class="fa-solid fa-tag"></i></div>
+                    <div style="font-size:1.8em; color:#e91e63;"><i class="fa-solid fa-tag"></i></div>
                     <div style="font-weight:bold;" id="lv3-price">350円</div>
                 </div>
-                <div style="font-size:1.2em; color:#999;">を</div>
+                <div style="font-size:1.1em; color:#999;">を</div>
                 <div style="text-align:center;">
-                    <div style="font-size:2em; color:#4caf50;"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <div style="font-size:1.8em; color:#4caf50;"><i class="fa-solid fa-money-bill-wave"></i></div>
                     <div style="font-weight:bold;" id="lv3-paid">500円</div>
                 </div>
-                <div style="font-size:1.2em; color:#999;">ではらう</div>
+                <div style="font-size:1.1em; color:#999;">ではらう</div>
             </div>
 
             <div style="display:flex; align-items:center; justify-content:center;">
