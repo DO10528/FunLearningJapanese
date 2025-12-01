@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>います・ありますゲーム - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通デザイン --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f0f4f8;
+        --text-color: #333;
+        --imasu-color: #ff6f61;  /* 生き物カラー */
+        --arimasu-color: #42a5f5; /* 物カラー */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        touch-action: none; /* 全体でスクロールやズームを抑制 */
+        overflow: hidden;
+    }
+
+    header {
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(161, 140, 209, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-shrink: 0;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+        overflow-y: auto; /* コンテンツが多い場合のみスクロール */
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: fadeIn 0.4s; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- スタート画面（単語リスト） --- */
+    .word-section { width: 100%; margin-bottom: 20px; }
+    .section-title {
+        font-size: 1.2em; font-weight: bold; color: white;
+        padding: 8px 15px; border-radius: 20px; margin-bottom: 10px;
+        display: inline-block;
+    }
+    .word-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px; width: 100%;
+    }
+    .word-card {
+        background: white; border-radius: 12px; padding: 10px 5px;
+        display: flex; flex-direction: column; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer;
+        border: 2px solid transparent; transition: transform 0.1s;
+    }
+    .word-card:active { transform: scale(0.95); }
+    .word-card.imasu { border-bottom: 4px solid var(--imasu-color); }
+    .word-card.arimasu { border-bottom: 4px solid var(--arimasu-color); }
+    
+    .word-icon { font-size: 1.8em; margin-bottom: 5px; }
+    .word-text { font-size: 0.9em; font-weight: bold; text-align: center; }
+
+    .start-btn-area {
+        position: sticky; bottom: 20px; width: 100%; display: flex; justify-content: center;
+        pointer-events: none; margin-top: auto;
+    }
+    .big-start-btn {
+        pointer-events: auto;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        color: white; border: none; padding: 15px 50px;
+        border-radius: 50px; font-size: 1.5em; font-weight: 900;
+        box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        cursor: pointer; transition: transform 0.2s;
+        border: 4px solid white;
+    }
+    .big-start-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    /* --- メニュー（レベル選択） --- */
+    .menu-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
+    }
+    .game-btn {
+        background: white; border-radius: 15px; padding: 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 4px 0 #ddd; border: 2px solid transparent;
+        transition: transform 0.1s;
+    }
+    .game-btn:active { transform: translateY(4px); box-shadow: none; }
+    .game-btn h3 { margin: 10px 0 5px; color: var(--primary); }
+
+    /* --- Level 1: ドラッグ&ドロップ --- */
+    .drag-area {
+        display: flex; width: 100%; height: 350px; gap: 10px; margin-top: 20px; position: relative;
+        touch-action: none;
+    }
+    .drop-zone {
+        flex: 1; border-radius: 20px;
+        display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+        padding: 20px; font-weight: 900; font-size: 1.5em; color: white;
+        transition: all 0.2s;
+    }
+    .zone-imasu { background-color: var(--imasu-color); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+    .zone-arimasu { background-color: var(--arimasu-color); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+    
+    /* 真ん中のピース（静止時） */
+    .center-piece {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 110px; height: 110px; background: white;
+        border-radius: 50%; /* 完全な丸 */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.2em; font-weight: 900; cursor: grab; z-index: 10;
+        border: 5px solid var(--accent);
+        text-align: center; padding: 5px;
+        /* 重要: ドラッグ操作をJSで制御するため、標準のタッチアクションを無効化 */
+        touch-action: none; 
+        user-select: none;
+    }
+    
+    /* ドラッグ中のゴースト（JSで生成） */
+    .drag-ghost {
+        position: fixed; pointer-events: none; z-index: 9999;
+        width: 110px; height: 110px; background: white;
+        border-radius: 50%; /* 丸い形維持 */
+        border: 5px solid var(--accent);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.2em; font-weight: 900; color: var(--text-color);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        /* 中心をマウス位置に合わせる */
+        transform: translate(-50%, -50%); 
+        text-align: center;
+        opacity: 0.9;
+    }
+
+    /* --- Level 2-4: クイズ形式 --- */
+    .quiz-container {
+        background: white; width: 100%; max-width: 500px;
+        border-radius: 20px; padding: 20px; text-align: center;
+        box-shadow: 0 8px 0 #eee;
+    }
+    
+    .quiz-img-area {
+        width: 100%; height: 180px; background: #f9f9f9;
+        border-radius: 15px; margin-bottom: 15px;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 3em; color: #555; border: 2px dashed #ddd;
+        position: relative; overflow: hidden;
+    }
+    .quiz-img-area.small-img i, .quiz-img-area.small-img img {
+        font-size: 2.5em; width: 60px; height: 60px;
+    }
+    
+    .quiz-question { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; line-height: 1.4; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } 
+    
+    .option-btn {
+        background: #f0f4f8; border: 2px solid #ddd; border-radius: 12px;
+        padding: 15px 5px; font-size: 1.0em; font-weight: bold; cursor: pointer;
+        transition: all 0.1s; min-height: 60px; display: flex; align-items: center; justify-content: center;
+    }
+    .option-btn:active { transform: translateY(3px); background: #e3f2fd; }
+    .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+    .option-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+    /* --- 確認モーダル --- */
+    .feedback-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7); display: none;
+        justify-content: center; align-items: center; z-index: 200;
+    }
+    .feedback-box {
+        background: white; padding: 30px; border-radius: 20px; text-align: center;
+        width: 90%; max-width: 350px; animation: popIn 0.3s;
+    }
+    .next-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 12px 30px; border-radius: 30px; font-size: 1.1em; font-weight: bold;
+        cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 #3949ab;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: none; }
+
+    @keyframes popIn { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> います・あります</a>
+    <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+</header>
+
+<div class="container">
+    <div id="auth-status" style="font-size:0.8em; color:#666; margin-bottom:10px;">認証中...</div>
+
+    <div id="start-screen" class="screen active">
+        
+        <div class="word-section">
+            <div class="section-title" style="background:var(--imasu-color);">
+                <i class="fa-solid fa-heart"></i> います (Living)
+            </div>
+            <div id="list-imasu" class="word-grid"></div>
+        </div>
+
+        <div class="word-section">
+            <div class="section-title" style="background:var(--arimasu-color);">
+                <i class="fa-solid fa-cube"></i> あります (Object)
+            </div>
+            <div id="list-arimasu" class="word-grid"></div>
+        </div>
+
+        <div class="start-btn-area">
+            <button class="big-start-btn" onclick="showMenu()">
+                <i class="fa-solid fa-gamepad"></i> ゲームスタート！
+            </button>
+        </div>
+    </div>
+
+    <div id="menu-screen" class="screen">
+        <h2 style="color:var(--primary);">ゲームを えらんでね</h2>
+        <div class="menu-grid">
+            <div class="game-btn" onclick="startLevel(1)">
+                <i class="fa-solid fa-hand-pointer fa-2x" style="color:var(--imasu-color);"></i>
+                <h3>Level 1</h3>
+                <p>います？あります？<br>(ドラッグ 10問)</p>
+            </div>
+            <div class="game-btn" onclick="startLevel(2)">
+                <i class="fa-solid fa-map-location-dot fa-2x" style="color:var(--arimasu-color);"></i>
+                <h3>Level 2</h3>
+                <p>なにが ありますか？<br>(ばしょ 10問)</p>
+            </div>
+            <div class="game-btn" onclick="startLevel(3)">
+                <i class="fa-solid fa-comments fa-2x" style="color:#ab47bc;"></i>
+                <h3>Level 3</h3>
+                <p>だれが いますか？<br>(ひと・もの)</p>
+            </div>
+            <div class="game-btn" onclick="startLevel(4)">
+                <i class="fa-solid fa-building fa-2x" style="color:#ff9800;"></i>
+                <h3>Level 4</h3>
+                <p>どこですか？<br>(かい 10問)</p>
+            </div>
+        </div>
+        <button onclick="showScreen('start-screen')" style="margin-top:30px; background:none; border:none; color:#999; cursor:pointer;">リストにもどる</button>
+    </div>
+
+    <div id="level1-screen" class="screen">
+        <h2 style="margin:0;">どっちかな？ (10問)</h2>
+        <p style="margin:5px 0; color:#666;">おとを きいて えらぼう！</p>
+        
+        <div class="drag-area" id="drag-area">
+            <div class="drop-zone zone-imasu" id="zone-imasu">
+                <div>います</div>
+                <div style="font-size:0.5em; opacity:0.8;">(Living)</div>
+            </div>
+            <div class="drop-zone zone-arimasu" id="zone-arimasu">
+                <div>あります</div>
+                <div style="font-size:0.5em; opacity:0.8;">(Non-living)</div>
+            </div>
+            </div>
+        <button onclick="showMenu()" style="margin-top:30px; background:none; border:none; color:#999; cursor:pointer;">やめる</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <h2 id="quiz-title">Level ?</h2>
+        <div class="quiz-container">
+            <div class="quiz-img-area" id="quiz-img">
+                </div>
+            <div class="quiz-question" id="quiz-question">もんだい</div>
+            <button id="btn-replay" onclick="playQuizAudio()" style="margin-bottom:15px; border:none; background:#e3f2fd; color:var(--primary); padding:5px 15px; border-radius:20px; cursor:pointer;">
+                <i class="fa-solid fa-volume-high"></i> もういちどきく
+            </button>
+            <div class="quiz-options" id="quiz-options">
+                </div>
+        </div>
+        <button onclick="showMenu()" style="margin-top:20px; background:none; border:none; color:#999; cursor:pointer;">やめる</button>
+    </div>
+</div>
+
+<div id="feedback-modal" class="feedback-overlay">
+    <div class="feedback-box">
+        <div id="fb-icon" style="font-size:3em; margin-bottom:10px;"></div>
+        <div id="fb-word" style="font-size:1.5em; font-weight:bold; color:var(--primary); margin:10px 0;"></div>
+        <div id="fb-msg" style="color:#666; margin-bottom:10px;"></div>
+        <button class="next-btn" onclick="nextQuestionAction()">つぎへ</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            authStatusEl.textContent = "✅ ログイン中";
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = "❌ ゲストモード";
+        }
+    });
+
+    window.addPointsToUser = async function(points) {
+        if (!window.currentUserId) return;
+        try {
+            await updateDoc(doc(db, "users", window.currentUserId), { points: increment(points) });
+        } catch (e) { console.error(e); }
+    }
+</script>
+
+<script>
+    // --- データ (ひらがな統一) ---
+    const wordsData = [
+        // います
+        { id: "w01", text: "せんせい", type: 1, icon: "fa-user-tie" },
+        { id: "w02", text: "がくせい", type: 1, icon: "fa-user-graduate" },
+        { id: "w03", text: "ねこ", type: 1, icon: "fa-cat" },
+        { id: "w04", text: "いぬ", type: 1, icon: "fa-dog" },
+        { id: "w05", text: "とり", type: 1, icon: "fa-crow" },
+        { id: "w06", text: "さかな", type: 1, icon: "fa-fish" },
+        { id: "w07", text: "ぞう", type: 1, icon: "fa-elephant" },
+        { id: "w08", text: "おとこのひと", type: 1, icon: "fa-person" },
+        { id: "w09", text: "おんなのひと", type: 1, icon: "fa-person-dress" },
+        { id: "w10", text: "おとこのこ", type: 1, icon: "fa-child" },
+        { id: "w11", text: "おんなのこ", type: 1, icon: "fa-child-dress" },
+        { id: "w12", text: "パンダ", type: 1, icon: "fa-paw" },
+        { id: "w13", text: "うさぎ", type: 1, icon: "fa-paw" },
+        { id: "w14", text: "うま", type: 1, icon: "fa-horse" },
+        { id: "w15", text: "うし", type: 1, icon: "fa-cow" },
+        { id: "w16", text: "むし", type: 1, icon: "fa-bug" },
+        { id: "w17", text: "かえる", type: 1, icon: "fa-frog" },
+        { id: "w18", text: "ともだち", type: 1, icon: "fa-user-group" },
+        { id: "w19", text: "かぞく", type: 1, icon: "fa-people-roof" },
+        { id: "w20", text: "あかちゃん", type: 1, icon: "fa-baby" },
+        // あります
+        { id: "w21", text: "ほん", type: 0, icon: "fa-book" },
+        { id: "w22", text: "えんぴつ", type: 0, icon: "fa-pen" },
+        { id: "w23", text: "つくえ", type: 0, icon: "fa-table" },
+        { id: "w24", text: "いす", type: 0, icon: "fa-chair" },
+        { id: "w25", text: "とけい", type: 0, icon: "fa-clock" },
+        { id: "w26", text: "かばん", type: 0, icon: "fa-briefcase" },
+        { id: "w27", text: "テレビ", type: 0, icon: "fa-tv" },
+        { id: "w28", text: "くるま", type: 0, icon: "fa-car" },
+        { id: "w29", text: "でんしゃ", type: 0, icon: "fa-train" },
+        { id: "w30", text: "いえ", type: 0, icon: "fa-house" },
+        { id: "w31", text: "き", type: 0, icon: "fa-tree" },
+        { id: "w32", text: "はな", type: 0, icon: "fa-fan" },
+        { id: "w33", text: "ケータイ", type: 0, icon: "fa-mobile" },
+        { id: "w34", text: "パソコン", type: 0, icon: "fa-laptop" },
+        { id: "w35", text: "くつ", type: 0, icon: "fa-shoe-prints" },
+        { id: "w36", text: "ぼうし", type: 0, icon: "fa-hat-cowboy" },
+        { id: "w37", text: "かさ", type: 0, icon: "fa-umbrella" },
+        { id: "w38", text: "れいぞうこ", type: 0, icon: "fa-snowflake" },
+        { id: "w39", text: "ベッド", type: 0, icon: "fa-bed" },
+        { id: "w40", text: "おふろ", type: 0, icon: "fa-bath" }
+    ];
+
+    // --- クイズデータ ---
+    const quizData = {
+        level2: [
+            // Level 2 (10問)
+            { id: "q2_1", text: "いすの うえに なにが ありますか？", icon: "fa-bag-shopping", options: ["かばん", "こくばん", "ほん", "いす"], correct: 0 },
+            { id: "q2_2", text: "つくえの したに なにが ありますか？", icon: "fa-book", options: ["かばん", "ほん", "ぼうし", "えんぴつ"], correct: 1 },
+            { id: "q2_3", text: "はこの なかに なにが ありますか？", icon: "fa-mobile", options: ["ケータイ", "パソコン", "とけい", "かぎ"], correct: 0 },
+            { id: "q2_4", text: "へやの なかに なにが ありますか？", icon: "fa-bed", options: ["テレビ", "ベッド", "いす", "つくえ"], correct: 1 },
+            { id: "q2_5", text: "きの したに なにが いますか？", icon: "fa-cat", options: ["いぬ", "とり", "ねこ", "うさぎ"], correct: 2 },
+            { id: "q2_6", text: "つくえの うえに なにが ありますか？", icon: "fa-pen", options: ["けしごむ", "えんぴつ", "はさみ", "のり"], correct: 1 },
+            { id: "q2_7", text: "はこの うえに なにが ありますか？", icon: "fa-apple-whole", options: ["みかん", "バナナ", "りんご", "ぶどう"], correct: 2 },
+            { id: "q2_8", text: "いすの したに なにが いますか？", icon: "fa-dog", options: ["いぬ", "ねこ", "うさぎ", "とり"], correct: 0 },
+            { id: "q2_9", text: "かばんの なかに なにが ありますか？", icon: "fa-wallet", options: ["ほん", "さいふ", "かぎ", "ケータイ"], correct: 1 },
+            { id: "q2_10", text: "ベッドの うえに なにが ありますか？", icon: "fa-shirt", options: ["ズボン", "ぼうし", "シャツ", "くつした"], correct: 2 }
+        ],
+        level3: [
+            // Level 3 (既存)
+            { id: "q3_1", text: "あそこに だれが いますか？", icon: "fa-chalkboard-user", options: ["せんせい", "がくせい", "いぬ", "ねこ"], correct: 0 },
+            { id: "q3_2", text: "あそこに なにが ありますか？", icon: "fa-bicycle", options: ["じてんしゃ", "バイク", "くるま", "バス"], correct: 0 },
+            { id: "q3_3", text: "きょうしつに せんせいが いますか？ (Yes)", icon: "fa-user-tie", options: ["はい、います", "いいえ、いません", "はい、あります", "いいえ、ありません"], correct: 0 },
+            { id: "q3_4", text: "へやに テレビが ありますか？ (No)", icon: "fa-bed", options: ["はい、あります", "いいえ、ありません", "はい、います", "いいえ、いません"], correct: 1 }
+        ],
+        level4: [
+            // Level 4 (10問)
+            { id: "q4_1", text: "トイレは なんがい ですか？", answerKana: "トイレわ... 2かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 1 },
+            { id: "q4_2", text: "じむしょは なんがい ですか？", answerKana: "じむしょわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 0 },
+            { id: "q4_3", text: "しょくどうは なんがい ですか？", answerKana: "しょくどうわ... ちか1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 3 },
+            { id: "q4_4", text: "かいぎしつは なんがい ですか？", answerKana: "かいぎしつわ... 3かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 2 },
+            { id: "q4_5", text: "ちゅうしゃじょうは どこですか？", answerKana: "ちゅうしゃじょうわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "ちか"], correct: 2 },
+            { id: "q4_6", text: "うけつけは なんがい ですか？", answerKana: "うけつけわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "4かい"], correct: 0 },
+            { id: "q4_7", text: "しゃちょうは どこですか？", answerKana: "しゃちょうわ... かいぎしつに います。", options: ["じむしょ", "かいぎしつ", "トイレ", "しょくどう"], correct: 1 },
+            { id: "q4_8", text: "じどうはんばいきは どこですか？", answerKana: "じどうはんばいきわ... ロビーに あります。", options: ["ロビー", "へや", "そと", "2かい"], correct: 0 },
+            { id: "q4_9", text: "エレベーターは どこですか？", answerKana: "エレベーターわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "どっち"], correct: 2 },
+            { id: "q4_10", text: "やまださんは どこですか？", answerKana: "やまださんわ... じむしょに います。", options: ["じむしょ", "うち", "きょうしつ", "デパート"], correct: 0 }
+        ]
+    };
+
+    // --- 音声 ---
+    const synth = window.speechSynthesis;
+    let currentQuizObj = null; // 現在のクイズオブジェクトを保持
+    let isSpeaking = false;
+
+    function speak(text, callback) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 0.9;
+        
+        if(callback) {
+            utterThis.onend = () => callback();
+        }
+        
+        synth.speak(utterThis);
+    }
+
+    // クイズ音声再生ロジック
+    function playQuizAudio() {
+        if(!currentQuizObj) return;
+
+        // Level 4: 問題文 -> 2秒待機 -> 答えの文
+        if (quizLvl === 4 && currentQuizObj.answerKana) {
+            // 1. 問題文を読む
+            speak(currentQuizObj.text, () => {
+                // 2. 2秒待機
+                setTimeout(() => {
+                    // 3. 答えの文を読む (「わ」の発音対応)
+                    speak(currentQuizObj.answerKana);
+                }, 2000);
+            });
+        } else {
+            // 通常: 問題文のみ読む
+            speak(currentQuizObj.text);
+        }
+    }
+
+    // --- ポイント管理 (1日1回) ---
+    function grantDailyPoint(questId) {
+        if (!window.currentUserId) return;
+        const today = new Date().toISOString().split('T')[0];
+        const storageKey = `imasu_arimasu_points_${window.currentUserId}_${today}`;
+        let answered = JSON.parse(localStorage.getItem(storageKey)) || [];
+        
+        if (!answered.includes(questId)) {
+            if(window.addPointsToUser) window.addPointsToUser(1);
+            answered.push(questId);
+            localStorage.setItem(storageKey, JSON.stringify(answered));
+        }
+    }
+
+    // --- 画面操作 ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // クイズ音声停止
+        if(synth.speaking) synth.cancel();
+    }
+    
+    window.showMenu = () => showScreen('menu-screen');
+
+    // --- 1. 単語リスト表示 ---
+    function initWordLists() {
+        const iList = document.getElementById('list-imasu');
+        const aList = document.getElementById('list-arimasu');
+        iList.innerHTML = ''; aList.innerHTML = '';
+        
+        wordsData.forEach(w => {
+            const div = document.createElement('div');
+            div.className = `word-card ${w.type === 1 ? 'imasu' : 'arimasu'}`;
+            div.innerHTML = `<i class="fa-solid ${w.icon} word-icon" style="color:${w.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i><div class="word-text">${w.text}</div>`;
+            div.onclick = () => speak(w.text);
+            
+            if (w.type === 1) iList.appendChild(div);
+            else aList.appendChild(div);
+        });
+    }
+
+    // --- Level 1: ドラッグ ---
+    let lvl1Queue = [];
+    let currentWord = null;
+
+    window.startLevel = (lvl) => {
+        if (lvl === 1) {
+            // ランダムに10問選出
+            const shuffled = [...wordsData].sort(() => Math.random() - 0.5);
+            lvl1Queue = shuffled.slice(0, 10);
+            showScreen('level1-screen');
+            nextLevel1Question();
+        } else {
+            startQuizLevel(lvl);
+        }
+    };
+
+    window.nextLevel1Question = () => {
+        if (lvl1Queue.length === 0) {
+            alert("Level 1 クリア！");
+            showMenu();
+            return;
+        }
+        currentWord = lvl1Queue.pop();
+        
+        // 前のピース消去
+        const old = document.querySelector('.center-piece');
+        if (old) old.remove();
+
+        const area = document.getElementById('drag-area');
+        const piece = document.createElement('div');
+        piece.className = 'center-piece';
+        piece.textContent = currentWord.text;
+        
+        setTimeout(() => speak(currentWord.text), 300);
+        
+        // 音声再生(クリック時)
+        // ドラッグとクリックの競合を防ぐため、mousedown/touchstart判定を入れるのが理想だが
+        // 簡易的に実装
+        
+        // Drag Logic (Mouse & Touch 共通化)
+        setupCommonDrag(piece);
+        area.appendChild(piece);
+    };
+
+    let dragGhost = null;
+
+    function setupCommonDrag(el) {
+        const handleStart = (e) => {
+            e.preventDefault();
+            // 音声再生 (ドラッグ開始時に再生すると分かりやすい)
+            speak(currentWord.text);
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // ゴースト生成
+            dragGhost = document.createElement('div');
+            dragGhost.className = 'drag-ghost';
+            dragGhost.textContent = el.textContent;
+            
+            // 色はCSSで定義済みだが、ボーダー色はJSで継承
+            dragGhost.style.border = el.style.border;
+
+            dragGhost.style.left = clientX + 'px';
+            dragGhost.style.top = clientY + 'px';
+            document.body.appendChild(dragGhost);
+            
+            el.style.opacity = '0'; // 元の要素は見えなくする
+
+            // イベント登録
+            if (e.type === 'touchstart') {
+                document.addEventListener('touchmove', handleMove, {passive: false});
+                document.addEventListener('touchend', handleEnd);
+            } else {
+                document.addEventListener('mousemove', handleMove);
+                document.addEventListener('mouseup', handleEnd);
+            }
+        };
+
+        const handleMove = (e) => {
+            e.preventDefault();
+            if (!dragGhost) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            dragGhost.style.left = clientX + 'px';
+            dragGhost.style.top = clientY + 'px';
+        };
+
+        const handleEnd = (e) => {
+            // イベント解除
+            document.removeEventListener('touchmove', handleMove);
+            document.removeEventListener('touchend', handleEnd);
+            document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('mouseup', handleEnd);
+
+            // ドロップ判定
+            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+            // ゴースト削除
+            if (dragGhost) dragGhost.remove();
+            dragGhost = null;
+            el.style.opacity = '1';
+
+            // ターゲット取得
+            // (注意: elementFromPointはゴーストが邪魔すると取れないのでゴースト消去後に実行)
+            const target = document.elementFromPoint(clientX, clientY);
+
+            if (target) {
+                const zone = target.closest('.drop-zone');
+                if (zone) checkDrop(zone, el);
+            }
+        };
+
+        el.addEventListener('touchstart', handleStart, {passive: false});
+        el.addEventListener('mousedown', handleStart);
+    }
+
+
+    function checkDrop(zone, piece) {
+        const isImasuZone = zone.id === 'zone-imasu';
+        const isCorrect = (isImasuZone && currentWord.type === 1) || (!isImasuZone && currentWord.type === 0);
+        
+        showFeedback(isCorrect, currentWord, () => {
+             document.getElementById('feedback-modal').style.display = 'none';
+             nextLevel1Question();
+        });
+
+        if (isCorrect) grantDailyPoint(`lvl1_${currentWord.id}`);
+    }
+
+    // --- Level 2-4: クイズ ---
+    let quizQueue = [];
+    let quizNow = null;
+    let quizLvl = 0;
+
+    function startQuizLevel(lvl) {
+        quizLvl = lvl;
+        let key = lvl === 2 ? 'level2' : lvl === 3 ? 'level3' : 'level4';
+        quizQueue = [...quizData[key]]; // シャッフルなし(固定順) or 必要ならシャッフル
+        
+        // Level 2, 4は10問あるのでそのまま使用
+        // Level 3は4問
+        
+        showScreen('quiz-screen');
+        document.getElementById('quiz-title').textContent = `Level ${lvl}`;
+        
+        const imgArea = document.getElementById('quiz-img');
+        if (lvl === 2) imgArea.classList.add('small-img');
+        else imgArea.classList.remove('small-img');
+
+        nextQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+        if (quizQueue.length === 0) {
+            alert(`Level ${quizLvl} クリア！`);
+            showMenu();
+            return;
+        }
+        quizNow = quizQueue.shift();
+        currentQuizObj = quizNow; // グローバル変数にセット(音声再生用)
+        
+        const imgArea = document.getElementById('quiz-img');
+        imgArea.innerHTML = `<i class="fa-solid ${quizNow.icon}"></i>`;
+        
+        document.getElementById('quiz-question').textContent = quizNow.text;
+
+        // 音声自動再生
+        playQuizAudio();
+        
+        const optsDiv = document.getElementById('quiz-options');
+        optsDiv.innerHTML = '';
+        quizNow.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkQuiz(idx, btn);
+            optsDiv.appendChild(btn);
+        });
+    }
+
+    function checkQuiz(idx, btn) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        
+        const isCorrect = idx === quizNow.correct;
+        if (isCorrect) {
+            btn.classList.add('correct');
+            grantDailyPoint(`lvl${quizLvl}_${quizNow.id}`);
+        } else {
+            btn.classList.add('wrong');
+            btns[quizNow.correct].classList.add('correct');
+        }
+
+        setTimeout(nextQuizQuestion, 2000); // 2秒後に次へ
+    }
+
+    // --- Feedback Modal ---
+    let onNextAction = null;
+    window.nextQuestionAction = () => {
+        if(onNextAction) onNextAction();
+    };
+
+    function showFeedback(isCorrect, word, callback) {
+        const modal = document.getElementById('feedback-modal');
+        const icon = document.getElementById('fb-icon');
+        const wText = document.getElementById('fb-word');
+        const msg = document.getElementById('fb-msg');
+        
+        icon.innerHTML = `<i class="fa-solid ${word.icon}" style="color:${word.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i>`;
+        wText.textContent = word.text;
+        
+        if (isCorrect) {
+            msg.textContent = "せいかい！ (Correct!)";
+            msg.style.color = "#28a745";
+        } else {
+            msg.textContent = word.type === 1 ? "正解は「います」です" : "正解は「あります」です";
+            msg.style.color = "#dc3545";
+        }
+        
+        onNextAction = callback;
+        modal.style.display = 'flex';
+    }
+
+    // 初期化
+    initWordLists();
+
+</script>
+</body>
+</html>
