@@ -589,9 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
             title.textContent = "正解！";
             title.style.color = "#4caf50";
-            score += 10;
+            score += 1;
             // Firebaseポイント
-            if(window.addPoints) window.addPoints(10);
+            if(window.addPoints) window.addPoints(1);
         } else {
             btn.classList.add('incorrect');
             icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';

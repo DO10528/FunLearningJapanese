@@ -378,8 +378,8 @@
         window.currentUserId = null;
         const authStatusEl = document.getElementById('auth-status-sc');
         
-        // ポイントルール: 各問題の正解で5ポイント (デフォルト)
-        const POINTS_PER_CORRECT = 5; 
+        // ポイントルール: 各問題の正解で1ポイント (デフォルト)
+        const POINTS_PER_CORRECT = 1; 
         
         // 4. 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
