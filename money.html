@@ -114,25 +114,23 @@
         border: 3px solid var(--primary); margin-bottom: 10px;
     }
 
-    /* --- Level 2 & 3: 入力エリア（中央寄せ修正） --- */
+    /* --- Level 2 & 3: 入力エリア（中央寄せ） --- */
     .quiz-card {
         background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px;
         text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        display: flex; flex-direction: column; align-items: center; /* 子要素を中央に */
+        display: flex; flex-direction: column; align-items: center;
     }
     .product-img { font-size: 4em; color: #ff7043; margin-bottom: 20px; }
     
-    /* 回答枠: 中央配置 */
     .input-money {
         font-size: 2em; padding: 10px; width: 220px; text-align: right;
-        border: 3px solid #ccc; border-radius: 10px; margin: 20px auto; /* 左右autoで中央 */
+        border: 3px solid #ccc; border-radius: 10px; margin: 20px auto;
         background: #fafafa;
     }
     
-    /* 電卓: 中央配置 */
     .numpad {
         display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
-        margin: 10px auto; /* 左右autoで中央 */
+        margin: 10px auto; 
         width: 100%; max-width: 280px;
     }
     .num-btn {
@@ -175,9 +173,15 @@
     }
     .big-start-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    .back-btn-text {
-        margin-top:20px; background:none; border:none; color:#999; cursor:pointer; font-weight:bold;
+    /* ★戻るボタンのデザイン★ */
+    .btn-return {
+        background: #cfd8dc; color: #455a64; border: none;
+        padding: 10px 25px; border-radius: 20px; font-weight: bold; font-size: 1em;
+        cursor: pointer; margin-top: 20px;
+        box-shadow: 0 3px 0 #b0bec5; transition: transform 0.1s;
     }
+    .btn-return:active { transform: translateY(3px); box-shadow: none; }
+    .btn-return i { margin-right: 5px; }
 
 </style>
 </head>
@@ -224,7 +228,7 @@
                 <p>おつりは いくら？<br>(けいさん)</p>
             </div>
         </div>
-        <button class="back-btn-text" onclick="showScreen('practice-screen')">
+        <button class="btn-return" onclick="showScreen('practice-screen')">
             <i class="fa-solid fa-arrow-left"></i> れんしゅうに もどる
         </button>
     </div>
@@ -243,7 +247,10 @@
         <button onclick="checkLv1()" style="background:var(--primary); color:white; padding:10px 30px; border:none; border-radius:20px; font-size:1.2em; font-weight:bold; margin-bottom:10px;">これではらう</button>
 
         <div class="wallet-area" id="wallet-area"></div>
-        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+        
+        <button class="btn-return" onclick="showScreen('practice-screen')">
+            <i class="fa-solid fa-arrow-left"></i> 練習に戻る
+        </button>
     </div>
 
     <div id="level2-screen" class="screen">
@@ -273,7 +280,10 @@
                 <button class="num-btn" onclick="checkLv2()" style="background:var(--primary); color:white;">OK</button>
             </div>
         </div>
-        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+        
+        <button class="btn-return" onclick="showScreen('practice-screen')">
+            <i class="fa-solid fa-arrow-left"></i> 練習に戻る
+        </button>
     </div>
 
     <div id="level3-screen" class="screen">
@@ -312,7 +322,10 @@
                 <button class="num-btn" onclick="checkLv3()" style="background:var(--primary); color:white;">OK</button>
             </div>
         </div>
-        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+        
+        <button class="btn-return" onclick="showScreen('practice-screen')">
+            <i class="fa-solid fa-arrow-left"></i> 練習に戻る
+        </button>
     </div>
 </div>
 
