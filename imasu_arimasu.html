@@ -28,7 +28,7 @@
         min-height: 100vh;
         display: flex; flex-direction: column;
         user-select: none;
-        overflow: hidden; /* アプリっぽく外側のスクロールは防ぐ */
+        /* スクロール設定はcontainerで行うためbodyはデフォルト */
     }
 
     header {
@@ -37,18 +37,15 @@
         box-shadow: 0 4px 15px rgba(161, 140, 209, 0.3); z-index: 100;
         display: flex; justify-content: space-between; align-items: center;
         flex-shrink: 0;
+        position: sticky; top: 0;
     }
     .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
     .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
 
-    /* ★★★ 修正箇所: スクロール設定 ★★★ */
     .container {
         flex-grow: 1; padding: 20px;
-        width: 100%; max-width: 800px; margin: 0 auto;
+        width: 100%; max-width: 900px; margin: 0 auto;
         display: flex; flex-direction: column; align-items: center;
-        overflow-y: auto; /* 中身が溢れたらスクロール */
-        -webkit-overflow-scrolling: touch; /* 滑らかなスクロール */
-        touch-action: pan-y; /* 縦スクロールを許可 */
         padding-bottom: 120px; /* 下部ボタン用スペース */
     }
 
@@ -57,29 +54,47 @@
     .screen.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* --- スタート画面（単語リスト） --- */
-    .word-section { width: 100%; margin-bottom: 20px; }
-    .section-title {
-        font-size: 1.2em; font-weight: bold; color: white;
-        padding: 8px 15px; border-radius: 20px; margin-bottom: 10px;
-        display: inline-block;
+    /* --- スタート画面（単語リスト左右分割） --- */
+    .lists-row {
+        display: flex; flex-direction: row;
+        justify-content: center; align-items: flex-start;
+        gap: 15px; width: 100%;
     }
+    
+    .list-col {
+        flex: 1;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    .section-title {
+        font-size: 1.1em; font-weight: bold; color: white;
+        padding: 8px 15px; border-radius: 20px; margin-bottom: 15px;
+        display: inline-block; width: 100%; text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
     .word-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        display: grid; 
+        /* ★修正: カードの幅を統一 */
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
         gap: 10px; width: 100%;
     }
+    
     .word-card {
         background: white; border-radius: 12px; padding: 10px 5px;
-        display: flex; flex-direction: column; align-items: center;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; /* 中央寄せ */
         box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer;
         border: 2px solid transparent; transition: transform 0.1s;
+        /* ★修正: 高さを統一 */
+        height: 110px; 
+        width: 100%;
     }
     .word-card:active { transform: scale(0.95); }
     .word-card.imasu { border-bottom: 4px solid var(--imasu-color); }
     .word-card.arimasu { border-bottom: 4px solid var(--arimasu-color); }
     
-    .word-icon { font-size: 1.8em; margin-bottom: 5px; }
-    .word-text { font-size: 0.9em; font-weight: bold; text-align: center; }
+    .word-icon { font-size: 2em; margin-bottom: 8px; }
+    .word-text { font-size: 0.9em; font-weight: bold; text-align: center; line-height: 1.2; }
 
     /* 固定ボタンエリア */
     .start-btn-area {
@@ -117,7 +132,6 @@
     /* --- Level 1: ドラッグ&ドロップ --- */
     .drag-area {
         display: flex; width: 100%; height: 350px; gap: 10px; margin-top: 20px; position: relative;
-        /* ゲーム中はスクロールさせない */
         touch-action: none; 
     }
     .drop-zone {
@@ -216,18 +230,20 @@
 
     <div id="start-screen" class="screen active">
         
-        <div class="word-section">
-            <div class="section-title" style="background:var(--imasu-color);">
-                <i class="fa-solid fa-heart"></i> います (Living)
+        <div class="lists-row">
+            <div class="list-col">
+                <div class="section-title" style="background:var(--imasu-color);">
+                    <i class="fa-solid fa-heart"></i> います
+                </div>
+                <div id="list-imasu" class="word-grid"></div>
             </div>
-            <div id="list-imasu" class="word-grid"></div>
-        </div>
 
-        <div class="word-section">
-            <div class="section-title" style="background:var(--arimasu-color);">
-                <i class="fa-solid fa-cube"></i> あります (Object)
+            <div class="list-col">
+                <div class="section-title" style="background:var(--arimasu-color);">
+                    <i class="fa-solid fa-cube"></i> あります
+                </div>
+                <div id="list-arimasu" class="word-grid"></div>
             </div>
-            <div id="list-arimasu" class="word-grid"></div>
         </div>
 
         <div class="start-btn-area">
@@ -407,16 +423,16 @@
             { id: "q3_4", text: "へやに テレビが ありますか？ (No)", icon: "fa-bed", options: ["はい、あります", "いいえ、ありません", "はい、います", "いいえ、いません"], correct: 1 }
         ],
         level4: [
-            { id: "q4_1", text: "トイレは なんがい ですか？", answerKana: "トイレわ... 2かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 1 },
-            { id: "q4_2", text: "じむしょは なんがい ですか？", answerKana: "じむしょわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 0 },
-            { id: "q4_3", text: "しょくどうは なんがい ですか？", answerKana: "しょくどうわ... ちか1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 3 },
-            { id: "q4_4", text: "かいぎしつは なんがい ですか？", answerKana: "かいぎしつわ... 3かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 2 },
-            { id: "q4_5", text: "ちゅうしゃじょうは どこですか？", answerKana: "ちゅうしゃじょうわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "ちか"], correct: 2 },
-            { id: "q4_6", text: "うけつけは なんがい ですか？", answerKana: "うけつけわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "4かい"], correct: 0 },
-            { id: "q4_7", text: "しゃちょうは どこですか？", answerKana: "しゃちょうわ... かいぎしつに います。", options: ["じむしょ", "かいぎしつ", "トイレ", "しょくどう"], correct: 1 },
-            { id: "q4_8", text: "じどうはんばいきは どこですか？", answerKana: "じどうはんばいきわ... ロビーに あります。", options: ["ロビー", "へや", "そと", "2かい"], correct: 0 },
-            { id: "q4_9", text: "エレベーターは どこですか？", answerKana: "エレベーターわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "どっち"], correct: 2 },
-            { id: "q4_10", text: "やまださんは どこですか？", answerKana: "やまださんわ... じむしょに います。", options: ["じむしょ", "うち", "きょうしつ", "デパート"], correct: 0 }
+            { id: "q4_1", text: "トイレわ... なんがい ですか？", answerKana: "トイレわ... 2かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 1 },
+            { id: "q4_2", text: "じむしょわ... なんがい ですか？", answerKana: "じむしょわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 0 },
+            { id: "q4_3", text: "しょくどうわ... なんがい ですか？", answerKana: "しょくどうわ... ちか1かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 3 },
+            { id: "q4_4", text: "かいぎしつわ... なんがい ですか？", answerKana: "かいぎしつわ... 3かいに あります。", options: ["1かい", "2かい", "3かい", "ちか1かい"], correct: 2 },
+            { id: "q4_5", text: "ちゅうしゃじょうわ... どこですか？", answerKana: "ちゅうしゃじょうわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "ちか"], correct: 2 },
+            { id: "q4_6", text: "うけつけわ... なんがい ですか？", answerKana: "うけつけわ... 1かいに あります。", options: ["1かい", "2かい", "3かい", "4かい"], correct: 0 },
+            { id: "q4_7", text: "しゃちょうわ... どこですか？", answerKana: "しゃちょうわ... かいぎしつに います。", options: ["じむしょ", "かいぎしつ", "トイレ", "しょくどう"], correct: 1 },
+            { id: "q4_8", text: "じどうはんばいきわ... どこですか？", answerKana: "じどうはんばいきわ... ロビーに あります。", options: ["ロビー", "へや", "そと", "2かい"], correct: 0 },
+            { id: "q4_9", text: "エレベーターわ... どこですか？", answerKana: "エレベーターわ... あそこに あります。", options: ["ここ", "そこ", "あそこ", "どっち"], correct: 2 },
+            { id: "q4_10", text: "やまださんわ... どこですか？", answerKana: "やまださんわ... じむしょに います。", options: ["じむしょ", "うち", "きょうしつ", "デパート"], correct: 0 }
         ]
     };
 
@@ -526,7 +542,7 @@
             dragGhost = document.createElement('div');
             dragGhost.className = 'drag-ghost';
             dragGhost.textContent = el.textContent;
-            dragGhost.style.border = el.style.border; // ★★★ 丸とボーダー色を継承 ★★★
+            dragGhost.style.border = el.style.border; 
             dragGhost.style.left = clientX + 'px';
             dragGhost.style.top = clientY + 'px';
             document.body.appendChild(dragGhost);
@@ -564,8 +580,6 @@
             dragGhost = null;
             el.style.opacity = '1';
 
-            // ターゲット取得
-            // (注意: elementFromPointはゴーストが邪魔すると取れないのでゴースト消去後に実行)
             const target = document.elementFromPoint(clientX, clientY);
 
             if (target) {
