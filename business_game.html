@@ -203,7 +203,12 @@
             <div class="scenario-card" onclick="loadScenario('office')" style="border-bottom-color: #3f51b5;">
                 <div class="card-icon-box" style="color:#3f51b5;"><i class="fa-solid fa-building"></i></div>
                 <div class="card-title">オフィス・挨拶</div>
-                <div class="card-desc">社長、上司、退社</div>
+                <div class="card-desc">おはよう、お疲れ様</div>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('titles')" style="border-bottom-color: #e91e63;">
+                <div class="card-icon-box" style="color:#e91e63;"><i class="fa-solid fa-id-badge"></i></div>
+                <div class="card-title">役職・ランク</div>
+                <div class="card-desc">課長、部長、社長</div>
             </div>
             <div class="scenario-card" onclick="loadScenario('phone')" style="border-bottom-color: #00bcd4;">
                 <div class="card-icon-box" style="color:#00bcd4;"><i class="fa-solid fa-phone"></i></div>
@@ -214,11 +219,6 @@
                 <div class="card-icon-box" style="color:#ff9800;"><i class="fa-solid fa-handshake"></i></div>
                 <div class="card-title">訪問・マナー</div>
                 <div class="card-desc">失礼します、名刺</div>
-            </div>
-            <div class="scenario-card" onclick="loadScenario('phrases')" style="border-bottom-color: #4caf50;">
-                <div class="card-icon-box" style="color:#4caf50;"><i class="fa-solid fa-book"></i></div>
-                <div class="card-title">便利なことば</div>
-                <div class="card-desc">よく使う敬語リスト</div>
             </div>
         </div>
     </div>
@@ -332,38 +332,107 @@ document.addEventListener('DOMContentLoaded', () => {
     const scenarios = {
         'office': {
             title: "オフィス・挨拶",
-            // 練習用リスト
+            // 練習用リスト（追加：挨拶・オフィス言葉）
             words: [
-                { jp: "社長 (しゃちょう)", en: "President / CEO" },
-                { jp: "部長 (ぶちょう)", en: "Department Manager" },
-                { jp: "おはようございます", en: "Good morning (Polite)" },
-                { jp: "お先に失礼します", en: "Excuse me for leaving first (Goodbye)" },
-                { jp: "お疲れ様です", en: "Thank you for your hard work (Hello/Goodbye)" }
+                { jp: "おはようございます", en: "Good morning" },
+                { jp: "お疲れ様です", en: "Thank you for your hard work (Hello/Goodbye)" },
+                { jp: "お先に失礼します", en: "Excuse me for leaving first" },
+                { jp: "行って参ります", en: "I'm going out (for business)" },
+                { jp: "ただいま戻りました", en: "I'm back (in the office)" },
+                { jp: "承知いたしました", en: "Certainly / Understood" }
             ],
-            // クイズ
             quizzes: [
                 {
-                    situation: "朝、廊下で「社長」に会いました。",
-                    role: "社長",
-                    icon: "fa-user-tie",
-                    question: "おはよう。（にこやか）",
-                    voice: "おはよう。",
+                    situation: "朝、会社に着きました。同僚に会いました。",
+                    role: "同僚",
+                    icon: "fa-users",
+                    question: "おはよう！",
+                    voice: "おはよう！",
                     options: [
-                        { text: "社長、おはようございます！", correct: true, fb: "正解！相手が社長なので、丁寧な挨拶が必要です。" },
-                        { text: "社長、おはよう！", correct: false, fb: "「おはよう」は友達や部下に使う言葉です。" },
-                        { text: "やあ、社長。", correct: false, fb: "失礼になります。" }
+                        { text: "おはようございます。", correct: true, fb: "正解！丁寧で明るい挨拶です。" },
+                        { text: "やあ。", correct: false, fb: "ビジネスでは少しカジュアルすぎます。" },
+                        { text: "さようなら。", correct: false, fb: "朝の挨拶ではありません。" }
                     ]
                 },
                 {
-                    situation: "仕事が終わりました。先に帰ります。",
-                    role: "同僚・上司",
-                    icon: "fa-users",
-                    question: "（みんな、まだ仕事をしています）",
-                    voice: "", // 無音の状況
+                    situation: "仕事が終わって、先に帰ります。",
+                    role: "上司・同僚",
+                    icon: "fa-building",
+                    question: "（みんなはまだ仕事をしています）",
+                    voice: "（みんなはまだ仕事をしています）", // ナレーション風
                     options: [
-                        { text: "お先に失礼します。", correct: true, fb: "正解！「先に帰ってごめんなさい」という気持ちを込めた挨拶です。" },
-                        { text: "さようなら。", correct: false, fb: "学校ではOKですが、会社ではあまり使いません。" },
-                        { text: "バイバイ！", correct: false, fb: "友達言葉です。" }
+                        { text: "お先に失礼します。", correct: true, fb: "正解！「先に帰ってすみません」という気持ちを表します。" },
+                        { text: "帰ります。", correct: false, fb: "少し冷たい印象を与えます。" },
+                        { text: "バイバイ！", correct: false, fb: "友達ではありません。" }
+                    ]
+                },
+                {
+                    situation: "営業に出かけます。",
+                    role: "上司",
+                    icon: "fa-user-tie",
+                    question: "（カバンを持って立ち上がりました）",
+                    voice: "", 
+                    options: [
+                        { text: "行って参ります。", correct: true, fb: "正解！外へ仕事に行くときに使います。" },
+                        { text: "行ってきます。", correct: false, fb: "少しカジュアルです。「参ります」の方が丁寧です。" },
+                        { text: "さようなら。", correct: false, fb: "もう戻らないように聞こえます。" }
+                    ]
+                }
+            ]
+        },
+        'titles': {
+            title: "役職・ランク",
+            // 練習用リスト（追加：役職・関係）
+            words: [
+                // 関係
+                { jp: "先輩 (せんぱい)", en: "Senior (in experience)" },
+                { jp: "後輩 (こうはい)", en: "Junior (in experience)" },
+                // 現場管理職
+                { jp: "主任 (しゅにん)", en: "Chief / Team Leader" },
+                { jp: "係長 (かかりちょう)", en: "Subsection Chief" },
+                { jp: "課長 (かちょう)", en: "Section Manager" },
+                { jp: "部長 (ぶちょう)", en: "General Manager" },
+                { jp: "本部長 (ほんぶちょう)", en: "Division Director" },
+                // 役員
+                { jp: "常務 (じょうむ)", en: "Managing Director" },
+                { jp: "専務 (せんむ)", en: "Senior Managing Director" },
+                { jp: "副社長 (ふくしゃちょう)", en: "Vice President" },
+                { jp: "社長 (しゃちょう)", en: "President / CEO" }
+            ],
+            quizzes: [
+                {
+                    situation: "田中さんは「課長」です。鈴木さんは「部長」です。どちらが偉いですか？",
+                    role: "質問",
+                    icon: "fa-sitemap",
+                    question: "どちらが 上司（偉い人）ですか？",
+                    voice: "どちらが 上司ですか？",
+                    options: [
+                        { text: "鈴木さん（部長）", correct: true, fb: "正解！課長よりも部長の方が上の役職です。" },
+                        { text: "田中さん（課長）", correct: false, fb: "課長は部長の部下にあたります。" }
+                    ]
+                },
+                {
+                    situation: "会社のトップ（一番偉い人）を呼びます。",
+                    role: "社員",
+                    icon: "fa-user-tie",
+                    question: "この会社の代表は誰ですか？",
+                    voice: "この会社の代表は誰ですか？",
+                    options: [
+                        { text: "社長", correct: true, fb: "正解！社長（または代表取締役）がトップです。" },
+                        { text: "店長", correct: false, fb: "お店のトップですが、会社のトップは社長です。" },
+                        { text: "係長", correct: false, fb: "係長は現場のリーダーです。" }
+                    ]
+                },
+                {
+                    situation: "自分より先に入社して、経験がある人のことを何と呼びますか？",
+                    role: "質問",
+                    icon: "fa-user-group",
+                    question: "（鈴木さんは私より3年早く入社しました）",
+                    voice: "鈴木さんは私より3年早く入社しました。",
+                    options: [
+                        { text: "先輩", correct: true, fb: "正解！経験が上の人は「先輩」です。" },
+                        { text: "後輩", correct: false, fb: "後輩は、自分より後に入った人です。" },
+                        { text: "先生", correct: false, fb: "会社ではあまり使いません。" }
                     ]
                 }
             ]
@@ -395,8 +464,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     question: "田中さんはいらっしゃいますか？",
                     voice: "田中さんはいらっしゃいますか？",
                     options: [
-                        { text: "あいにく、席を外しております。", correct: true, fb: "正解！具体的な場所（トイレなど）は言わず、「席にいない」と伝えます。" },
-                        { text: "トイレに行っています。", correct: false, fb: "お客様にトイレと言うのは失礼になります。" },
+                        { text: "あいにく、席を外しております。", correct: true, fb: "正解！具体的な場所は言わず、「席にいない」と伝えます。" },
+                        { text: "トイレに行っています。", correct: false, fb: "失礼になります。" },
                         { text: "田中はいません。", correct: false, fb: "少しぶっきらぼうです。" }
                     ]
                 }
@@ -405,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'visit': {
             title: "訪問・マナー",
             words: [
-                { jp: "失礼します (しつれいします)", en: "Excuse me (Entering/Leaving)" },
+                { jp: "失礼します", en: "Excuse me (Entering/Leaving)" },
                 { jp: "お世話になっております", en: "Thank you for your continued support" },
                 { jp: "名刺 (めいし)", en: "Business Card" }
             ],
@@ -419,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     options: [
                         { text: "失礼します。", correct: true, fb: "正解！入るときも出るときも使えます。" },
                         { text: "お邪魔します。", correct: false, fb: "友達の家に行くときに使います。" },
-                        { text: "ごめんください。", correct: false, fb: "お店や他人の家で使いますが、会議室では使いません。" }
+                        { text: "ごめんください。", correct: false, fb: "会社では使いません。" }
                     ]
                 },
                 {
@@ -435,57 +504,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 }
             ]
-        },
-        'phrases': {
-            title: "便利なことば",
-            words: [
-                { jp: "かしこまりました", en: "Certainly / Understood (Very polite)" },
-                { jp: "承知いたしました", en: "I understand (Polite)" },
-                { jp: "申し訳ありません", en: "I am very sorry" },
-                { jp: "とんでもございません", en: "Not at all / You're welcome" }
-            ],
-            quizzes: [
-                {
-                    situation: "上司に「この仕事をやっておいて」と頼まれました。",
-                    role: "上司",
-                    icon: "fa-user-tie",
-                    question: "これ、15時までにお願い。",
-                    voice: "これ、15時までにお願い。",
-                    options: [
-                        { text: "かしこまりました。", correct: true, fb: "正解！とても丁寧な了解の返事です。" },
-                        { text: "了解です。", correct: false, fb: "目上の人に「了解」は使いません。" },
-                        { text: "うん、わかった。", correct: false, fb: "友達言葉です。" }
-                    ]
-                },
-                {
-                    situation: "お客様にお礼を言われました。「ありがとう！」",
-                    role: "お客様",
-                    icon: "fa-user",
-                    question: "手伝ってくれてありがとう。",
-                    voice: "手伝ってくれてありがとう。",
-                    options: [
-                        { text: "とんでもございません。", correct: true, fb: "正解！「どういたしまして」より丁寧です。" },
-                        { text: "いいえ、いいえ。", correct: false, fb: "悪くはありませんが、ビジネスでは別の表現がいいでしょう。" },
-                        { text: "当たり前です。", correct: false, fb: "失礼に聞こえます。" }
-                    ]
-                }
-            ]
         }
     };
 
-    let currentMode = null; // 'office', 'phone', etc.
+    let currentMode = null;
     let quizIndex = 0;
     let score = 0;
     let currentQuizData = [];
 
-    // --- 音声再生 ---
+    // --- 音声再生 (修正：一度だけ再生するように制御) ---
     window.speak = (text) => {
         if (!text) return;
         if (synth.speaking) synth.cancel();
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
         
-        // 日本語音声を探す
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
         if(jpVoice) utterThis.voice = jpVoice;
         
@@ -503,10 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMode = key;
         const data = scenarios[key];
         
-        // タイトルセット
         document.getElementById('practice-title').textContent = data.title;
         
-        // 練習リスト生成
         const listEl = document.getElementById('word-list');
         listEl.innerHTML = '';
         data.words.forEach(w => {
@@ -546,15 +577,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('char-role').textContent = q.role;
         document.getElementById('question-text').textContent = q.question;
         
-        // アイコン変更
         const iconEl = document.getElementById('char-icon');
         iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
 
-        // 選択肢生成
         const container = document.getElementById('options-container');
         container.innerHTML = '';
         
-        // シャッフル
         const options = [...q.options].sort(() => Math.random() - 0.5);
         
         options.forEach(opt => {
@@ -565,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(btn);
         });
 
-        // 音声自動再生
+        // ★修正: 質問読み上げはここでのみ実行（一度きり）
         if(q.voice) window.speak(q.voice);
     }
 
@@ -575,7 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function handleAnswer(opt, btn) {
-        // 全ボタン無効化
         const btns = document.querySelectorAll('.option-btn');
         btns.forEach(b => b.disabled = true);
 
@@ -590,7 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
             title.textContent = "正解！";
             title.style.color = "#4caf50";
             score += 1;
-            // Firebaseポイント
             if(window.addPoints) window.addPoints(1);
         } else {
             btn.classList.add('incorrect');
@@ -600,8 +626,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         text.textContent = opt.fb;
-        
-        // モーダル表示
         modal.style.display = 'flex';
     }
 

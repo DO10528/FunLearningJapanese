@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>お金の学習 - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 --- */
+    :root {
+        --primary: #4caf50; /* お金っぽい緑 */
+        --accent: #ffc107;  /* ゴールド */
+        --bg-color: #f1f8e9;
+        --text-color: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        overflow: hidden; /* ドラッグ操作のため */
+    }
+
+    header {
+        background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+        overflow-y: auto;
+        padding-bottom: 120px; /* 下部ボタン用スペース確保 */
+    }
+
+    /* --- お金のデザイン (CSSで描画) --- */
+    .money {
+        display: inline-flex; justify-content: center; align-items: center;
+        font-weight: 900; box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+        cursor: pointer; position: relative; user-select: none;
+        transition: transform 0.1s; flex-shrink: 0;
+    }
+    .money:active { transform: scale(0.95); }
+
+    /* 硬貨 */
+    .coin { border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); }
+    .coin-1 { width: 45px; height: 45px; background: #e0e0e0; color: #555; font-size: 0.9em; }
+    .coin-5 { width: 48px; height: 48px; background: #ffd700; color: #555; font-size: 0.9em; }
+    .coin-5::after { content:''; position:absolute; width:12px; height:12px; background:var(--bg-color); border-radius:50%; } /* 穴 */
+    .coin-10 { width: 50px; height: 50px; background: #cd7f32; color: white; font-size: 1em; }
+    .coin-50 { width: 49px; height: 49px; background: #e0e0e0; color: #555; font-size: 0.9em; border: 3px solid #ccc; }
+    .coin-50::after { content:''; position:absolute; width:12px; height:12px; background:var(--bg-color); border-radius:50%; }
+    .coin-100 { width: 52px; height: 52px; background: #e0e0e0; color: #555; font-size: 1em; border: 2px dashed #bbb; }
+    .coin-500 { width: 56px; height: 56px; background: #d4af37; color: white; font-size: 1.1em; border: 3px solid #e0e0e0; }
+
+    /* 紙幣 */
+    .bill { width: 110px; height: 55px; border-radius: 4px; font-size: 1em; margin: 5px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .bill-1000 { background: #64b5f6; border: 2px solid #1e88e5; }
+    .bill-5000 { background: #ba68c8; border: 2px solid #8e24aa; }
+    .bill-10000 { background: #a1887f; border: 2px solid #5d4037; }
+
+    .money-label { pointer-events: none; }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: fadeIn 0.4s; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- メニュー --- */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+    .game-btn {
+        background: white; border-radius: 15px; padding: 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 4px 0 #ccc; border: 2px solid transparent;
+    }
+    .game-btn:active { transform: translateY(4px); box-shadow: none; }
+
+    /* --- 練習モード --- */
+    .practice-grid {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;
+        background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px;
+    }
+    .practice-item { text-align: center; display: flex; flex-direction: column; align-items: center; }
+
+    /* --- Level 1: ドラッグ --- */
+    .wallet-area {
+        background: #795548; padding: 15px; border-radius: 0 0 15px 15px;
+        width: 100%; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+        box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
+    }
+    .tray-area {
+        background: #f5f5f5; border: 4px dashed #999; border-radius: 15px;
+        width: 100%; height: 180px; margin: 10px 0;
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px;
+        position: relative;
+    }
+    .target-display {
+        background: white; padding: 10px 30px; border-radius: 30px;
+        font-size: 1.5em; font-weight: 900; color: var(--primary);
+        border: 3px solid var(--primary); margin-bottom: 10px;
+    }
+
+    /* --- Level 2 & 3: 入力エリア（中央寄せ修正） --- */
+    .quiz-card {
+        background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px;
+        text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        display: flex; flex-direction: column; align-items: center; /* 子要素を中央に */
+    }
+    .product-img { font-size: 4em; color: #ff7043; margin-bottom: 20px; }
+    
+    /* 回答枠: 中央配置 */
+    .input-money {
+        font-size: 2em; padding: 10px; width: 220px; text-align: right;
+        border: 3px solid #ccc; border-radius: 10px; margin: 20px auto; /* 左右autoで中央 */
+        background: #fafafa;
+    }
+    
+    /* 電卓: 中央配置 */
+    .numpad {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+        margin: 10px auto; /* 左右autoで中央 */
+        width: 100%; max-width: 280px;
+    }
+    .num-btn {
+        background: #fff; border: 1px solid #ccc; padding: 15px; font-size: 1.4em; border-radius: 10px; cursor: pointer;
+        box-shadow: 0 3px 0 #ddd; font-weight: bold; color: #555;
+    }
+    .num-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    /* ドラッグ用ゴースト */
+    .drag-ghost {
+        position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8;
+    }
+
+    /* モーダル */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 200;
+    }
+    .modal-box {
+        background: white; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 350px;
+    }
+
+    /* 固定ボタンエリア */
+    .start-btn-area {
+        position: fixed; 
+        bottom: 30px; 
+        left: 0; right: 0;
+        display: flex; justify-content: center;
+        z-index: 500;
+        pointer-events: none;
+    }
+    .big-start-btn {
+        pointer-events: auto;
+        background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+        color: white; border: none; padding: 15px 50px;
+        border-radius: 50px; font-size: 1.5em; font-weight: 900;
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        cursor: pointer; transition: transform 0.2s;
+        border: 4px solid white;
+    }
+    .big-start-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    
+    .back-btn-text {
+        margin-top:20px; background:none; border:none; color:#999; cursor:pointer; font-weight:bold;
+    }
+
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-coins"></i> お金の学習</a>
+    <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+</header>
+
+<div class="container">
+    <div id="auth-status" style="font-size:0.8em; color:#666; margin-bottom:10px;">認証中...</div>
+
+    <div id="practice-screen" class="screen active">
+        <h2 style="color:var(--primary);"><i class="fa-solid fa-book-open"></i> おかねの れんしゅう</h2>
+        <p style="margin-top:0;">おかねを タッチして おぼえよう！</p>
+        
+        <div class="practice-grid" id="practice-list">
+            </div>
+
+        <div class="start-btn-area">
+            <button class="big-start-btn" onclick="showMenu()">
+                <i class="fa-solid fa-gamepad"></i> ゲームをはじめる
+            </button>
+        </div>
+    </div>
+
+    <div id="menu-screen" class="screen">
+        <h2 style="color:var(--primary);">ゲームを えらんでね</h2>
+        <div class="menu-grid">
+            <div class="game-btn" onclick="startLevel(1)">
+                <i class="fa-solid fa-hand-holding-dollar fa-2x" style="color:var(--primary);"></i>
+                <h3>Level 1</h3>
+                <p>おかねを はらおう<br>(ドラッグ)</p>
+            </div>
+            <div class="game-btn" onclick="startLevel(2)">
+                <i class="fa-solid fa-cash-register fa-2x" style="color:#2196f3;"></i>
+                <h3>Level 2</h3>
+                <p>いくらですか？<br>(ききとり)</p>
+            </div>
+            <div class="game-btn" onclick="startLevel(3)">
+                <i class="fa-solid fa-calculator fa-2x" style="color:#9c27b0;"></i>
+                <h3>Level 3</h3>
+                <p>おつりは いくら？<br>(けいさん)</p>
+            </div>
+        </div>
+        <button class="back-btn-text" onclick="showScreen('practice-screen')">
+            <i class="fa-solid fa-arrow-left"></i> れんしゅうに もどる
+        </button>
+    </div>
+
+    <div id="level1-screen" class="screen">
+        <div class="target-display" id="lv1-target">0円</div>
+        <button onclick="speakPrice(currentLv1Target)" style="margin-bottom:10px; border:none; background:#e3f2fd; color:#2196f3; padding:5px 15px; border-radius:20px;">
+            <i class="fa-solid fa-volume-high"></i> もういちど
+        </button>
+
+        <div class="tray-area" id="tray-area">
+            <div style="position:absolute; color:#ccc; font-weight:bold;">ここにおかねをおく</div>
+        </div>
+        
+        <div style="width:100%; text-align:center; margin-bottom:5px; font-weight:bold;">いま: <span id="current-sum">0</span>円</div>
+        <button onclick="checkLv1()" style="background:var(--primary); color:white; padding:10px 30px; border:none; border-radius:20px; font-size:1.2em; font-weight:bold; margin-bottom:10px;">これではらう</button>
+
+        <div class="wallet-area" id="wallet-area"></div>
+        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+    </div>
+
+    <div id="level2-screen" class="screen">
+        <div class="quiz-card">
+            <div class="product-img"><i class="fa-solid fa-apple-whole"></i></div>
+            <button onclick="speakPrice(currentLv2Target)" style="border:none; background:#e3f2fd; color:#2196f3; padding:10px 20px; border-radius:20px; font-size:1.2em;">
+                <i class="fa-solid fa-volume-high"></i> きく
+            </button>
+            
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <div id="lv2-input-display" class="input-money">0</div>
+                <div style="font-size:1.5em; margin-left:5px;">円</div>
+            </div>
+
+            <div class="numpad">
+                <button class="num-btn" onclick="addNum(7)">7</button>
+                <button class="num-btn" onclick="addNum(8)">8</button>
+                <button class="num-btn" onclick="addNum(9)">9</button>
+                <button class="num-btn" onclick="addNum(4)">4</button>
+                <button class="num-btn" onclick="addNum(5)">5</button>
+                <button class="num-btn" onclick="addNum(6)">6</button>
+                <button class="num-btn" onclick="addNum(1)">1</button>
+                <button class="num-btn" onclick="addNum(2)">2</button>
+                <button class="num-btn" onclick="addNum(3)">3</button>
+                <button class="num-btn" onclick="addNum(0)">0</button>
+                <button class="num-btn" onclick="clearNum()" style="color:white; background:#ef5350;">C</button>
+                <button class="num-btn" onclick="checkLv2()" style="background:var(--primary); color:white;">OK</button>
+            </div>
+        </div>
+        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+    </div>
+
+    <div id="level3-screen" class="screen">
+        <div class="quiz-card">
+            <div style="font-size:1.2em; margin-bottom:10px; font-weight:bold; color:var(--primary);">おつりは いくら？</div>
+            <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:20px; width:100%;">
+                <div style="text-align:center;">
+                    <div style="font-size:2em; color:#e91e63;"><i class="fa-solid fa-tag"></i></div>
+                    <div style="font-weight:bold;" id="lv3-price">350円</div>
+                </div>
+                <div style="font-size:1.2em; color:#999;">を</div>
+                <div style="text-align:center;">
+                    <div style="font-size:2em; color:#4caf50;"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <div style="font-weight:bold;" id="lv3-paid">500円</div>
+                </div>
+                <div style="font-size:1.2em; color:#999;">ではらう</div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <div id="lv3-input-display" class="input-money">0</div>
+                <div style="font-size:1.5em; margin-left:5px;">円</div>
+            </div>
+
+            <div class="numpad">
+                <button class="num-btn" onclick="addNum(7)">7</button>
+                <button class="num-btn" onclick="addNum(8)">8</button>
+                <button class="num-btn" onclick="addNum(9)">9</button>
+                <button class="num-btn" onclick="addNum(4)">4</button>
+                <button class="num-btn" onclick="addNum(5)">5</button>
+                <button class="num-btn" onclick="addNum(6)">6</button>
+                <button class="num-btn" onclick="addNum(1)">1</button>
+                <button class="num-btn" onclick="addNum(2)">2</button>
+                <button class="num-btn" onclick="addNum(3)">3</button>
+                <button class="num-btn" onclick="addNum(0)">0</button>
+                <button class="num-btn" onclick="clearNum()" style="color:white; background:#ef5350;">C</button>
+                <button class="num-btn" onclick="checkLv3()" style="background:var(--primary); color:white;">OK</button>
+            </div>
+        </div>
+        <button class="back-btn-text" onclick="showScreen('practice-screen')">れんしゅうに もどる</button>
+    </div>
+</div>
+
+<div id="modal" class="modal-overlay">
+    <div class="modal-box">
+        <div id="modal-icon" style="font-size:4em; margin-bottom:10px;"></div>
+        <h2 id="modal-msg" style="margin:5px 0;"></h2>
+        <div id="modal-sub" style="color:#666; margin-bottom:15px;"></div>
+        <button onclick="closeModal()" style="background:var(--primary); color:white; border:none; padding:10px 30px; border-radius:20px; font-size:1.1em;">つぎへ</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.currentUserId = user.uid;
+            authStatusEl.textContent = "✅ ログイン中";
+        } else {
+            window.currentUserId = null;
+            authStatusEl.textContent = "❌ ゲストモード";
+        }
+    });
+
+    window.addPointsToUser = async function(points) {
+        if (!window.currentUserId) return;
+        try {
+            await updateDoc(doc(db, "users", window.currentUserId), { points: increment(points) });
+        } catch (e) { console.error(e); }
+    }
+</script>
+
+<script>
+    // --- データ ---
+    const moneyTypes = [
+        { val: 1, type: 'coin', class: 'coin-1', label: '1' },
+        { val: 5, type: 'coin', class: 'coin-5', label: '5' },
+        { val: 10, type: 'coin', class: 'coin-10', label: '10' },
+        { val: 50, type: 'coin', class: 'coin-50', label: '50' },
+        { val: 100, type: 'coin', class: 'coin-100', label: '100' },
+        { val: 500, type: 'coin', class: 'coin-500', label: '500' },
+        { val: 1000, type: 'bill', class: 'bill-1000', label: '1000' },
+        { val: 5000, type: 'bill', class: 'bill-5000', label: '5000' },
+        { val: 10000, type: 'bill', class: 'bill-10000', label: '10000' },
+    ];
+
+    // --- 音声 ---
+    const synth = window.speechSynthesis;
+    function speak(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        synth.speak(utterThis);
+    }
+    
+    function speakPrice(amount) {
+        speak(`${amount}円`);
+    }
+
+    // --- 画面操作 ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+    window.showMenu = () => showScreen('menu-screen');
+
+    // --- 練習モード（初期表示） ---
+    window.initPractice = () => {
+        const list = document.getElementById('practice-list');
+        list.innerHTML = '';
+        moneyTypes.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'practice-item';
+            
+            const el = document.createElement('div');
+            el.className = `money ${m.class} ${m.type}`;
+            el.innerHTML = `<span class="money-label">${m.label}</span>`;
+            el.onclick = () => speakPrice(m.val);
+
+            const p = document.createElement('div');
+            p.textContent = `${m.val}円`;
+            p.style.fontWeight = "bold";
+
+            div.appendChild(el);
+            div.appendChild(p);
+            list.appendChild(div);
+        });
+        showScreen('practice-screen'); // デフォルト画面
+    };
+
+    // --- Level 1: 支払い (ドラッグ) ---
+    let currentLv1Target = 0;
+    let trayTotal = 0;
+
+    window.startLevel = (lvl) => {
+        if (lvl === 1) initLevel1();
+        if (lvl === 2) initLevel2();
+        if (lvl === 3) initLevel3();
+    };
+
+    function initLevel1() {
+        const patterns = [
+            Math.floor(Math.random() * 9 + 1) * 10,   
+            Math.floor(Math.random() * 9 + 1) * 100,  
+            Math.floor(Math.random() * 9 + 1) * 100 + Math.floor(Math.random() * 9 + 1) * 10, 
+            Math.floor(Math.random() * 20 + 1) * 100 
+        ];
+        currentLv1Target = patterns[Math.floor(Math.random() * patterns.length)];
+        
+        document.getElementById('lv1-target').textContent = `${currentLv1Target}円`;
+        document.getElementById('tray-area').innerHTML = '<div style="position:absolute; color:#ccc; font-weight:bold;">ここにおかねをおく</div>';
+        trayTotal = 0;
+        updateTraySum();
+        
+        const wallet = document.getElementById('wallet-area');
+        wallet.innerHTML = '';
+        moneyTypes.forEach(m => {
+            const el = createMoneyElement(m);
+            setupDrag(el, m.val);
+            wallet.appendChild(el);
+        });
+
+        showScreen('level1-screen');
+        setTimeout(() => speakPrice(currentLv1Target), 500);
+    }
+
+    function createMoneyElement(m) {
+        const el = document.createElement('div');
+        el.className = `money ${m.class} ${m.type}`;
+        el.innerHTML = `<span class="money-label">${m.label}</span>`;
+        return el;
+    }
+
+    function setupDrag(el, val) {
+        const handleStart = (e) => {
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const ghost = el.cloneNode(true);
+            ghost.classList.add('drag-ghost');
+            ghost.style.left = clientX + 'px';
+            ghost.style.top = clientY + 'px';
+            document.body.appendChild(ghost);
+
+            const move = (ev) => {
+                ev.preventDefault();
+                const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+                const cy = ev.touches ? ev.touches[0].clientY : ev.clientY;
+                ghost.style.left = cx + 'px';
+                ghost.style.top = cy + 'px';
+            };
+
+            const end = (ev) => {
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('touchend', end);
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('mouseup', end);
+
+                const cx = ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX;
+                const cy = ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY;
+                
+                ghost.remove();
+
+                const target = document.elementFromPoint(cx, cy);
+                if (target && target.closest('#tray-area')) {
+                    addToTray(val);
+                }
+            };
+
+            if (e.type === 'touchstart') {
+                document.addEventListener('touchmove', move, {passive: false});
+                document.addEventListener('touchend', end);
+            } else {
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', end);
+            }
+        };
+
+        el.addEventListener('touchstart', handleStart, {passive: false});
+        el.addEventListener('mousedown', handleStart);
+    }
+
+    function addToTray(val) {
+        const m = moneyTypes.find(x => x.val === val);
+        const el = createMoneyElement(m);
+        el.onclick = () => {
+            el.remove();
+            trayTotal -= val;
+            updateTraySum();
+        };
+        document.getElementById('tray-area').appendChild(el);
+        trayTotal += val;
+        updateTraySum();
+        speak(val + "円");
+    }
+
+    function updateTraySum() {
+        document.getElementById('current-sum').textContent = trayTotal;
+    }
+
+    window.checkLv1 = () => {
+        if (trayTotal === currentLv1Target) {
+            showModal(true, "せいかい！");
+            if(window.addPointsToUser) window.addPointsToUser(1);
+        } else {
+            showModal(false, `いま ${trayTotal}円 です。<br>${currentLv1Target}円 にしてね。`);
+        }
+    };
+
+    // --- Level 2: 聞き取り ---
+    let currentLv2Target = 0;
+    let inputNum = "";
+
+    function initLevel2() {
+        inputNum = "";
+        updateInputDisplay(2);
+        currentLv2Target = (Math.floor(Math.random() * 50) + 1) * 10;
+        showScreen('level2-screen');
+        setTimeout(() => speak(`これは ${currentLv2Target}円 です`), 500);
+    }
+
+    window.addNum = (n) => {
+        if (inputNum.length > 5) return;
+        if (inputNum === "0") inputNum = "";
+        inputNum += n;
+        updateInputDisplay(document.querySelector('#level2-screen.active') ? 2 : 3);
+    };
+
+    window.clearNum = () => {
+        inputNum = "0";
+        updateInputDisplay(document.querySelector('#level2-screen.active') ? 2 : 3);
+    };
+
+    function updateInputDisplay(lvl) {
+        const id = lvl === 2 ? 'lv2-input-display' : 'lv3-input-display';
+        document.getElementById(id).textContent = inputNum === "" ? "0" : inputNum;
+    }
+
+    window.checkLv2 = () => {
+        if (parseInt(inputNum) === currentLv2Target) {
+            showModal(true, "せいかい！");
+            if(window.addPointsToUser) window.addPointsToUser(1);
+        } else {
+            showModal(false, `こたえは ${currentLv2Target}円 でした。`);
+        }
+    };
+
+    // --- Level 3: おつり ---
+    let lv3Price = 0;
+    let lv3Paid = 0;
+
+    function initLevel3() {
+        inputNum = "";
+        updateInputDisplay(3);
+        
+        lv3Price = Math.floor(Math.random() * 9 + 1) * 100 - (Math.random() > 0.5 ? 0 : Math.floor(Math.random()*5)*10);
+        if (lv3Price < 500) lv3Paid = 500;
+        else if (lv3Price < 1000) lv3Paid = 1000;
+        else lv3Paid = 2000;
+
+        document.getElementById('lv3-price').textContent = `${lv3Price}円`;
+        document.getElementById('lv3-paid').textContent = `${lv3Paid}円`;
+        
+        showScreen('level3-screen');
+    }
+
+    window.checkLv3 = () => {
+        const correct = lv3Paid - lv3Price;
+        if (parseInt(inputNum) === correct) {
+            showModal(true, "せいかい！");
+            if(window.addPointsToUser) window.addPointsToUser(2);
+        } else {
+            showModal(false, `こたえは ${correct}円 です。`);
+        }
+    };
+
+    // --- モーダル制御 ---
+    let nextAction = null;
+    function showModal(isCorrect, msg) {
+        const modal = document.getElementById('modal');
+        const icon = document.getElementById('modal-icon');
+        const text = document.getElementById('modal-msg');
+        const sub = document.getElementById('modal-sub');
+        
+        modal.style.display = 'flex';
+        text.textContent = isCorrect ? "すごい！" : "ざんねん...";
+        sub.innerHTML = msg;
+        
+        if (isCorrect) {
+            icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
+            speak("せいかい！");
+        } else {
+            icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
+            speak("ちがいます");
+        }
+
+        nextAction = () => {
+            modal.style.display = 'none';
+            if (document.querySelector('#level1-screen.active')) initLevel1();
+            else if (document.querySelector('#level2-screen.active')) initLevel2();
+            else if (document.querySelector('#level3-screen.active')) initLevel3();
+        };
+    }
+
+    window.closeModal = () => {
+        if (nextAction) nextAction();
+    };
+
+    // 初期化
+    initPractice();
+
+</script>
+</body>
+</html>
