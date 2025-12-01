@@ -312,13 +312,11 @@
 
         try {
             if (window.authMode === 'signup') {
-                // ★★★ ゲーム名バリデーションと重複チェック ★★★
                 if (!displayName || displayName.length < 2) { 
                     msg.textContent = 'ゲーム名を入力してください（2文字以上）。'; 
                     return; 
                 }
                 const usersRef = collection(db, "users");
-                // データベースからdisplayNameの重複をチェック
                 const q = query(usersRef, where("displayName", "==", displayName), limit(1));
                 const snap = await getDocs(q);
                 if (!snap.empty) {
@@ -326,14 +324,12 @@
                     return;
                 }
 
-                // 新規登録 (Firebase Authを使用)
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
                 
-                // Firestoreにユーザーデータを作成（UIDをドキュメントIDとして使用）
                 await setDoc(doc(db, "users", user.uid), {
                     email: email, 
-                    displayName: displayName, // ゲーム名を保存
+                    displayName: displayName,
                     points: 0,
                     streak: 1,
                     lastLogin: new Date().toISOString()
@@ -343,7 +339,6 @@
                 window.closeAuthModal();
 
             } else {
-                // ログイン (Firebase Authを使用)
                 const userCredential = await signInWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
@@ -351,19 +346,17 @@
                 const userSnap = await getDoc(userRef); 
 
                 if (!userSnap.exists()) {
-                    // ★★★ ログイン成功時にFirestoreデータが存在しない場合、自動生成する ★★★
-                    // 以前の [code=not-found] エラー対策
                     await setDoc(userRef, {
                         email: email,
-                        // 既に認証済みだがFirestoreにデータがない場合、メールの@前を仮のゲーム名とする
                         displayName: email.split('@')[0] || 'UnknownUser', 
                         points: 0,
                         streak: 1,
                         lastLogin: new Date().toISOString()
                     });
                 } else {
-                    // データがある場合、最終ログイン日時を更新
-                    await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+                    // 通常のログイン時はここで日時を更新するが、
+                    // 下の onAuthStateChanged 内で月次チェックを行うため、ここでは何もしなくてOK
+                    // （もし即座に更新したい場合はここで updateDoc しても良いが、月次チェックと重複する可能性あり）
                 }
 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
@@ -371,28 +364,51 @@
             }
         } catch (error) {
             console.error(error);
-            
             let errorMsg = '認証中にエラーが発生しました。';
-            if (error.code === 'auth/email-already-in-use') {
-                errorMsg = 'そのメールアドレスは既に使用されています。';
-            } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                errorMsg = 'メールアドレスまたはパスワードが正しくありません。';
-            }
+            if (error.code === 'auth/email-already-in-use') errorMsg = 'そのメールアドレスは既に使用されています。';
+            else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = 'メールアドレスまたはパスワードが正しくありません。';
             msg.textContent = errorMsg;
         }
     };
 
     window.logout = async () => {
         if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
-        sessionStorage.removeItem(SESS_KEY); // セッション情報を削除
-        await signOut(auth); // Firebase Authからログアウト
-        updateUI(null); // UIを未ログイン状態に更新
+        sessionStorage.removeItem(SESS_KEY);
+        await signOut(auth);
+        updateUI(null);
     };
 
     window.loginAsGuest = () => {
         if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
         sessionStorage.setItem(SESS_KEY, 'guest');
         updateUI('guest');
+    };
+
+    // --- 月次リセットチェック関数 (新規追加) ---
+    const checkMonthlyReset = async (user) => {
+        const userRef = doc(db, "users", user.uid);
+        const snapshot = await getDoc(userRef);
+        
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            const now = new Date();
+            const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0); // データがない場合は古い日付扱い
+
+            // 現在の「年」か「月」が、前回のログインと違う場合
+            if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
+                // ポイントを0にリセットし、ログイン日時を更新
+                await updateDoc(userRef, {
+                    points: 0,
+                    lastLogin: now.toISOString()
+                });
+                console.log("月が変わったため、ポイントをリセットしました。");
+            } else {
+                // 月が同じなら、最終ログイン日時のみ更新
+                await updateDoc(userRef, {
+                    lastLogin: now.toISOString()
+                });
+            }
+        }
     };
 
     // --- UI更新機能 ---
@@ -417,24 +433,19 @@
 
             const userId = userState.uid;
             
-            // Firestoreのリアルタイム更新をリッスン (UIDでドキュメントを参照)
+            // Firestoreのリアルタイム更新をリッスン
             currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
                 if (doc.exists()) {
                     const data = doc.data();
-                    
-                    // Firestoreに保存したdisplayNameを表示
                     document.getElementById('user-name').textContent = data.displayName || 'ユーザー'; 
-                    
                     document.getElementById('streak-val').textContent = data.streak || 0;
                     document.getElementById('point-val').textContent = data.points || 0;
                     
-                    // レベル計算
                     const pts = data.points || 0;
                     const level = Math.floor(pts / 100) + 1;
                     document.getElementById('user-lvl').textContent = level;
                     document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
                 } else {
-                    // AuthはあるがFirestoreデータがない場合
                     document.getElementById('user-name').textContent = 'エラー';
                 }
             });
@@ -457,7 +468,6 @@
         loading.style.display = 'block';
 
         try {
-            // ポイント順に上位5名を取得
             const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
             const querySnapshot = await getDocs(q);
             
@@ -466,14 +476,12 @@
             let rank = 1;
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                // Firestoreに保存されているdisplayNameをランキング名として表示
                 const name = data.displayName || 'Unknown'; 
                 const pt = data.points || 0;
                 
                 const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
                 
                 const li = document.createElement('li');
-                // 安全なHTML生成
                 li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
                 
                 const leftSpan = document.createElement('span');
@@ -500,16 +508,17 @@
     };
 
     // --- 初期化と認証状態の監視 ---
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // ログイン済み (Firebase Authがセッションを保持している)
             sessionStorage.setItem(SESS_KEY, 'authenticated');
+            
+            // ★ログイン時に月次リセットチェックを実行
+            await checkMonthlyReset(user);
+
             updateUI(user);
         } else if (sessionStorage.getItem(SESS_KEY) === 'guest') {
-            // ゲストモードが選択されている
             updateUI('guest');
         } else {
-            // 未ログイン状態
             updateUI(null);
         }
     });
@@ -530,7 +539,7 @@
     document.getElementById('auth-pass').onkeydown = handleEnter;
     document.getElementById('auth-display-name').onkeydown = handleEnter;
 
-    // ゲームカテゴリ表示 (既存ロジックを維持)
+    // ゲームカテゴリ表示
     window.renderGameCategories(); 
 </script>
 
@@ -542,7 +551,7 @@
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
             cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
-            cat_practice: "じっせん" // ★追加
+            cat_practice: "じっせん"
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
@@ -550,7 +559,7 @@
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
             cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
-            cat_practice: "Practice" // ★追加
+            cat_practice: "Practice"
         }
     };
 
@@ -561,11 +570,11 @@
             { url: "hiragana_drag_match.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
             { url: "hiragana.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
             { url: "hiragana2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
-            { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }// ★追加
+            { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
         ]},
         { id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
             { url: "trace_write_katakana.html", title: "カタカナ道場", icon: "fa-solid fa-pen-nib" },
-            {  url: "katakana_block.html", title: "カタカナおとクイズ", icon: "fa-solid fa-cube" },
+            { url: "katakana_block.html", title: "おとクイズ", icon: "fa-solid fa-cube" }, 
             { url: "katakana_drag_match.html", title: "カタカナマッチ", icon: "fa-solid fa-hand-pointer" },
             { url: "hira_kata_pair.html", title: "ひらカタあわせ", icon: "fa-solid fa-right-left" }
         ]},
@@ -582,7 +591,7 @@
             { url: "clock2.html", title: "とけい2", icon: "fa-solid fa-stopwatch" }
         ]},
         { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#66bb6a", titleKey: "cat_kanji_game", games: [
-            { url: "trace_write_kanji.html", title: "かんじ道場", icon: "fa-solid fa-scroll" },
+            { url: "kanji_dojo.html", title: "かきかた道場", icon: "fa-solid fa-paintbrush" },
             { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
         ]},
         { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#ab47bc", titleKey: "cat_keiyoshi_game", games: [
@@ -598,7 +607,7 @@
             { url: "particle_quiz.html", title: "てにをはマスター", icon: "fa-solid fa-filter" },
             { url: "sentence_puzzle.html", title: "ぶんづくり", icon: "fa-solid fa-layer-group" }
         ]},
-        { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ // ★追加
+        { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ 
             { url: "shopping_talk.html", title: "お買い物トーク", icon: "fa-solid fa-cart-shopping" },
             { url: "business_game.html", title: "お仕事トーク", icon: "fa-solid fa-briefcase" }
         ]}
