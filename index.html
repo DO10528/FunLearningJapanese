@@ -356,7 +356,6 @@
                 } else {
                     // 通常のログイン時はここで日時を更新するが、
                     // 下の onAuthStateChanged 内で月次チェックを行うため、ここでは何もしなくてOK
-                    // （もし即座に更新したい場合はここで updateDoc しても良いが、月次チェックと重複する可能性あり）
                 }
 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
@@ -551,7 +550,25 @@
             btn_kiso: "ひらがな基礎", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
             cat_clock: "とけい", cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
-            cat_practice: "じっせん"
+            cat_practice: "じっせん",
+            
+            // ★ Hiragana Game Titles (ひらがなゲームタイトル)
+            btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
+            btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
+            
+            // ★ Katakana Game Titles (カタカナゲームタイトル)
+            btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", 
+            btn_k_pair: "ひらカタあわせ",
+            
+            // ★ Other Game Titles (その他のゲームタイトル)
+            btn_shiri1: "しりとり1", btn_shiri2: "しりとり2",
+            btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
+            btn_clock1: "とけい1", btn_clock2: "とけい2",
+            btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
+            btn_kei1: "けいようし1",
+            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング",
+            btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
+            btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク"
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
@@ -559,57 +576,75 @@
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
             cat_clock: "Clock", cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
-            cat_practice: "Practice"
+            cat_practice: "Practice",
+
+            // ★ Hiragana Game Titles (ひらがなゲームタイトル)
+            btn_h_write: "Writing Practice", btn_h_sound: "Sound Quiz", btn_h_match: "Hiragana Match",
+            btn_h_vocab: "Hiragana Vocab", btn_h_reorder: "Reordering", btn_h_meteor: "Meteor Quiz",
+            
+            // ★ Katakana Game Titles (カタカナゲームタイトル)
+            btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Katakana Match",
+            btn_k_pair: "Hira/Kata Pair",
+
+            // ★ Other Game Titles (その他のゲームタイトル)
+            btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2",
+            btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
+            btn_clock1: "Clock 1", btn_clock2: "Clock 2",
+            btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
+            btn_kei1: "Adjective Quiz 1",
+            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing",
+            btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
+            btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk"
         }
     };
 
     const gameStructure = [
         { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
-            { url: "trace_write_hiragana.html", title: "かきかた道場", icon: "fa-solid fa-paintbrush" },
-            { url: "hiragana_block.html", title: "おとクイズ", icon: "fa-solid fa-cube" },
-            { url: "hiragana_drag_match.html", title: "ひらがなマッチ", icon: "fa-solid fa-hand-pointer" },
-            { url: "hiragana.html", title: "ひらがな単語", icon: "fa-solid fa-shapes" },
-            { url: "hiragana2.html", title: "並び替え", icon: "fa-solid fa-sort-alpha-down" },
-            { url: "meteor_quiz.html", title: "隕石クイズ", icon: "fa-solid fa-meteor" }
+            { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
+            { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
+            { url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
+            { url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
+            { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
+            { url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
         ]},
         { id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
-            { url: "trace_write_katakana.html", title: "カタカナ道場", icon: "fa-solid fa-pen-nib" },
-            { url: "katakana_block.html", title: "おとクイズ", icon: "fa-solid fa-cube" }, 
-            { url: "katakana_drag_match.html", title: "カタカナマッチ", icon: "fa-solid fa-hand-pointer" },
-            { url: "hira_kata_pair.html", title: "ひらカタあわせ", icon: "fa-solid fa-right-left" }
+            { url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
+            { url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" }, 
+            { url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
+            { url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
         ]},
         { id: "shiritori", icon: "fa-solid fa-comments", color: "#f0ad4e", titleKey: "cat_shiritori", games: [
-            { url: "shiritori.html", title: "しりとり1", icon: "fa-solid fa-comment-dots" },
-            { url: "shiritori2.html", title: "しりとり2", icon: "fa-regular fa-comments" }
+            { url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
+            { url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
         ]},
         { id: "word_other", icon: "fa-solid fa-microphone", color: "#00bcd4", titleKey: "cat_word_other", games: [
-            { url: "treasure_Hunt.html", title: "宝探し", icon: "fa-solid fa-gem" },
-            { url: "aisatsu_quiz.html", title: "あいさつ", icon: "fa-solid fa-hand-spock" },
+            { url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
+            { url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
         ]},
         { id: "clock", icon: "fa-solid fa-clock", color: "#42a5f5", titleKey: "cat_clock", games: [
-            { url: "clock.html", title: "とけい1", icon: "fa-regular fa-clock" },
-            { url: "clock2.html", title: "とけい2", icon: "fa-solid fa-stopwatch" }
+            { url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
+            { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
         ]},
         { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#66bb6a", titleKey: "cat_kanji_game", games: [
-            { url: "kanji_dojo.html", title: "かきかた道場", icon: "fa-solid fa-paintbrush" },
-            { url: "kanji_quiz.html", title: "かんじクイズ", icon: "fa-solid fa-scroll" },
+            { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
+            { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
         ]},
         { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#ab47bc", titleKey: "cat_keiyoshi_game", games: [
-            { url: "keiyoshi.html", title: "けいようし1", icon: "fa-solid fa-star-half-stroke" },
+            { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
         ]},
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#9c27b0", titleKey: "cat_verb_game", games: [
-            { url: "verb.html", title: "どうしゲーム", icon: "fa-solid fa-person-running" },
-            { url: "verb_typing_masu.html", title: "ます形タイピング", icon: "fa-regular fa-keyboard" },
-            { url: "verb_typing_te.html", title: "て形タイピング", icon: "fa-solid fa-keyboard" }
+            { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
+            { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
+            { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" }
         ]},
         { id: "sentence", icon: "fa-solid fa-layer-group", color: "#546e7a", titleKey: "cat_sentence", games: [
-            { url: "particle_sorter.html", title: "助詞・仕分け道場", icon: "fa-solid fa-filter" },
-            { url: "particle_quiz.html", title: "てにをはマスター", icon: "fa-solid fa-filter" },
-            { url: "sentence_puzzle.html", title: "ぶんづくり", icon: "fa-solid fa-layer-group" }
+            { url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
+            { url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
+            { url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
         ]},
         { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ 
-            { url: "shopping_talk.html", title: "お買い物トーク", icon: "fa-solid fa-cart-shopping" },
-            { url: "business_game.html", title: "お仕事トーク", icon: "fa-solid fa-briefcase" }
+            { url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
+            { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
         ]}
     ];
 
@@ -652,9 +687,13 @@
             a.href = game.url;
             a.className = 'game-card';
             a.style.borderColor = category.color;
+
+            // ★ 修正点: titleKeyを使用して翻訳をルックアップ
+            const gameTitle = i18nData[currentLang][game.titleKey] || game.title;
+            
             a.innerHTML = `
                 <i class="${game.icon} card-icon" style="color:${category.color}"></i>
-                <span class="card-title">${game.title}</span>
+                <span class="card-title">${gameTitle}</span>
             `;
             gameGrid.appendChild(a);
         });
