@@ -3,16 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // ★★★ Firebase連携設定 ★★★
     // ----------------------------------------------------
-    // Firebase連携のグローバル関数に依存します。
     if (typeof window.addPointsToUser !== 'function') {
         window.addPointsToUser = async () => { return false; };
     }
-    const POINTS_PER_CORRECT = 5; // 自己評価で正解時に加算されるポイント数 (HTML側と同期)
-    // ★★★ 古いローカルストレージベースのポイントロジックは削除しました ★★★
-    // ----------------------------------------------------
+    const POINTS_PER_CORRECT = 1; 
 
     // ----------------------------------------------------
-    // ★ 1. データ定義 (ここでトピックと単語を管理します)
+    // ★ 1. データ定義
+    // (soundプロパティは使用しませんが、データ構造はそのままでも問題ありません)
     // ----------------------------------------------------
     const ASSETS_BASE = 'assets/';
 
@@ -21,88 +19,160 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'ぶんぼうぐ',
             color: '#ffd54f',
             words: [
-                { id: 'enpitsu', name: 'えんぴつ', img: 'enpitsu.png', sound: 'enpitsu.mp3' },
-                { id: 'keshigomu', name: 'けしゴム', img: 'keshigomu.png', sound: 'keshigomu.mp3' },
-                { id: 'pen', name: 'ペン', img: 'pen.png', sound: 'pen.mp3' },
-                { id: 'note', name: 'ノート', img: 'note.png', sound: 'note.mp3' },
-                { id: 'hasami', name: 'はさみ', img: 'hasami.png', sound: 'hasami.mp3' },
-                { id: 'nori', name: 'のり', img: 'nori.png', sound: 'nori.mp3' },
-                { id: 'hotchkiss', name: 'ホッチキス', img: 'hotchkiss.png', sound: 'hotchkiss.mp3' },
-                { id: 'jougi', name: 'じょうぎ', img: 'jougi.png', sound: 'jougi.mp3' },
-                { id: 'fudebako', name: 'ふでばこ', img: 'fudebako.png', sound: 'fudebako.mp3' },
-                { id: 'crayon', name: 'クレヨン', img: 'crayon.png', sound: 'crayon.mp3' }
+                { id: 'enpitsu', name: 'えんぴつ', img: 'enpitsu.png' },
+                { id: 'keshigomu', name: 'けしゴム', img: 'keshigomu.png' },
+                { id: 'pen', name: 'ペン', img: 'pen.png' },
+                { id: 'note', name: 'ノート', img: 'note.png' },
+                { id: 'hasami', name: 'はさみ', img: 'hasami.png' },
+                { id: 'nori', name: 'のり', img: 'nori.png' },
+                { id: 'hotchkiss', name: 'ホッチキス', img: 'hotchkiss.png' },
+                { id: 'jougi', name: 'じょうぎ', img: 'jougi.png' },
+                { id: 'fudebako', name: 'ふでばこ', img: 'fudebako.png' },
+                { id: 'crayon', name: 'クレヨン', img: 'crayon.png' }
             ]
         },
         food: {
             title: 'たべもの',
             color: '#ffab91', 
             words: [
-                // 元の5つ
-                { id: 'ringo', name: 'りんご', img: 'apple.png', sound: 'apple.mp3' },
-                { id: 'banana', name: 'バナナ', img: 'banana.png', sound: 'banana.mp3' },
-                { id: 'pan', name: 'パン', img: 'bread.png', sound: 'bread.mp3' },
-                { id: 'gyunyu', name: 'ぎゅうにゅう', img: 'milk.png', sound: 'milk.mp3' },
-                { id: 'tamago', name: 'たまご', img: 'egg.png', sound: 'egg.mp3' },
-                // ★追加した5つ
-                { id: 'onigiri', name: 'おにぎり', img: 'onigiri.png', sound: 'onigiri.mp3' },
-                { id: 'mikan', name: 'みかん', img: 'orange.png', sound: 'orange.mp3' },
-                { id: 'juice', name: 'ジュース', img: 'juice.png', sound: 'juice.mp3' },
-                { id: 'cookie', name: 'クッキー', img: 'cookie.png', sound: 'cookie.mp3' },
-                { id: 'tomato', name: 'トマト', img: 'tomato.png', sound: 'tomato.mp3' }
+                { id: 'ringo', name: 'りんご', img: 'apple.png' },
+                { id: 'banana', name: 'バナナ', img: 'banana.png' },
+                { id: 'pan', name: 'パン', img: 'bread.png' },
+                { id: 'gyunyu', name: 'ぎゅうにゅう', img: 'milk.png' },
+                { id: 'tamago', name: 'たまご', img: 'egg.png' },
+                { id: 'onigiri', name: 'おにぎり', img: 'onigiri.png' },
+                { id: 'mikan', name: 'みかん', img: 'orange.png' },
+                { id: 'juice', name: 'ジュース', img: 'juice.png' },
+                { id: 'cookie', name: 'クッキー', img: 'cookie.png' },
+                { id: 'tomato', name: 'トマト', img: 'tomato.png' }
             ]
         },
         clothing: {
             title: 'おようふく',
             color: '#81d4fa', 
             words: [
-                // 元の5つ
-                { id: 'kutsu', name: 'くつ', img: 'shoes.png', sound: 'shoes.mp3' },
-                { id: 'boushi', name: 'ぼうし', img: 'hat.png', sound: 'hat.mp3' },
-                { id: 'tshirt', name: 'Tシャツ', img: 'tshirt.png', sound: 'tshirt.mp3' },
-                { id: 'kutsushita', name: 'くつした', img: 'socks.png', sound: 'socks.mp3' },
-                { id: 'zubon', name: 'ズボン', img: 'pants.png', sound: 'pants.mp3' },
-                // ★追加した5つ
-                { id: 'uwagi', name: 'うわぎ', img: 'jacket.png', sound: 'jacket.mp3' },
-                { id: 'skirt', name: 'スカート', img: 'skirt.png', sound: 'skirt.mp3' },
-                { id: 'kaban', name: 'かばん', img: 'bag.png', sound: 'bag.mp3' },
-                { id: 'kasa', name: 'かさ', img: 'umbrella.png', sound: 'umbrella.mp3' },
-                { id: 'megane', name: 'めがね', img: 'glasses.png', sound: 'glasses.mp3' }
+                { id: 'kutsu', name: 'くつ', img: 'shoes.png' },
+                { id: 'boushi', name: 'ぼうし', img: 'hat.png' },
+                { id: 'tshirt', name: 'Tシャツ', img: 'tshirt.png' },
+                { id: 'kutsushita', name: 'くつした', img: 'socks.png' },
+                { id: 'zubon', name: 'ズボン', img: 'pants.png' },
+                { id: 'uwagi', name: 'うわぎ', img: 'jacket.png' },
+                { id: 'skirt', name: 'スカート', img: 'skirt.png' },
+                { id: 'kaban', name: 'かばん', img: 'bag.png' },
+                { id: 'kasa', name: 'かさ', img: 'umbrella.png' },
+                { id: 'megane', name: 'めがね', img: 'glasses.png' }
             ]
         },
         toys: {
             title: 'おもちゃ',
             color: '#a5d6a7', 
             words: [
-                // 元の5つ
-                { id: 'ball', name: 'ボール', img: 'ball.png', sound: 'ball.mp3' },
-                { id: 'kuruma', name: 'くるま', img: 'car.png', sound: 'car.mp3' },
-                { id: 'ningyou', name: 'にんぎょう', img: 'doll.png', sound: 'doll.mp3' },
-                { id: 'block', name: 'ブロック', img: 'block.png', sound: 'block.mp3' },
-                { id: 'nuigurumi', name: 'ぬいぐるみ', img: 'plush.png', sound: 'plush.mp3' },
-                // ★追加した5つ
-                { id: 'densha', name: 'でんしゃ', img: 'train.png', sound: 'train.mp3' },
-                { id: 'hikouki', name: 'ひこうき', img: 'airplane.png', sound: 'airplane.mp3' },
-                { id: 'robotto', name: 'ロボット', img: 'robot.png', sound: 'robot.mp3' },
-                { id: 'ehon', name: 'えほん', img: 'book.png', sound: 'book.mp3' },
-                { id: 'fuusen', name: 'ふうせん', img: 'balloon.png', sound: 'balloon.mp3' }
+                { id: 'ball', name: 'ボール', img: 'ball.png' },
+                { id: 'kuruma', name: 'くるま', img: 'car.png' },
+                { id: 'ningyou', name: 'にんぎょう', img: 'doll.png' },
+                { id: 'block', name: 'ブロック', img: 'block.png' },
+                { id: 'nuigurumi', name: 'ぬいぐるみ', img: 'plush.png' },
+                { id: 'densha', name: 'でんしゃ', img: 'train.png' },
+                { id: 'hikouki', name: 'ひこうき', img: 'airplane.png' },
+                { id: 'robotto', name: 'ロボット', img: 'robot.png' },
+                { id: 'ehon', name: 'えほん', img: 'book.png' },
+                { id: 'fuusen', name: 'ふうせん', img: 'balloon.png' }
             ]
         },
         room: {
             title: 'おへや',
             color: '#ce93d8', 
             words: [
-                // 元の5つ
-                { id: 'isu', name: 'いす', img: 'chair.png', sound: 'chair.mp3' },
-                { id: 'tsukue', name: 'つくえ', img: 'desk.png', sound: 'desk.mp3' },
-                { id: 'tokei', name: 'とけい', img: 'clock.png', sound: 'clock.mp3' },
-                { id: 'tv', name: 'テレビ', img: 'tv.png', sound: 'tv.mp3' },
-                { id: 'gomibako', name: 'ごみばこ', img: 'trashcan.png', sound: 'trashcan.mp3' },
-                // ★追加した5つ
-                { id: 'beddo', name: 'ベッド', img: 'bed.png', sound: 'bed.mp3' },
-                { id: 'doa', name: 'ドア', img: 'door.png', sound: 'door.mp3' },
-                { id: 'mado', name: 'まど', img: 'window.png', sound: 'window.mp3' },
-                { id: 'denki', name: 'でんき', img: 'light.png', sound: 'light.mp3' },
-                { id: 'sofa', name: 'ソファ', img: 'sofa.mp3', sound: 'sofa.mp3' }
+                { id: 'isu', name: 'いす', img: 'chair.png' },
+                { id: 'tsukue', name: 'つくえ', img: 'desk.png' },
+                { id: 'tokei', name: 'とけい', img: 'clock.png' },
+                { id: 'tv', name: 'テレビ', img: 'tv.png' },
+                { id: 'gomibako', name: 'ごみばこ', img: 'trashcan.png' },
+                { id: 'beddo', name: 'ベッド', img: 'bed.png' },
+                { id: 'doa', name: 'ドア', img: 'door.png' },
+                { id: 'mado', name: 'まど', img: 'window.png' },
+                { id: 'denki', name: 'でんき', img: 'light.png' },
+                { id: 'sofa', name: 'ソファ', img: 'sofa.png' }
+            ]
+        },
+        kitchen: {
+            title: 'キッチン・しょっき',
+            color: '#ffcc80', // オレンジ系
+            words: [
+                { id: 'spoon', name: 'スプーン', img: 'spoon.png' },
+                { id: 'fork', name: 'フォーク', img: 'fork.png' },
+                { id: 'cup', name: 'コップ', img: 'cup.png' },
+                { id: 'osara', name: 'おさら', img: 'plate.png' },
+                { id: 'ohashi', name: 'おはし', img: 'chopsticks.png' },
+                { id: 'fryingpan', name: 'フライパン', img: 'fryingpan.png' },
+                { id: 'pot', name: 'ポット', img: 'pot.png' },
+                { id: 'suihanki', name: 'すいはんき', img: 'ricecooker.png' },
+                { id: 'renji', name: 'レンジ', img: 'microwave.png' },
+                { id: 'apron', name: 'エプロン', img: 'apron.png' }
+            ]
+        },
+        bathroom: {
+            title: 'おふろ・せんめんじょ',
+            color: '#80deea', // 水色系
+            words: [
+                { id: 'haburashi', name: 'はブラシ', img: 'toothbrush.png' },
+                { id: 'towel', name: 'タオル', img: 'towel.png' },
+                { id: 'sekken', name: 'せっけん', img: 'soap.png' },
+                { id: 'shampoo', name: 'シャンプー', img: 'shampoo.png' },
+                { id: 'kagami', name: 'かがみ', img: 'mirror.png' },
+                { id: 'dryer', name: 'ドライヤー', img: 'hairdryer.png' },
+                { id: 'oke', name: 'おけ', img: 'bucket.png' },
+                { id: 'jaguchi', name: 'じゃぐち', img: 'faucet.png' },
+                { id: 'kushi', name: 'くし', img: 'comb.png' },
+                { id: 'washingmachine', name: 'せんたくき', img: 'washingmachine.png' }
+            ]
+        },
+        electronics: {
+            title: 'かでん',
+            color: '#b0bec5', // メタリック/グレー系
+            words: [
+                { id: 'rimokon', name: 'リモコン', img: 'remote.png' },
+                { id: 'soujiki', name: 'そうじき', img: 'vacuum.png' },
+                { id: 'reizouko', name: 'れいぞうこ', img: 'fridge.png' },
+                { id: 'senpuuki', name: 'せんぷうき', img: 'fan.png' },
+                { id: 'sumaho', name: 'スマホ', img: 'smartphone.png' },
+                { id: 'iron', name: 'アイロン', img: 'iron.png' },
+                { id: 'stove', name: 'ストーブ', img: 'heater.png' },
+                { id: 'switch', name: 'スイッチ', img: 'switch.png' },
+                { id: 'camera', name: 'カメラ', img: 'camera.png' },
+                { id: 'tokei_digital', name: 'とけい', img: 'digitalclock.png' }
+            ]
+        },
+        colors: {
+            title: 'いろ',
+            color: '#f48fb1', // ピンク系
+            words: [
+                { id: 'aka', name: 'あかいもの', img: 'red.png' }, // 赤い色紙などの画像を用意
+                { id: 'ao', name: 'あおいもの', img: 'blue.png' },
+                { id: 'kiiro', name: 'きいろいもの', img: 'yellow.png' },
+                { id: 'midori', name: 'みどりのもの', img: 'green.png' },
+                { id: 'pink', name: 'ピンクのもの', img: 'pink.png' },
+                { id: 'shiro', name: 'しろいもの', img: 'white.png' },
+                { id: 'kuro', name: 'くろいもの', img: 'black.png' },
+                { id: 'orange', name: 'オレンジのもの', img: 'orange_color.png' },
+                { id: 'murasaki', name: 'むらさきのもの', img: 'purple.png' },
+                { id: 'chairo', name: 'ちゃいろのもの', img: 'brown.png' }
+            ]
+        },
+        body: {
+            title: 'からだ',
+            color: '#ffccbc', // 肌色系
+            words: [
+                { id: 'te', name: 'て', img: 'hand.png' },
+                { id: 'ashi', name: 'あし', img: 'foot.png' },
+                { id: 'atama', name: 'あたま', img: 'head.png' },
+                { id: 'me', name: 'め', img: 'eye.png' },
+                { id: 'mimi', name: 'みみ', img: 'ear.png' },
+                { id: 'kuchi', name: 'くち', img: 'mouth.png' },
+                { id: 'hana', name: 'はな', img: 'nose.png' },
+                { id: 'kata', name: 'かた', img: 'shoulder.png' },
+                { id: 'onaka', name: 'おなか', img: 'stomach.png' },
+                { id: 'senaka', name: 'せなか', img: 'back.png' }
             ]
         }
     };
@@ -114,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentWordList = [];
     let currentWord = null;
     let videoStream = null;
-    const audioCache = {};
+    // audioCache は削除しました
 
     // ----------------------------------------------------
     // ★ 3. DOM要素の取得
@@ -147,12 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const resUserImg = document.getElementById('sc-result-image');
     const btnCorrect = document.getElementById('sc-correct-button');
     const btnIncorrect = document.getElementById('sc-incorrect-button');
-    const pointFeedback = document.getElementById('sc-point-feedback'); // フィードバック表示用
+    const pointFeedback = document.getElementById('sc-point-feedback'); 
 
     const backToTopicBtns = document.querySelectorAll('.sc-back-to-topic');
 
     // ----------------------------------------------------
-    // ★ 4. 関数定義
+    // ★ 4. 関数定義 (音声読み上げに変更)
     // ----------------------------------------------------
 
     // 画面切り替え
@@ -161,14 +231,23 @@ document.addEventListener('DOMContentLoaded', () => {
         screenEl.classList.add('active');
     }
 
-    // 音声再生 (キャッシュ機能付き)
-    function playSound(path) {
-        if (!audioCache[path]) {
-            audioCache[path] = new Audio(path);
+    // ★★★ 音声読み上げ関数 (Text-to-Speech) ★★★
+    function speakText(text) {
+        if (!window.speechSynthesis) {
+            console.error("このブラウザは音声読み上げに対応していません");
+            return;
         }
-        const audio = audioCache[path];
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log('Audio Play Error:', e));
+        
+        // 読み上げ中のものがあればキャンセル
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP'; // 日本語
+        utterance.rate = 0.9;     // 速さ (1.0が標準、0.9は少しゆっくり)
+        utterance.pitch = 1.0;    // 高さ
+        utterance.volume = 1.0;   // 音量
+
+        window.speechSynthesis.speak(utterance);
     }
 
     function shuffleArray(array) {
@@ -210,18 +289,17 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'sc-study-item';
             
             const imgPath = `${ASSETS_BASE}images/${currentTopicId}/${word.img}`;
-            const soundPath = `${ASSETS_BASE}sounds/${currentTopicId}/${word.sound}`;
 
             const img = document.createElement('img');
             img.src = imgPath;
             img.alt = word.name;
-            // 画像読み込みエラー時のフォールバック（オプション）
             img.onerror = () => { img.src = 'assets/images/placeholder.png'; };
 
             const p = document.createElement('p');
             p.textContent = word.name;
 
-            item.onclick = () => playSound(soundPath);
+            // ★変更: クリック時にテキストを読み上げ
+            item.onclick = () => speakText(word.name);
             
             item.appendChild(img);
             item.appendChild(p);
@@ -247,8 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     playSoundBtn.onclick = () => {
-        const path = `${ASSETS_BASE}sounds/${currentTopicId}/${currentWord.sound}`;
-        playSound(path);
+        // ★変更: テキストを読み上げ
+        speakText(currentWord.name);
+
         gamePrompt.textContent = `「${currentWord.name}」をさがしてね！`;
         openCameraBtn.style.display = 'block';
     };
@@ -266,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ★ 7. カメラロジック
     // ----------------------------------------------------
     openCameraBtn.onclick = async () => {
-        // streamが既に存在する場合は終了 (isCameraOpenのチェックを簡略化)
         if (videoStream) return;
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -279,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvasEl.width = videoEl.videoWidth;
                 canvasEl.height = videoEl.videoHeight;
             };
-            await videoEl.play(); // ビデオ再生開始
+            await videoEl.play();
             showScreen(screenCamera);
         } catch (err) {
             console.error(err);
@@ -314,47 +392,48 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // ★ 8. 結果ロジック (ポイント連携を修正)
+    // ★ 8. 結果ロジック
     // ----------------------------------------------------
     
-    async function handleSelfAssessment(isCorrect) { // ★ async関数に変更
+    async function handleSelfAssessment(isCorrect) {
         
-        // 自己評価ボタンを無効化
         btnCorrect.disabled = true;
         btnIncorrect.disabled = true;
 
         if (isCorrect) {
-            // ★★★ Firebaseポイント付与ロジック ★★★
-            const wordKey = currentWord.word; // 単語名をキーにする
+            // ★変更: 正解時の音声もTTSで言わせる
+            speakText("せいかい！やったね！");
+
+            const wordKey = currentWord.name; // nameをキーとして使用
             const success = await window.addPointsToUser(POINTS_PER_CORRECT, wordKey);
             
             let message = `⭕️ せいかい！おめでとう！`;
             if (success) {
-                message += ` (+${POINTS_PER_CORRECT} ポイント記録)`;
+                message += ` (+${POINTS_PER_CORRECT} ポイント)`;
                 pointFeedback.style.color = 'var(--correct-color)';
             } else {
                 message += ' (ポイント記録エラー)';
                 pointFeedback.style.color = 'var(--accent)';
             }
             pointFeedback.textContent = message;
-            // ★★★ Firebaseポイント付与ロジック 終了 ★★★
 
         } else {
+            // ★変更: 不正解時の音声もTTSで言わせる
+            speakText("ざんねん。つぎ、がんばろう！");
+
             pointFeedback.textContent = '❌ ざんねん！ちがったみたい。がんばろうね。';
             pointFeedback.style.color = 'var(--incorrect-color)';
         }
         
-        // 次の問題へ遷移 (ボタン操作を許可)
         setTimeout(() => {
             resUserImg.src = '';
             resProbImg.src = '';
-            btnCorrect.disabled = false; // 有効化
-            btnIncorrect.disabled = false; // 有効化
+            btnCorrect.disabled = false;
+            btnIncorrect.disabled = false;
             setupNewProblem();
-        }, 1500);
+        }, 2000); // 読み上げ時間を考慮して少し長めに待機
     }
     
-    // イベントリスナーを修正
     btnCorrect.onclick = () => handleSelfAssessment(true);
     btnIncorrect.onclick = () => handleSelfAssessment(false);
 
