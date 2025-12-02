@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         },
         kitchen: {
-            title: 'キッチン・しょっき',
+            title: 'キッチン・\nしょっき',
             color: '#ffcc80', // オレンジ系
             words: [
                 { id: 'spoon', name: 'スプーン', img: 'spoon.png' },
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         },
         bathroom: {
-            title: 'おふろ・せんめんじょ',
+            title: 'おふろ・\nせんめんじょ',
             color: '#80deea', // 水色系
             words: [
                 { id: 'haburashi', name: 'はブラシ', img: 'toothbrush.png' },
