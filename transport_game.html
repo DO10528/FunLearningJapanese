@@ -5,230 +5,356 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>こうつう の ゲーム - FunLearnJP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* --- デザイン定義 (Main Screen準拠) --- */
         :root {
-            --primary: #4facfe;
+            --primary: #5c7aff;
             --accent: #ffcc5c;
-            --bg-color: #f0f9ff;
+            --bg-color: #f4f7fc;
             --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #ef5350;
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0; padding: 20px;
+            margin: 0; padding: 0; padding-bottom: 40px;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
-        h1, h2 { text-align: center; color: #0277bd; margin: 0 0 15px 0; }
-        
-        /* コンテナ */
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+            color: white; padding: 15px 20px; width: 100%;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 5px 12px; border-radius: 20px; text-decoration: none;
+            font-size: 0.9em; font-weight: bold; display: flex; align-items: center; gap: 5px;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .page-title { font-size: 1.2em; font-weight: 900; margin: 0; }
+        .auth-status { font-size: 0.8em; opacity: 0.9; }
+
+        /* --- コンテナ --- */
         .game-container {
             background: white;
-            max-width: 800px; width: 100%;
+            max-width: 800px; width: 95%;
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-top: 20px; margin-bottom: 20px;
         }
 
-        /* 画面切り替え */
-        .screen { display: none; animation: fadeIn 0.3s; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* --- ナビゲーションタブ --- */
+        .nav-area { 
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 25px; 
+        }
+        .nav-btn {
+            padding: 8px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer;
+            background: #eee; color: #666; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .nav-btn.active { 
+            background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(92, 122, 255, 0.3); 
+        }
 
-        /* スタディモード */
+        /* --- 画面切り替え --- */
+        .screen { display: none; animation: popIn 0.3s ease-out; }
+        .screen.active { display: block; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        h2 { text-align: center; color: #555; margin: 0 0 20px 0; font-size: 1.4em; }
+
+        /* --- スタディモード (カード) --- */
         .word-section { margin-bottom: 30px; border-bottom: 2px dashed #eee; padding-bottom: 20px; }
         .section-label {
-            background: #e1f5fe; padding: 8px 20px; border-radius: 20px;
-            display: inline-block; font-weight: bold; margin-bottom: 15px; color: #0277bd; font-size: 1.1em;
+            background: #e0e7ff; color: var(--primary);
+            padding: 6px 15px; border-radius: 15px; display: inline-block; 
+            font-weight: bold; margin-bottom: 15px; font-size: 1em;
         }
         .grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px;
         }
         .card {
-            background: #fff; border: 2px solid #b3e5fc; border-radius: 15px;
-            padding: 10px; text-align: center; cursor: pointer;
-            transition: transform 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+            background: #fff; border: 2px solid #eee; border-radius: 15px;
+            padding: 10px 5px; text-align: center; cursor: pointer;
+            transition: all 0.2s; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
-        .card:active { transform: scale(0.95); background: #e1f5fe; }
+        .card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .card:active { transform: scale(0.95); background: #f0f4ff; }
         
-        .emoji-img { font-size: 3.5rem; line-height: 1.2; margin-bottom: 5px; }
-        .card span { font-size: 0.95em; font-weight: bold; line-height: 1.3; }
+        .emoji-img { font-size: 3rem; line-height: 1.2; margin-bottom: 5px; }
+        .card span { font-size: 0.9em; font-weight: bold; color: #555; }
 
-        /* ゲーム共通 */
+        /* --- ゲーム共通UI --- */
         .question-box {
-            background: #fff9c4; padding: 20px; border-radius: 15px;
-            text-align: center; font-size: 1.2em; font-weight: bold; margin-bottom: 20px;
-            border: 3px solid #fff176;
+            background: #fff8e1; color: #f57f17;
+            padding: 15px; border-radius: 15px; border: 2px solid #ffecb3;
+            text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 20px;
         }
         .main-image {
-            width: 150px; height: 150px; 
-            margin: 10px auto; display: flex; justify-content: center; align-items: center;
-            background: white; border-radius: 20px; padding: 10px;
-            border: 2px solid #eee; font-size: 6rem; /* 絵文字サイズ */
+            width: 140px; height: 140px; 
+            margin: 10px auto 20px auto; display: flex; justify-content: center; align-items: center;
+            background: white; border-radius: 20px; 
+            border: 4px solid #eee; font-size: 5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* 並び替えブロック */
+        /* 並び替えエリア */
         .sortable-area {
-            min-height: 80px; background: #f5f5f5; border-radius: 10px;
-            padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-            margin-bottom: 20px; border: 2px dashed #ccc;
+            min-height: 70px; background: #f8f9fa; border-radius: 15px;
+            padding: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+            margin-bottom: 15px; border: 2px dashed #ccc; transition: background 0.2s;
         }
         .word-block {
             background: white; border: 2px solid var(--primary); color: var(--primary);
-            padding: 12px 18px; border-radius: 12px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1); user-select: none; font-size: 1.1em;
+            padding: 10px 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 3px 0 rgba(92, 122, 255, 0.2); user-select: none; font-size: 1em;
+            transition: transform 0.1s;
         }
-        .word-block:active { transform: translateY(3px); box-shadow: none; }
+        .word-block:active { transform: translateY(2px); box-shadow: none; }
 
         /* Yes/No ボタン */
-        .yes-no-area { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .yes-no-area { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
         .choice-btn {
-            flex: 1; max-width: 150px; padding: 15px; border-radius: 15px;
-            border: none; font-size: 1.2em; font-weight: bold; cursor: pointer; color: white;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
+            flex: 1; max-width: 140px; padding: 12px; border-radius: 50px;
+            border: none; font-size: 1.1em; font-weight: bold; cursor: pointer; color: white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s;
         }
-        .choice-btn:active { transform: translateY(4px); box-shadow: none; }
-        .btn-yes { background: #66bb6a; }
-        .btn-no { background: #ef5350; }
-        .choice-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-        
-        /* 選択肢ボタン (修正質問用) */
+        .choice-btn:active { transform: translateY(3px); box-shadow: none; }
+        .btn-yes { background: var(--correct-color); }
+        .btn-no { background: var(--incorrect-color); }
+        .choice-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* 修正質問エリア */
         .fix-area { 
-            margin-top: 20px; padding: 15px; background: #ffebee; border-radius: 15px; animation: fadeIn 0.5s; 
+            margin-top: 20px; padding: 15px; background: #ffebee; border-radius: 15px; animation: popIn 0.3s;
         }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .option-btn {
             background: white; border: 2px solid #ddd; padding: 15px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; font-size: 1.3em; /* 文字を大きく */
-            box-shadow: 0 3px 0 #eee;
-            height: 80px; /* 高さ固定で押しやすく */
+            font-weight: bold; cursor: pointer; font-size: 1.1em; color: #555;
+            box-shadow: 0 3px 0 #eee; height: 70px;
         }
         .option-btn:active { transform: translateY(2px); box-shadow: none; }
 
-        /* ナビゲーション */
-        .nav-area { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        .nav-btn {
-            padding: 10px 20px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer;
-            background: #e0e0e0; color: #555; transition: all 0.2s;
-        }
-        .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 0 #0277bd; }
-
+        /* ビッグボタン */
         .big-btn {
             background: var(--primary); color: white; border: none; padding: 12px 40px;
             font-size: 1.1em; font-weight: bold; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 4px 0 #0277bd; display: block; margin: 20px auto;
+            box-shadow: 0 4px 0 #3949ab; display: block; margin: 20px auto 0 auto;
+            transition: transform 0.1s;
         }
-        .big-btn:active { transform: translateY(4px); box-shadow: none; }
+        .big-btn:active { transform: translateY(3px); box-shadow: none; }
 
         /* フィードバック */
         .feedback-msg {
-            text-align: center; font-weight: bold; min-height: 30px; margin-top: 15px; font-size: 1.2em;
+            text-align: center; font-weight: 900; min-height: 30px; margin-top: 15px; font-size: 1.3em;
         }
+
+        /* ゲットアニメーション */
+        @keyframes pointGet { 0% { opacity:0; transform:translateY(0); } 50% { opacity:1; transform:translateY(-20px); } 100% { opacity:0; transform:translateY(-40px); } }
+        .point-anim { position: absolute; color: #ffcc5c; font-weight: bold; font-size: 1.5em; pointer-events: none; animation: pointGet 1s ease-out forwards; }
+
     </style>
 </head>
 <body>
 
-    <h1>🚦 こうつう の ゲーム 🚃</h1>
+<header>
+    <div class="header-left">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> ホーム</a>
+        <h1 class="page-title">こうつうゲーム</h1>
+    </div>
+    <div class="auth-status" id="auth-status-display">...</div>
+</header>
 
+<div class="game-container">
+    
     <div class="nav-area">
-        <button class="nav-btn active" onclick="switchScreen('study')">単語(たんご)</button>
-        <button class="nav-btn" onclick="switchScreen('game1')">Game 1 (文作り)</button>
-        <button class="nav-btn" onclick="switchScreen('game2')">Game 2 (場所)</button>
-        <button class="nav-btn" onclick="switchScreen('game3')">Game 3 (乗り物)</button>
-        <button class="nav-btn" onclick="switchScreen('game4')">Game 4 (まとめ)</button>
+        <button class="nav-btn active" onclick="switchScreen('study')"><i class="fa-solid fa-book"></i> 単語</button>
+        <button class="nav-btn" onclick="switchScreen('game1')"><i class="fa-solid fa-pen"></i> 文作り</button>
+        <button class="nav-btn" onclick="switchScreen('game2')"><i class="fa-solid fa-location-dot"></i> 場所</button>
+        <button class="nav-btn" onclick="switchScreen('game3')"><i class="fa-solid fa-bus"></i> 乗り物</button>
+        <button class="nav-btn" onclick="switchScreen('game4')"><i class="fa-solid fa-star"></i> まとめ</button>
     </div>
 
-    <div class="game-container">
+    <div id="screen-study" class="screen active">
+        <h2><i class="fa-solid fa-volume-high"></i> ことば を おぼえよう</h2>
+        <p style="text-align:center; font-size:0.9em; color:#666; margin-bottom:20px;">クリックして 音をきいてね</p>
+
+        <div class="word-section">
+            <div class="section-label">🙂 ひと (People)</div>
+            <div class="grid" id="grid-people"></div>
+        </div>
+        <div class="word-section">
+            <div class="section-label">🚗 のりもの (Transports)</div>
+            <div class="grid" id="grid-transport"></div>
+        </div>
+        <div class="word-section">
+            <div class="section-label">🏫 ばしょ (Places)</div>
+            <div class="grid" id="grid-place"></div>
+        </div>
+        <div class="word-section">
+            <div class="section-label">🏃 どうさ (Verbs)</div>
+            <div class="grid" id="grid-verb"></div>
+        </div>
+    </div>
+
+    <div id="screen-game1" class="screen">
+        <h2>Game 1: ぶん を つくろう</h2>
+        <div class="question-box" id="q1-text">English Sentence</div>
+        <div class="sortable-area" id="area-game1"></div>
+        <div class="sortable-area" id="pool-game1" style="border: 2px solid #e0e7ff; background:white;"></div>
+        <div id="feedback-game1" class="feedback-msg"></div>
+        <button class="big-btn" onclick="checkGame1()">こたえあわせ</button>
+    </div>
+
+    <div id="screen-game2" class="screen">
+        <h2>Game 2: どこへ いきますか？</h2>
+        <div id="img-game2" class="main-image">🏫</div>
+        <div class="question-box" id="q2-text">質問文</div>
         
-        <div id="screen-study" class="screen active">
-            <h2>ことば を おぼえよう</h2>
-            <p style="text-align:center;">クリックして 音をきいてね</p>
-
-            <div class="word-section">
-                <div class="section-label">🙂 ひと (People)</div>
-                <div class="grid" id="grid-people"></div>
-            </div>
-            <div class="word-section">
-                <div class="section-label">🚗 のりもの (Transports)</div>
-                <div class="grid" id="grid-transport"></div>
-            </div>
-            <div class="word-section">
-                <div class="section-label">🏫 ばしょ (Places)</div>
-                <div class="grid" id="grid-place"></div>
-            </div>
-            <div class="word-section">
-                <div class="section-label">🏃 どうさ (Verbs)</div>
-                <div class="grid" id="grid-verb"></div>
-            </div>
+        <div id="area-yesno-game2" class="yes-no-area">
+            <button id="g2-yes" class="choice-btn btn-yes" onclick="answerGame2(true)">はい</button>
+            <button id="g2-no" class="choice-btn btn-no" onclick="answerGame2(false)">いいえ</button>
         </div>
-
-        <div id="screen-game1" class="screen">
-            <h2>Game 1: ぶん を つくろう</h2>
-            <div class="question-box" id="q1-text">English Sentence</div>
-            <div class="sortable-area" id="area-game1"></div>
-            <div class="sortable-area" id="pool-game1" style="border: 2px solid #ddd; background:white;"></div>
-            <div id="feedback-game1" class="feedback-msg"></div>
-            <button class="big-btn" onclick="checkGame1()">こたえあわせ</button>
+        
+        <div id="area-fix-game2" class="fix-area" style="display:none;">
+            <p style="text-align:center; font-weight:bold; color:#ef5350;">ただしい ばしょ は どっち？</p>
+            <div class="options-grid" id="opts-game2"></div>
         </div>
-
-        <div id="screen-game2" class="screen">
-            <h2>Game 2: どこへ いきますか？</h2>
-            <div id="img-game2" class="main-image">🏫</div>
-            <div class="question-box" id="q2-text">質問文</div>
-            
-            <div id="area-yesno-game2" class="yes-no-area">
-                <button id="g2-yes" class="choice-btn btn-yes" onclick="answerGame2(true)">はい</button>
-                <button id="g2-no" class="choice-btn btn-no" onclick="answerGame2(false)">いいえ</button>
-            </div>
-            
-            <div id="area-fix-game2" class="fix-area" style="display:none;">
-                <p style="text-align:center; font-weight:bold; color:#d32f2f;">ただしい ばしょ は どっち？</p>
-                <div class="options-grid" id="opts-game2"></div>
-            </div>
-
-            <div id="feedback-game2" class="feedback-msg"></div>
-        </div>
-
-        <div id="screen-game3" class="screen">
-            <h2>Game 3: どうやって いきますか？</h2>
-            <div id="img-game3" class="main-image">🚌</div>
-            <div class="question-box" id="q3-text">質問文</div>
-            
-            <div id="area-yesno-game3" class="yes-no-area">
-                <button id="g3-yes" class="choice-btn btn-yes" onclick="answerGame3(true)">はい</button>
-                <button id="g3-no" class="choice-btn btn-no" onclick="answerGame3(false)">いいえ</button>
-            </div>
-            
-            <div id="area-fix-game3" class="fix-area" style="display:none;">
-                <p style="text-align:center; font-weight:bold; color:#d32f2f;">どうやって いきますか？</p>
-                <div class="options-grid" id="opts-game3"></div>
-            </div>
-
-            <div id="feedback-game3" class="feedback-msg"></div>
-        </div>
-
-        <div id="screen-game4" class="screen">
-            <h2>Game 4: ぜんぶ いえるかな？</h2>
-            <p style="text-align:center; font-size:0.9em;">(だれが → どうやって → どこへ → どうする)</p>
-            <div class="question-box" id="q4-text">English</div>
-            <div class="sortable-area" id="area-game4"></div>
-            <div class="sortable-area" id="pool-game4" style="border: 2px solid #ddd; background:white;"></div>
-            <div id="feedback-game4" class="feedback-msg"></div>
-            <button class="big-btn" onclick="checkGame4()">こたえあわせ</button>
-        </div>
-
+        <div id="feedback-game2" class="feedback-msg"></div>
     </div>
+
+    <div id="screen-game3" class="screen">
+        <h2>Game 3: どうやって いきますか？</h2>
+        <div id="img-game3" class="main-image">🚌</div>
+        <div class="question-box" id="q3-text">質問文</div>
+        
+        <div id="area-yesno-game3" class="yes-no-area">
+            <button id="g3-yes" class="choice-btn btn-yes" onclick="answerGame3(true)">はい</button>
+            <button id="g3-no" class="choice-btn btn-no" onclick="answerGame3(false)">いいえ</button>
+        </div>
+        
+        <div id="area-fix-game3" class="fix-area" style="display:none;">
+            <p style="text-align:center; font-weight:bold; color:#ef5350;">どうやって いきますか？</p>
+            <div class="options-grid" id="opts-game3"></div>
+        </div>
+        <div id="feedback-game3" class="feedback-msg"></div>
+    </div>
+
+    <div id="screen-game4" class="screen">
+        <h2>Game 4: ぜんぶ いえるかな？</h2>
+        <p style="text-align:center; font-size:0.9em; color:#666;">(だれが → どうやって → どこへ → どうする)</p>
+        <div class="question-box" id="q4-text">English</div>
+        <div class="sortable-area" id="area-game4"></div>
+        <div class="sortable-area" id="pool-game4" style="border: 2px solid #e0e7ff; background:white;"></div>
+        <div id="feedback-game4" class="feedback-msg"></div>
+        <button class="big-btn" onclick="checkGame4()">こたえあわせ</button>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    let currentUser = null;
+
+    // 認証状態監視
+    onAuthStateChanged(auth, (user) => {
+        const statusEl = document.getElementById('auth-status-display');
+        if (user) {
+            currentUser = user;
+            statusEl.textContent = "ログイン中";
+            statusEl.style.color = "#bbdefb";
+        } else {
+            currentUser = null;
+            statusEl.textContent = "ゲストモード";
+            statusEl.style.color = "#ffccbc";
+        }
+    });
+
+    /**
+     * ポイント加算ロジック (1日1回制限)
+     * @param {string} uniqueId - 問題のユニークID (例: 'g1_me_school_bus')
+     */
+    window.addPointsToUser = async (uniqueId) => {
+        if (!currentUser) return; // ゲストは保存しない
+
+        try {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const dailyLogRef = doc(db, "users", currentUser.uid, "daily_logs", today);
+            
+            const docSnap = await getDoc(dailyLogRef);
+            let alreadySolved = false;
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data[uniqueId]) alreadySolved = true;
+            }
+
+            if (!alreadySolved) {
+                // ポイント加算 (ユーザー本体)
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, { points: increment(1) });
+
+                // ログ保存 (今日の記録) - merge:trueで既存データを保持
+                await setDoc(dailyLogRef, { [uniqueId]: true }, { merge: true });
+
+                console.log(`Point added for ${uniqueId}`);
+                showPointAnimation();
+            } else {
+                console.log(`Already solved today: ${uniqueId}`);
+            }
+
+        } catch (e) {
+            console.error("Error adding points:", e);
+        }
+    };
+
+    function showPointAnimation() {
+        const el = document.createElement('div');
+        el.textContent = "+1 Pt!";
+        el.className = 'point-anim';
+        // 中央付近に表示
+        el.style.left = '50%';
+        el.style.top = '50%';
+        el.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    }
+</script>
 
 <script>
-    // --- 1. データ定義 ---
-
+    // --- データ定義 ---
     const verbs = [
         { id: 'go', name: 'いきます', en: 'go', emoji: '➡️' },
         { id: 'come', name: 'きます', en: 'come', emoji: '⬅️' },
@@ -244,12 +370,7 @@
         { id: 'taxi', name: 'タクシー', en: 'taxi', emoji: '🚕', particle: 'で' },
         { id: 'shinkansen', name: 'しんかんせん', en: 'Shinkansen', emoji: '🚅', particle: 'で' },
         { id: 'plane', name: 'ひこうき', en: 'plane', emoji: '✈️', particle: 'で' },
-        { id: 'ship', name: 'ふね', en: 'ship', emoji: '🚢', particle: 'で' },
-        { id: 'subway', name: 'ちかてつ', en: 'subway', emoji: '🚇', particle: 'で' },
-        { id: 'truck', name: 'トラック', en: 'truck', emoji: '🚚', particle: 'で' },
-        { id: 'motorcycle', name: 'バイク', en: 'motorcycle', emoji: '🏍️', particle: 'で' },
-        { id: 'policecar', name: 'パトカー', en: 'police car', emoji: '🚓', particle: 'で' },
-        { id: 'ambulance', name: 'きゅうきゅうしゃ', en: 'ambulance', emoji: '🚑', particle: 'で' }
+        { id: 'ship', name: 'ふね', en: 'ship', emoji: '🚢', particle: 'で' }
     ];
 
     const places = [
@@ -261,11 +382,6 @@
         { id: 'park', name: 'こうえん', en: 'park', emoji: '🛝' },
         { id: 'station', name: 'えき', en: 'station', emoji: '🚉' },
         { id: 'supermarket', name: 'スーパー', en: 'supermarket', emoji: '🛒' },
-        { id: 'library', name: 'としょかん', en: 'library', emoji: '📚' },
-        { id: 'sea', name: 'うみ', en: 'sea', emoji: '🏖️' },
-        { id: 'mountain', name: 'やま', en: 'mountain', emoji: '⛰️' },
-        { id: 'airport', name: 'くうこう', en: 'airport', emoji: '🛫' },
-        { id: 'postoffice', name: 'ゆうびんきょく', en: 'post office', emoji: '📮' },
         { id: 'conbini', name: 'コンビニ', en: 'convenience store', emoji: '🏪' }
     ];
 
@@ -275,17 +391,10 @@
         { id: 'teacher', name: 'せんせい', en: 'Teacher', emoji: '👩‍🏫' },
         { id: 'father', name: 'おとうさん', en: 'Father', emoji: '👨' },
         { id: 'mother', name: 'おかあさん', en: 'Mother', emoji: '👩' },
-        { id: 'brother_older', name: 'おにいさん', en: 'Brother', emoji: '👦' },
-        { id: 'sister_older', name: 'おねえさん', en: 'Sister', emoji: '👧' },
-        { id: 'brother_younger', name: 'おとうと', en: 'Brother', emoji: '👶' },
-        { id: 'sister_younger', name: 'いもうと', en: 'Sister', emoji: '👶' },
-        { id: 'friend', name: 'ともだち', en: 'Friend', emoji: '👫' },
-        { id: 'grandfather', name: 'おじいさん', en: 'Grandfather', emoji: '👴' },
-        { id: 'grandmother', name: 'おばあさん', en: 'Grandmother', emoji: '👵' }
+        { id: 'friend', name: 'ともだち', en: 'Friend', emoji: '👫' }
     ];
 
-    // --- 2. 共通関数 ---
-    
+    // --- 共通関数 ---
     function speak(text) {
         window.speechSynthesis.cancel();
         const ut = new SpeechSynthesisUtterance(text);
@@ -293,15 +402,8 @@
         ut.rate = 0.9;
         window.speechSynthesis.speak(ut);
     }
-
-    function playSeikai() {
-        const audio = new Audio('assets/sounds/seikai.mp3');
-        audio.play().catch(e => console.log('Audio error:', e));
-    }
-    function playBubu() {
-        const audio = new Audio('assets/sounds/bubu.mp3');
-        audio.play().catch(e => console.log('Audio error:', e));
-    }
+    function playSeikai() { new Audio('assets/sounds/seikai.mp3').play().catch(()=>{}); }
+    function playBubu() { new Audio('assets/sounds/bubu.mp3').play().catch(()=>{}); }
 
     function switchScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -319,7 +421,7 @@
     function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
 
-    // --- 3. Study Mode ---
+    // --- Study Mode ---
     function initStudy() {
         renderGrid('grid-people', people);
         renderGrid('grid-transport', transports);
@@ -339,8 +441,8 @@
         });
     }
 
-    // --- 4. Game 1 (基本並び替え) ---
-    let g1Answer = [];
+    // --- Game 1 ---
+    let g1Answer = [], g1CurrentId = "";
     
     function initGame1() {
         document.getElementById('feedback-game1').innerText = '';
@@ -350,11 +452,13 @@
         const plc = getRandom(places);
         const vrb = getRandom(verbs);
 
+        // ID生成 (例: g1_me_school_go)
+        g1CurrentId = `g1_${sub.id}_${plc.id}_${vrb.id}`;
+
         let enVerb = vrb.en;
         if(sub.id !== 'me' && sub.id !== 'you' && sub.id !== 'friend') enVerb += 's'; 
         if(sub.id === 'you' || sub.id === 'friend' || sub.id === 'me') enVerb = vrb.en;
-        const enText = `${sub.en} ${enVerb} to ${plc.en}.`;
-        document.getElementById('q1-text').innerText = enText;
+        document.getElementById('q1-text').innerText = `${sub.en} ${enVerb} to ${plc.en}.`;
         
         const parts = [
             { text: sub.name + 'は', type: 'sub' },
@@ -376,11 +480,8 @@
 
     function moveBlock(el, fromId, toId) {
         const parent = el.parentNode;
-        if(parent.id === fromId) {
-            document.getElementById(toId).appendChild(el);
-        } else {
-            document.getElementById(fromId).appendChild(el);
-        }
+        if(parent.id === fromId) document.getElementById(toId).appendChild(el);
+        else document.getElementById(fromId).appendChild(el);
         speak(el.innerText);
     }
 
@@ -388,29 +489,31 @@
         const blocks = document.querySelectorAll('#area-game1 .word-block');
         let userAnswer = "";
         blocks.forEach(b => userAnswer += b.innerText);
-
         const fb = document.getElementById('feedback-game1');
         if (userAnswer === g1Answer) {
             fb.innerText = "⭕️ せいかい！";
-            fb.style.color = "green";
+            fb.style.color = "var(--correct-color)";
             playSeikai();
-            // 自動で次へ
+            if(window.addPointsToUser) window.addPointsToUser(g1CurrentId);
             setTimeout(() => initGame1(), 2000);
         } else {
             fb.innerText = "❌ ちがいます...";
-            fb.style.color = "red";
+            fb.style.color = "var(--incorrect-color)";
             playBubu();
         }
     }
 
-
-    // --- 5. Game 2 (場所 Yes/No) ---
-    let g2Target, g2Wrong, g2IsCorrectCase;
+    // --- Game 2 ---
+    let g2Target, g2CurrentId = "";
+    let g2IsCorrectCase;
 
     function initGame2() {
         resetGameUI('game2');
         g2Target = getRandom(places);
         g2IsCorrectCase = Math.random() > 0.5;
+        
+        // ID生成 (例: g2_school_yes または g2_school_no)
+        g2CurrentId = `g2_${g2Target.id}_${g2IsCorrectCase ? 'yes' : 'no'}`;
 
         document.getElementById('img-game2').innerText = g2Target.emoji;
 
@@ -418,8 +521,9 @@
         if (g2IsCorrectCase) {
             qText = `${g2Target.name} に いきますか？`;
         } else {
-            do { g2Wrong = getRandom(places); } while(g2Wrong.id === g2Target.id);
-            qText = `${g2Wrong.name} に いきますか？`;
+            let wrong;
+            do { wrong = getRandom(places); } while(wrong.id === g2Target.id);
+            qText = `${wrong.name} に いきますか？`;
         }
         document.getElementById('q2-text').innerText = qText;
         speak(qText);
@@ -427,27 +531,21 @@
 
     function answerGame2(isYes) {
         const fb = document.getElementById('feedback-game2');
-        
         if ( (g2IsCorrectCase && isYes) || (!g2IsCorrectCase && !isYes) ) {
-            // 正解
             if(isYes) {
                 fb.innerText = `⭕️ はい、${g2Target.name} に いきます。`;
-                fb.style.color = "green";
+                fb.style.color = "var(--correct-color)";
                 playSeikai();
-                // 自動で次へ
+                if(window.addPointsToUser) window.addPointsToUser(g2CurrentId);
                 setTimeout(() => initGame2(), 2000);
             } else {
-                // Noと答えた -> 修正問題へ
-                // 音声が重ならないように、SEが鳴り終わった頃（1秒後）に質問読み上げ
-                playSeikai(); 
-                setTimeout(() => {
-                    showFixQuestion2();
-                }, 1000);
+                playSeikai();
+                setTimeout(() => showFixQuestion2(), 1000);
             }
             disableYesNo('game2');
         } else {
             fb.innerText = "❌ ちがいます...";
-            fb.style.color = "red";
+            fb.style.color = "var(--incorrect-color)";
             playBubu();
         }
     }
@@ -455,7 +553,6 @@
     function showFixQuestion2() {
         const fixArea = document.getElementById('area-fix-game2');
         fixArea.style.display = 'block';
-        
         const optsDiv = document.getElementById('opts-game2');
         optsDiv.innerHTML = '';
         
@@ -463,23 +560,16 @@
         while(dummy.id === g2Target.id) dummy = getRandom(places);
         
         const choices = shuffle([g2Target, dummy]);
-        
         choices.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            // ★修正: イラスト無し、文字のみ
             btn.innerText = c.name;
             btn.onclick = () => {
                 if(c.id === g2Target.id) {
                     document.getElementById('feedback-game2').innerText = `⭕️ せいかい！ ${g2Target.name} に いきます。`;
                     playSeikai();
-                    
-                    // 正解したので確認用にイラストを見せる（メイン画像を書き換えるなどの演出でも可ですが、メイン画像は既に正解なのでそのままでOK）
-                    
-                    const allOpts = optsDiv.querySelectorAll('button');
-                    allOpts.forEach(b => b.disabled = true);
-                    
-                    // 自動で次へ
+                    if(window.addPointsToUser) window.addPointsToUser(g2CurrentId);
+                    optsDiv.querySelectorAll('button').forEach(b => b.disabled = true);
                     setTimeout(() => initGame2(), 2000);
                 } else {
                     playBubu();
@@ -487,28 +577,29 @@
             };
             optsDiv.appendChild(btn);
         });
-        
         speak("どこへ いきますか？");
     }
 
-    // --- 6. Game 3 (手段 Yes/No) ---
-    let g3Target, g3Wrong, g3IsCorrectCase;
+    // --- Game 3 ---
+    let g3Target, g3CurrentId = "";
+    let g3IsCorrectCase;
 
     function initGame3() {
         resetGameUI('game3');
         g3Target = getRandom(transports);
         g3IsCorrectCase = Math.random() > 0.5;
+        g3CurrentId = `g3_${g3Target.id}_${g3IsCorrectCase ? 'yes' : 'no'}`;
 
         document.getElementById('img-game3').innerText = g3Target.emoji;
 
-        let qText = "";
         let targetWord = g3Target.name + (g3Target.particle || '');
-
+        let qText = "";
         if (g3IsCorrectCase) {
             qText = `${targetWord} いきますか？`;
         } else {
-            do { g3Wrong = getRandom(transports); } while(g3Wrong.id === g3Target.id);
-            let wrongWord = g3Wrong.name + (g3Wrong.particle || '');
+            let wrong;
+            do { wrong = getRandom(transports); } while(wrong.id === g3Target.id);
+            let wrongWord = wrong.name + (wrong.particle || '');
             qText = `${wrongWord} いきますか？`;
         }
         document.getElementById('q3-text').innerText = qText;
@@ -522,21 +613,18 @@
         if ( (g3IsCorrectCase && isYes) || (!g3IsCorrectCase && !isYes) ) {
             if(isYes) {
                 fb.innerText = `⭕️ はい、${targetWord} いきます。`;
-                fb.style.color = "green";
+                fb.style.color = "var(--correct-color)";
                 playSeikai();
-                // 自動で次へ
+                if(window.addPointsToUser) window.addPointsToUser(g3CurrentId);
                 setTimeout(() => initGame3(), 2000);
             } else {
                 playSeikai();
-                // 音声が重ならないように遅延実行
-                setTimeout(() => {
-                    showFixQuestion3();
-                }, 1000);
+                setTimeout(() => showFixQuestion3(), 1000);
             }
             disableYesNo('game3');
         } else {
             fb.innerText = "❌ ちがいます...";
-            fb.style.color = "red";
+            fb.style.color = "var(--incorrect-color)";
             playBubu();
         }
     }
@@ -550,22 +638,17 @@
         while(dummy.id === g3Target.id) dummy = getRandom(transports);
         
         const choices = shuffle([g3Target, dummy]);
-        
         choices.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            // ★修正: イラスト無し、文字のみ
             btn.innerText = c.name;
             btn.onclick = () => {
                 if(c.id === g3Target.id) {
                     let text = c.name + (c.particle || '');
                     document.getElementById('feedback-game3').innerText = `⭕️ せいかい！ ${text} いきます。`;
                     playSeikai();
-                    
-                    const allOpts = optsDiv.querySelectorAll('button');
-                    allOpts.forEach(b => b.disabled = true);
-                    
-                    // 自動で次へ
+                    if(window.addPointsToUser) window.addPointsToUser(g3CurrentId);
+                    optsDiv.querySelectorAll('button').forEach(b => b.disabled = true);
                     setTimeout(() => initGame3(), 2000);
                 } else {
                     playBubu();
@@ -576,9 +659,8 @@
         speak("どうやって いきますか？");
     }
 
-
-    // --- 7. Game 4 (総合) ---
-    let g4Answer = "";
+    // --- Game 4 ---
+    let g4Answer = "", g4CurrentId = "";
 
     function initGame4() {
         document.getElementById('feedback-game4').innerText = '';
@@ -588,6 +670,9 @@
         const trn = getRandom(transports);
         const plc = getRandom(places);
         const vrb = getRandom(verbs);
+
+        // ID生成 (例: g4_me_bus_school_go)
+        g4CurrentId = `g4_${sub.id}_${trn.id}_${plc.id}_${vrb.id}`;
 
         let enVerb = vrb.en;
         if(sub.id !== 'me' && sub.id !== 'you') enVerb += 's';
@@ -619,43 +704,34 @@
         const blocks = document.querySelectorAll('#area-game4 .word-block');
         let userAnswer = "";
         blocks.forEach(b => userAnswer += b.innerText);
-
         const fb = document.getElementById('feedback-game4');
         if (userAnswer === g4Answer) {
             fb.innerText = "⭕️ かんぺきです！";
-            fb.style.color = "green";
+            fb.style.color = "var(--correct-color)";
             playSeikai();
-            // 自動で次へ
+            if(window.addPointsToUser) window.addPointsToUser(g4CurrentId);
             setTimeout(() => initGame4(), 2000);
         } else {
             fb.innerText = "❌ おしい！";
-            fb.style.color = "red";
+            fb.style.color = "var(--incorrect-color)";
             playBubu();
         }
     }
 
-
-    // --- ヘルパー関数 ---
     function resetGameUI(gameId) {
         const yesBtn = document.getElementById(`g${gameId.slice(-1)}-yes`);
         const noBtn = document.getElementById(`g${gameId.slice(-1)}-no`);
-        yesBtn.disabled = false;
-        noBtn.disabled = false;
-        
+        yesBtn.disabled = false; noBtn.disabled = false;
         document.getElementById(`area-fix-${gameId}`).style.display = 'none';
         document.getElementById(`feedback-${gameId}`).innerText = '';
     }
-
     function disableYesNo(gameId) {
         const yesBtn = document.getElementById(`g${gameId.slice(-1)}-yes`);
         const noBtn = document.getElementById(`g${gameId.slice(-1)}-no`);
-        yesBtn.disabled = true;
-        noBtn.disabled = true;
+        yesBtn.disabled = true; noBtn.disabled = true;
     }
 
-    // 初期化
     initStudy();
-
 </script>
 </body>
 </html>
