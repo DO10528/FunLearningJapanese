@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>どっちが〇〇？ - 形容詞ゲーム</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #ab47bc; /* 形容詞カラー */
+            --accent: #ffca28;
+            --bg-color: #f3e5f5;
+            --text-color: #333;
+            --card-bg: white;
+            --correct: #66bb6a;
+            --incorrect: #ef5350;
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+            color: white; padding: 15px 20px; width: 100%;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 5px 12px; border-radius: 20px; text-decoration: none;
+            font-size: 0.9em; font-weight: bold;
+        }
+        #auth-status { font-size: 0.8em; }
+
+        /* --- ゲームエリア --- */
+        .game-container {
+            max-width: 600px; width: 95%;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        /* 質問カード */
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px; /* 間隔を少し広げる */
+            position: relative;
+            overflow: hidden;
+            border: 4px solid white;
+        }
+        
+        .question-word {
+            font-size: 3em;
+            color: var(--primary);
+            font-weight: 900;
+            margin: 10px 0;
+            line-height: 1.2;
+        }
+        .question-reading {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .speaker-btn {
+            background: var(--accent);
+            border: none; width: 50px; height: 50px; border-radius: 50%;
+            color: white; font-size: 1.5em; cursor: pointer;
+            box-shadow: 0 4px 0 #ff6f00; transition: transform 0.1s;
+        }
+        .speaker-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 選択肢エリア (左右2択) */
+        .choices-container {
+            display: flex;
+            gap: 20px; /* 間隔を少し広げる */
+            justify-content: center;
+        }
+
+        .choice-card {
+            background: white;
+            border-radius: 20px;
+            
+            /* ★修正: 枠を小さく調整 */
+            width: 40%; 
+            max-width: 160px; /* 最大幅を制限 */
+            aspect-ratio: 1 / 1; /* 正方形にする */
+            
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            border: 4px solid transparent;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .choice-card:active { transform: scale(0.95); }
+        
+        .choice-img {
+            font-size: 4rem; /* 絵文字も少し小さく調整 */
+            line-height: 1;
+        }
+
+        /* 正解・不正解アニメーション */
+        .correct-anim { border-color: var(--correct); background-color: #e8f5e9; }
+        .incorrect-anim { border-color: var(--incorrect); background-color: #ffebee; }
+        
+        .mark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; font-weight: bold; opacity: 0; pointer-events: none; z-index: 10;
+        }
+        .mark.show { animation: popMark 0.5s forwards; }
+        
+        @keyframes popMark { 
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+        }
+
+        /* スコアバー */
+        .score-board {
+            display: flex; justify-content: space-between;
+            background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 50px;
+            margin-bottom: 15px; font-weight: bold; color: #555;
+        }
+        .streak-counter { color: #ff9800; }
+
+        /* 次へボタン */
+        #next-btn {
+            background: var(--primary); color: white;
+            border: none; padding: 12px 30px; font-size: 1.1em; font-weight: bold;
+            border-radius: 50px; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 4px 0 #7b1fa2; display: none;
+        }
+        #next-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* ポイントアニメーション */
+        @keyframes pointGet { 0% { opacity:0; transform:translateY(0); } 50% { opacity:1; transform:translateY(-20px); } 100% { opacity:0; transform:translateY(-40px); } }
+        .point-anim { position: absolute; color: #ffca28; font-weight: 900; font-size: 1.5em; pointer-events: none; animation: pointGet 1s ease-out forwards; z-index: 20; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> ホーム</a>
+        <h1 style="margin:0; font-size:1.2em;">どっちが 〇〇？</h1>
+    </div>
+    <div id="auth-status">...</div>
+</header>
+
+<div class="game-container">
+
+    <div class="score-board">
+        <span><i class="fa-solid fa-star"></i> スコア: <span id="score">0</span></span>
+        <span class="streak-counter"><i class="fa-solid fa-fire"></i> <span id="streak">0</span> れんぞく</span>
+    </div>
+
+    <div class="question-card">
+        <div class="question-reading" id="q-reading"></div>
+        <div class="question-word" id="q-word"></div>
+        <button class="speaker-btn" onclick="playQuestionSound()">
+            <i class="fa-solid fa-volume-high"></i>
+        </button>
+    </div>
+
+    <div class="choices-container" id="choices-area">
+        </div>
+
+    <button id="next-btn" onclick="nextQuestion()">つぎの もんだい <i class="fa-solid fa-arrow-right"></i></button>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    window.db = db;
+
+    onAuthStateChanged(auth, (user) => {
+        const el = document.getElementById('auth-status');
+        if (user) {
+            window.currentUser = user;
+            el.textContent = "ログイン中";
+        } else {
+            window.currentUser = null;
+            el.textContent = "ゲスト";
+        }
+    });
+
+    window.addPoints = async (id) => {
+        if(!window.currentUser) return;
+        try {
+            const userRef = doc(db, "users", window.currentUser.uid);
+            await updateDoc(userRef, { points: increment(1) });
+        } catch(e) { console.error(e); }
+    };
+</script>
+
+<script>
+    // --- ゲームデータ ---
+    const quizData = [
+        { word: "おおきい", reading: "おおきい", kanji: "大きい", correct: "🐘", wrong: "🐜", en: "Big" },
+        { word: "ちいさい", reading: "ちいさい", kanji: "小さい", correct: "🐜", wrong: "🐘", en: "Small" },
+        { word: "あつい", reading: "あつい", kanji: "熱い", correct: "🔥", wrong: "🧊", en: "Hot" },
+        { word: "つめたい", reading: "つめたい", kanji: "冷たい", correct: "🧊", wrong: "🔥", en: "Cold" },
+        { word: "はやい", reading: "はやい", kanji: "速い", correct: "🏎️", wrong: "🐢", en: "Fast" },
+        { word: "おそい", reading: "おそい", kanji: "遅い", correct: "🐢", wrong: "🏎️", en: "Slow" },
+        { word: "たかい", reading: "たかい", kanji: "高い", correct: "🦒", wrong: "🐈", en: "Tall" }, 
+        { word: "ながい", reading: "ながい", kanji: "長い", correct: "🐍", wrong: "🐛", en: "Long" }, 
+        { word: "おもい", reading: "おもい", kanji: "重い", correct: "🪨", wrong: "🪶", en: "Heavy" }, 
+        { word: "かるい", reading: "かるい", kanji: "軽い", correct: "🪶", wrong: "🪨", en: "Light" },
+        { word: "うれしい", reading: "うれしい", kanji: "嬉しい", correct: "😄", wrong: "😭", en: "Happy" },
+        { word: "かなしい", reading: "かなしい", kanji: "悲しい", correct: "😭", wrong: "😄", en: "Sad" },
+        { word: "あまい", reading: "あまい", kanji: "甘い", correct: "🍰", wrong: "🍋", en: "Sweet" },
+        { word: "すっぱい", reading: "すっぱい", kanji: "酸っぱい", correct: "🍋", wrong: "🍰", en: "Sour" },
+        { word: "あかるい", reading: "あかるい", kanji: "明るい", correct: "☀️", wrong: "🌑", en: "Bright" },
+        { word: "くらい", reading: "くらい", kanji: "暗い", correct: "🌑", wrong: "☀️", en: "Dark" },
+        { word: "おいしい", reading: "おいしい", kanji: "美味しい", correct: "😋", wrong: "🤢", en: "Delicious" },
+        { word: "くさい", reading: "くさい", kanji: "臭い", correct: "💩", wrong: "🌸", en: "Smelly" },
+        { word: "あたらしい", reading: "あたらしい", kanji: "新しい", correct: "✨👟", wrong: "🏚️", en: "New" },
+        { word: "ふるい", reading: "ふるい", kanji: "古い", correct: "🏚️", wrong: "✨🏡", en: "Old" }
+    ];
+
+    let currentQ = null;
+    let score = 0;
+    let streak = 0;
+    let isAnswering = false;
+
+    // --- 音声合成 ---
+    const synth = window.speechSynthesis;
+    let voices = [];
+    setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+    function speak(text) {
+        synth.cancel();
+        const ut = new SpeechSynthesisUtterance(text);
+        ut.lang = 'ja-JP';
+        ut.rate = 0.9;
+        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        let target = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
+        if(!target && jpVoices.length) target = jpVoices[0];
+        if(target) ut.voice = target;
+        synth.speak(ut);
+    }
+
+    function playSeikai() { new Audio('assets/sounds/seikai.mp3').play().catch(()=>{}); }
+    function playBubu() { new Audio('assets/sounds/bubu.mp3').play().catch(()=>{}); }
+
+    function playQuestionSound() {
+        if(currentQ) speak(currentQ.word); 
+    }
+
+    // --- ゲームロジック ---
+    function initGame() {
+        score = 0;
+        streak = 0;
+        updateScore();
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        isAnswering = true;
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const randomIndex = Math.floor(Math.random() * quizData.length);
+        currentQ = quizData[randomIndex];
+
+        document.getElementById('q-word').innerText = currentQ.kanji;
+        document.getElementById('q-reading').innerText = currentQ.reading;
+        
+        setTimeout(() => playQuestionSound(), 300);
+
+        const container = document.getElementById('choices-area');
+        container.innerHTML = '';
+
+        const isLeftCorrect = Math.random() > 0.5;
+        const leftContent = isLeftCorrect ? currentQ.correct : currentQ.wrong;
+        const rightContent = isLeftCorrect ? currentQ.wrong : currentQ.correct;
+
+        container.appendChild(createCard(leftContent, isLeftCorrect));
+        container.appendChild(createCard(rightContent, !isLeftCorrect));
+    }
+
+    function createCard(content, isCorrect) {
+        const div = document.createElement('div');
+        div.className = 'choice-card';
+        div.innerHTML = `
+            <div class="choice-img">${content}</div>
+            <div class="mark" style="color:${isCorrect ? '#4caf50' : '#ef5350'}">
+                ${isCorrect ? '<i class="fa-regular fa-circle"></i>' : '<i class="fa-solid fa-xmark"></i>'}
+            </div>
+        `;
+        div.onclick = (e) => checkAnswer(div, isCorrect, e);
+        return div;
+    }
+
+    function checkAnswer(cardEl, isCorrect, e) {
+        if(!isAnswering) return; 
+        isAnswering = false;
+
+        const mark = cardEl.querySelector('.mark');
+        mark.classList.add('show');
+
+        if(isCorrect) {
+            cardEl.classList.add('correct-anim');
+            playSeikai();
+            
+            // ★修正: 1点加算
+            score += 1;
+            streak++;
+            updateScore();
+            
+            // +1 Pt アニメーション
+            showPointAnim(e.clientX, e.clientY);
+            
+            if(window.addPoints) window.addPoints('adj_' + currentQ.reading);
+
+            setTimeout(() => nextQuestion(), 1500);
+        } else {
+            cardEl.classList.add('incorrect-anim');
+            playBubu();
+            streak = 0;
+            updateScore();
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+    }
+
+    function showPointAnim(x, y) {
+        const el = document.createElement('div');
+        el.className = 'point-anim';
+        el.innerText = "+1";
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+    }
+
+    function updateScore() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('streak').innerText = streak;
+    }
+
+    initGame();
+
+</script>
+</body>
+</html>
