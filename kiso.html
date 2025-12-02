@@ -338,46 +338,50 @@
             container.innerHTML = html;
         }
 
-        // 2. 濁音・半濁音チャートの描画 (変更なし - 5列グリッド)
-        function renderDakuonHandakuonChart() {
-            const container = document.getElementById('dakuon-handakuon-chart');
-            let html = '';
-            
-            charData.dakuon_handakuon.forEach(item => {
-                const isDakuon = item.type === 'dakuon';
-                // 濁音・半濁音はカタカナの青 (#42a5f5) を使用
-                const typeColor = isDakuon ? '#42a5f5' : var(--primary-dark); 
-                
-                html += generateCardHTML(item.h, item.k, item.r, typeColor);
-            });
-            container.innerHTML = html;
-        }
+        // 2. 濁音・半濁音チャートの描画
+function renderDakuonHandakuonChart() {
+    const container = document.getElementById('dakuon-handakuon-chart');
+    let html = '';
+    
+    charData.dakuon_handakuon.forEach(item => {
+        const isDakuon = item.type === 'dakuon';
+        
+        // ★修正点 1: CSS変数を引用符で囲む
+        // 濁音・半濁音の枠線色を設定 (濁音は青、半濁音はチャートのメイン色)
+        const typeColor = isDakuon ? '#42a5f5' : 'var(--primary-dark)'; 
+        
+        html += generateCardHTML(item.h, item.k, item.r, typeColor);
+    });
+    container.innerHTML = html;
+}
 
-        // 3. 拗音チャートの描画 (変更なし - 4列グリッド)
-        function renderYoonChart() {
-            const container = document.getElementById('yoon-chart');
-            let html = '';
-            
-            charData.yoon.forEach(item => {
-                const isDakuonYoon = item.h.includes('ぎ') || item.h.includes('じ') || item.h.includes('ぢ') || item.h.includes('び') || item.h.includes('ぴ');
-                const typeColor = isDakuonYoon ? '#42a5f5' : var(--hira-color);
-                
-                // 枠線は濁音の拗音のみ青 (#42a5f5) にする
-                const borderColor = isDakuonYoon ? '#42a5f5' : '#ddd';
+// 3. 拗音チャートの描画
+function renderYoonChart() {
+    const container = document.getElementById('yoon-chart');
+    let html = '';
+    
+    charData.yoon.forEach(item => {
+        const isDakuonYoon = item.h.includes('ぎ') || item.h.includes('じ') || item.h.includes('ぢ') || item.h.includes('び') || item.h.includes('ぴ');
+        
+        // ★修正点 2: CSS変数を引用符で囲む (hira文字の色設定)
+        const typeColor = isDakuonYoon ? '#42a5f5' : 'var(--hira-color)';
+        
+        // 枠線は濁音の拗音のみ青 (#42a5f5) にし、清音拗音はデフォルトの#ddd
+        const borderColor = isDakuonYoon ? '#42a5f5' : '#ddd';
 
-                html += `
-                    <div class="kiso-card" onclick="speakChar('${item.h}', '${item.k}')" style="border-color:${borderColor};">
-                        <div class="kiso-kana-box">
-                            <span class="hira" style="color:${typeColor};">${item.h}</span>
-                            <span class="kata">${item.k}</span>
-                        </div>
-                        <div class="romaji">${item.r}</div>
-                        <i class="fa-solid fa-volume-high" style="font-size:0.8em; color:#999; margin-top:3px;"></i>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
+        html += `
+            <div class="kiso-card" onclick="speakChar('${item.h}', '${item.k}')" style="border-color:${borderColor};">
+                <div class="kiso-kana-box">
+                    <span class="hira" style="color:${typeColor};">${item.h}</span>
+                    <span class="kata">${item.k}</span>
+                </div>
+                <div class="romaji">${item.r}</div>
+                <i class="fa-solid fa-volume-high" style="font-size:0.8em; color:#999; margin-top:3px;"></i>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
 
         // ページロード時に全てを実行
         document.addEventListener('DOMContentLoaded', () => {
