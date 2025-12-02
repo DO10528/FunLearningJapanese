@@ -213,7 +213,7 @@
     </a>
     
     <a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
-        <i class="fa-solid fa-book card-icon" style="color:#42a5f5;"></i>
+        <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
         <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
     </a>
 </div>
@@ -548,7 +548,7 @@
             btn_clock1: "とけい1", btn_clock2: "とけい2",
             btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
             btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング",
+            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", btn_tekudasai: "V-てください",
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
             btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
 
@@ -587,7 +587,7 @@
             btn_clock1: "Clock 1", btn_clock2: "Clock 2",
             btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
             btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
-            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing",
+            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", btn_tekudasai: "V-te Kudasai",
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
             btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
 
@@ -652,6 +652,8 @@
         ]},
         // 8. どうし (紫系: 基礎と統一)
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
+            // ★修正: Vてくださいのリンク先を練習ページに
+            { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" }, 
             { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
             { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
             { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" }

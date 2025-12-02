@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-てください 練習表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 共通設定 (V2デザイン - 動詞テーマ) --- */
+        :root {
+            --primary: #ab47bc; /* 動詞カテゴリの紫 */
+            --primary-light: #d1c4e9;
+            --primary-dark: #8e24aa;
+            --accent: #ffcc5c; /* 黄色 */
+            --bg-color: #f8f1f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --request-color: #42a5f5; /* お願い（青） */
+            --instruction-color: #66bb6a; /* 指示（緑） */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(171, 71, 188, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        .mode-title {
+            font-size: 1.6em;
+            font-weight: 900;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            border-bottom: 4px solid;
+            display: inline-block;
+        }
+        #request-title { border-color: var(--request-color); color: var(--request-color); }
+        #instruction-title { border-color: var(--instruction-color); color: var(--instruction-color); }
+
+
+        /* --- 練習カードグリッド --- */
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        /* カード内容 */
+        .verb-forms { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        
+        .masu-box {
+            background: var(--primary-light);
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: var(--primary-dark);
+            font-weight: 900;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+        .tekudasai-box {
+            flex-grow: 1;
+            font-size: 1.6em;
+            font-weight: 900;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .context-meaning {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* 音声ボタン */
+        .sound-btn {
+            background: var(--accent);
+            color: white; border: none;
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1em;
+            box-shadow: 0 3px 0 #ffb300;
+            transition: all 0.1s;
+            position: absolute; top: 20px; right: 20px;
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        /* ゲーム開始ボタン */
+        .start-game-area {
+            text-align: center;
+            margin: 50px 0;
+        }
+        #start-game-btn {
+            background: var(--correct);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.4em;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 #3a7d40;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #start-game-btn:active { transform: translateY(5px); box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="verb_tekudasai_practice.html" style="font-size: 1.4em; font-weight: 900; color: white; text-decoration: none;">
+            <i class="fa-solid fa-list-check"></i> V-てください 練習
+        </a>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="container">
+        <h1>V-てください：用法と動詞の形</h1>
+        
+        <div class="start-game-area">
+            <button id="start-game-btn" onclick="window.location.href='verb_tekudasai_puzzle_master.html'">
+                パズルゲームを始める <i class="fa-solid fa-gamepad"></i>
+            </button>
+            <p style="color:#777; margin-top:10px;">（動詞の形と使い方を覚えたら、ゲームに進もう！）</p>
+        </div>
+        
+
+        <h2 id="request-title" class="mode-title">お願い（依頼）のV-てください</h2>
+        <div class="practice-grid" id="request-list">
+            </div>
+
+        <h2 id="instruction-title" class="mode-title">指示・勧め（命令・提供）のV-てください</h2>
+        <div class="practice-grid" id="instruction-list">
+            </div>
+    </div>
+
+    <script>
+        // --- データ定義 (30+30=60項目) ---
+        // V-ます形を動詞リストから使用し、文脈と形を表示
+        const practiceData = [
+            // ========== お願い（依頼）: 困っている時、相手に何かを頼む時 ==========
+            { type: 'request', masu: '貸します', te: '貸して', context: '鉛筆、お金など、物を借りたい時。 (Lend me...)', meaning: 'Lend me a pencil.' },
+            { type: 'request', masu: '手伝います', te: '手伝って', context: '重い荷物を運ぶなど、助けを求める時。 (Help me with...)', meaning: 'Help me with the luggage.' },
+            { type: 'request', masu: '教えます', te: '教えて', context: '道や電話番号など、情報を聞きたい時。 (Tell/Show me...)', meaning: 'Tell me your phone number.' },
+            { type: 'request', masu: '開けます', te: '開けて', context: '窓やドアを開けてほしい時。 (Open the door.)', meaning: 'Open the door, please.' },
+            { type: 'request', masu: '閉めます', te: '閉めて', context: '寒いので窓やドアを閉めてほしい時。 (Close the window.)', meaning: 'Close the window, please.' },
+            { type: 'request', masu: '待ちます', te: '待って', context: '相手に少し待つよう頼む時。 (Wait a moment.)', meaning: 'Wait a moment, please.' },
+            { type: 'request', masu: '止めます', te: '止めて', context: '危ないので、走る車を止めてほしい時。 (Stop the car.)', meaning: 'Stop the car, please.' },
+            { type: 'request', masu: '見せます', te: '見せて', context: '相手のノートや携帯を見たい時。 (Show me your...)', meaning: 'Show me your notebook.' },
+            { type: 'request', masu: '取ります', te: '取って', context: '棚の高い場所にある物を取ってほしい時。 (Take/Pass me...)', meaning: 'Pass me that book.' },
+            { type: 'request', masu: '言います', te: '言って', context: '相手の名前をもう一度聞きたい時。 (Say/Tell me again.)', meaning: 'Say your name again.' },
+            { type: 'request', masu: '書きます', te: '書いて', context: '相手にメモを書いてほしい時。 (Write it down.)', meaning: 'Write it down here.' },
+            { type: 'request', masu: '使います', te: '使って', context: '相手の道具を使わせてほしい時。 (Let me use...)', meaning: 'Let me use your scissors.' },
+            { type: 'request', masu: '借ります', te: '借りて', context: '本を一時的に借りたい時。 (Borrow this.)', meaning: 'May I borrow this book?' },
+            { type: 'request', masu: '直します', te: '直して', context: '壊れたものを修理してほしい時。 (Fix/Repair this.)', meaning: 'Fix this broken chair.' },
+            { type: 'request', masu: '忘れます', te: '忘れて', context: '嫌なことを気にしないでほしい時。 (Forget about it.)', meaning: 'Please forget about this matter.' },
+            // (繰り返しとバリエーションを加えて30項目を構成)
+            { type: 'request', masu: 'つけます', te: 'つけて', context: '部屋が暗いので電気をつけてほしい時。 (Turn on the light.)', meaning: 'Turn on the light.' },
+            { type: 'request', masu: '消します', te: '消して', context: '電気が明るすぎるので消してほしい時。 (Turn off the light.)', meaning: 'Turn off the light.' },
+            { type: 'request', masu: '登ります', te: '登って', context: '高いところのものを取るのを手伝ってほしい時。 (Climb up.)', meaning: 'Climb up here.' },
+            { type: 'request', masu: '降ります', te: '降りて', context: '高いところから降りてほしい時。 (Come down.)', meaning: 'Come down from there.' },
+            { type: 'request', masu: '送ります', te: '送って', context: '重いものを運ぶのを手伝ってほしい時。 (Send/Transport.)', meaning: 'Send this package.' },
+            { type: 'request', masu: '運びます', te: '運んで', context: '重い箱を運ぶのを手伝ってほしい時。 (Carry this box.)', meaning: 'Carry this box.' },
+            { type: 'request', masu: 'いれます', te: 'いれて', context: 'コーヒーに砂糖を入れてほしい時。 (Put in sugar.)', meaning: 'Put sugar in the coffee.' },
+            { type: 'request', masu: '出します', te: '出して', context: '引き出しから鍵を出してほしい時。 (Take out the key.)', meaning: 'Take the key out of the drawer.' },
+            { type: 'request', masu: '座ります', te: '座って', context: '電車で席を詰めてほしい時。 (Move and sit.)', meaning: 'Move over and sit.' },
+            { type: 'request', masu: '立ちます', te: '立って', context: '前の人が邪魔なので立ってほしい時。 (Stand up.)', meaning: 'Stand up, please.' },
+            { type: 'request', masu: '集めます', te: '集めて', context: '落ちた紙を集めてほしい時。 (Collect the papers.)', meaning: 'Collect the papers.' },
+            { type: 'request', masu: '並べます', te: '並べて', context: '椅子を並べてほしい時。 (Line up the chairs.)', meaning: 'Line up the chairs.' },
+            { type: 'request', masu: '並びます', te: '並んで', context: '列に並んでほしい時。 (Form a line.)', meaning: 'Please form a line.' },
+            { type: 'request', masu: 'まとめます', te: 'まとめて', context: '散らかった書類を片付けてほしい時。 (Gather the documents.)', meaning: 'Gather the documents.' },
+            { type: 'request', masu: '触ります', te: '触って', context: '物が落ちそうなので触ってほしい時。 (Touch/Feel this.)', meaning: 'Touch this carefully.' },
+            { type: 'request', masu: '返します', te: '返して', context: '借りたものを返してほしい時。 (Return it.)', meaning: 'Return the book.' },
+
+            // ========== 指示・勧め（命令・提供）: 先生/親が指示する時、何かをすすめる時 ==========
+            { type: 'instruction', masu: '見ます', te: '見て', context: '先生がホワイトボードを見るよう指示する時。 (Look at the WB.)', meaning: 'Look at the whiteboard.' },
+            { type: 'instruction', masu: '聞きます', te: '聞いて', context: '先生が話を聞くよう指示する時。 (Listen carefully.)', meaning: 'Listen carefully to me.' },
+            { type: 'instruction', masu: '読みます', te: '読んで', context: '本や書類を読むよう指示する時。 (Read this.)', meaning: 'Read this document.' },
+            { type: 'instruction', masu: '書きます', te: '書いて', context: 'ノートに答えを書くよう指示する時。 (Write the answer.)', meaning: 'Write the answer down.' },
+            { type: 'instruction', masu: '座ります', te: '座って', context: '疲れた人に席を勧める時。 (Sit down.)', meaning: 'Please sit down here.' },
+            { type: 'instruction', masu: '立ちます', te: '立って', context: '起立や、前の人が邪魔な時に指示する時。 (Stand up.)', meaning: 'Stand up, please.' },
+            { type: 'instruction', masu: '入ります', te: '入って', context: '部屋や店に入るよう勧める時。 (Come in.)', meaning: 'Please come in.' },
+            { type: 'instruction', masu: '出ます', te: '出て', context: '教室から出るよう指示する時。 (Go out.)', meaning: 'Go out of the room.' },
+            { type: 'instruction', masu: '食べます', te: '食べて', context: 'お菓子や料理を人に勧める時。 (Have some food.)', meaning: 'Please eat this candy.' },
+            { type: 'instruction', masu: '飲みます', te: '飲んで', context: 'お茶やお酒を人に勧める時。 (Have a drink.)', meaning: 'Please drink this tea.' },
+            { type: 'instruction', masu: '覚えます', te: '覚えて', context: '単語や漢字を記憶するよう指示する時。 (Memorize this.)', meaning: 'Memorize these words.' },
+            { type: 'instruction', masu: '開けます', te: '開けて', context: '本の新しいページを開くよう指示する時。 (Open the book.)', meaning: 'Open the book to page 3.' },
+            { type: 'instruction', masu: '閉めます', te: '閉めて', context: '本や辞書を閉じるよう指示する時。 (Close the book.)', meaning: 'Close the book now.' },
+            { type: 'instruction', masu: '忘れます', te: '忘れて', context: '嫌なことをすぐに忘れるよう勧める時。 (Forget it.)', meaning: 'Please forget that happened.' },
+            { type: 'instruction', masu: '使います', te: '使って', context: '道具や機会を使うよう勧める時。 (Use this tool.)', meaning: 'Use this tool for work.' },
+            // (繰り返しとバリエーションを加えて30項目を構成)
+            { type: 'instruction', masu: 'いいます', te: 'いって', context: '名前や住所を言うよう指示する時。 (Say your name.)', meaning: 'Say your full name.' },
+            { type: 'instruction', masu: 'やめます', te: 'やめて', context: '悪い習慣を止めるよう指示する時。 (Stop doing that.)', meaning: 'Stop talking during class.' },
+            { type: 'instruction', masu: '出かけます', te: '出かけて', context: '外へ遊びに行くよう勧める時。 (Go outside.)', meaning: 'Go outside and play.' },
+            { type: 'instruction', masu: '帰ります', te: '帰って', context: '家に帰るよう指示する時。 (Go home.)', meaning: 'Go home early.' },
+            { type: 'instruction', masu: 'かえします', te: 'かえして', context: '借りた本を返すよう指示する時。 (Return the borrowed item.)', meaning: 'Return the borrowed CD.' },
+            { type: 'instruction', masu: 'たちます', te: 'たって', context: '教室で起立するよう指示する時。 (Stand up.)', meaning: 'Stand up straight.' },
+            { type: 'instruction', masu: 'すわります', te: 'すわって', context: '椅子に座るよう指示する時。 (Sit down.)', meaning: 'Sit down immediately.' },
+            { type: 'instruction', masu: 'あげます', te: 'あげて', context: '物を上の棚にあげるよう指示する時。 (Lift/Raise it.)', meaning: 'Raise your hand.' },
+            { type: 'instruction', masu: 'もらいます', te: 'もらって', context: 'プレゼントを受け取るよう勧める時。 (Receive this.)', meaning: 'Receive this gift happily.' },
+            { type: 'instruction', masu: 'あそびます', te: 'あそんで', context: '宿題が終わったら遊ぶよう勧める時。 (Play games.)', meaning: 'Play after finishing homework.' },
+            { type: 'instruction', masu: 'およぎます', te: 'およいで', context: 'プールで泳ぐよう勧める時。 (Go swimming.)', meaning: 'Go swimming in the pool.' },
+            { type: 'instruction', masu: 'あるきます', te: 'あるいて', context: '健康のために歩くよう勧める時。 (Walk slowly.)', meaning: 'Walk slowly here.' },
+            { type: 'instruction', masu: 'はしります', te: 'はしって', context: '早く走るよう指示する時。 (Run quickly.)', meaning: 'Run quickly to the goal.' },
+            { type: 'instruction', masu: 'とびます', te: 'とんで', context: '縄跳びをするよう勧める時。 (Jump high.)', meaning: 'Jump rope outside.' },
+            { type: 'instruction', masu: 'すみます', te: 'すんで', context: 'この町に住むよう勧める時。 (Live here.)', meaning: 'Live here forever.' },
+        ];
+
+        
+        // --- 共通機能：音声合成 ---
+        const synth = window.speechSynthesis;
+        let voices = [];
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        window.speakPhrase = (teForm) => {
+            if (synth.speaking) synth.cancel();
+            
+            // 読み上げは「[Te形]、ください」
+            const textToSpeak = teForm.replace(/（[^）]*）/g, '') + "、ください。"; // 漢字の読みを外して読み上げ
+            
+            const ut = new SpeechSynthesisUtterance(textToSpeak);
+            ut.lang = 'ja-JP';
+            ut.rate = 0.9;
+
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            const preferredKeywords = ['Google', 'Female', 'Kyoko', 'Haruka'];
+            let targetVoice = jpVoices.find(v => preferredKeywords.some(k => v.name.includes(k)));
+            
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) ut.voice = targetVoice;
+
+            synth.speak(ut);
+        };
+
+        // --- リスト描画ロジック ---
+        function createVerbCard(item) {
+            const isRequest = item.type === 'request';
+            const cardColor = isRequest ? 'var(--request-color)' : 'var(--instruction-color)';
+            
+            // 画像URLのプレースホルダー (ここでは省略)
+            // const imageURL = `placeholder_url_${item.masu.toLowerCase()}`;
+
+            const card = document.createElement('div');
+            card.className = 'verb-card';
+            card.style.borderColor = cardColor;
+            
+            card.innerHTML = `
+                <button class="sound-btn" onclick="speakPhrase('${item.te}')">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                
+                <div class="verb-forms">
+                    <div class="masu-box">
+                        ${item.masu}
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="color:#999;"></i>
+                    <div class="tekudasai-box">
+                        ${item.te}<span style="font-size:0.7em;">ください</span>
+                    </div>
+                </div>
+                
+                <p style="font-weight:bold; color: ${cardColor}; margin: 5px 0 5px 0;">
+                    <i class="fa-solid ${isRequest ? 'fa-user-group' : 'fa-hand-point-right'}"></i> 
+                    ${isRequest ? '相手に依頼' : '相手に指示・提供'}
+                </p>
+
+                <p class="context-meaning">
+                    **日本語文脈:** ${item.context}<br>
+                    **英語意味:** ${item.meaning}
+                </p>
+            `;
+            return card;
+        }
+
+        function renderLists() {
+            const requestList = document.getElementById('request-list');
+            const instructionList = document.getElementById('instruction-list');
+
+            const requests = practiceData.filter(item => item.type === 'request');
+            const instructions = practiceData.filter(item => item.type === 'instruction');
+
+            requests.forEach(item => {
+                requestList.appendChild(createVerbCard(item));
+            });
+            
+            instructions.forEach(item => {
+                instructionList.appendChild(createVerbCard(item));
+            });
+        }
+
+        // ページロード時に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLists();
+        });
+    </script>
+</body>
+</html>
