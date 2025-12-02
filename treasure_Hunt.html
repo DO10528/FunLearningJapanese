@@ -100,24 +100,43 @@
     h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 10px; }
     h2 { color: #555; font-size: 1.8em; margin-bottom: 20px; }
 
-    /* --- トピック選択画面 --- */
+    /* --- ★修正箇所：トピック選択画面 --- */
     #sc-topic-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        /* カードの最小幅を少し広げてバランス調整 */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 15px;
         margin: 25px 0;
+        /* 行の高さを揃える */
+        align-items: stretch; 
     }
     .sc-topic-card {
-        padding: 25px 10px;
+        /* Flexboxで中身を中央揃え */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        
+        /* 高さと幅の確保 */
+        min-height: 100px; /* 最低限の高さを保証 */
+        height: 100%;      /* グリッドの高さに合わせる */
+        
+        /* 文字の折り返し設定 */
+        word-break: keep-all; /* 単語の途中での改行を防ぐ */
+        overflow-wrap: break-word; /* どうしても入らない場合のみ改行 */
+        line-height: 1.4;
+
+        padding: 15px;
         background: white;
         border: 4px solid #ccc;
         border-radius: 15px;
-        font-size: 1.3em;
+        font-size: 1.2em;
         font-weight: 700;
         color: var(--text-color);
         cursor: pointer;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         transition: all 0.2s;
+        box-sizing: border-box;
     }
     .sc-topic-card:hover {
         transform: translateY(-3px) scale(1.02);
@@ -195,12 +214,12 @@
     #sc-play-sound-button:active { box-shadow: 0 2px 0 #008ba3; }
     
     
-    /* --- ★カメラ画面（修正箇所）★ --- */
+    /* --- ★カメラ画面 --- */
     #sc-camera-view-wrapper {
         position: relative;
         width: 100%;
-        max-width: 200px; /* 小さくしました */
-        height: 266px;    /* 高さ固定 */
+        max-width: 200px; 
+        height: 266px;    
         
         margin: 20px auto 10px auto;
         
@@ -215,12 +234,12 @@
         width: 100%;
         height: 100%;
         display: block;
-        object-fit: cover; /* 重要：これで隙間なく埋まります */
+        object-fit: cover; 
     }
 
-    /* キャンバス（写真データ用）：画面には表示しない！ */
+    /* キャンバス（写真データ用）：画面には表示しない */
     #sc-canvas-element {
-        display: none; /* これで白い余白が消えます */
+        display: none; 
     }
 
 

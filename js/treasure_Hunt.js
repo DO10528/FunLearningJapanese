@@ -147,16 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'いろ',
             color: '#f48fb1', // ピンク系
             words: [
-                { id: 'aka', name: 'あかいもの', img: 'red.png' }, // 赤い色紙などの画像を用意
-                { id: 'ao', name: 'あおいもの', img: 'blue.png' },
-                { id: 'kiiro', name: 'きいろいもの', img: 'yellow.png' },
-                { id: 'midori', name: 'みどりのもの', img: 'green.png' },
-                { id: 'pink', name: 'ピンクのもの', img: 'pink.png' },
-                { id: 'shiro', name: 'しろいもの', img: 'white.png' },
-                { id: 'kuro', name: 'くろいもの', img: 'black.png' },
-                { id: 'orange', name: 'オレンジのもの', img: 'orange_color.png' },
-                { id: 'murasaki', name: 'むらさきのもの', img: 'purple.png' },
-                { id: 'chairo', name: 'ちゃいろのもの', img: 'brown.png' }
+                { id: 'aka', name: 'あか', img: 'red.png' }, // 赤い色紙などの画像を用意
+                { id: 'ao', name: 'あお', img: 'blue.png' },
+                { id: 'kiiro', name: 'きいろ', img: 'yellow.png' },
+                { id: 'midori', name: 'みどり', img: 'green.png' },
+                { id: 'pink', name: 'ピンク', img: 'pink.png' },
+                { id: 'shiro', name: 'しろ', img: 'white.png' },
+                { id: 'kuro', name: 'くろ', img: 'black.png' },
+                { id: 'orange', name: 'オレンジ', img: 'orange_color.png' },
+                { id: 'murasaki', name: 'むらさき', img: 'purple.png' },
+                { id: 'chairo', name: 'ちゃいろ', img: 'brown.png' }
             ]
         },
         body: {
