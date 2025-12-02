@@ -177,9 +177,8 @@
 
     <script>
         // --- データ定義 (30+30=60項目) ---
-        // V-ます形を動詞リストから使用し、文脈と形を表示
         const practiceData = [
-            // ========== お願い（依頼）: 困っている時、相手に何かを頼む時 ==========
+            // ========== お願い（依頼）: 困っている時、相手に何かを頼む時 (30項目) ==========
             { type: 'request', masu: '貸します', te: '貸して', context: '鉛筆、お金など、物を借りたい時。 (Lend me...)', meaning: 'Lend me a pencil.' },
             { type: 'request', masu: '手伝います', te: '手伝って', context: '重い荷物を運ぶなど、助けを求める時。 (Help me with...)', meaning: 'Help me with the luggage.' },
             { type: 'request', masu: '教えます', te: '教えて', context: '道や電話番号など、情報を聞きたい時。 (Tell/Show me...)', meaning: 'Tell me your phone number.' },
@@ -195,7 +194,6 @@
             { type: 'request', masu: '借ります', te: '借りて', context: '本を一時的に借りたい時。 (Borrow this.)', meaning: 'May I borrow this book?' },
             { type: 'request', masu: '直します', te: '直して', context: '壊れたものを修理してほしい時。 (Fix/Repair this.)', meaning: 'Fix this broken chair.' },
             { type: 'request', masu: '忘れます', te: '忘れて', context: '嫌なことを気にしないでほしい時。 (Forget about it.)', meaning: 'Please forget about this matter.' },
-            // (繰り返しとバリエーションを加えて30項目を構成)
             { type: 'request', masu: 'つけます', te: 'つけて', context: '部屋が暗いので電気をつけてほしい時。 (Turn on the light.)', meaning: 'Turn on the light.' },
             { type: 'request', masu: '消します', te: '消して', context: '電気が明るすぎるので消してほしい時。 (Turn off the light.)', meaning: 'Turn off the light.' },
             { type: 'request', masu: '登ります', te: '登って', context: '高いところのものを取るのを手伝ってほしい時。 (Climb up.)', meaning: 'Climb up here.' },
@@ -211,9 +209,8 @@
             { type: 'request', masu: '並びます', te: '並んで', context: '列に並んでほしい時。 (Form a line.)', meaning: 'Please form a line.' },
             { type: 'request', masu: 'まとめます', te: 'まとめて', context: '散らかった書類を片付けてほしい時。 (Gather the documents.)', meaning: 'Gather the documents.' },
             { type: 'request', masu: '触ります', te: '触って', context: '物が落ちそうなので触ってほしい時。 (Touch/Feel this.)', meaning: 'Touch this carefully.' },
-            { type: 'request', masu: '返します', te: '返して', context: '借りたものを返してほしい時。 (Return it.)', meaning: 'Return the book.' },
 
-            // ========== 指示・勧め（命令・提供）: 先生/親が指示する時、何かをすすめる時 ==========
+            // ========== 指示・勧め（命令・提供）: 先生/親が指示する時、何かをすすめる時 (30項目) ==========
             { type: 'instruction', masu: '見ます', te: '見て', context: '先生がホワイトボードを見るよう指示する時。 (Look at the WB.)', meaning: 'Look at the whiteboard.' },
             { type: 'instruction', masu: '聞きます', te: '聞いて', context: '先生が話を聞くよう指示する時。 (Listen carefully.)', meaning: 'Listen carefully to me.' },
             { type: 'instruction', masu: '読みます', te: '読んで', context: '本や書類を読むよう指示する時。 (Read this.)', meaning: 'Read this document.' },
@@ -229,7 +226,6 @@
             { type: 'instruction', masu: '閉めます', te: '閉めて', context: '本や辞書を閉じるよう指示する時。 (Close the book.)', meaning: 'Close the book now.' },
             { type: 'instruction', masu: '忘れます', te: '忘れて', context: '嫌なことをすぐに忘れるよう勧める時。 (Forget it.)', meaning: 'Please forget that happened.' },
             { type: 'instruction', masu: '使います', te: '使って', context: '道具や機会を使うよう勧める時。 (Use this tool.)', meaning: 'Use this tool for work.' },
-            // (繰り返しとバリエーションを加えて30項目を構成)
             { type: 'instruction', masu: 'いいます', te: 'いって', context: '名前や住所を言うよう指示する時。 (Say your name.)', meaning: 'Say your full name.' },
             { type: 'instruction', masu: 'やめます', te: 'やめて', context: '悪い習慣を止めるよう指示する時。 (Stop doing that.)', meaning: 'Stop talking during class.' },
             { type: 'instruction', masu: '出かけます', te: '出かけて', context: '外へ遊びに行くよう勧める時。 (Go outside.)', meaning: 'Go outside and play.' },
@@ -256,8 +252,7 @@
         window.speakPhrase = (teForm) => {
             if (synth.speaking) synth.cancel();
             
-            // 読み上げは「[Te形]、ください」
-            const textToSpeak = teForm.replace(/（[^）]*）/g, '') + "、ください。"; // 漢字の読みを外して読み上げ
+            const textToSpeak = teForm.replace(/（[^）]*）/g, '') + "、ください。"; 
             
             const ut = new SpeechSynthesisUtterance(textToSpeak);
             ut.lang = 'ja-JP';
@@ -278,9 +273,6 @@
             const isRequest = item.type === 'request';
             const cardColor = isRequest ? 'var(--request-color)' : 'var(--instruction-color)';
             
-            // 画像URLのプレースホルダー (ここでは省略)
-            // const imageURL = `placeholder_url_${item.masu.toLowerCase()}`;
-
             const card = document.createElement('div');
             card.className = 'verb-card';
             card.style.borderColor = cardColor;
