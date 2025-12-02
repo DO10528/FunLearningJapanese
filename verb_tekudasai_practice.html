@@ -76,7 +76,6 @@
         .verb-card {
             background: var(--card-bg);
             border-radius: 15px;
-            /* ★修正1: 右側のパディングを増やし、音声ボタンのスペースを確保 */
             padding: 20px 60px 20px 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             border-left: 6px solid;
@@ -112,7 +111,6 @@
             border-bottom: 2px solid #eee;
             padding-bottom: 5px;
             text-align: center;
-            /* ★修正2: 文字がボタンを侵食しないように最大幅を設定 */
             max-width: 60%; 
         }
         
@@ -140,7 +138,6 @@
             font-size: 1em;
             box-shadow: 0 3px 0 #ffb300;
             transition: all 0.1s;
-            /* ★修正3: 位置を調整 (右から15px、上から15pxに) */
             position: absolute; top: 15px; right: 15px; 
         }
         .sound-btn:active { transform: translateY(3px); box-shadow: none; }
@@ -151,18 +148,23 @@
             margin: 50px 0;
         }
         #start-game-btn {
-            background: var(--correct);
+            /* ★修正: ボタンデザインを大幅に変更して目立たせる */
+            background: var(--primary-dark); /* 濃い紫 */
             color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.4em;
-            font-weight: bold;
-            border-radius: 50px;
-            box-shadow: 0 5px 0 #3a7d40;
+            border: 4px solid var(--accent); /* 黄色の枠線 */
+            padding: 18px 45px;
+            font-size: 1.6em; /* サイズアップ */
+            font-weight: 900;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 var(--primary); /* 影を紫に */
             cursor: pointer;
             transition: transform 0.1s;
+            text-transform: uppercase;
         }
-        #start-game-btn:active { transform: translateY(5px); box-shadow: none; }
+        #start-game-btn:active { 
+            transform: translateY(6px); 
+            box-shadow: none; 
+        }
 
         /* ルビのスタイル */
         .ruby-text { font-size: 0.7em; }
@@ -199,7 +201,6 @@
 
     <script>
         // --- データ定義 (30+30=60項目) ---
-        // 漢字はルビをつけ、ひらがな表記を優先。
         const practiceData = [
             // ========== お願い（依頼）(30項目) ==========
             { type: 'request', masu: 'かします', te: 'かして', meaning: 'Lend', context: 'えんぴつを かして ほしいとき。' },
@@ -253,7 +254,7 @@
             { type: 'instruction', masu: 'やめます', te: 'やめて', meaning: 'Stop', context: 'わるい しゅうかんを とめるよう しじ する とき。' },
             { type: 'instruction', masu: 'でかけます', te: 'でかけて', meaning: 'Go out', context: 'そとへ あそびに いくよう すすめる とき。' },
             { type: 'instruction', masu: 'かえります', te: 'かえって', meaning: 'Go home', context: 'いえに かえるよう しじ する とき。' },
-            { type: 'instruction', masu: 'かえします', te: 'かえして', meaning: 'Return', context: 'かりた ほんを かえすよう しじ する とき。' },
+            { type: 'instruction', masu: 'かえします', te: 'かえして', context: 'かりた ほんを かえすよう しじ する とき。' },
             { type: 'instruction', masu: 'あげます', te: 'あげて', meaning: 'Raise/Lift', context: 'ものを たなにあげるよう しじ する とき。' },
             { type: 'instruction', masu: 'もらいます', te: 'もらって', meaning: 'Receive', context: 'プレゼントを うけとるよう すすめる とき。' },
             { type: 'instruction', masu: 'あそびます', te: 'あそんで', meaning: 'Play', context: 'しゅくだいが おわったら あそぶよう すすめる とき。' },
