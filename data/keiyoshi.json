@@ -43,7 +43,6 @@
     { "kanji": "可愛い", "hiragana": "かわいい", "type": "i", "meaning": "cute, pretty" },
     { "kanji": "面白い", "hiragana": "おもしろい", "type": "i", "meaning": "interesting, funny" },
     { "kanji": "つまらない", "hiragana": "つまらない", "type": "i", "meaning": "boring, dull" },
-    
     { "kanji": "暇", "hiragana": "ひまな", "type": "na", "meaning": "free (time), bored" },
     { "kanji": "元気", "hiragana": "げんきな", "type": "na", "meaning": "healthy, energetic" },
     { "kanji": "静か", "hiragana": "しずかな", "type": "na", "meaning": "quiet" },
@@ -57,7 +56,7 @@
     { "kanji": "嫌い", "hiragana": "きらいな", "type": "na", "meaning": "dislike, hateful" },
     { "kanji": "色々", "hiragana": "いろいろな", "type": "na", "meaning": "various" },
     { "kanji": "簡単", "hiragana": "かんたんな", "type": "na", "meaning": "simple, easy" },
-    { "kanji": "結構", "hiragana": "けっこうな", "type": "na", "meaning": "splendid, nice, sufficient (often used for refusal)" },
+    { "kanji": "結構", "hiragana": "けっこうな", "type": "na", "meaning": "splendid, nice, sufficient" },
     { "kanji": "大丈夫", "hiragana": "だいじょうぶな", "type": "na", "meaning": "all right, safe, secure" },
     { "kanji": "無理", "hiragana": "むりな", "type": "na", "meaning": "impossible, unreasonable" },
     { "kanji": "大切", "hiragana": "たいせつな", "type": "na", "meaning": "important, precious" },

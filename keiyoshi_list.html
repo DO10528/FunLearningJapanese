@@ -3,96 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>形容詞 一覧表</title>
-    <link rel="stylesheet" href="assets/css/style.css"> 
+    <title>形容詞リスト (Adjectives) - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+    
     <style>
-        /* Table-specific styles (既存のCSSと統合してください) */
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; color: #007bff; }
-        .table-container { 
-            margin-top: 20px; 
-            overflow-x: auto; 
-            border: 1px solid #ccc; 
-            border-radius: 8px;
+        /* --- 共通設定 (V2デザイン - 形容詞用グリーン) --- */
+        :root {
+            --primary: #66bb6a; /* Green */
+            --primary-dark: #388e3c;
+            --accent: #ffcc5c;
+            --bg-color: #f1f8e9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            
+            --tag-i: #42a5f5; /* い形容詞用カラー */
+            --tag-na: #ef5350; /* な形容詞用カラー */
         }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 600px; /* 小さな画面でも見やすくするための最小幅 */
-        }
-        th, td { 
-            padding: 12px 15px; 
-            border: 1px solid #ddd; 
-            text-align: left;
-            font-size: 16px;
-        }
-        th { 
-            background-color: #f2f2f2; 
-            font-weight: bold; 
-            color: #333;
-        }
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-        tr:hover { 
-            background-color: #eef; 
-        }
-        .adjective-type { font-style: italic; color: #666; font-size: 0.9em; }
-        .type-i { color: #28a745; } /* 緑 */
-        .type-na { color: #ffc107; } /* 黄色 */
 
-        .home-button-container {
-            text-align: center;
-            margin-top: 20px;
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
         }
-        .home-button-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 5px;
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            text-decoration: none; font-weight: bold;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+
+        /* --- グリッド (カードデザイン) --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .word-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; flex-direction: row;
+            align-items: center; gap: 15px;
+            border-left: 6px solid var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .word-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* 左側：単語ボックス */
+        .word-box {
+            background: #e8f5e9;
+            color: #1b5e20;
+            min-width: 100px; 
+            height: 80px;
+            padding: 0 10px;
+            border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Klee One', cursive; /* 教科書体 */
+            font-weight: 600;
+            font-size: 1.8em; 
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        /* 中央：情報 */
+        .info-box {
+            flex-grow: 1;
+            display: flex; flex-direction: column; gap: 4px;
+            min-width: 0; /* フレックスアイテムの縮小許可 */
+        }
+        .meaning {
+            font-weight: bold; font-size: 1.1em; color: #555;
+            border-bottom: 2px solid #eee; padding-bottom: 2px; margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .reading { 
+            font-size: 0.9em; color: #777; 
+        }
+
+        /* 形容詞タイプバッジ */
+        .type-badge {
+            display: inline-block;
+            font-size: 0.75em; padding: 2px 8px; border-radius: 10px;
+            color: white; font-weight: bold; margin-top: 3px;
+            align-self: flex-start;
+        }
+        .type-i { background-color: var(--tag-i); }
+        .type-na { background-color: var(--tag-na); }
+
+        /* 右側：音声ボタン */
+        .sound-btn {
+            background: var(--accent);
+            color: white; border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em;
+            box-shadow: 0 3px 0 #ffb300;
+            transition: all 0.1s;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .sound-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        /* 検索バー */
+        .search-area {
+            margin-bottom: 30px; text-align: center;
+        }
+        #search-input {
+            padding: 12px 20px; border-radius: 25px; border: 2px solid #ddd;
+            width: 90%; max-width: 400px; font-size: 1em; outline: none;
+            transition: border-color 0.2s;
+        }
+        #search-input:focus { border-color: var(--primary); }
+
+        @media (max-width: 500px) {
+            .grid-container { grid-template-columns: 1fr; } 
+            .word-card { padding: 15px; }
+            .word-box { min-width: 80px; height: 70px; font-size: 1.5em; }
         }
     </style>
-
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-0BX3DD42C1');
     </script>
-    </head>
+</head>
 <body>
 
-    <h1>📝 形容詞 一覧表</h1>
+    <header>
+        <a href="keiyoshi_list.html" class="logo"><i class="fa-solid fa-star-half-stroke"></i> 形容詞リスト</a>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
 
-    <div class="home-button-container">
-        <button onclick="window.location.href='index.html'">ホームに戻る</button>
+    <div class="container">
+        <h1>形容詞 (Adjectives)</h1>
+        
+        <div class="search-area">
+            <input type="text" id="search-input" placeholder="日本語、よみ、英語でさがす...">
+        </div>
+
+        <div class="grid-container" id="list-container">
+            <div style="text-align:center; grid-column:1/-1; color:#666;">読み込み中...</div>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table id="adjective-table">
-            <thead>
-                <tr>
-                    <th>漢字</th>
-                    <th>ひらがな</th>
-                    <th>種類</th>
-                    <th>意味 (Meaning)</th>
-                </tr>
-            </thead>
-            <tbody id="adjective-tbody">
-                </tbody>
-        </table>
-    </div>
+    <script>
+        // データ保持用
+        let adjectiveData = [];
 
-    <div class="home-button-container">
-        <button onclick="window.location.href='index.html'">ホームに戻る</button>
-    </div>
+        // ページ読み込み完了時
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('list-container');
+            const searchInput = document.getElementById('search-input');
+            
+            // 音声合成の準備
+            const synth = window.speechSynthesis;
+            let voices = [];
+            
+            const loadVoices = () => { 
+                voices = synth.getVoices(); 
+            };
+            if (synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = loadVoices;
+            }
+            setTimeout(loadVoices, 500); // 念のため少し遅延させて取得
 
-    <script src="js/keiyoshi_list.js"></script>
+            // 1. JSONデータの取得
+            try {
+                const response = await fetch('data/keiyoshi.json');
+                if (!response.ok) throw new Error("JSON not found");
+                const jsonData = await response.json();
+                adjectiveData = jsonData.adjectives; // JSON構造に合わせて配列を取得
+                console.log("JSON loaded:", adjectiveData.length + " words");
+                renderList(adjectiveData);
+            } catch (e) {
+                console.error("Error loading data/keiyoshi.json:", e);
+                container.innerHTML = '<p style="text-align:center; color:red;">データの読み込みに失敗しました。</p>';
+            }
+
+            // 2. リスト描画関数
+            function renderList(list) {
+                container.innerHTML = '';
+                if (list.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
+                    return;
+                }
+
+                list.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'word-card';
+                    
+                    // 文字数が多い場合にフォントサイズを調整
+                    const fontSize = item.kanji.length > 4 ? '1.2em' : '1.8em';
+                    
+                    // 形容詞タイプのラベル
+                    const typeLabel = item.type === 'i' ? 'い-adj' : 'な-adj';
+                    const typeClass = item.type === 'i' ? 'type-i' : 'type-na';
+
+                    card.innerHTML = `
+                        <div class="word-box" style="font-size: ${fontSize}">${item.kanji}</div>
+                        <div class="info-box">
+                            <div class="meaning">${item.meaning}</div>
+                            <div class="reading">${item.hiragana}</div>
+                            <span class="type-badge ${typeClass}">${typeLabel}</span>
+                        </div>
+                        <button class="sound-btn" onclick="speak('${item.kanji}')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // 3. 音声再生関数 (Global)
+            window.speak = (text) => {
+                if (synth.speaking) synth.cancel();
+
+                const utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.lang = 'ja-JP';
+                utterThis.rate = 0.9;
+
+                // 日本語の女性の声を探すロジック
+                const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+                
+                // 優先キーワード: Google, Female, Kyoko など
+                const preferredKeywords = ['Google', 'Female', 'Kyoko', 'O-Ren', 'Haruka'];
+                let targetVoice = jpVoices.find(v => preferredKeywords.some(k => v.name.includes(k)));
+                
+                if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+                if (targetVoice) utterThis.voice = targetVoice;
+
+                synth.speak(utterThis);
+            };
+
+            // 4. 検索フィルタ機能
+            searchInput.addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const filtered = adjectiveData.filter(item => {
+                    return item.kanji.includes(val) || 
+                           item.hiragana.includes(val) ||
+                           item.meaning.toLowerCase().includes(val);
+                });
+                renderList(filtered);
+            });
+        });
+    </script>
+
+    
 
 </body>
 </html>
