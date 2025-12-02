@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'sekken', name: 'せっけん', img: 'soap.png' },
                 { id: 'shampoo', name: 'シャンプー', img: 'shampoo.png' },
                 { id: 'kagami', name: 'かがみ', img: 'mirror.png' },
-                { id: 'dryer', name: 'ドライヤー', img: 'hairdryer.png' },
+                { id: 'doraiya', name: 'ドライヤー', img: 'hairdryer.png' },
                 { id: 'oke', name: 'おけ', img: 'bucket.png' },
                 { id: 'jaguchi', name: 'じゃぐち', img: 'faucet.png' },
                 { id: 'kushi', name: 'くし', img: 'comb.png' },
