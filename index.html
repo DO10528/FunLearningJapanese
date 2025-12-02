@@ -606,6 +606,7 @@
     };
 
     const gameStructure = [
+        // 1. ひらがな (赤系: 基礎と統一)
         { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
             { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
             { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
@@ -614,47 +615,54 @@
             { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
             { url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
         ]},
+        // 2. カタカナ (オレンジ系: 動画練習と近い色味)
         { id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
             { url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
             { url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" }, 
             { url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
             { url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
         ]},
-        { id: "shiritori", icon: "fa-solid fa-comments", color: "#f0ad4e", titleKey: "cat_shiritori", games: [
+        // 3. しりとり (黄色系: 明るく目立つ色)
+        { id: "shiritori", icon: "fa-solid fa-comments", color: "#fdd835", titleKey: "cat_shiritori", games: [
             { url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
             { url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
         ]},
-        { id: "word_other", icon: "fa-solid fa-microphone", color: "#00bcd4", titleKey: "cat_word_other", games: [
+        // 4. ことば (水色系: 新鮮な色)
+        { id: "word_other", icon: "fa-solid fa-microphone", color: "#26c6da", titleKey: "cat_word_other", games: [
             { url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
             { url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
-            // ★新規追加
             { url: "imasu_arimasu.html", titleKey: "btn_imasu", icon: "fa-solid fa-cat" },
             { url: "money.html", titleKey: "btn_money", icon: "fa-solid fa-coins" },
             { url: "transport_game.html", titleKey: "btn_transport", icon: "fa-solid fa-car" },
         ]},
-        { id: "clock", icon: "fa-solid fa-clock", color: "#42a5f5", titleKey: "cat_clock", games: [
+        // 5. とけい (インディゴ系: 知的なイメージ)
+        { id: "clock", icon: "fa-solid fa-clock", color: "#5c6bc0", titleKey: "cat_clock", games: [
             { url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
             { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
         ]},
-        { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#66bb6a", titleKey: "cat_kanji_game", games: [
+        // 6. かんじ (青系: 基礎と統一)
+        { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
             { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
             { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
         ]},
-        { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#ab47bc", titleKey: "cat_keiyoshi_game", games: [
-            // ★新規追加: どっちが〇〇？を先頭に
+        // 7. けいようし (緑系: 基礎と統一)
+        { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
             { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
             { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
         ]},
-        { id: "verbs", icon: "fa-solid fa-person-running", color: "#9c27b0", titleKey: "cat_verb_game", games: [
+        // 8. どうし (紫系: 基礎と統一)
+        { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
             { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
             { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
             { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" }
         ]},
-        { id: "sentence", icon: "fa-solid fa-layer-group", color: "#546e7a", titleKey: "cat_sentence", games: [
+        // 9. ぶんしょう (ピンク系: アクセントカラー)
+        { id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
             { url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
             { url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
             { url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
         ]},
+        // 10. じっせん (茶色系: 落ち着いた色)
         { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ 
             { url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
             { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
