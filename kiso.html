@@ -2,203 +2,389 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>ひらがな・カタカナ基礎表</title> 
-    <link rel="stylesheet" href="assets/css/style.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ひらがな・カタカナ基礎表 - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- 共通スタイル --- */
-        body { 
-            font-family: 'Arial', sans-serif; 
-            max-width: 900px; /* ★レイアウト変更のため幅を拡大★ */
-            margin: 20px auto; 
-            padding: 20px; 
-            background-color: #f4f7f6;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
+        /* --- 共通設定 (V2デザイン - ひらがな/カタカナ用) --- */
+        :root {
+            --primary: #ff6f61; /* Coral Red (メインメニューのひらがな色) */
+            --primary-dark: #cc564c;
+            --accent: #ffcc5c;
+            --bg-color: #fffafa; /* Light Reddish Background */
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --hira-color: #263238; /* Dark Grey */
+            --kata-color: #42a5f5; /* Light Blue */
         }
-        h1 { 
-            text-align: center; 
-            color: #5c7aff; 
-            margin-bottom: 20px;
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
         }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(255, 111, 97, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            text-decoration: none; font-weight: bold;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1100px; 
+            margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 20px; font-size: 1.8em;
+        }
+
+        .chart-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border-top: 5px solid var(--primary);
+        }
+
         h2.table-title {
+            color: var(--primary);
+            font-size: 1.4em;
+            margin-top: 0; margin-bottom: 15px;
             text-align: center;
-            color: #5c7aff;
-            background-color: #e6f3ff;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 30px;
+            font-weight: 900;
         }
-        .container-content {
-            background-color: #ffffff; 
-            padding: 25px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* ★★★ 1. 50音グリッド (Seion) スタイル ★★★ */
-        #kiso-chart-container-seion {
+        
+        /* --- 50音グリッドコンテナ --- */
+        .kiso-grid {
             display: grid;
-            /* 10列 (あ,か,さ,た,な,は,ま,や,ら,わ) */
-            grid-template-columns: repeat(10, 1fr); 
+            /* ★修正点: 10列 (文字) + 0.5fr (右側の行見出し) */
+            grid-template-columns: repeat(10, 1fr) 0.5fr; 
             gap: 5px;
-            border: 2px solid #5c7aff;
-            border-radius: 8px;
-            padding: 5px;
-            background-color: #f0f8ff;
-        }
-        .kiso-cell {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px;
-            text-align: center;
-            min-height: 100px;
-            display: flex; /* ★セルの中身を縦に積む */
-            flex-direction: column;
-            justify-content: center;
-        }
-        .kiso-cell.empty {
-            background-color: transparent;
-            border: none;
-        }
-        .kiso-chars {
-            display: flex;
-            justify-content: space-around;
-            font-weight: bold;
-        }
-        .kiso-hira { font-size: 1.4em; color: #333; }
-        .kiso-kata { font-size: 1.4em; color: #007bff; }
-        .kiso-illust {
-            max-width: 100%;
-            max-height: 40px;
-            display: block;
-            margin: 3px auto 0;
-            border-radius: 3px;
-        }
-        .kiso-illust-placeholder {
-            height: 40px; /* 画像がない場合も高さを確保 */
-        }
-        .kiso-word {
-            font-size: 0.8em;
-            color: #555;
         }
 
-        /* ★★★ 2. 3列テーブル (Dakuon etc.) スタイル ★★★ */
-        .table-container { 
-            margin-top: 20px; 
-            overflow-x: auto; 
-            border: 1px solid #ddd; 
+        /* --- グリッドカードスタイル --- */
+        .kiso-card, .kiso-header {
+            background: #fff;
             border-radius: 8px;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
-        th, td { 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-            text-align: center; 
-            font-size: 1.1em;
-        }
-        th { 
-            background-color: #e6f3ff; 
-            font-weight: bold; 
-            color: #5c7aff;
-        }
-        .char-hira, .char-kata { 
-            font-size: 2.0em; 
-            font-weight: bold;
-            width: 20%;
-        }
-        .char-illust {
-            width: 40%;
-            font-size: 0.9em;
-        }
-        .char-illust .kiso-illust { /* .kiso-illustを再利用 */
-            max-height: 50px;
-            margin: 0 auto;
+            padding: 5px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            transition: all 0.15s;
         }
         
-        /* --- ボタン共通スタイル --- */
-        .navigation-buttons {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .navigation-buttons button {
-            padding: 10px 25px;
-            font-size: 1em;
-            border: none;
-            border-radius: 20px;
+        .kiso-card {
+            border: 2px solid #ddd;
             cursor: pointer;
-            transition: background-color 0.3s;
-            background-color: #6c757d;
+            min-height: 80px;
+        }
+
+        .kiso-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        
+        .kiso-card:active {
+            transform: scale(0.95);
+            background: #ffe0dd;
+        }
+        
+        /* ヘッダーセル (行/列) */
+        .kiso-header {
+            background: var(--primary);
             color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .navigation-buttons button:hover {
-            background-color: #5a6268;
+
+        /* 文字表示エリア */
+        .kiso-kana-box {
+            display: flex; justify-content: space-around;
+            width: 100%; margin-bottom: 3px;
         }
+        .hira { font-size: 1.5em; color: var(--hira-color); font-weight: 900; }
+        .kata { font-size: 1.5em; color: var(--kata-color); font-weight: 900; }
+        .romaji { font-size: 0.7em; color: #999; }
+        
+        /* 空のセル */
+        .kiso-empty {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            cursor: default !important;
+            min-height: 80px;
+        }
+        
+        /* --- その他のグリッド --- */
+        .dakuon-grid, .yoon-grid {
+            grid-template-columns: repeat(5, 1fr); /* 5列表示 */
+            gap: 10px;
+        }
+        .yoon-grid { grid-template-columns: repeat(4, 1fr); }
+
+        /* --- ヘルパー --- */
+        .mt-30 { margin-top: 30px; }
     </style>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
     
-      gtag('config', 'G-0BX3DD42C1');
-    </script>
-    </head>
+</head>
 <body>
-    
-    <h1>📝 ひらがな・カタカナ基礎表</h1>
-    
-    <div class="container-content">
-        
-        <div class="navigation-buttons">
-            <button onclick="window.location.href='index.html'">ホームに戻る</button>
-        </div>
 
-        <h2 class="table-title">50音 (ごじゅうおん)</h2>
-        <div id="kiso-chart-container-seion">
+    <header>
+        <a href="kiso.html" class="logo"><i class="fa-solid fa-pen-nib"></i> 基礎表</a>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="container">
+        <h1>ひらがな・カタカナ基礎表 (音付き)</h1>
+        
+        <div class="chart-section">
+            <h2 class="table-title">50音 (清音: せいおん) - 【右からあ行、左からわ行】</h2>
+            <div id="seion-chart" class="kiso-grid">
+                </div>
+        </div>
+        
+        <div class="chart-section mt-30">
+            <h2 class="table-title">濁音 (だくおん) ・ 半濁音 (はんだくおん)</h2>
+            <div id="dakuon-handakuon-chart" class="kiso-grid dakuon-grid">
             </div>
-
-        <h2 class="table-title">濁音 (だくおん)</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ひらがな</th>
-                        <th>カタカナ</th>
-                        <th>イラストと単語</th>
-                    </tr>
-                </thead>
-                <tbody id="kiso-tbody-dakuon">
-                    </tbody>
-            </table>
         </div>
         
-        <h2 class="table-title">半濁音 (はんだくおん)</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ひらがな</th>
-                        <th>カタカナ</th>
-                        <th>イラストと単語</th>
-                    </tr>
-                </thead>
-                <tbody id="kiso-tbody-handakuon">
-                    </tbody>
-            </table>
+        <div class="chart-section mt-30">
+            <h2 class="table-title">拗音 (ようおん)</h2>
+            <div id="yoon-chart" class="kiso-grid yoon-grid">
+            </div>
         </div>
 
-        <div class="navigation-buttons">
-            <button onclick="window.location.href='index.html'">ホームに戻る</button>
-        </div>
     </div>
     
-    <script src="js/kiso.js"></script>
+    <script>
+        // --- データ定義 ---
+        const charData = {
+            rows: ['A', 'I', 'U', 'E', 'O'],
+            
+            // 清音データ: 10列 x 5行の構造 (A, K, S, T, N, H, M, Y, R, W の順)
+            seion: [
+                ['あ', 'ア', 'a'], ['か', 'カ', 'ka'], ['さ', 'サ', 'sa'], ['た', 'タ', 'ta'], ['な', 'ナ', 'na'],
+                ['は', 'ハ', 'ha'], ['ま', 'マ', 'ma'], ['や', 'ヤ', 'ya'], ['ら', 'ラ', 'ra'], ['わ', 'ワ', 'wa'],
+                
+                ['い', 'イ', 'i'], ['き', 'キ', 'ki'], ['し', 'シ', 'shi'], ['ち', 'チ', 'chi'], ['に', 'ニ', 'ni'],
+                ['ひ', 'ヒ', 'hi'], ['み', 'ミ', 'mi'], ['', '', ''], ['り', 'リ', 'ri'], ['ゐ', 'ヰ', 'wi'],
+                
+                ['う', 'ウ', 'u'], ['く', 'ク', 'ku'], ['す', 'ス', 'su'], ['つ', 'ツ', 'tsu'], ['ぬ', 'ヌ', 'nu'],
+                ['ふ', 'フ', 'fu'], ['む', 'ム', 'mu'], ['ゆ', 'ユ', 'yu'], ['る', 'ル', 'ru'], ['', '', ''],
+
+                ['え', 'エ', 'e'], ['け', 'ケ', 'ke'], ['せ', 'セ', 'se'], ['て', 'テ', 'te'], ['ね', 'ネ', 'ne'],
+                ['へ', 'ヘ', 'he'], ['め', 'メ', 'me'], ['', '', ''], ['れ', 'レ', 're'], ['ゑ', 'ヱ', 'we'],
+                
+                ['お', 'オ', 'o'], ['こ', 'コ', 'ko'], ['そ', 'ソ', 'so'], ['と', 'ト', 'to'], ['の', 'ノ', 'no'],
+                ['ほ', 'ホ', 'ho'], ['も', 'モ', 'mo'], ['よ', 'ヨ', 'yo'], ['ろ', 'ロ', 'ro'], ['を', 'ヲ', 'wo'],
+                
+                ['ん', 'ン', 'n'] // 最後の'ん'/'ン'
+            ],
+
+            // 濁音・半濁音データ
+            dakuon_handakuon: [
+                {h: 'が', k: 'ガ', r: 'ga', type: 'dakuon'}, {h: 'ぎ', k: 'ギ', r: 'gi', type: 'dakuon'},
+                {h: 'ぐ', k: 'グ', r: 'gu', type: 'dakuon'}, {h: 'げ', k: 'ゲ', r: 'ge', type: 'dakuon'},
+                {h: 'ご', k: 'ゴ', r: 'go', type: 'dakuon'},
+                
+                {h: 'ざ', 'k': 'ザ', r: 'za', type: 'dakuon'}, {h: 'じ', k: 'ジ', r: 'ji', type: 'dakuon'},
+                {h: 'ず', k: 'ズ', r: 'zu', type: 'dakuon'}, {h: 'ぜ', k: 'ゼ', r: 'ze', type: 'dakuon'},
+                {h: 'ぞ', k: 'ゾ', r: 'zo', type: 'dakuon'},
+
+                {h: 'だ', 'k': 'ダ', r: 'da', type: 'dakuon'}, {h: 'ぢ', k: 'ヂ', r: 'ji', type: 'dakuon'},
+                {h: 'づ', k: 'ヅ', r: 'zu', type: 'dakuon'}, {h: 'で', k: 'デ', r: 'de', type: 'dakuon'},
+                {h: 'ど', k: 'ド', r: 'do', type: 'dakuon'},
+
+                {h: 'ば', 'k': 'バ', r: 'ba', type: 'dakuon'}, {h: 'び', k: 'ビ', r: 'bi', type: 'dakuon'},
+                {h: 'ぶ', k: 'ブ', r: 'bu', type: 'dakuon'}, {h: 'べ', k: 'ベ', r: 'be', type: 'dakuon'},
+                {h: 'ぼ', k: 'ボ', r: 'bo', type: 'dakuon'},
+
+                {h: 'ぱ', 'k': 'パ', r: 'pa', type: 'handakuon'}, {h: 'ぴ', k: 'ピ', r: 'pi', type: 'handakuon'},
+                {h: 'ぷ', k: 'プ', r: 'pu', type: 'handakuon'}, {h: 'ぺ', k: 'ペ', r: 'pe', type: 'handakuon'},
+                {h: 'ぽ', 'k': 'ポ', r: 'po', type: 'handakuon'}
+            ],
+            
+            // 拗音データ
+            yoon: [
+                {h: 'きゃ', k: 'キャ', r: 'kya'}, {h: 'きゅ', k: 'キュ', r: 'kyu'}, {h: 'きょ', k: 'キョ', r: 'kyo'},
+                {h: 'ぎゃ', k: 'ギャ', r: 'gya'}, {h: 'ぎゅ', k: 'ギュ', r: 'gyu'}, {h: 'ぎょ', k: 'ギョ', r: 'gyo'},
+                
+                {h: 'しゃ', k: 'シャ', r: 'sha'}, {h: 'しゅ', k: 'シュ', r: 'shu'}, {h: 'しょ', k: 'ショ', r: 'sho'},
+                {h: 'じゃ', k: 'ジャ', r: 'ja'}, {h: 'じゅ', k: 'ジュ', r: 'ju'}, {h: 'じょ', k: 'ジョ', r: 'jo'},
+                
+                {h: 'ちゃ', k: 'チャ', r: 'cha'}, {h: 'ちゅ', k: 'チュ', r: 'chu'}, {h: 'ちょ', k: 'チョ', r: 'cho'},
+                {h: 'ぢゃ', k: 'ヂャ', r: 'ja'}, {h: 'ぢゅ', k: 'ヂュ', r: 'ju'}, {h: 'ぢょ', k: 'ヂョ', r: 'jo'},
+                
+                {h: 'にゃ', k: 'ニャ', r: 'nya'}, {h: 'にゅ', k: 'ニュ', r: 'nyu'}, {h: 'にょ', k: 'ニョ', r: 'nyo'},
+                {h: 'ひゃ', k: 'ヒャ', r: 'hya'}, {h: 'ひゅ', k: 'ヒュ', r: 'hyu'}, {h: 'ひょ', k: 'ヒョ', r: 'hyo'},
+                
+                {h: 'びゃ', k: 'ビャ', r: 'bya'}, {h: 'びゅ', k: 'ビュ', r: 'byu'}, {h: 'びょ', k: 'ビョ', r: 'byo'},
+                {h: 'ぴゃ', k: 'ピャ', r: 'pya'}, {h: 'ぴゅ', k: 'ピュ', r: 'pyu'}, {h: 'ぴょ', k: 'ピョ', r: 'pyo'},
+
+                {h: 'みゃ', k: 'ミャ', r: 'mya'}, {h: 'みゅ', k: 'ミュ', r: 'myu'}, {h: 'みょ', k: 'ミョ', r: 'myo'},
+                {h: 'りゃ', k: 'リャ', r: 'rya'}, {h: 'りゅ', k: 'リュ', r: 'ryu'}, {h: 'りょ', k: 'リョ', r: 'ryo'},
+            ]
+        };
+
+        // --- 共通機能：音声合成 ---
+        const synth = window.speechSynthesis;
+        let voices = [];
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        window.speakChar = (hira, kata) => {
+            if (synth.speaking) synth.cancel();
+            
+            const textToSpeak = hira || kata; 
+            if (!textToSpeak) return;
+
+            const ut = new SpeechSynthesisUtterance(textToSpeak);
+            ut.lang = 'ja-JP';
+            ut.rate = 0.9;
+
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            const preferredKeywords = ['Google', 'Female', 'Kyoko', 'Haruka'];
+            let targetVoice = jpVoices.find(v => preferredKeywords.some(k => v.name.includes(k)));
+            
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) ut.voice = targetVoice;
+
+            synth.speak(ut);
+        };
+        
+        // --- HTML生成ヘルパー ---
+        function generateCardHTML(hira, kata, romaji, typeColor = '') {
+             const colorStyle = typeColor ? `style="border-color:${typeColor};"` : '';
+             return `
+                 <div class="kiso-card" onclick="speakChar('${hira}', '${kata}')" ${colorStyle}>
+                     <div class="kiso-kana-box">
+                         <span class="hira">${hira}</span>
+                         <span class="kata">${kata}</span>
+                     </div>
+                     <div class="romaji">${romaji}</div>
+                     <i class="fa-solid fa-volume-high" style="font-size:0.8em; color:#999; margin-top:3px;"></i>
+                 </div>
+             `;
+         }
+
+
+        // 1. 清音 (50音) チャートの描画
+        function renderSeionChart() {
+            const container = document.getElementById('seion-chart');
+            let html = '';
+            
+            // ★修正点 1: 列の表示順序を反転 (W -> A)
+            const reversedColumns = ['わ', 'ら', 'や', 'ま', 'は', 'な', 'た', 'さ', 'か', 'あ']; 
+            
+            // 1行目: 列ヘッダー (わ行 -> あ行)
+            for (const col of reversedColumns) {
+                html += `<div class="kiso-header">${col}-column</div>`;
+            }
+            html += '<div class="kiso-empty"></div>'; // 右上角の空セル
+            
+            // 2行目以降: 行データ
+            for (let i = 0; i < 5; i++) { // i = 行インデックス (A, I, U, E, O)
+                for (let j = 9; j >= 0; j--) { // j = 元の列インデックス (9=W, 8=R, ... 0=A)
+                    const index = i * 10 + j; 
+                    const charPair = charData.seion[index];
+                    const hira = charPair[0];
+                    const kata = charPair[1];
+                    const romaji = charPair[2];
+
+                    if (hira === '') {
+                        html += '<div class="kiso-empty"></div>';
+                    } else {
+                        html += generateCardHTML(hira, kata, romaji);
+                    }
+                }
+                // ★修正点 2: 行見出しを右側に配置
+                html += `<div class="kiso-header">${charData.rows[i]}-row</div>`;
+            }
+            
+            // 最後の「ん/ン」を別途追加 (グリッドの外側)
+            html += `
+                <div style="grid-column: 1 / 12; text-align:right; margin-top:10px;">
+                    <span style="color:#666; font-size:0.9em; margin-right:10px;">(最後の音: </span>
+                    <div class="kiso-card" style="display:inline-flex; width:100px; min-height:60px; margin-right:10px;" onclick="speakChar('ん', 'ン')">
+                        <div class="kiso-kana-box" style="margin:0;">
+                            <span class="hira">ん</span>
+                            <span class="kata">ン</span>
+                        </div>
+                        <div class="romaji">n</div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // 2. 濁音・半濁音チャートの描画 (変更なし - 5列グリッド)
+        function renderDakuonHandakuonChart() {
+            const container = document.getElementById('dakuon-handakuon-chart');
+            let html = '';
+            
+            charData.dakuon_handakuon.forEach(item => {
+                const isDakuon = item.type === 'dakuon';
+                // 濁音・半濁音はカタカナの青 (#42a5f5) を使用
+                const typeColor = isDakuon ? '#42a5f5' : var(--primary-dark); 
+                
+                html += generateCardHTML(item.h, item.k, item.r, typeColor);
+            });
+            container.innerHTML = html;
+        }
+
+        // 3. 拗音チャートの描画 (変更なし - 4列グリッド)
+        function renderYoonChart() {
+            const container = document.getElementById('yoon-chart');
+            let html = '';
+            
+            charData.yoon.forEach(item => {
+                const isDakuonYoon = item.h.includes('ぎ') || item.h.includes('じ') || item.h.includes('ぢ') || item.h.includes('び') || item.h.includes('ぴ');
+                const typeColor = isDakuonYoon ? '#42a5f5' : var(--hira-color);
+                
+                // 枠線は濁音の拗音のみ青 (#42a5f5) にする
+                const borderColor = isDakuonYoon ? '#42a5f5' : '#ddd';
+
+                html += `
+                    <div class="kiso-card" onclick="speakChar('${item.h}', '${item.k}')" style="border-color:${borderColor};">
+                        <div class="kiso-kana-box">
+                            <span class="hira" style="color:${typeColor};">${item.h}</span>
+                            <span class="kata">${item.k}</span>
+                        </div>
+                        <div class="romaji">${item.r}</div>
+                        <i class="fa-solid fa-volume-high" style="font-size:0.8em; color:#999; margin-top:3px;"></i>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ページロード時に全てを実行
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSeionChart();
+            renderDakuonHandakuonChart();
+            renderYoonChart();
+        });
+    </script>
 </body>
 </html>
