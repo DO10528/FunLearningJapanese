@@ -58,7 +58,6 @@
         }
         .card:active { transform: scale(0.95); background: #e1f5fe; }
         
-        /* 絵文字を大きく表示するスタイル */
         .emoji-img { font-size: 3.5rem; line-height: 1.2; margin-bottom: 5px; }
         .card span { font-size: 0.95em; font-weight: bold; line-height: 1.3; }
 
@@ -107,8 +106,9 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
         .option-btn {
             background: white; border: 2px solid #ddd; padding: 15px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; font-size: 1.1em;
+            font-weight: bold; cursor: pointer; font-size: 1.3em; /* 文字を大きく */
             box-shadow: 0 3px 0 #eee;
+            height: 80px; /* 高さ固定で押しやすく */
         }
         .option-btn:active { transform: translateY(2px); box-shadow: none; }
 
@@ -176,7 +176,6 @@
             <div class="sortable-area" id="pool-game1" style="border: 2px solid #ddd; background:white;"></div>
             <div id="feedback-game1" class="feedback-msg"></div>
             <button class="big-btn" onclick="checkGame1()">こたえあわせ</button>
-            <button class="big-btn" onclick="initGame1()" style="background:#888; display:none;" id="next-game1">つぎへ</button>
         </div>
 
         <div id="screen-game2" class="screen">
@@ -195,7 +194,6 @@
             </div>
 
             <div id="feedback-game2" class="feedback-msg"></div>
-            <button class="big-btn" onclick="initGame2()" style="display:none;" id="next-game2">つぎへ</button>
         </div>
 
         <div id="screen-game3" class="screen">
@@ -214,7 +212,6 @@
             </div>
 
             <div id="feedback-game3" class="feedback-msg"></div>
-            <button class="big-btn" onclick="initGame3()" style="display:none;" id="next-game3">つぎへ</button>
         </div>
 
         <div id="screen-game4" class="screen">
@@ -225,7 +222,6 @@
             <div class="sortable-area" id="pool-game4" style="border: 2px solid #ddd; background:white;"></div>
             <div id="feedback-game4" class="feedback-msg"></div>
             <button class="big-btn" onclick="checkGame4()">こたえあわせ</button>
-            <button class="big-btn" onclick="initGame4()" style="background:#888; display:none;" id="next-game4">つぎへ</button>
         </div>
 
     </div>
@@ -243,7 +239,7 @@
         { id: 'bus', name: 'バス', en: 'bus', emoji: '🚌', particle: 'で' },
         { id: 'train', name: 'でんしゃ', en: 'train', emoji: '🚃', particle: 'で' },
         { id: 'car', name: 'くるま', en: 'car', emoji: '🚗', particle: 'で' },
-        { id: 'walk', name: 'あるいて', en: 'on foot', emoji: '🚶', particle: '' }, // 「で」がつかない
+        { id: 'walk', name: 'あるいて', en: 'on foot', emoji: '🚶', particle: '' }, 
         { id: 'bicycle', name: 'じてんしゃ', en: 'bicycle', emoji: '🚲', particle: 'で' },
         { id: 'taxi', name: 'タクシー', en: 'taxi', emoji: '🚕', particle: 'で' },
         { id: 'shinkansen', name: 'しんかんせん', en: 'Shinkansen', emoji: '🚅', particle: 'で' },
@@ -273,7 +269,6 @@
         { id: 'conbini', name: 'コンビニ', en: 'convenience store', emoji: '🏪' }
     ];
 
-    // 人物データ
     const people = [
         { id: 'me', name: 'わたし', en: 'I', emoji: '😊' },
         { id: 'you', name: 'あなた', en: 'You', emoji: '🫵' },
@@ -291,7 +286,6 @@
 
     // --- 2. 共通関数 ---
     
-    // テキスト読み上げ (問題文などのみ使用)
     function speak(text) {
         window.speechSynthesis.cancel();
         const ut = new SpeechSynthesisUtterance(text);
@@ -300,7 +294,6 @@
         window.speechSynthesis.speak(ut);
     }
 
-    // ★効果音再生 (正解/不正解)★
     function playSeikai() {
         const audio = new Audio('assets/sounds/seikai.mp3');
         audio.play().catch(e => console.log('Audio error:', e));
@@ -328,7 +321,6 @@
 
     // --- 3. Study Mode ---
     function initStudy() {
-        // 並び順修正: 人物 -> 乗り物 -> 場所 -> 動作
         renderGrid('grid-people', people);
         renderGrid('grid-transport', transports);
         renderGrid('grid-place', places);
@@ -351,7 +343,6 @@
     let g1Answer = [];
     
     function initGame1() {
-        document.getElementById('next-game1').style.display = 'none';
         document.getElementById('feedback-game1').innerText = '';
         document.getElementById('area-game1').innerHTML = '';
         
@@ -359,14 +350,12 @@
         const plc = getRandom(places);
         const vrb = getRandom(verbs);
 
-        // 英語 (表示のみ)
         let enVerb = vrb.en;
         if(sub.id !== 'me' && sub.id !== 'you' && sub.id !== 'friend') enVerb += 's'; 
         if(sub.id === 'you' || sub.id === 'friend' || sub.id === 'me') enVerb = vrb.en;
         const enText = `${sub.en} ${enVerb} to ${plc.en}.`;
         document.getElementById('q1-text').innerText = enText;
         
-        // 日本語パーツ
         const parts = [
             { text: sub.name + 'は', type: 'sub' },
             { text: plc.name + 'に', type: 'plc' }, 
@@ -404,12 +393,13 @@
         if (userAnswer === g1Answer) {
             fb.innerText = "⭕️ せいかい！";
             fb.style.color = "green";
-            playSeikai(); // MP3再生
-            document.getElementById('next-game1').style.display = 'inline-block';
+            playSeikai();
+            // 自動で次へ
+            setTimeout(() => initGame1(), 2000);
         } else {
             fb.innerText = "❌ ちがいます...";
             fb.style.color = "red";
-            playBubu(); // MP3再生
+            playBubu();
         }
     }
 
@@ -443,20 +433,22 @@
             if(isYes) {
                 fb.innerText = `⭕️ はい、${g2Target.name} に いきます。`;
                 fb.style.color = "green";
-                playSeikai(); // MP3再生
-                showNextBtn('game2');
+                playSeikai();
+                // 自動で次へ
+                setTimeout(() => initGame2(), 2000);
             } else {
-                fb.innerText = `⭕️ いいえ、いきません。`;
-                // 「いいえ」の正解音はここでは鳴らさず、修正問題へ誘導
+                // Noと答えた -> 修正問題へ
+                // 音声が重ならないように、SEが鳴り終わった頃（1秒後）に質問読み上げ
                 playSeikai(); 
-                showFixQuestion2();
+                setTimeout(() => {
+                    showFixQuestion2();
+                }, 1000);
             }
             disableYesNo('game2');
         } else {
-            // 不正解
             fb.innerText = "❌ ちがいます...";
             fb.style.color = "red";
-            playBubu(); // MP3再生
+            playBubu();
         }
     }
 
@@ -475,17 +467,22 @@
         choices.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.innerHTML = `<div style="font-size:2em;">${c.emoji}</div>${c.name}`;
+            // ★修正: イラスト無し、文字のみ
+            btn.innerText = c.name;
             btn.onclick = () => {
                 if(c.id === g2Target.id) {
                     document.getElementById('feedback-game2').innerText = `⭕️ せいかい！ ${g2Target.name} に いきます。`;
-                    playSeikai(); // MP3再生
-                    showNextBtn('game2');
+                    playSeikai();
+                    
+                    // 正解したので確認用にイラストを見せる（メイン画像を書き換えるなどの演出でも可ですが、メイン画像は既に正解なのでそのままでOK）
                     
                     const allOpts = optsDiv.querySelectorAll('button');
                     allOpts.forEach(b => b.disabled = true);
+                    
+                    // 自動で次へ
+                    setTimeout(() => initGame2(), 2000);
                 } else {
-                    playBubu(); // MP3再生
+                    playBubu();
                 }
             };
             optsDiv.appendChild(btn);
@@ -526,18 +523,21 @@
             if(isYes) {
                 fb.innerText = `⭕️ はい、${targetWord} いきます。`;
                 fb.style.color = "green";
-                playSeikai(); // MP3
-                showNextBtn('game3');
+                playSeikai();
+                // 自動で次へ
+                setTimeout(() => initGame3(), 2000);
             } else {
-                fb.innerText = `⭕️ いいえ、いきません。`;
-                playSeikai(); // MP3
-                showFixQuestion3();
+                playSeikai();
+                // 音声が重ならないように遅延実行
+                setTimeout(() => {
+                    showFixQuestion3();
+                }, 1000);
             }
             disableYesNo('game3');
         } else {
             fb.innerText = "❌ ちがいます...";
             fb.style.color = "red";
-            playBubu(); // MP3
+            playBubu();
         }
     }
 
@@ -554,17 +554,21 @@
         choices.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
-            btn.innerHTML = `<div style="font-size:2em;">${c.emoji}</div>${c.name}`;
+            // ★修正: イラスト無し、文字のみ
+            btn.innerText = c.name;
             btn.onclick = () => {
                 if(c.id === g3Target.id) {
                     let text = c.name + (c.particle || '');
                     document.getElementById('feedback-game3').innerText = `⭕️ せいかい！ ${text} いきます。`;
-                    playSeikai(); // MP3
-                    showNextBtn('game3');
+                    playSeikai();
+                    
                     const allOpts = optsDiv.querySelectorAll('button');
                     allOpts.forEach(b => b.disabled = true);
+                    
+                    // 自動で次へ
+                    setTimeout(() => initGame3(), 2000);
                 } else {
-                    playBubu(); // MP3
+                    playBubu();
                 }
             };
             optsDiv.appendChild(btn);
@@ -577,7 +581,6 @@
     let g4Answer = "";
 
     function initGame4() {
-        document.getElementById('next-game4').style.display = 'none';
         document.getElementById('feedback-game4').innerText = '';
         document.getElementById('area-game4').innerHTML = '';
 
@@ -593,7 +596,6 @@
         const enText = `${sub.en} ${enVerb} to ${plc.en} ${enTrn}.`;
         document.getElementById('q4-text').innerText = enText;
         
-        // 日本語パーツ
         const p1 = sub.name + 'は';
         const p2 = trn.name + (trn.particle || '');
         const p3 = plc.name + 'に';
@@ -622,12 +624,13 @@
         if (userAnswer === g4Answer) {
             fb.innerText = "⭕️ かんぺきです！";
             fb.style.color = "green";
-            playSeikai(); // MP3
-            document.getElementById('next-game4').style.display = 'inline-block';
+            playSeikai();
+            // 自動で次へ
+            setTimeout(() => initGame4(), 2000);
         } else {
             fb.innerText = "❌ おしい！";
             fb.style.color = "red";
-            playBubu(); // MP3
+            playBubu();
         }
     }
 
@@ -641,7 +644,6 @@
         
         document.getElementById(`area-fix-${gameId}`).style.display = 'none';
         document.getElementById(`feedback-${gameId}`).innerText = '';
-        document.getElementById(`next-${gameId}`).style.display = 'none';
     }
 
     function disableYesNo(gameId) {
@@ -649,10 +651,6 @@
         const noBtn = document.getElementById(`g${gameId.slice(-1)}-no`);
         yesBtn.disabled = true;
         noBtn.disabled = true;
-    }
-
-    function showNextBtn(gameId) {
-        document.getElementById(`next-${gameId}`).style.display = 'inline-block';
     }
 
     // 初期化
