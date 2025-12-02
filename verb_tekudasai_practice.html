@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V-てください 練習表</title>
+    <title>V-てください れんしゅうひょう</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
     
@@ -76,7 +76,8 @@
         .verb-card {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 20px;
+            /* ★修正1: 右側のパディングを増やし、音声ボタンのスペースを確保 */
+            padding: 20px 60px 20px 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             border-left: 6px solid;
             transition: transform 0.2s;
@@ -85,7 +86,13 @@
         .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
         /* カード内容 */
-        .verb-forms { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .verb-forms { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 10px; 
+            justify-content: space-between;
+        }
         
         .masu-box {
             background: var(--primary-light);
@@ -95,6 +102,7 @@
             font-weight: 900;
             font-size: 1.3em;
             flex-shrink: 0;
+            text-align: center;
         }
         .tekudasai-box {
             flex-grow: 1;
@@ -103,12 +111,22 @@
             color: #333;
             border-bottom: 2px solid #eee;
             padding-bottom: 5px;
+            text-align: center;
+            /* ★修正2: 文字がボタンを侵食しないように最大幅を設定 */
+            max-width: 60%; 
         }
         
-        .context-meaning {
+        .simple-meaning {
             font-size: 0.9em;
             color: #777;
-            margin-top: 5px;
+            margin-top: 10px;
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
+        }
+        .english-meaning {
+            font-size: 1.1em;
+            color: #007bff;
+            font-weight: bold;
         }
 
         /* 音声ボタン */
@@ -122,7 +140,8 @@
             font-size: 1em;
             box-shadow: 0 3px 0 #ffb300;
             transition: all 0.1s;
-            position: absolute; top: 20px; right: 20px;
+            /* ★修正3: 位置を調整 (右から15px、上から15pxに) */
+            position: absolute; top: 15px; right: 15px; 
         }
         .sound-btn:active { transform: translateY(3px); box-shadow: none; }
         
@@ -144,103 +163,107 @@
             transition: transform 0.1s;
         }
         #start-game-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ルビのスタイル */
+        .ruby-text { font-size: 0.7em; }
     </style>
 </head>
 <body>
 
     <header>
         <a href="verb_tekudasai_practice.html" style="font-size: 1.4em; font-weight: 900; color: white; text-decoration: none;">
-            <i class="fa-solid fa-list-check"></i> V-てください 練習
+            <i class="fa-solid fa-list-check"></i> V-てください れんしゅう
         </a>
         <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
     </header>
 
     <div class="container">
-        <h1>V-てください：用法と動詞の形</h1>
+        <h1>V-てください：つかいかたと、かたち</h1>
         
         <div class="start-game-area">
             <button id="start-game-btn" onclick="window.location.href='verb_tekudasai_puzzle_master.html'">
-                パズルゲームを始める <i class="fa-solid fa-gamepad"></i>
+                パズルゲームをはじめる <i class="fa-solid fa-gamepad"></i>
             </button>
-            <p style="color:#777; margin-top:10px;">（動詞の形と使い方を覚えたら、ゲームに進もう！）</p>
+            <p style="color:#777; margin-top:10px;">（かたちと つかいかたを おぼえたら、ゲームに すすもう！）</p>
         </div>
         
 
-        <h2 id="request-title" class="mode-title">お願い（依頼）のV-てください</h2>
+        <h2 id="request-title" class="mode-title">おねがい（たのみごと）の V-てください</h2>
         <div class="practice-grid" id="request-list">
             </div>
 
-        <h2 id="instruction-title" class="mode-title">指示・勧め（命令・提供）のV-てください</h2>
+        <h2 id="instruction-title" class="mode-title">しじ・すすめ（やってね、どうぞ）の V-てください</h2>
         <div class="practice-grid" id="instruction-list">
             </div>
     </div>
 
     <script>
         // --- データ定義 (30+30=60項目) ---
+        // 漢字はルビをつけ、ひらがな表記を優先。
         const practiceData = [
-            // ========== お願い（依頼）: 困っている時、相手に何かを頼む時 (30項目) ==========
-            { type: 'request', masu: '貸します', te: '貸して', context: '鉛筆、お金など、物を借りたい時。 (Lend me...)', meaning: 'Lend me a pencil.' },
-            { type: 'request', masu: '手伝います', te: '手伝って', context: '重い荷物を運ぶなど、助けを求める時。 (Help me with...)', meaning: 'Help me with the luggage.' },
-            { type: 'request', masu: '教えます', te: '教えて', context: '道や電話番号など、情報を聞きたい時。 (Tell/Show me...)', meaning: 'Tell me your phone number.' },
-            { type: 'request', masu: '開けます', te: '開けて', context: '窓やドアを開けてほしい時。 (Open the door.)', meaning: 'Open the door, please.' },
-            { type: 'request', masu: '閉めます', te: '閉めて', context: '寒いので窓やドアを閉めてほしい時。 (Close the window.)', meaning: 'Close the window, please.' },
-            { type: 'request', masu: '待ちます', te: '待って', context: '相手に少し待つよう頼む時。 (Wait a moment.)', meaning: 'Wait a moment, please.' },
-            { type: 'request', masu: '止めます', te: '止めて', context: '危ないので、走る車を止めてほしい時。 (Stop the car.)', meaning: 'Stop the car, please.' },
-            { type: 'request', masu: '見せます', te: '見せて', context: '相手のノートや携帯を見たい時。 (Show me your...)', meaning: 'Show me your notebook.' },
-            { type: 'request', masu: '取ります', te: '取って', context: '棚の高い場所にある物を取ってほしい時。 (Take/Pass me...)', meaning: 'Pass me that book.' },
-            { type: 'request', masu: '言います', te: '言って', context: '相手の名前をもう一度聞きたい時。 (Say/Tell me again.)', meaning: 'Say your name again.' },
-            { type: 'request', masu: '書きます', te: '書いて', context: '相手にメモを書いてほしい時。 (Write it down.)', meaning: 'Write it down here.' },
-            { type: 'request', masu: '使います', te: '使って', context: '相手の道具を使わせてほしい時。 (Let me use...)', meaning: 'Let me use your scissors.' },
-            { type: 'request', masu: '借ります', te: '借りて', context: '本を一時的に借りたい時。 (Borrow this.)', meaning: 'May I borrow this book?' },
-            { type: 'request', masu: '直します', te: '直して', context: '壊れたものを修理してほしい時。 (Fix/Repair this.)', meaning: 'Fix this broken chair.' },
-            { type: 'request', masu: '忘れます', te: '忘れて', context: '嫌なことを気にしないでほしい時。 (Forget about it.)', meaning: 'Please forget about this matter.' },
-            { type: 'request', masu: 'つけます', te: 'つけて', context: '部屋が暗いので電気をつけてほしい時。 (Turn on the light.)', meaning: 'Turn on the light.' },
-            { type: 'request', masu: '消します', te: '消して', context: '電気が明るすぎるので消してほしい時。 (Turn off the light.)', meaning: 'Turn off the light.' },
-            { type: 'request', masu: '登ります', te: '登って', context: '高いところのものを取るのを手伝ってほしい時。 (Climb up.)', meaning: 'Climb up here.' },
-            { type: 'request', masu: '降ります', te: '降りて', context: '高いところから降りてほしい時。 (Come down.)', meaning: 'Come down from there.' },
-            { type: 'request', masu: '送ります', te: '送って', context: '重いものを運ぶのを手伝ってほしい時。 (Send/Transport.)', meaning: 'Send this package.' },
-            { type: 'request', masu: '運びます', te: '運んで', context: '重い箱を運ぶのを手伝ってほしい時。 (Carry this box.)', meaning: 'Carry this box.' },
-            { type: 'request', masu: 'いれます', te: 'いれて', context: 'コーヒーに砂糖を入れてほしい時。 (Put in sugar.)', meaning: 'Put sugar in the coffee.' },
-            { type: 'request', masu: '出します', te: '出して', context: '引き出しから鍵を出してほしい時。 (Take out the key.)', meaning: 'Take the key out of the drawer.' },
-            { type: 'request', masu: '座ります', te: '座って', context: '電車で席を詰めてほしい時。 (Move and sit.)', meaning: 'Move over and sit.' },
-            { type: 'request', masu: '立ちます', te: '立って', context: '前の人が邪魔なので立ってほしい時。 (Stand up.)', meaning: 'Stand up, please.' },
-            { type: 'request', masu: '集めます', te: '集めて', context: '落ちた紙を集めてほしい時。 (Collect the papers.)', meaning: 'Collect the papers.' },
-            { type: 'request', masu: '並べます', te: '並べて', context: '椅子を並べてほしい時。 (Line up the chairs.)', meaning: 'Line up the chairs.' },
-            { type: 'request', masu: '並びます', te: '並んで', context: '列に並んでほしい時。 (Form a line.)', meaning: 'Please form a line.' },
-            { type: 'request', masu: 'まとめます', te: 'まとめて', context: '散らかった書類を片付けてほしい時。 (Gather the documents.)', meaning: 'Gather the documents.' },
-            { type: 'request', masu: '触ります', te: '触って', context: '物が落ちそうなので触ってほしい時。 (Touch/Feel this.)', meaning: 'Touch this carefully.' },
+            // ========== お願い（依頼）(30項目) ==========
+            { type: 'request', masu: 'かします', te: 'かして', meaning: 'Lend', context: 'えんぴつを かして ほしいとき。' },
+            { type: 'request', masu: 'てつだいます', te: 'てつだって', meaning: 'Help', context: 'おもい にもつを はこぶとき。' },
+            { type: 'request', masu: 'おしえます', te: 'おしえて', meaning: 'Tell/Show', context: 'みちや でんわばんごうを ききたいとき。' },
+            { type: 'request', masu: 'あけます', te: 'あけて', meaning: 'Open', context: 'まどや ドアを あけて ほしいとき。' },
+            { type: 'request', masu: 'しめます', te: 'しめて', meaning: 'Close', context: 'まどや ドアを しめて ほしいとき。' },
+            { type: 'request', masu: 'まちます', te: 'まって', meaning: 'Wait', context: 'すこし まって ほしいとき。' },
+            { type: 'request', masu: 'とめます', te: 'とめて', meaning: 'Stop', context: 'あぶないので くるまを とめて ほしいとき。' },
+            { type: 'request', masu: 'みせます', te: 'みせて', meaning: 'Show', context: 'あいての ノートを みたいとき。' },
+            { type: 'request', masu: 'とります', te: 'とって', meaning: 'Take/Pass', context: 'たかい ところの ほを とって ほしいとき。' },
+            { type: 'request', masu: 'いいます', te: 'いって', meaning: 'Say/Tell', context: 'なまえを もういちど ききたいとき。' },
+            { type: 'request', masu: 'かきます', te: 'かいて', meaning: 'Write', context: 'メモを かいて ほしいとき。' },
+            { type: 'request', masu: 'つかいます', te: 'つかって', meaning: 'Use', context: 'あいての どうぐを つかわせて ほしいとき。' },
+            { type: 'request', masu: 'かります', te: 'かりて', meaning: 'Borrow', context: 'ほんを いちじてきに かりたいとき。' },
+            { type: 'request', masu: 'なおします', te: 'なおして', meaning: 'Fix', context: 'こわれた ものを しゅうり して ほしいとき。' },
+            { type: 'request', masu: 'わすれます', te: 'わすれて', meaning: 'Forget', context: 'いやな ことを きにしないで ほしいとき。' },
+            { type: 'request', masu: 'つけます', te: 'つけて', meaning: 'Turn On', context: 'へやが くらいので でんきを つけて ほしいとき。' },
+            { type: 'request', masu: 'けします', te: 'けして', meaning: 'Turn Off', context: 'でんきが あかるすぎるので けして ほしいとき。' },
+            { type: 'request', masu: 'のぼります', te: 'のぼって', meaning: 'Climb', context: 'たかいところの ものを とるとき。' },
+            { type: 'request', masu: 'おります', te: 'おりて', meaning: 'Come Down', context: 'たかいところから おりて ほしいとき。' },
+            { type: 'request', masu: 'おくります', te: 'おくって', meaning: 'Send', context: 'にもつを おくって ほしいとき。' },
+            { type: 'request', masu: 'はこびます', te: 'はこんで', meaning: 'Carry', context: 'おもい はこを はこんで ほしいとき。' },
+            { type: 'request', masu: 'いれます', te: 'いれて', meaning: 'Put In', context: 'コーヒーに さとうを いれて ほしいとき。' },
+            { type: 'request', masu: 'だします', te: 'だして', meaning: 'Take Out', context: 'ひきだしから かぎを だして ほしいとき。' },
+            { type: 'request', masu: 'すわります', te: 'すわって', meaning: 'Sit', context: 'でんしゃで せきを つめて ほしいとき。' },
+            { type: 'request', masu: 'たちます', te: 'たって', meaning: 'Stand Up', context: 'まえの ひとが じゃまな とき。' },
+            { type: 'request', masu: 'あつめます', te: 'あつめて', meaning: 'Collect', context: 'おちた かみを あつめて ほしいとき。' },
+            { type: 'request', masu: 'ならべます', te: 'ならべて', meaning: 'Line Up', context: 'いすを ならべて ほしいとき。' },
+            { type: 'request', masu: 'ならびます', te: 'ならんで', meaning: 'Form a Line', context: 'れつに ならんで ほしいとき。' },
+            { type: 'request', masu: 'まとめます', te: 'まとめて', meaning: 'Gather', context: 'ちらかった しょるいを まとめて ほしいとき。' },
+            { type: 'request', masu: 'さわります', te: 'さわって', meaning: 'Touch', context: 'おちそうな ものを さわって ほしいとき。' },
 
-            // ========== 指示・勧め（命令・提供）: 先生/親が指示する時、何かをすすめる時 (30項目) ==========
-            { type: 'instruction', masu: '見ます', te: '見て', context: '先生がホワイトボードを見るよう指示する時。 (Look at the WB.)', meaning: 'Look at the whiteboard.' },
-            { type: 'instruction', masu: '聞きます', te: '聞いて', context: '先生が話を聞くよう指示する時。 (Listen carefully.)', meaning: 'Listen carefully to me.' },
-            { type: 'instruction', masu: '読みます', te: '読んで', context: '本や書類を読むよう指示する時。 (Read this.)', meaning: 'Read this document.' },
-            { type: 'instruction', masu: '書きます', te: '書いて', context: 'ノートに答えを書くよう指示する時。 (Write the answer.)', meaning: 'Write the answer down.' },
-            { type: 'instruction', masu: '座ります', te: '座って', context: '疲れた人に席を勧める時。 (Sit down.)', meaning: 'Please sit down here.' },
-            { type: 'instruction', masu: '立ちます', te: '立って', context: '起立や、前の人が邪魔な時に指示する時。 (Stand up.)', meaning: 'Stand up, please.' },
-            { type: 'instruction', masu: '入ります', te: '入って', context: '部屋や店に入るよう勧める時。 (Come in.)', meaning: 'Please come in.' },
-            { type: 'instruction', masu: '出ます', te: '出て', context: '教室から出るよう指示する時。 (Go out.)', meaning: 'Go out of the room.' },
-            { type: 'instruction', masu: '食べます', te: '食べて', context: 'お菓子や料理を人に勧める時。 (Have some food.)', meaning: 'Please eat this candy.' },
-            { type: 'instruction', masu: '飲みます', te: '飲んで', context: 'お茶やお酒を人に勧める時。 (Have a drink.)', meaning: 'Please drink this tea.' },
-            { type: 'instruction', masu: '覚えます', te: '覚えて', context: '単語や漢字を記憶するよう指示する時。 (Memorize this.)', meaning: 'Memorize these words.' },
-            { type: 'instruction', masu: '開けます', te: '開けて', context: '本の新しいページを開くよう指示する時。 (Open the book.)', meaning: 'Open the book to page 3.' },
-            { type: 'instruction', masu: '閉めます', te: '閉めて', context: '本や辞書を閉じるよう指示する時。 (Close the book.)', meaning: 'Close the book now.' },
-            { type: 'instruction', masu: '忘れます', te: '忘れて', context: '嫌なことをすぐに忘れるよう勧める時。 (Forget it.)', meaning: 'Please forget that happened.' },
-            { type: 'instruction', masu: '使います', te: '使って', context: '道具や機会を使うよう勧める時。 (Use this tool.)', meaning: 'Use this tool for work.' },
-            { type: 'instruction', masu: 'いいます', te: 'いって', context: '名前や住所を言うよう指示する時。 (Say your name.)', meaning: 'Say your full name.' },
-            { type: 'instruction', masu: 'やめます', te: 'やめて', context: '悪い習慣を止めるよう指示する時。 (Stop doing that.)', meaning: 'Stop talking during class.' },
-            { type: 'instruction', masu: '出かけます', te: '出かけて', context: '外へ遊びに行くよう勧める時。 (Go outside.)', meaning: 'Go outside and play.' },
-            { type: 'instruction', masu: '帰ります', te: '帰って', context: '家に帰るよう指示する時。 (Go home.)', meaning: 'Go home early.' },
-            { type: 'instruction', masu: 'かえします', te: 'かえして', context: '借りた本を返すよう指示する時。 (Return the borrowed item.)', meaning: 'Return the borrowed CD.' },
-            { type: 'instruction', masu: 'たちます', te: 'たって', context: '教室で起立するよう指示する時。 (Stand up.)', meaning: 'Stand up straight.' },
-            { type: 'instruction', masu: 'すわります', te: 'すわって', context: '椅子に座るよう指示する時。 (Sit down.)', meaning: 'Sit down immediately.' },
-            { type: 'instruction', masu: 'あげます', te: 'あげて', context: '物を上の棚にあげるよう指示する時。 (Lift/Raise it.)', meaning: 'Raise your hand.' },
-            { type: 'instruction', masu: 'もらいます', te: 'もらって', context: 'プレゼントを受け取るよう勧める時。 (Receive this.)', meaning: 'Receive this gift happily.' },
-            { type: 'instruction', masu: 'あそびます', te: 'あそんで', context: '宿題が終わったら遊ぶよう勧める時。 (Play games.)', meaning: 'Play after finishing homework.' },
-            { type: 'instruction', masu: 'およぎます', te: 'およいで', context: 'プールで泳ぐよう勧める時。 (Go swimming.)', meaning: 'Go swimming in the pool.' },
-            { type: 'instruction', masu: 'あるきます', te: 'あるいて', context: '健康のために歩くよう勧める時。 (Walk slowly.)', meaning: 'Walk slowly here.' },
-            { type: 'instruction', masu: 'はしります', te: 'はしって', context: '早く走るよう指示する時。 (Run quickly.)', meaning: 'Run quickly to the goal.' },
-            { type: 'instruction', masu: 'とびます', te: 'とんで', context: '縄跳びをするよう勧める時。 (Jump high.)', meaning: 'Jump rope outside.' },
-            { type: 'instruction', masu: 'すみます', te: 'すんで', context: 'この町に住むよう勧める時。 (Live here.)', meaning: 'Live here forever.' },
+            // ========== 指示・勧め（命令・提供）(30項目) ==========
+            { type: 'instruction', masu: 'みます', te: 'みて', meaning: 'Look at', context: 'ホワイトボードを みるよう しじ する とき。' },
+            { type: 'instruction', masu: 'ききます', te: 'きいて', meaning: 'Listen', context: 'せんせいが はなしを きくよう しじ する とき。' },
+            { type: 'instruction', masu: 'よみます', te: 'よんで', meaning: 'Read', context: 'ほんを よむよう しじ する とき。' },
+            { type: 'instruction', masu: 'かきます', te: 'かいて', meaning: 'Write', context: 'ノートに こたえを かくよう しじ する とき。' },
+            { type: 'instruction', masu: 'すわります', te: 'すわって', meaning: 'Sit down', context: 'つかれた ひとに せきを すすめる とき。' },
+            { type: 'instruction', masu: 'たちます', te: 'たって', meaning: 'Stand up', context: 'きりつ や あいてが じゃまな とき。' },
+            { type: 'instruction', masu: 'はいります', te: 'はいって', meaning: 'Come in', context: 'へやに はいるよう すすめる とき。' },
+            { type: 'instruction', masu: 'でます', te: 'でて', meaning: 'Go out', context: 'きょうしつから でるよう しじ する とき。' },
+            { type: 'instruction', masu: 'たべます', te: 'たべて', meaning: 'Eat/Have', context: 'おかし や りょうりを すすめる とき。' },
+            { type: 'instruction', masu: 'のみます', te: 'のんで', meaning: 'Drink/Have', context: 'おちゃ や のみものを すすめる とき。' },
+            { type: 'instruction', masu: 'おぼえます', te: 'おぼえて', meaning: 'Memorize', context: 'たんご や かんじを きおく するよう しじ する とき。' },
+            { type: 'instruction', masu: 'あけます', te: 'あけて', meaning: 'Open', context: 'ほんの あたらしい ページを あける とき。' },
+            { type: 'instruction', masu: 'しめます', te: 'しめて', meaning: 'Close', context: 'ほんや じしょを とじるよう しじ する とき。' },
+            { type: 'instruction', masu: 'わすれます', te: 'わすれて', meaning: 'Forget', context: 'いやな ことを すぐ わすれるよう すすめる とき。' },
+            { type: 'instruction', masu: 'つかいます', te: 'つかって', meaning: 'Use', context: 'どうぐや きかいを つかうよう すすめる とき。' },
+            { type: 'instruction', masu: 'いいます', te: 'いって', meaning: 'Say/Tell', context: 'なまえや じゅうしょを いうよう しじ する とき。' },
+            { type: 'instruction', masu: 'やめます', te: 'やめて', meaning: 'Stop', context: 'わるい しゅうかんを とめるよう しじ する とき。' },
+            { type: 'instruction', masu: 'でかけます', te: 'でかけて', meaning: 'Go out', context: 'そとへ あそびに いくよう すすめる とき。' },
+            { type: 'instruction', masu: 'かえります', te: 'かえって', meaning: 'Go home', context: 'いえに かえるよう しじ する とき。' },
+            { type: 'instruction', masu: 'かえします', te: 'かえして', meaning: 'Return', context: 'かりた ほんを かえすよう しじ する とき。' },
+            { type: 'instruction', masu: 'あげます', te: 'あげて', meaning: 'Raise/Lift', context: 'ものを たなにあげるよう しじ する とき。' },
+            { type: 'instruction', masu: 'もらいます', te: 'もらって', meaning: 'Receive', context: 'プレゼントを うけとるよう すすめる とき。' },
+            { type: 'instruction', masu: 'あそびます', te: 'あそんで', meaning: 'Play', context: 'しゅくだいが おわったら あそぶよう すすめる とき。' },
+            { type: 'instruction', masu: 'およぎます', te: 'およいで', meaning: 'Swim', context: 'プールで およぐよう すすめる とき。' },
+            { type: 'instruction', masu: 'あるきます', te: 'あるいて', meaning: 'Walk', context: 'けんこうの ために あるくよう すすめる とき。' },
+            { type: 'instruction', masu: 'はしります', te: 'はしって', meaning: 'Run', context: 'はやく はしるよう しじ する とき。' },
+            { type: 'instruction', masu: 'とびます', te: 'とんで', meaning: 'Jump', context: 'なわとびを するよう すすめる とき。' },
+            { type: 'instruction', masu: 'すみます', te: 'すんで', meaning: 'Live', context: 'この まちに すむよう すすめる とき。' },
+            { type: 'instruction', masu: 'つくります', te: 'つくって', meaning: 'Make/Create', context: 'もんだいを つくるよう しじ する とき。' },
+            { type: 'instruction', masu: 'えらびます', te: 'えらんで', meaning: 'Choose', context: 'ただしい こたえを えらぶよう しじ する とき。' },
         ];
 
         
@@ -252,7 +275,9 @@
         window.speakPhrase = (teForm) => {
             if (synth.speaking) synth.cancel();
             
-            const textToSpeak = teForm.replace(/（[^）]*）/g, '') + "、ください。"; 
+            // 読み上げは「[Te形]、ください」
+            const hiraganaTeForm = teForm.replace(/（[^）]*）/g, ''); 
+            const textToSpeak = hiraganaTeForm + "、ください。"; 
             
             const ut = new SpeechSynthesisUtterance(textToSpeak);
             ut.lang = 'ja-JP';
@@ -294,12 +319,12 @@
                 
                 <p style="font-weight:bold; color: ${cardColor}; margin: 5px 0 5px 0;">
                     <i class="fa-solid ${isRequest ? 'fa-user-group' : 'fa-hand-point-right'}"></i> 
-                    ${isRequest ? '相手に依頼' : '相手に指示・提供'}
+                    ${isRequest ? 'おねがい（たのみごと）' : 'しじ・すすめ'}
                 </p>
 
-                <p class="context-meaning">
-                    **日本語文脈:** ${item.context}<br>
-                    **英語意味:** ${item.meaning}
+                <p class="simple-meaning">
+                    <span class="english-meaning">${item.meaning}</span>
+                    <br>${item.context}
                 </p>
             `;
             return card;
