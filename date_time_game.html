@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年・月・日・曜日 パズルマスター</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 共通設定 (ネイビーテーマ: 時間・暦) --- */
+        :root {
+            --primary: #3f51b5; /* ネイビーブルー */
+            --primary-light: #7986cb;
+            --primary-dark: #1a237e;
+            --accent: #ffca28; /* 黄色 */
+            --correct: #4CAF50; /* 緑 */
+            --incorrect: #F44336; /* 赤 */
+            --bg-color: #e8eaf6; /* 薄い青背景 */
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        #auth-status {
+            color: #ffca28;
+            font-weight: 700;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+            text-decoration: none; font-weight: bold;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 900px; margin: 20px auto; padding: 20px;
+            flex-grow: 1;
+        }
+        
+        /* --- モード選択画面 --- */
+        #mode-selection {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .mode-card {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 20px;
+            margin: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2em;
+            font-weight: 700;
+            border: 4px solid var(--primary);
+            box-shadow: 0 4px 0 var(--primary);
+        }
+        .mode-card:hover {
+            background-color: var(--accent);
+            color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--primary);
+        }
+        .mode-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--primary);
+        }
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        /* --- ゲーム画面共通 --- */
+        .game-area {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        /* スコアカウンターのIDをモードごとに修正済み */
+        [id^="question-counter-"] {
+            text-align: right;
+            font-size: 1.1em;
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* --- モード1: 読み方 (選択肢) --- */
+        #mode1-question-box {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            font-weight: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .choice-btn {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary);
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .choice-btn:hover:not(.selected):not(.answered) {
+            background-color: var(--accent);
+        }
+        .choice-btn.selected {
+            border: 4px solid var(--accent);
+            background-color: #fffff0;
+        }
+        .choice-btn.correct {
+            background-color: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+        .choice-btn.incorrect {
+            background-color: var(--incorrect);
+            color: white;
+            border-color: var(--incorrect);
+        }
+
+        /* --- モード2: 聞き取り (ドロップダウン) & モード3: 日常会話 (ドロップダウン) --- */
+        .listening-prompt, .situational-prompt {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        #play-audio-btn {
+            background: var(--primary);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.4em;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        #play-audio-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .dropdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .dropdown-group {
+            text-align: left;
+        }
+        .dropdown-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        select {
+            padding: 10px;
+            font-size: 1.1em;
+            border-radius: 6px;
+            border: 2px solid var(--primary-light);
+            min-width: 150px;
+            appearance: none; 
+            background-color: white;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%233f51b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: border-color 0.2s;
+        }
+        select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        /* --- 共通フッター/操作ボタン --- */
+        #feedback-message-1, #feedback-message-2, #feedback-message-3 {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 900;
+            min-height: 40px;
+            margin-top: 15px;
+        }
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .action-buttons button:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+        .action-buttons button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* --- スコアボード --- */
+        #scoreboard {
+            background: var(--primary-dark);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        #score-text {
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-size: 1.4em; font-weight: 900; color: white;">
+            <i class="fa-solid fa-calendar-alt"></i> パズルマスター
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <a href="date_time_practice.html" class="home-link"><i class="fa-solid fa-book"></i> 練習ページ</a>
+            <div id="auth-status" style="font-size:0.9em;">ゲスト</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>年・月・日・曜日 ゲーム</h1>
+        
+        <div id="mode-selection">
+            <h2>プレイするモードを選んでください</h2>
+            <div id="daily-point-limit" style="margin-top: 15px; font-weight: 700; color: var(--incorrect);">
+                </div>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="startGame(1)">
+                    <i class="fa-solid fa-pencil"></i> 読み方モード (四択)<br><span style="font-size:0.8em; font-weight:normal;">(漢字の読み方チェック)</span>
+                </div>
+                <div class="mode-card" onclick="startGame(2)">
+                    <i class="fa-solid fa-volume-high"></i> 聞き取りモード (ドロップダウン)<br><span style="font-size:0.8em; font-weight:normal;">(聞いた日付を選択)</span>
+                </div>
+                <div class="mode-card" onclick="startGame(3)">
+                    <i class="fa-solid fa-comments"></i> 日常会話モード (ドロップダウン)<br><span style="font-size:0.8em; font-weight:normal;">(文脈からの日付推測)</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="mode1-game" class="game-area">
+            <div id="question-counter-1">問 0 / 10</div>
+            <div id="mode1-question-box"></div>
+            <div class="choice-grid" id="mode1-choices"></div>
+            <div id="feedback-message-1" style="min-height: 40px;"></div>
+            <div class="action-buttons">
+                <button id="mode1-check-btn" onclick="checkAnswer(1)" disabled>答える</button>
+                <button id="mode1-next-btn" onclick="nextQuestion(1)" style="display:none;">次へ</button>
+            </div>
+        </div>
+
+        <div id="mode2-game" class="game-area">
+            <div id="question-counter-2">問 0 / 10</div>
+            <div class="listening-prompt">
+                <h2>聞こえた日付を選んでください</h2>
+                <button id="play-audio-btn" onclick="speakCurrentQuestion(2)">
+                    <i class="fa-solid fa-play"></i> 音声を再生
+                </button>
+            </div>
+            <div class="dropdown-container" id="mode2-dropdowns">
+                </div>
+            <div id="feedback-message-2" style="min-height: 40px;"></div>
+            <div class="action-buttons">
+                <button id="mode2-check-btn" onclick="checkAnswer(2)">答える</button>
+                <button id="mode2-next-btn" onclick="nextQuestion(2)" style="display:none;">次へ</button>
+            </div>
+        </div>
+
+        <div id="mode3-game" class="game-area">
+            <div id="question-counter-3">問 0 / 10</div>
+            <div class="situational-prompt">
+                <h2 id="mode3-question-text" style="font-size:1.4em; color:var(--primary-dark);"></h2>
+            </div>
+            <div class="dropdown-container" id="mode3-dropdowns">
+                </div>
+            <div id="feedback-message-3" style="min-height: 40px;"></div>
+            <div class="action-buttons">
+                <button id="mode3-check-btn" onclick="checkAnswer(3)">答える</button>
+                <button id="mode3-next-btn" onclick="nextQuestion(3)" style="display:none;">次へ</button>
+            </div>
+        </div>
+        
+        <div id="scoreboard" style="display:none;">
+            <h2>ゲーム結果</h2>
+            <div id="score-text"></div>
+            <div style="margin-top: 10px;">
+                <button onclick="resetGame()" style="background:#fff; color:var(--primary-dark); padding:10px 20px; border-radius:5px; border:none; font-weight:bold; cursor:pointer;">
+                    <i class="fa-solid fa-rotate-left"></i> もう一度プレイ
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { 
+        getFirestore, doc, updateDoc, increment, getDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspo.com", 
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    // グローバルアクセス用に関数を設定
+    window.db = db;
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.getDoc = getDoc;
+    window.increment = increment;
+    window.currentUser = null;
+    
+    onAuthStateChanged(auth, (user) => {
+        const el = document.getElementById('auth-status');
+        if (user) {
+            window.currentUser = user;
+            el.textContent = "ログイン中";
+        } else {
+            window.currentUser = "ゲスト";
+            el.textContent = "ゲスト";
+        }
+    });
+
+    /**
+     * 1日1ポイント制限でユーザーポイントを更新する
+     * @param {number} qId - 現在の問題ID (currentQuestionIndex + 1)
+     * @param {string} gameName - ゲームモードのユニークID (例: 'date_time_1')
+     * @returns {Promise<boolean>} ポイントが追加されたかどうか
+     */
+    window.addPuzzlePoints = async (qId, gameName) => {
+        if (!window.currentUser || window.currentUser === "ゲスト") return false;
+        
+        const today = new Date().toISOString().split('T')[0];
+        const scoreId = `${gameName}_${qId}`;
+
+        try {
+            const userRef = window.doc(window.db, "users", window.currentUser.uid);
+            const userSnap = await window.getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                const dailyTracker = data.dailyTracker || {};
+
+                // 1. ポイント付与済みチェック
+                if (dailyTracker[scoreId] === today) {
+                    return false;
+                }
+
+                // 2. ポイント付与とトラッカー更新
+                const newDailyTracker = { ...dailyTracker, [scoreId]: today };
+
+                await window.updateDoc(userRef, {
+                    points: window.increment(1),
+                    dailyTracker: newDailyTracker
+                });
+
+                return true;
+            }
+            return false;
+
+        } catch(e) { 
+            console.error("Error updating puzzle points:", e); 
+            return false;
+        }
+    };
+</script>
+
+<script>
+    // ★ 修正 1, 4: JS内でCSS変数を使用するために取得
+    const cssVars = {
+        incorrect: getComputedStyle(document.documentElement).getPropertyValue('--incorrect').trim(),
+        correct: getComputedStyle(document.documentElement).getPropertyValue('--correct').trim()
+    };
+    
+    // ★ 修正 8: スコアを画面に反映する関数を定義
+    function updateScore() {
+        // 現在のスコア表示はゲーム終了時に行われるため、特に何もしないが、将来のUI拡張のために定義
+    }
+
+    // --- データ定義 ---
+
+    const GAME_BASE_ID = "date_time"; 
+
+    const dateOptions = {
+        years: [
+            { kanji: '今年', kana: 'ことし' },
+            { kanji: '去年', kana: 'きょねん' },
+            { kanji: '来年', kana: 'らいねん' },
+            { kanji: '何年', kana: 'なんねん' }
+        ],
+        months: [
+            { kanji: '一月', kana: 'いちがつ' }, { kanji: '二月', kana: 'にがつ' }, { kanji: '三月', kana: 'さんがつ' },
+            { kanji: '四月', kana: 'しがつ' }, { kanji: '五月', kana: 'ごがつ' }, { kanji: '六月', kana: 'ろくがつ' },
+            { kanji: '七月', kana: 'しちがつ' }, { kanji: '八月', kana: 'はちがつ' }, { kanji: '九月', kana: 'くがつ' },
+            { kanji: '十月', kana: 'じゅうがつ' }, { kanji: '十一月', kana: 'じゅういちがつ' }, { kanji: '十二月', kana: 'じゅうにがつ' },
+            { kanji: '何月', kana: 'なんがつ' }
+        ],
+        dates: [
+            { kanji: '一日', kana: 'ついたち' }, { kanji: '二日', kana: 'ふつか' }, { kanji: '三日', kana: 'みっか' },
+            { kanji: '四日', kana: 'よっか' }, { kanji: '五日', kana: 'いつか' }, { kanji: '六日', kana: 'むいか' },
+            { kanji: '七日', kana: 'なのか' }, { kanji: '八日', kana: 'ようか' }, { kanji: '九日', kana: 'ここのか' },
+            { kanji: '十日', kana: 'とおか' }, { kanji: '十一日', kana: 'じゅういちにち' }, { kanji: '十二日', kana: 'じゅうににち' },
+            { kanji: '十三日', kana: 'じゅうさんにち' }, { kanji: '十四日', kana: 'じゅうよっか' }, { kanji: '十五日', kana: 'じゅうごにち' },
+            { kanji: '十六日', kana: 'じゅうろくにち' }, { kanji: '十七日', kana: 'じゅうしちにち' }, { kanji: '十八日', kana: 'じゅうはちにち' },
+            { kanji: '十九日', kana: 'じゅうくにち' }, { kanji: '二十日', kana: 'はつか' }, { kanji: '二十一日', kana: 'にじゅういちにち' },
+            { kanji: '二十二日', kana: 'にじゅうににち' }, { kanji: '二十三日', kana: 'にじゅうさんにち' }, { kanji: '二十四日', kana: 'にじゅうよっか' },
+            { kanji: '二十五日', kana: 'にじゅうごにち' }, { kanji: '二十六日', kana: 'にじゅうろくにち' }, { kanji: '二十七日', kana: 'にじゅうしちにち' },
+            { kanji: '二十八日', kana: 'にじゅうはちにち' }, { kanji: '二十九日', kana: 'にじゅうくにち' }, { kanji: '三十日', kana: 'さんじゅうにち' },
+            { kanji: '三十一日', kana: 'さんじゅういちにち' }, { kanji: '何日', kana: 'なんにち' }, { kanji: '七日', kana: 'なのかん' }
+        ],
+        daysOfWeek: [
+            { kanji: '月曜日', kana: 'げつようび' }, { kanji: '火曜日', kana: 'かようび' }, { kanji: '水曜日', kana: 'すいようび' },
+            { kanji: '木曜日', kana: 'もくようび' }, { kanji: '金曜日', kana: 'きんようび' }, { kanji: '土曜日', kana: 'どようび' },
+            { kanji: '日曜日', kana: 'にちようび' }, { kanji: '何曜日', kana: 'なんようび' }
+        ],
+        dayCounts: [
+            { kanji: '一日', kana: 'いちにち' }, { kanji: '二日', kana: 'ふつか' }, { kanji: '三日', kana: 'みっか' },
+            { kanji: '七日', kana: 'なのかん' }, { kanji: '七日', kana: 'いっしゅうかん' }
+        ]
+    };
+
+    const mode1Questions = [
+        { kanji: '一日', kana: 'ついたち', type: 'date' }, { kanji: '二日', kana: 'ふつか', type: 'date' },
+        { kanji: '三日', kana: 'みっか', type: 'date' }, { kanji: '四日', kana: 'よっか', type: 'date' },
+        { kanji: '七日', kana: 'なのか', type: 'date' }, { kanji: '十日', kana: 'とおか', type: 'date' },
+        { kanji: '十四日', kana: 'じゅうよっか', type: 'date' }, { kanji: '二十日', kana: 'はつか', type: 'date' },
+        { kanji: '二十四日', kana: 'にじゅうよっか', type: 'date' }, { kanji: '何日', kana: 'なんにち', type: 'date' },
+        { kanji: '四月', kana: 'しがつ', type: 'month' }, { kanji: '九月', kana: 'くがつ', type: 'month' },
+        { kanji: '七月', kana: 'しちがつ', type: 'month' }, { kanji: '金曜日', kana: 'きんようび', type: 'day' },
+        { kanji: '水曜日', kana: 'すいようび', type: 'day' }, { kanji: '去年', kana: 'きょねん', type: 'year' },
+        { kanji: '今年', kana: 'ことし', type: 'year' }, { kanji: '来年', kana: 'らいねん', type: 'year' },
+    ];
+    
+    const mode2Combinations = [
+        { month: '一月', date: '三日', day: '月曜日', text: '一月三日月曜日です。' },
+        { month: '七月', date: '七日', day: '土曜日', text: '七月七日土曜日です。' },
+        { month: '十二月', date: '二十五日', day: '金曜日', text: '十二月二十五日金曜日です。' },
+        { month: '二月', date: '二十日', day: '水曜日', text: '二月二十日水曜日です。' },
+        { month: '五月', date: '五日', day: '日曜日', text: '五月五日日曜日です。' },
+        { month: '四月', date: '一日', day: '火曜日', text: '四月一日火曜日です。' },
+        { month: '九月', date: '十四日', day: '木曜日', text: '九月十四日木曜日です。' },
+        ...Array(20).fill(0).map(() => {
+            const month = getRandomItem(dateOptions.months.slice(0, 12));
+            const date = getRandomItem(dateOptions.dates.slice(0, 31));
+            const day = getRandomItem(dateOptions.daysOfWeek.slice(0, 7));
+            const monthKana = dateOptions.months.find(m => m.kanji === month.kanji)?.kana || month.kanji;
+            const dateKana = dateOptions.dates.find(d => d.kanji === date.kanji)?.kana || date.kanji;
+            const dayKana = dateOptions.daysOfWeek.find(d => d.kanji === day.kanji)?.kana || day.kanji;
+            const text = `${monthKana}の${dateKana}${dayKana}です。`;
+            return { month: month.kanji, date: date.kanji, day: day.kanji, text: text };
+        })
+    ];
+
+    const mode3Questions = [
+        { id: 1, question: '年の終わり、除夜の鐘を聞くのは何月何日ですか？', answer: { month: '十二月', date: '三十一日' }, components: ['month', 'date'] },
+        { id: 2, question: '日本の新年（お正月）は、何月何日ですか？', answer: { month: '一月', date: '一日' }, components: ['month', 'date'] },
+        { id: 3, question: '日本の学校や会社が休みになることが多いのは、何曜日と何曜日ですか？', answer: { day: '土曜日', day2: '日曜日' }, components: ['day', 'day2'] }, 
+        { id: 4, question: '来年のオリンピック（仮）は何年ですか？', answer: { year: '来年' }, components: ['year'] },
+        { id: 5, question: 'クリスマスは何月何日ですか？', answer: { month: '十二月', date: '二十五日' }, components: ['month', 'date'] },
+        { id: 6, question: 'バレンタインデーは何月何日ですか？', answer: { month: '二月', date: '十四日' }, components: ['month', 'date'] },
+        { id: 7, question: 'ゴールデンウィークはだいたい何月ですか？', answer: { month: '五月' }, components: ['month'] },
+        { id: 8, question: '子どもの日（こどものひ）は何月何日ですか？', answer: { month: '五月', date: '五日' }, components: ['month', 'date'] },
+        { id: 9, question: '七夕（たなばた）は何月何日ですか？', answer: { month: '七月', date: '七日' }, components: ['month', 'date'] },
+        { id: 10, question: '日本の学校の夏休みはだいたい何月ごろですか？', answer: { month: '八月' }, components: ['month'] },
+        { id: 11, question: '敬老の日（けいろうのひ）はだいたい何月ですか？', answer: { month: '九月' }, components: ['month'] },
+        { id: 12, question: '今日（きょう）は月曜日です。明日は何曜日ですか？', answer: { day: '火曜日' }, components: ['day'] },
+        { id: 13, question: '今日（きょう）は木曜日です。昨日は何曜日でしたか？', answer: { day: '水曜日' }, components: ['day'] },
+        { id: 14, question: '今日（きょう）は金曜日です。明後日（あさって）は何曜日ですか？', answer: { day: '日曜日' }, components: ['day'] },
+        { id: 15, question: '月曜日の前は何曜日ですか？', answer: { day: '日曜日' }, components: ['day'] },
+        { id: 16, question: '一般的に、日本の企業でボーナスが支給されるのは、何月と何月ですか？', answer: { month: '七月', month2: '十二月' }, components: ['month', 'month2'] }, 
+        { id: 17, question: '鏡開き（かがみびらき）は一月の何日ですか？', answer: { date: '十一日' }, components: ['date'] },
+        { id: 18, question: '一般的に、あなたの国で一番暑い季節は何月ですか？', answer: { month: '八月' }, components: ['month'] },
+        { id: 19, question: '1週間で真ん中の日（中心）は何曜日ですか？', answer: { day: '水曜日' }, components: ['day'] },
+        { id: 20, question: '春分の日（しゅんぶんのひ）はだいたい何月ですか？', answer: { month: '三月' }, components: ['month'] },
+        { id: 21, question: 'お正月休みが始まるのは何月何日ごろですか？', answer: { date: '二十九日', month: '十二月' }, components: ['month', 'date'] },
+        { id: 22, question: '28日の次の日にちは何日ですか？', answer: { date: '二十九日' }, components: ['date'] },
+        { id: 23, question: '15日の前の日にちは何日ですか？', answer: { date: '十四日' }, components: ['date'] },
+        { id: 24, question: '五月の前は何月ですか？', answer: { month: '四月' }, components: ['month'] },
+        { id: 25, question: '六月の次は何月ですか？', answer: { month: '七月' }, components: ['month'] },
+        { id: 26, question: '年末（ねんまつ）は何月ですか？', answer: { month: '十二月' }, components: ['month'] },
+        { id: 27, question: '月初め（つきはじめ）は何日ですか？', answer: { date: '一日' }, components: ['date'] },
+        { id: 28, question: '今日（きょう）は土曜日です。一週間後は何曜日ですか？', answer: { day: '土曜日' }, components: ['day'] },
+        { id: 29, question: '会社の新しい年度は何月から始まりますか？', answer: { month: '四月' }, components: ['month'] },
+        { id: 30, question: '学校の新しい年度（入学式）は何月ですか？', answer: { month: '四月' }, components: ['month'] }
+    ];
+
+
+    // --- ゲーム状態変数 ---
+    let currentMode = 0;
+    let questionData = []; 
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const maxQuestions = 10;
+    let isAnswered = false;
+    let selectedChoice = null;
+
+    // --- TTS/音声機能 ---
+    const synth = window.speechSynthesis;
+    let voices = [];
+    setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+    function speak(text) {
+        if (synth.speaking) synth.cancel();
+        const ut = new SpeechSynthesisUtterance(text);
+        ut.lang = 'ja-JP'; ut.rate = 0.95;
+        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
+        if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+        if (targetVoice) ut.voice = targetVoice;
+        synth.speak(ut);
+    }
+
+    // --- ユーティリティ関数 ---
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function filterOptions(type, correctKanji) {
+        let pool;
+        if (type === 'date') {
+            pool = dateOptions.dates.filter(item => item.kanji !== correctKanji);
+        } else if (type === 'month') {
+            pool = dateOptions.months.filter(item => item.kanji !== correctKanji);
+        } else if (type === 'day') {
+            pool = dateOptions.daysOfWeek.filter(item => item.kanji !== correctKanji);
+        } else if (type === 'year') {
+            pool = dateOptions.years.filter(item => item.kanji !== correctKanji);
+        } else {
+            return [];
+        }
+
+        return shuffleArray(pool).slice(0, 3).map(item => item.kana);
+    }
+    
+    // ★ 修正 8: スコア更新の定義
+    function updateScore() {
+        // 現在のスコア表示はゲーム終了時に行われるため、ここではロジックをシンプルに保つ
+    }
+
+
+    // --- ゲーム制御 ---
+
+    function resetGame() {
+        currentMode = 0;
+        questionData = [];
+        currentQuestionIndex = 0;
+        score = 0;
+        document.querySelectorAll('.game-area').forEach(el => el.style.display = 'none');
+        document.getElementById('scoreboard').style.display = 'none';
+        document.getElementById('mode-selection').style.display = 'block';
+        document.getElementById('daily-point-limit').textContent = ''; 
+    }
+
+    function startGame(mode) {
+        if (currentMode !== 0) return; 
+        currentMode = mode;
+        score = 0;
+        currentQuestionIndex = 0;
+        isAnswered = false;
+        
+        // 画面切り替え
+        document.getElementById('mode-selection').style.display = 'none';
+        const gameArea = document.getElementById(`mode${mode}-game`);
+        gameArea.style.display = 'block';
+
+        // 質問データの準備
+        let sourceData;
+        if (mode === 1) {
+            sourceData = mode1Questions;
+        } else if (mode === 2) {
+            sourceData = mode2Combinations;
+        } else if (mode === 3) {
+            sourceData = mode3Questions;
+        }
+        questionData = shuffleArray(sourceData).slice(0, maxQuestions);
+
+        loadQuestion(mode);
+    }
+
+    function loadQuestion(mode) {
+        isAnswered = false;
+        selectedChoice = null;
+        const currentQ = questionData[currentQuestionIndex];
+        document.getElementById(`question-counter-${mode}`).textContent = `問 ${currentQuestionIndex + 1} / ${maxQuestions}`;
+        document.getElementById(`feedback-message-${mode}`).innerHTML = '';
+        document.getElementById(`mode${mode}-check-btn`).style.display = 'block';
+        document.getElementById(`mode${mode}-next-btn`).style.display = 'none';
+        
+        if (mode === 1) {
+            // --- モード1: 読み方 ---
+            document.getElementById(`mode1-check-btn`).disabled = true;
+            const kanji = currentQ.kanji;
+            const correctKana = currentQ.kana;
+            document.getElementById('mode1-question-box').textContent = kanji;
+            
+            let choices = [correctKana];
+            const distractors = filterOptions(currentQ.type, kanji);
+            choices.push(...distractors.slice(0, 3)); 
+
+            choices = shuffleArray(choices);
+
+            const choicesEl = document.getElementById('mode1-choices');
+            choicesEl.innerHTML = '';
+
+            choices.forEach(kana => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = kana;
+                btn.setAttribute('data-value', kana);
+                btn.onclick = () => selectChoice(btn);
+                choicesEl.appendChild(btn);
+            });
+
+        } else if (mode === 2) {
+            // --- モード2: 聞き取り ---
+            const dropdowns = [
+                { id: 'month', type: 'month' },
+                { id: 'date', type: 'date' },
+                { id: 'day', type: 'day' }
+            ];
+            setupDynamicDropdowns(2, dropdowns);
+            document.getElementById('play-audio-btn').textContent = '音声を再生';
+
+        } else if (mode === 3) {
+            // --- モード3: 日常会話 ---
+            document.getElementById('mode3-question-text').textContent = currentQ.question;
+            const currentComponents = [];
+            const answerKeys = Object.keys(currentQ.answer);
+            
+            answerKeys.forEach(key => {
+                let baseType = key.replace(/[0-9]/g, ''); 
+                
+                let type;
+                if (baseType === 'day') type = 'day';
+                else if (baseType === 'month') type = 'month';
+                else if (baseType === 'date') type = 'date';
+                else if (baseType === 'year') type = 'year';
+
+                currentComponents.push({ id: key, type: type });
+            });
+            
+            setupDynamicDropdowns(3, currentComponents);
+        }
+    }
+    
+    // モード1: 選択肢のクリックハンドラ
+    function selectChoice(btn) {
+        if (isAnswered) return;
+        document.querySelectorAll('#mode1-choices .choice-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedChoice = btn.getAttribute('data-value');
+        document.getElementById('mode1-check-btn').disabled = false;
+    }
+
+    // モード2/3: ドロップダウンの動的生成
+    function setupDynamicDropdowns(mode, components) {
+        const container = document.getElementById(`mode${mode}-dropdowns`);
+        container.innerHTML = '';
+        
+        const kanjiMap = {
+            'year': dateOptions.years,
+            'month': dateOptions.months,
+            'date': dateOptions.dates,
+            'day': dateOptions.daysOfWeek,
+        };
+
+        components.forEach(comp => {
+            const group = document.createElement('div');
+            group.className = 'dropdown-group';
+
+            const labelText = comp.id
+                .replace('day2', '曜日2')
+                .replace('month2', '月2')
+                .replace('day_count', '日数')
+                .replace('year', '年')
+                .replace('month', '月')
+                .replace('date', '日にち')
+                .replace('day', '曜日');
+
+            const label = document.createElement('label');
+            label.textContent = labelText;
+            label.setAttribute('for', `mode${mode}-${comp.id}`);
+
+            const selectEl = document.createElement('select');
+            selectEl.id = `mode${mode}-${comp.id}`;
+            selectEl.name = `mode${mode}-${comp.id}`;
+            
+            const optionsData = kanjiMap[comp.type] || [];
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = `-- ${labelText}を選択 --`;
+            selectEl.appendChild(defaultOption);
+
+            optionsData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.kanji; 
+                option.textContent = `${item.kanji} (${item.kana})`;
+                selectEl.appendChild(option);
+            });
+
+            group.appendChild(label);
+            group.appendChild(selectEl);
+            container.appendChild(group);
+        });
+    }
+    
+    // モード2の音声再生
+    window.speakCurrentQuestion = function(mode) {
+        if (mode !== 2 || isAnswered) return;
+        const currentQ = questionData[currentQuestionIndex];
+        const textToSpeak = currentQ.text;
+        speak(textToSpeak);
+        document.getElementById('play-audio-btn').textContent = '再生中...';
+        setTimeout(() => {
+            document.getElementById('play-audio-btn').textContent = 'もう一度再生';
+        }, 2500); 
+    }
+
+    // --- 回答チェック機能 ---
+
+    window.checkAnswer = async function(mode) { 
+        if (isAnswered) return;
+        isAnswered = true;
+        let correct = false;
+        let feedback = '';
+        
+        const checkBtn = document.getElementById(`mode${mode}-check-btn`);
+        checkBtn.disabled = true; 
+        
+        const currentQ = questionData[currentQuestionIndex];
+
+        if (mode === 1) {
+            // --- モード1: 読み方 (四択) ---
+            const correctKana = currentQ.kana;
+            const buttons = document.querySelectorAll('#mode1-choices .choice-btn');
+            
+            buttons.forEach(btn => {
+                const value = btn.getAttribute('data-value');
+                if (value === correctKana) {
+                    btn.classList.add('correct', 'answered');
+                    if (value === selectedChoice) {
+                        correct = true;
+                    }
+                } else if (value === selectedChoice) {
+                    btn.classList.add('incorrect', 'answered');
+                } else {
+                    btn.classList.add('answered');
+                }
+            });
+        
+        } else if (mode === 2) {
+            // --- モード2: 聞き取り (ドロップダウン) ---
+            const selectedMonth = document.getElementById('mode2-month').value;
+            const selectedDate = document.getElementById('mode2-date').value;
+            const selectedDay = document.getElementById('mode2-day').value;
+            
+            const correctMonth = currentQ.month;
+            const correctDate = currentQ.date;
+            const correctDay = currentQ.day;
+
+            correct = (selectedMonth === correctMonth && selectedDate === correctDate && selectedDay === correctDay);
+
+        } else if (mode === 3) {
+            // --- モード3: 日常会話 (ドロップダウン) ---
+            const correctAnswers = currentQ.answer;
+            correct = true;
+            let correctKanjiText = '';
+
+            for (const key in correctAnswers) {
+                const selectEl = document.getElementById(`mode3-${key}`);
+                
+                // ★ 修正 7: ドロップダウンが生成されていないキーはスキップ
+                if (!selectEl) continue; 
+
+                const selectedValue = selectEl.value;
+
+                // ★ 修正 3, 5: 値が空か、正解と一致しない場合に不正解
+                if (!selectedValue || selectedValue !== correctAnswers[key]) {
+                    correct = false;
+                    // ★ 修正 1, 4: JS変数として定義したCSS値を使用
+                    selectEl.style.borderColor = cssVars.incorrect; 
+                } else {
+                    selectEl.style.borderColor = cssVars.correct;
+                }
+                
+                // 正解テキストの組み立て
+                correctKanjiText += `${correctAnswers[key]}`;
+            }
+        }
+        
+        // --- ★ Firebase Point Logic & Feedback ---
+        if (correct) {
+            const GAME_ID = `${GAME_BASE_ID}_${mode}`; 
+            const pointAdded = await window.addPuzzlePoints(currentQuestionIndex + 1, GAME_ID); 
+            
+            if (pointAdded) {
+                score++;
+                // データベース更新後のローカルスコアを更新
+                document.getElementById('daily-point-limit').textContent = `🎉 ポイント獲得！ (${GAME_ID} - Q${currentQuestionIndex + 1}) (+1pt)`;
+                feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 大正解！ (+1pt)</span>`;
+            } else {
+                document.getElementById('daily-point-limit').textContent = `(今日はポイント獲得済み)`;
+                feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 正解です！ (今日はこの問題のポイント獲得済み)</span>`;
+            }
+        } else {
+            feedback = `<span style="color:${cssVars.incorrect};"><i class="fa-solid fa-circle-xmark"></i> 残念。もう一度考えてみましょう。</span>`;
+        }
+        
+        updateScore();
+        document.getElementById(`feedback-message-${mode}`).innerHTML = feedback;
+        document.getElementById(`mode${mode}-next-btn`).style.display = 'block';
+    }
+
+    function nextQuestion(mode) {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < maxQuestions) {
+            loadQuestion(mode);
+        } else {
+            showResults(mode);
+        }
+    }
+
+    function showResults(mode) {
+        document.getElementById(`mode${mode}-game`).style.display = 'none';
+        
+        const scoreboard = document.getElementById('scoreboard');
+        scoreboard.style.display = 'block';
+
+        document.getElementById('score-text').innerHTML = 
+            `<p>お疲れ様でした！</p>
+            <p style="font-size:2em; margin:10px 0;">あなたのスコアは <span style="color:var(--accent);">${score}</span> / ${maxQuestions} 点です。</p>`;
+        
+        if (score >= maxQuestions * 0.7) { 
+            document.getElementById('score-text').innerHTML += 
+                `<p style="color:var(--accent); font-weight:900;">🎉 素晴らしい！ポイント獲得チャンスを活かしました！ 🎉</p>`;
+        } else {
+            document.getElementById('score-text').innerHTML += 
+                `<p style="font-weight:700;">もう一度チャレンジして、ポイントを獲得しましょう！</p>`;
+        }
+    }
+
+
+    // --- 初期化 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        resetGame();
+        // TTS機能の初期化を確実に
+        if (synth.getVoices().length === 0) {
+            synth.addEventListener('voiceschanged', () => {
+                voices = synth.getVoices();
+            });
+        }
+    });
+</script>
+</body>
+</html>
