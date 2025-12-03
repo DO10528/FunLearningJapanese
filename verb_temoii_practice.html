@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-てもいいですか れんしゅう</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 共通設定 (エメラルドテーマ: 許可・安全) --- */
+        :root {
+            --primary: #26a69a; /* エメラルドグリーン */
+            --primary-light: #b2dfdb;
+            --primary-dark: #00796b;
+            --accent: #ffca28; /* 黄色 */
+            --bg-color: #e0f2f1; /* 薄い緑背景 */
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --ask-color: #26a69a; /* 質問 */
+            --reply-ok: #66bb6a; /* OK */
+            --reply-no: #ef5350; /* NO */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(38, 166, 154, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+            text-decoration: none; font-weight: bold;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        /* --- 返事の練習エリア --- */
+        .reply-section {
+            background: white; border-radius: 20px; padding: 25px;
+            margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 3px solid var(--primary-light);
+        }
+        .reply-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;
+        }
+        .reply-card {
+            padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1.2em;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .reply-card:active { transform: scale(0.98); }
+        .reply-ok { background: #e8f5e9; color: var(--reply-ok); border: 2px solid var(--reply-ok); }
+        .reply-no { background: #ffebee; color: var(--reply-no); border: 2px solid var(--reply-no); }
+
+        .mode-title {
+            font-size: 1.6em; font-weight: 900; margin-top: 20px; margin-bottom: 15px;
+            padding: 10px 20px; border-bottom: 4px solid var(--primary); display: inline-block; color: var(--primary-dark);
+        }
+
+        /* --- 練習カードグリッド --- */
+        .practice-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg); border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+            transition: transform 0.2s; position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .verb-forms-container { 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 10px; 
+        }
+        
+        .masu-box {
+            background: var(--primary-light); padding: 8px 12px;
+            border-radius: 8px; color: var(--primary-dark);
+            font-weight: 900; font-size: 1.1em; flex-shrink: 0; text-align: center;
+        }
+        
+        .temoii-box {
+            font-size: 1.4em; font-weight: 900; color: var(--text-color); white-space: nowrap;
+        }
+        .temoii-box span { font-size: 0.7em; font-weight: 700; }
+        
+        .example-sentence {
+            background: #e0f2f1; padding: 10px; border-radius: 8px;
+            font-size: 1.1em; font-weight: 700; color: #555;
+            margin-top: 15px; border-left: 5px solid var(--primary);
+        }
+
+        .simple-meaning {
+            font-size: 0.9em; color: #777; margin-top: 10px;
+            border-top: 1px dashed #eee; padding-top: 10px;
+        }
+        .english-meaning { font-size: 1.1em; color: var(--primary-dark); font-weight: bold; }
+
+        /* ゲーム開始ボタン */
+        .start-game-area { text-align: center; margin: 50px 0; }
+        #start-game-btn {
+            background: var(--primary-dark);
+            color: white; border: 4px solid var(--accent);
+            padding: 18px 45px; font-size: 1.6em; font-weight: 900;
+            border-radius: 12px; box-shadow: 0 6px 0 var(--primary);
+            cursor: pointer; transition: transform 0.1s; text-transform: uppercase;
+        }
+        #start-game-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        @media (max-width: 768px) {
+            .practice-grid, .reply-grid { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-size: 1.4em; font-weight: 900; color: white;">
+            <i class="fa-solid fa-circle-check"></i> V-てもいいですか
+        </div>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="container">
+        <h1>V-てもいいですか：きょか（Permission）</h1>
+        
+        <div class="start-game-area">
+            <button id="start-game-btn" onclick="window.location.href='verb_temoii_puzzle_master.html'">
+                パズルゲームをはじめる <i class="fa-solid fa-gamepad"></i>
+            </button>
+            <p style="color:#777; margin-top:10px;">（かたちを おぼえたら、ゲームに すすもう！）</p>
+        </div>
+
+        <h2 class="mode-title" style="border-color:#aaa; color:#555;">まず、こたえかた (Replies)</h2>
+        <div class="reply-section">
+            <p style="text-align:center; font-weight:bold; color:#777;">クリックして おとを きこう！</p>
+            <div class="reply-grid">
+                <div class="reply-card reply-ok" onclick="speak('はい、いいですよ。')">
+                    <span><i class="fa-regular fa-circle"></i> (OK) はい、いいですよ。</span>
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="reply-card reply-ok" onclick="speak('はい、どうぞ。')">
+                    <span><i class="fa-regular fa-circle"></i> (OK) はい、どうぞ。</span>
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="reply-card reply-no" onclick="speak('すみません、ちょっと。')">
+                    <span><i class="fa-solid fa-xmark"></i> (NO) すみません、ちょっと…。</span>
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div class="reply-card reply-no" onclick="speak('いいえ、だめです。')">
+                    <span><i class="fa-solid fa-ban"></i> (NO) いいえ、だめです。(Strong)</span>
+                    <i class="fa-solid fa-volume-high"></i>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="mode-title">しつもんする (Asking Permission)</h2>
+        <div class="practice-grid" id="verb-list">
+            </div>
+    </div>
+
+    <script>
+        const practiceData = [
+            // 日常動作
+            { masu: 'たべます', te: 'たべて', meaning: 'May I eat?', example: 'これを たべても いいですか。', context: 'おかしを たべたい とき。' },
+            { masu: 'のみます', te: 'のんで', meaning: 'May I drink?', example: 'ジュースを のんでも いいですか。', context: 'のどが かわいた とき。' },
+            { masu: 'すいます', te: 'すって', meaning: 'May I smoke?', example: 'たばこを すっても いいですか。', context: 'きつえんじょ ですか。' },
+            { masu: 'とります', te: 'とって', meaning: 'May I take (photo)?', example: 'しゃしんを とっても いいですか。', context: 'しゃしんを とりたい とき。' },
+            { masu: 'かえります', te: 'かえって', meaning: 'May I go home?', example: 'もう かえっても いいですか。', context: 'ようじが おわった とき。' },
+            { masu: 'はいります', te: 'はいって', meaning: 'May I enter?', example: 'へやに はいっても いいですか。', context: 'ドアを ノック した とき。' },
+            { masu: 'すわります', te: 'すわって', meaning: 'May I sit?', example: 'ここに すわっても いいですか。', context: 'いすが あいている とき。' },
+            { masu: 'みます', te: 'みて', meaning: 'May I look?', example: 'これを みても いいですか。', context: 'みせて ほしい とき。' },
+            
+            // 物の貸し借り・操作
+            { masu: 'つかいます', te: 'つかって', meaning: 'May I use?', example: 'ペンを つかっても いいですか。', context: 'ペンを かりたい とき。' },
+            { masu: 'かります', te: 'かりて', meaning: 'May I borrow?', example: 'かさを かりても いいですか。', context: 'かさを もっていない とき。' },
+            { masu: 'おきます', te: 'おいて', meaning: 'May I put?', example: 'にもつを おいても いいですか。', context: 'にもつが おもい とき。' },
+            { masu: 'あけます', te: 'あけて', meaning: 'May I open?', example: 'まどを あけても いいですか。', context: 'あつい とき。' },
+            { masu: 'しめます', te: 'しめて', meaning: 'May I close?', example: 'ドアを しめても いいですか。', context: 'さむい とき。' },
+            { masu: 'つけます', te: 'つけて', meaning: 'May I turn on?', example: 'テレビを つけても いいですか。', context: 'ニュースを みたい とき。' },
+            { masu: 'けします', te: 'けして', meaning: 'May I turn off?', example: 'でんきを けしても いいですか。', context: 'ねたい とき。' },
+            { masu: 'もらいます', te: 'もらって', meaning: 'May I have?', example: 'これを もらっても いいですか。', context: 'ほしい ものが ある とき。' },
+        ];
+
+        const synth = window.speechSynthesis;
+        let voices = [];
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        window.speak = (text) => {
+            if (synth.speaking) synth.cancel();
+            const ut = new SpeechSynthesisUtterance(text);
+            ut.lang = 'ja-JP'; ut.rate = 0.9;
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) ut.voice = targetVoice;
+            synth.speak(ut);
+        };
+
+        window.speakPhrase = (teForm) => {
+            const textToSpeak = teForm + "もいいですか。"; 
+            speak(textToSpeak);
+        };
+        
+        window.speakExample = (exampleSentence) => {
+            speak(exampleSentence);
+        };
+
+        function createVerbCard(item) {
+            const card = document.createElement('div');
+            card.className = 'verb-card';
+            
+            card.innerHTML = `
+                <div class="verb-forms-container">
+                    <div class="masu-box">${item.masu}</div>
+                    <i class="fa-solid fa-arrow-right" style="color:#999;"></i>
+                    <div class="temoii-box">
+                        <span onclick="speakPhrase('${item.te}')" style="cursor:pointer; padding-right:5px;">
+                            ${item.te}<span style="font-size:0.7em;">もいいですか</span> 
+                            <i class="fa-solid fa-volume-high" style="color:var(--primary); font-size: 0.8em;"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="example-sentence" onclick="speakExample('${item.example}')" style="cursor:pointer;">
+                    ${item.example} <i class="fa-solid fa-volume-high" style="float:right; color:#777; font-size: 0.8em;"></i>
+                </div>
+
+                <p class="simple-meaning">
+                    <span class="english-meaning">${item.meaning}</span>
+                    <br>${item.context}
+                </p>
+            `;
+            return card;
+        }
+
+        function renderLists() {
+            const list = document.getElementById('verb-list');
+            practiceData.forEach(item => list.appendChild(createVerbCard(item)));
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLists);
+    </script>
+</body>
+</html>
