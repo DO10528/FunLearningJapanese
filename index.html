@@ -548,7 +548,10 @@
             btn_clock1: "とけい1", btn_clock2: "とけい2",
             btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
             btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", btn_tekudasai: "V-てください",
+            // ★動詞カテゴリ修正
+            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
+            btn_tekudasai: "V-てください", btn_mashouka: "V-ましょうか", 
+            
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
             btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
 
@@ -587,7 +590,11 @@
             btn_clock1: "Clock 1", btn_clock2: "Clock 2",
             btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
             btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
-            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", btn_tekudasai: "V-te Kudasai",
+            
+            // ★ Verbs
+            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
+            btn_tekudasai: "V-te Kudasai", btn_mashouka: "V-mashouka",
+            
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
             btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
 
@@ -651,12 +658,13 @@
             { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
         ]},
         // 8. どうし (紫系: 基礎と統一)
+        // ★修正: 順番変更
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
-            // ★ V-てくださいのリンクを練習ページに統一
-            { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" }, 
             { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
             { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
-            { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" }
+            { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
+            { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
+            { url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" }
         ]},
         // 9. ぶんしょう (ピンク系: アクセントカラー)
         { id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [

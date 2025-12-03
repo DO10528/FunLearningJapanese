@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-ましょうか れんしゅう</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 共通設定 (オレンジテーマ: 提案・親切) --- */
+        :root {
+            --primary: #fb8c00; /* オレンジ */
+            --primary-light: #ffe0b2;
+            --primary-dark: #e65100;
+            --accent: #ffeb3b; /* 黄色 */
+            --bg-color: #fff8e1; /* 薄い黄色背景 */
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --offer-color: #ff9800; /* お手伝い（オレンジ） */
+            --invite-color: #fdd835; /* お誘い（黄色） */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(230, 81, 0, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+            text-decoration: none; font-weight: bold;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        .mode-title {
+            font-size: 1.6em; font-weight: 900; margin-top: 40px; margin-bottom: 15px;
+            padding: 10px 20px; border-bottom: 4px solid; display: inline-block;
+        }
+        #offer-title { border-color: var(--offer-color); color: var(--offer-color); }
+        #invite-title { border-color: var(--invite-color); color: #fbc02d; }
+
+        /* --- 練習カードグリッド (縦2列) --- */
+        .practice-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg); border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid;
+            transition: transform 0.2s; position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .verb-forms-container { 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 10px; 
+        }
+        
+        .masu-box {
+            background: var(--primary-light); padding: 8px 12px;
+            border-radius: 8px; color: var(--primary-dark);
+            font-weight: 900; font-size: 1.1em; flex-shrink: 0; text-align: center;
+        }
+        
+        .mashouka-box {
+            font-size: 1.5em; font-weight: 900; color: var(--text-color); white-space: nowrap;
+        }
+        .mashouka-box span { font-size: 0.7em; font-weight: 700; }
+        
+        /* 例文スタイル */
+        .example-sentence {
+            background: #fff3e0; padding: 10px; border-radius: 8px;
+            font-size: 1.1em; font-weight: 700; color: #555;
+            margin-top: 15px; border-left: 5px solid var(--offer-color);
+        }
+        .verb-card.invite-type .example-sentence { border-left-color: var(--invite-color); background: #fffde7; }
+
+        .simple-meaning {
+            font-size: 0.9em; color: #777; margin-top: 10px;
+            border-top: 1px dashed #eee; padding-top: 10px;
+        }
+        .english-meaning { font-size: 1.1em; color: #ff9800; font-weight: bold; }
+
+        .sound-btn {
+            background: var(--accent); color: #e65100; border: none;
+            width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1em; box-shadow: 0 3px 0 #fbc02d;
+            transition: all 0.1s; position: absolute; top: 15px; right: 15px; 
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        /* ゲーム開始ボタン */
+        .start-game-area { text-align: center; margin: 50px 0; }
+        #start-game-btn {
+            background: #e65100; /* 濃いオレンジ */
+            color: white; border: 4px solid var(--accent);
+            padding: 18px 45px; font-size: 1.6em; font-weight: 900;
+            border-radius: 12px; box-shadow: 0 6px 0 #bf360c;
+            cursor: pointer; transition: transform 0.1s; text-transform: uppercase;
+        }
+        #start-game-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        @media (max-width: 768px) {
+            .practice-grid { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-size: 1.4em; font-weight: 900; color: white;">
+            <i class="fa-solid fa-hand-holding-heart"></i> V-ましょうか
+        </div>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="container">
+        <h1>V-ましょうか：おてつだい と おさそい</h1>
+        
+        <div class="start-game-area">
+            <button id="start-game-btn" onclick="window.location.href='verb_mashouka_puzzle_master.html'">
+                パズルゲームをはじめる <i class="fa-solid fa-gamepad"></i>
+            </button>
+            <p style="color:#777; margin-top:10px;">（かたちを おぼえたら、ゲームに すすもう！）</p>
+        </div>
+        
+        <h2 id="offer-title" class="mode-title">おてつだい（Shall I...?）</h2>
+        <div class="practice-grid" id="offer-list"></div>
+
+        <h2 id="invite-title" class="mode-title">おさそい（Shall we...?）</h2>
+        <div class="practice-grid" id="invite-list"></div>
+    </div>
+
+    <script>
+        // --- データ定義 ---
+        const practiceData = [
+            // ========== お手伝い (Offer: 私がしましょうか？) ==========
+            { type: 'offer', masu: 'もちます', stem: 'もち', meaning: 'Shall I carry?', example: 'にもつを もちましょうか。', context: 'おもい にもつを もっている ひとに。' },
+            { type: 'offer', masu: 'てつだいます', stem: 'てつだい', meaning: 'Shall I help?', example: 'てつだいましょうか。', context: 'いそがしそうな ひとに。' },
+            { type: 'offer', masu: 'かします', stem: 'かし', meaning: 'Shall I lend?', example: 'かさを かしましょうか。', context: 'あめで かさが ない ひとに。' },
+            { type: 'offer', masu: 'あけます', stem: 'あけ', meaning: 'Shall I open?', example: 'まどを あけましょうか。', context: 'へやが あつい とき。' },
+            { type: 'offer', masu: 'しめます', stem: 'しめ', meaning: 'Shall I close?', example: 'ドアを しめましょうか。', context: 'さむい とき。' },
+            { type: 'offer', masu: 'つけます', stem: 'つけ', meaning: 'Shall I turn on?', example: 'エアコンを つけましょうか。', context: 'へやが あつい とき。' },
+            { type: 'offer', masu: 'けします', stem: 'けし', meaning: 'Shall I turn off?', example: 'テレビを けしましょうか。', context: 'うるさい とき。' },
+            { type: 'offer', masu: 'おしえます', stem: 'おしえ', meaning: 'Shall I tell?', example: 'ちずを おしえましょうか。', context: 'みちに まよっている ひとに。' },
+            { type: 'offer', masu: 'むかえにいきます', stem: 'むかえにいき', meaning: 'Shall I pick you up?', example: 'えきまで むかえにいきましょうか。', context: 'あめが ふっている とき。' },
+            { type: 'offer', masu: 'かきます', stem: 'かき', meaning: 'Shall I write?', example: 'ちずを かきましょうか。', context: 'みちを せつめい する とき。' },
+            { type: 'offer', masu: 'とります', stem: 'とり', meaning: 'Shall I take?', example: 'しゃしんを とりましょうか。', context: 'かんこうきゃくに。' },
+            { type: 'offer', masu: 'よびます', stem: 'よび', meaning: 'Shall I call?', example: 'タクシーを よびましょうか。', context: 'にもつが おおい とき。' },
+            { type: 'offer', masu: 'あらいます', stem: 'あらい', meaning: 'Shall I wash?', example: 'おさらを あらいましょうか。', context: 'しょくじの あとで。' },
+            { type: 'offer', masu: 'コピーします', stem: 'コピーし', meaning: 'Shall I copy?', example: 'しりょうを コピーしましょうか。', context: 'かいぎの まえに。' },
+
+            // ========== お誘い (Invitation: 一緒にしましょうか？) ==========
+            { type: 'invite', masu: 'いきます', stem: 'いき', meaning: 'Shall we go?', example: 'いっしょに いきましょうか。', context: 'ランチに さそう とき。' },
+            { type: 'invite', masu: 'たべます', stem: 'たべ', meaning: 'Shall we eat?', example: 'なにか たべましょうか。', context: 'おなかが すいた とき。' },
+            { type: 'invite', masu: 'のみます', stem: 'のみ', meaning: 'Shall we drink?', example: 'コーヒーを のみましょうか。', context: 'つかれた とき。' },
+            { type: 'invite', masu: 'やすみます', stem: 'やすみ', meaning: 'Shall we rest?', example: 'すこし やすみましょうか。', context: 'たくさん あるいた とき。' },
+            { type: 'invite', masu: 'かえります', stem: 'かえり', meaning: 'Shall we go home?', example: 'そろそろ かえりましょうか。', context: 'おそく なった とき。' },
+            { type: 'invite', masu: 'はじめます', stem: 'はじめ', meaning: 'Shall we start?', example: 'そろそろ はじめましょうか。', context: 'じかんに なった とき。' },
+            { type: 'invite', masu: 'あそびます', stem: 'あそび', meaning: 'Shall we play?', example: 'ゲームで あそびましょうか。', context: 'ひまな とき。' },
+            { type: 'invite', masu: 'みます', stem: 'み', meaning: 'Shall we watch?', example: 'えいがを みましょうか。', context: 'デートの とき。' },
+            { type: 'invite', masu: 'あいます', stem: 'あい', meaning: 'Shall we meet?', example: 'あした あいましょうか。', context: 'やくそくを する とき。' },
+            { type: 'invite', masu: 'さんぽします', stem: 'さんぽし', meaning: 'Shall we walk?', example: 'こうえんを さんぽしましょうか。', context: 'てんきが いい とき。' },
+        ];
+
+        const synth = window.speechSynthesis;
+        let voices = [];
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        // V-ましょうか読み上げ
+        window.speakPhrase = (stem) => {
+            if (synth.speaking) synth.cancel();
+            const textToSpeak = stem + "ましょうか。"; 
+            speak(textToSpeak);
+        };
+        
+        // 例文読み上げ
+        window.speakExample = (exampleSentence) => {
+            if (synth.speaking) synth.cancel();
+            speak(exampleSentence);
+        };
+
+        function speak(text) {
+            const ut = new SpeechSynthesisUtterance(text);
+            ut.lang = 'ja-JP'; ut.rate = 0.9;
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) ut.voice = targetVoice;
+            synth.speak(ut);
+        }
+
+        function createVerbCard(item) {
+            const isOffer = item.type === 'offer';
+            const cardColor = isOffer ? 'var(--offer-color)' : '#fbc02d'; // Invitation color
+            
+            const card = document.createElement('div');
+            card.className = 'verb-card ' + (isOffer ? 'offer-type' : 'invite-type');
+            card.style.borderColor = cardColor;
+            
+            card.innerHTML = `
+                <div class="verb-forms-container">
+                    <div class="masu-box">${item.masu}</div>
+                    <i class="fa-solid fa-arrow-right" style="color:#999;"></i>
+                    <div class="mashouka-box">
+                        <span onclick="speakPhrase('${item.stem}')" style="cursor:pointer; padding-right:5px;">
+                            ${item.stem}<span style="font-size:0.7em;">ましょうか</span> 
+                            <i class="fa-solid fa-volume-high" style="color:${cardColor}; font-size: 0.8em;"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="example-sentence" onclick="speakExample('${item.example}')" style="cursor:pointer;">
+                    ${item.example} <i class="fa-solid fa-volume-high" style="float:right; color:#777; font-size: 0.8em;"></i>
+                </div>
+
+                <p class="simple-meaning">
+                    <span class="english-meaning">${item.meaning}</span>
+                    <br>${item.context}
+                </p>
+                
+                <p style="font-weight:bold; color: ${cardColor}; margin: 5px 0 5px 0; font-size: 0.9em;">
+                    <i class="fa-solid ${isOffer ? 'fa-hand-holding-heart' : 'fa-users'}"></i> 
+                    ${isOffer ? 'おてつだい (Shall I?)' : 'おさそい (Shall we?)'}
+                </p>
+            `;
+            return card;
+        }
+
+        function renderLists() {
+            const offerList = document.getElementById('offer-list');
+            const inviteList = document.getElementById('invite-list');
+
+            const offers = practiceData.filter(item => item.type === 'offer');
+            const invites = practiceData.filter(item => item.type === 'invite');
+
+            offers.forEach(item => offerList.appendChild(createVerbCard(item)));
+            invites.forEach(item => inviteList.appendChild(createVerbCard(item)));
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLists);
+    </script>
+</body>
+</html>
