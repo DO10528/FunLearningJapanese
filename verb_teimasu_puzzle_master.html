@@ -156,7 +156,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { 
+        getFirestore, doc, updateDoc, increment, getDoc, setDoc 
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -173,6 +175,12 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     
+    // グローバルアクセス用に関数を設定
+    window.db = db;
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.getDoc = getDoc;
+    window.increment = increment;
     window.currentUser = null;
     
     onAuthStateChanged(auth, (user) => {
@@ -186,12 +194,47 @@
         }
     });
 
-    window.addPoints = async (id) => {
-        if(!window.currentUser || window.currentUser === "ゲスト") return;
+    /**
+     * 1日1ポイント制限でユーザーポイントを更新する
+     * @param {number} qId - 現在の問題ID (currentQIndex + 1)
+     * @param {string} gameName - ゲームモードのユニークID (例: 'teimasu_action')
+     * @returns {Promise<boolean>} ポイントが追加されたかどうか
+     */
+    window.addPuzzlePoints = async (qId, gameName) => {
+        if (!window.currentUser || window.currentUser === "ゲスト") return false;
+        
+        const today = new Date().toISOString().split('T')[0];
+        const scoreId = `${gameName}_${qId}`;
+
         try {
-            const userRef = doc(db, "users", window.currentUser.uid);
-            await updateDoc(userRef, { points: increment(1) });
-        } catch(e) { console.error(e); }
+            const userRef = window.doc(window.db, "users", window.currentUser.uid);
+            const userSnap = await window.getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                const dailyTracker = data.dailyTracker || {};
+
+                // 1. ポイント付与済みチェック
+                if (dailyTracker[scoreId] === today) {
+                    return false;
+                }
+
+                // 2. ポイント付与とトラッカー更新
+                const newDailyTracker = { ...dailyTracker, [scoreId]: today };
+
+                await window.updateDoc(userRef, {
+                    points: window.increment(1),
+                    dailyTracker: newDailyTracker
+                });
+
+                return true;
+            }
+            return false;
+
+        } catch(e) { 
+            console.error("Error updating puzzle points:", e); 
+            return false;
+        }
     };
 </script>
 
@@ -265,6 +308,8 @@
     let score = 0;
     let currentQIndex = 0;
     let isChecking = false;
+    let currentMode = '';
+    const GAME_BASE_ID = "teimasu"; // ★ ユニークなゲームIDを定義
 
     // DOM要素
     const scenarioText = document.getElementById('scenario-text');
@@ -277,6 +322,7 @@
     const mainGameArea = document.getElementById('main-game-area');
     const modeSelection = document.getElementById('mode-selection');
 
+    // TTS/Helper Functions (簡略化)
     const synth = window.speechSynthesis;
     let voices = [];
     setTimeout(() => { voices = synth.getVoices(); }, 500);
@@ -317,6 +363,8 @@
     };
 
     window.startGame = function(mode) {
+        // --- モード設定 ---
+        currentMode = mode;
         modeSelection.style.display = 'none';
         mainGameArea.style.display = 'block';
         
@@ -408,7 +456,7 @@
         }
     }
     
-    window.checkSentence = function() {
+    window.checkSentence = async function() { // ★ async function に変更
         if (isChecking) return;
         isChecking = true; checkBtn.disabled = true;
         
@@ -420,9 +468,23 @@
         const correctSentence = currentQ.correct_order.join('');
 
         if (constructedSentence === correctSentence) {
-            playSeikai(); score++; updateScore();
-            resultMessage.className = 'correct-msg';
-            resultMessage.innerHTML = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}います）</span>`;
+            playSeikai();
+
+            // --- ★ Firebase Point Logic ---
+            const GAME_ID = `${GAME_BASE_ID}_${currentMode}`; // teimasu_action or teimasu_state
+            
+            // window.addPuzzlePoints は module script で定義されています
+            const pointAdded = await window.addPuzzlePoints(currentQIndex + 1, GAME_ID); 
+            
+            if (pointAdded) {
+                score++;
+                updateScore();
+                resultMessage.innerHTML = `⭕️ **せいかい！ (+1pt)** <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
+            } else {
+                resultMessage.innerHTML = `⭕️ **せいかい！** (今日はこの問題のポイント獲得済み) <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
+            }
+            // --- ★ End Point Logic ---
+            
             speak("せいかい！"); 
             currentQIndex++;
             setTimeout(() => { 
