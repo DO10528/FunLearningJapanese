@@ -140,7 +140,7 @@
         <h1>年・月・日にち・曜日 の練習</h1>
         
         <div class="start-game-area">
-            <button id="start-game-btn" onclick="alert('このボタンは次のステップでゲームにリンクします。')">
+            <button id="start-game-btn" onclick="window.location.href = 'date_time_game.html';">
                 ゲームをはじめる <i class="fa-solid fa-gamepad"></i>
             </button>
             <p style="color:#777; margin-top:10px;">（言葉を覚えたら、ゲームに進もう！）</p>
@@ -205,7 +205,7 @@
                 { kanji: '九日', kana: 'ここのか', cue: '9', meaning: '9th' },
                 { kanji: '十日', kana: 'とおか', cue: '10', meaning: '10th' },
                 { kanji: '十四日', kana: 'じゅうよっか', cue: '14', meaning: '14th (Irregular)' },
-                { kanji: '二十日', kana: 'はつか', cue: '20th (Irregular)', meaning: '20th (Irregular)' },
+                { kanji: '二十日', kana: 'はつか', cue: '20', meaning: '20th (Irregular)' },
             ],
             datesRegular: [
                 { kanji: '十一日', kana: 'じゅういちにち', cue: '11', meaning: '11th' },
@@ -242,7 +242,6 @@
             const card = document.createElement('div');
             card.className = 'item-card';
             
-            // 読み上げテキストは通常 kana
             const textToSpeak = speakText || item.kana; 
             
             card.setAttribute('onclick', `speak('${textToSpeak}')`);
