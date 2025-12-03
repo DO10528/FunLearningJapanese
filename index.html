@@ -252,7 +252,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { 
         getFirestore, doc, setDoc, updateDoc, getDocs, collection, 
-        query, orderBy, limit, onSnapshot, where, getDoc 
+        query, orderBy, limit, onSnapshot, where, getDoc, increment 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { 
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
@@ -336,7 +336,8 @@
                     displayName: displayName,
                     points: 0,
                     streak: 1,
-                    lastLogin: new Date().toISOString()
+                    lastLogin: new Date().toISOString(),
+                    dailyTracker: {} // Initialize for puzzle tracking
                 });
                 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
@@ -355,8 +356,14 @@
                         displayName: email.split('@')[0] || 'UnknownUser', 
                         points: 0,
                         streak: 1,
-                        lastLogin: new Date().toISOString()
+                        lastLogin: new Date().toISOString(),
+                        dailyTracker: {} // Initialize for puzzle tracking
                     });
+                } else {
+                    // Ensure dailyTracker is present on login if missing
+                    if (!userSnap.data().dailyTracker) {
+                        await updateDoc(userRef, { dailyTracker: {} });
+                    }
                 }
 
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
@@ -394,7 +401,7 @@
             const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
 
             if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-                await updateDoc(userRef, { points: 0, lastLogin: now.toISOString() });
+                await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} }); // Reset points and daily tracker monthly
                 console.log("月が変わったため、ポイントをリセットしました。");
             } else {
                 await updateDoc(userRef, { lastLogin: now.toISOString() });
@@ -540,7 +547,7 @@
             btn_k_pair: "ひらカタあわせ",
             btn_shiri1: "しりとり1", btn_shiri2: "しりとり2",
             btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
-            // ★新規追加
+            
             btn_imasu: "います<br>あります",
             btn_money: "お金の学習",
             btn_transport: "こうつう",
@@ -548,15 +555,19 @@
             btn_clock1: "とけい1", btn_clock2: "とけい2",
             btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
             btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            // ★動詞カテゴリ修正
+            
             btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
-            btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_kata: "V-方", btn_mashouka: "V-ましょうか", 
-            btn_teimasu: "V-ています", btn_temoii: "V-てもいいですか",
+            btn_tekudasai: "V-てください", 
+            btn_tekudasaimasenka: "V-てくださいませんか",
+            btn_mashouka: "V-ましょうか", 
+            btn_teimasu: "V-ています", 
+            btn_temoii: "V-てもいいですか",
+            btn_kata: "V-方",
             
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
             btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
 
-            // ★ 認証モーダル
+            // 認証モーダル
             modal_login: "ログイン", modal_signup: "新規登録",
             ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
             btn_exec: "実行", btn_cancel: "キャンセル",
@@ -583,7 +594,7 @@
             btn_k_pair: "Hira/Kata Pair",
             btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2",
             btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
-            // ★新規追加
+            
             btn_imasu: "Imasu<br>Arimasu",
             btn_money: "Money Learning",
             btn_transport: "Transport",
@@ -592,15 +603,18 @@
             btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
             btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
             
-            // ★ Verbs
             btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
-            btn_tekudasai: "V-te Kudasai", btn_tekudasaimasenka: "V-te Kudasaimasenka", btn_kata: "How to V (V-kata)", btn_mashouka: "V-mashouka",
-            btn_teimasu: "V-te Imasu", btn_temoii: "May I...?",
+            btn_tekudasai: "V-te Kudasai", 
+            btn_tekudasaimasenka: "V-te Kudasaimasenka",
+            btn_mashouka: "V-mashouka",
+            btn_teimasu: "V-te Imasu",
+            btn_temoii: "May I...?",
+            btn_kata: "How to V (V-kata)",
             
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
             btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
 
-            // ★ Auth Modal
+            // Auth Modal
             modal_login: "Login", modal_signup: "Sign Up",
             ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
             btn_exec: "Submit", btn_cancel: "Cancel",
@@ -659,17 +673,17 @@
             { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
             { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
         ]},
-        // 8. どうし (紫系: 基礎と統一)
+        // 8. どうし (紫系)
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
             { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
             { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
             { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
             { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
             { url: "verb_tekudasaimasenka_practice.html", titleKey: "btn_tekudasaimasenka", icon: "fa-solid fa-hands-praying" },
-            { url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" },
             { url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" },
             { url: "verb_teimasu_practice.html", titleKey: "btn_teimasu", icon: "fa-solid fa-spinner" },
-            { url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" }
+            { url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" },
+            { url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" }
         ]},
         // 9. ぶんしょう (ピンク系: アクセントカラー)
         { id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
@@ -744,7 +758,7 @@
             const key = el.dataset.i18n;
             if(i18nData[lang][key]) el.textContent = i18nData[lang][key];
         });
-        // ★ プレースホルダー更新
+        // プレースホルダー更新
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const key = el.dataset.i18nPlaceholder;
             if(i18nData[lang][key]) el.placeholder = i18nData[lang][key];
