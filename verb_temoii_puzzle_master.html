@@ -211,16 +211,16 @@
     // Game 1: 質問 (Ask) - 30問生成
     // 固定ブロック: "いいですか"
     const askScenarios = [
-        { verb_index: 0, scenario: "おなかがすきました。きょかを もとめます。", prefix: "これを", particles: ["を"], verb: "たべても" },
-        { verb_index: 1, scenario: "のどがかわきました。", prefix: "ジュース", particles: ["を"], verb: "のんでも" },
-        { verb_index: 2, scenario: "しゃしんをとりたいです。", prefix: "しゃしん", particles: ["を"], verb: "とっても" },
-        { verb_index: 3, scenario: "ペンをかりたいです。", prefix: "このペン", particles: ["を"], verb: "つかっても" },
+        { verb_index: 0, scenario: "おなかがすきました。きょかを もとめます。", prefix: "", particles: ["を"], verb: "たべても" },
+        { verb_index: 1, scenario: "のどがかわきました。", prefix: "", particles: ["を"], verb: "のんでも" },
+        { verb_index: 2, scenario: "しゃしんをとりたいです。", prefix: "", particles: ["を"], verb: "とっても" },
+        { verb_index: 3, scenario: "ペンをかりたいです。", prefix: "この", particles: ["を"], verb: "つかっても" },
         { verb_index: 4, scenario: "ノックしました。「はいってください」", prefix: "へや", particles: ["に"], verb: "はいっても" },
-        { verb_index: 5, scenario: "いすがあいています。", prefix: "ここ", particles: ["に"], verb: "すわっても" },
-        { verb_index: 6, scenario: "あついです。", prefix: "まど", particles: ["を"], verb: "あけても" },
-        { verb_index: 7, scenario: "テレビをみたいです。", prefix: "テレビ", particles: ["を"], verb: "みても" },
-        { verb_index: 8, scenario: "ようじがおわりました。", prefix: "もう", particles: [], verb: "かえっても" },
-        { verb_index: 9, scenario: "にもつがおもいです。", prefix: "ここに", custom_object: "", particles: [], verb: "おいても" },
+        { verb_index: 5, scenario: "いすがあいています。", prefix: "", particles: ["に"], verb: "すわっても" },
+        { verb_index: 6, scenario: "あついです。", prefix: "", particles: ["を"], verb: "あけても" },
+        { verb_index: 7, scenario: "テレビをみたいです。", prefix: "", particles: ["を"], verb: "みても" },
+        { verb_index: 8, scenario: "ようじがおわりました。", prefix: "", particles: [], verb: "かえっても" },
+        { verb_index: 9, scenario: "にもつがおもいです。", prefix: "ここに", custom_object: "にもつ", particles: ["を"], verb: "おいても" },
         
         { verb_index: 0, scenario: "おかしをたべたいです。", prefix: "おかし", custom_object: "", particles: ["を"], verb: "たべても" },
         { verb_index: 1, scenario: "みずをのみたいです。", prefix: "みず", custom_object: "", particles: ["を"], verb: "のんでも" },
