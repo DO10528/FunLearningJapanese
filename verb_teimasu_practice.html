@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-ています れんしゅう</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 共通設定 (水色テーマ: 進行・状態) --- */
+        :root {
+            --primary: #00acc1; /* 水色 */
+            --primary-light: #b2ebf2;
+            --primary-dark: #00838f;
+            --accent: #ffeb3b; /* 黄色 */
+            --bg-color: #e0f7fa; /* 薄い水色背景 */
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --action-color: #039be5; /* 動作進行（青） */
+            --state-color: #00897b; /* 状態（ティール） */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0, 172, 193, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+            text-decoration: none; font-weight: bold;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        .mode-title {
+            font-size: 1.6em; font-weight: 900; margin-top: 40px; margin-bottom: 15px;
+            padding: 10px 20px; border-bottom: 4px solid; display: inline-block;
+        }
+        #action-title { border-color: var(--action-color); color: var(--action-color); }
+        #state-title { border-color: var(--state-color); color: var(--state-color); }
+
+        /* --- 練習カードグリッド (縦2列) --- */
+        .practice-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg); border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid;
+            transition: transform 0.2s; position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .verb-forms-container { 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 10px; 
+        }
+        
+        .masu-box {
+            background: var(--primary-light); padding: 8px 12px;
+            border-radius: 8px; color: var(--primary-dark);
+            font-weight: 900; font-size: 1.1em; flex-shrink: 0; text-align: center;
+        }
+        
+        .teimasu-box {
+            font-size: 1.5em; font-weight: 900; color: var(--text-color); white-space: nowrap;
+        }
+        .teimasu-box span { font-size: 0.7em; font-weight: 700; }
+        
+        /* 例文スタイル */
+        .example-sentence {
+            background: #e1f5fe; padding: 10px; border-radius: 8px;
+            font-size: 1.1em; font-weight: 700; color: #555;
+            margin-top: 15px; border-left: 5px solid var(--action-color);
+        }
+        .verb-card.state-type .example-sentence { border-left-color: var(--state-color); background: #e0f2f1; }
+
+        .simple-meaning {
+            font-size: 0.9em; color: #777; margin-top: 10px;
+            border-top: 1px dashed #eee; padding-top: 10px;
+        }
+        .english-meaning { font-size: 1.1em; color: var(--primary-dark); font-weight: bold; }
+
+        .sound-btn {
+            background: var(--accent); color: #00838f; border: none;
+            width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1em; box-shadow: 0 3px 0 #fdd835;
+            transition: all 0.1s; position: absolute; top: 15px; right: 15px; 
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        /* ゲーム開始ボタン */
+        .start-game-area { text-align: center; margin: 50px 0; }
+        #start-game-btn {
+            background: var(--primary-dark); /* 濃い水色 */
+            color: white; border: 4px solid var(--accent);
+            padding: 18px 45px; font-size: 1.6em; font-weight: 900;
+            border-radius: 12px; box-shadow: 0 6px 0 var(--primary);
+            cursor: pointer; transition: transform 0.1s; text-transform: uppercase;
+        }
+        #start-game-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        @media (max-width: 768px) {
+            .practice-grid { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-size: 1.4em; font-weight: 900; color: white;">
+            <i class="fa-solid fa-spinner"></i> V-ています
+        </div>
+        <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="container">
+        <h1>V-ています：いま していること・じょうたい</h1>
+        
+        <div class="start-game-area">
+            <button id="start-game-btn" onclick="window.location.href='verb_teimasu_puzzle_master.html'">
+                パズルゲームをはじめる <i class="fa-solid fa-gamepad"></i>
+            </button>
+            <p style="color:#777; margin-top:10px;">（かたちを おぼえたら、ゲームに すすもう！）</p>
+        </div>
+        
+        <h2 id="action-title" class="mode-title">いま しています (Action Now)</h2>
+        <div class="practice-grid" id="action-list"></div>
+
+        <h2 id="state-title" class="mode-title">ずっと しています (State/Habit)</h2>
+        <div class="practice-grid" id="state-list"></div>
+    </div>
+
+    <script>
+        // --- データ定義 ---
+        const practiceData = [
+            // ========== 動作進行 (Action: 今やっている) ==========
+            { type: 'action', masu: 'たべます', te: 'たべて', meaning: 'is eating', example: 'ごはんを たべています。', context: 'いま、しょくじちゅう です。' },
+            { type: 'action', masu: 'のみます', te: 'のんで', meaning: 'is drinking', example: 'おちゃを のんでいます。', context: 'いま、きゅうけいちゅう です。' },
+            { type: 'action', masu: 'よみます', te: 'よんで', meaning: 'is reading', example: 'ほんを よんでいます。', context: 'いま、どくしょちゅう です。' },
+            { type: 'action', masu: 'かきます', te: 'かいて', meaning: 'is writing', example: 'てがみを かいています。', context: 'いま、つくえに むかっています。' },
+            { type: 'action', masu: 'べんきょうします', te: 'べんきょうして', meaning: 'is studying', example: 'にほんごを べんきょうしています。', context: 'いま、がっこうに います。' },
+            { type: 'action', masu: 'まっています', te: 'まって', meaning: 'is waiting', example: 'バスを まっています。', context: 'いま、バスていに います。' },
+            { type: 'action', masu: 'はなします', te: 'はなして', meaning: 'is talking', example: 'ともだちと はなしています。', context: 'いま、でんわを しています。' },
+            { type: 'action', masu: 'ねます', te: 'ねて', meaning: 'is sleeping', example: 'あかちゃんが ねています。', context: 'いま、ベッドに います。' },
+            { type: 'action', masu: 'みます', te: 'みて', meaning: 'is watching', example: 'テレビを みています。', context: 'いま、リビングに います。' },
+            { type: 'action', masu: 'ききます', te: 'きいて', meaning: 'is listening', example: 'おんがくを きいています。', context: 'いま、イヤホンを しています。' },
+            { type: 'action', masu: 'はしります', te: 'はしって', meaning: 'is running', example: 'こうえんを はしっています。', context: 'いま、うんどう しています。' },
+            { type: 'action', masu: 'あそびます', te: 'あそんで', meaning: 'is playing', example: 'こどもが あそんでいます。', context: 'いま、そとに います。' },
+            { type: 'action', masu: 'つくります', te: 'つくって', meaning: 'is cooking/making', example: 'りょうりを つくっています。', context: 'いま、キッチンに います。' },
+            { type: 'action', masu: 'およぎます', te: 'およいで', meaning: 'is swimming', example: 'プールで およいでいます。', context: 'いま、みずのなかに います。' },
+
+            // ========== 状態 (State: 結果の状態・習慣) ==========
+            { type: 'state', masu: 'すみます', te: 'すんで', meaning: 'live in', example: 'とうきょうに すんでいます。', context: 'じゅうしょは どこですか。' },
+            { type: 'state', masu: 'けっこんします', te: 'けっこんして', meaning: 'is married', example: 'けっこんしています。', context: 'どくしん ですか。' },
+            { type: 'state', masu: 'しります', te: 'しって', meaning: 'know', example: 'かのじょを しっています。', context: 'あのひとが だれか わかりますか。' },
+            { type: 'state', masu: 'もちます', te: 'もって', meaning: 'have/own', example: 'くるまを もっています。', context: 'じぶんの くるまが ありますか。' },
+            { type: 'state', masu: 'きます', te: 'きて', meaning: 'is wearing (shirt)', example: 'シャツを きています。', context: 'なにを きていますか。' },
+            { type: 'state', masu: 'はきます', te: 'はいて', meaning: 'is wearing (shoes/pants)', example: 'ズボンを はいています。', context: 'なにを はいていますか。' },
+            { type: 'state', masu: 'かぶります', te: 'かぶって', meaning: 'is wearing (hat)', example: 'ぼうしを かぶっています。', context: 'あたまに なにが ありますか。' },
+            { type: 'state', masu: 'かけます', te: 'かけて', meaning: 'is wearing (glasses)', example: 'めがねを かけています。', context: 'めがねを していますか。' },
+            { type: 'state', masu: 'おぼえます', te: 'おぼえて', meaning: 'remember', example: 'パスワードを おぼえています。', context: 'わすれて いません。' },
+            { type: 'state', masu: 'つかれます', te: 'つかれて', meaning: 'is tired', example: 'すこし つかれています。', context: 'げんきが ないようです。' },
+        ];
+
+        const synth = window.speechSynthesis;
+        let voices = [];
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        // V-ています読み上げ
+        window.speakPhrase = (teForm) => {
+            if (synth.speaking) synth.cancel();
+            // ひらがなのみ抽出
+            const textToSpeak = teForm + "います。"; 
+            speak(textToSpeak);
+        };
+        
+        // 例文読み上げ
+        window.speakExample = (exampleSentence) => {
+            if (synth.speaking) synth.cancel();
+            speak(exampleSentence);
+        };
+
+        function speak(text) {
+            const ut = new SpeechSynthesisUtterance(text);
+            ut.lang = 'ja-JP'; ut.rate = 0.9;
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) ut.voice = targetVoice;
+            synth.speak(ut);
+        }
+
+        function createVerbCard(item) {
+            const isAction = item.type === 'action';
+            const cardColor = isAction ? 'var(--action-color)' : 'var(--state-color)';
+            
+            const card = document.createElement('div');
+            card.className = 'verb-card ' + (isAction ? 'action-type' : 'state-type');
+            card.style.borderColor = cardColor;
+            
+            card.innerHTML = `
+                <div class="verb-forms-container">
+                    <div class="masu-box">${item.masu}</div>
+                    <i class="fa-solid fa-arrow-right" style="color:#999;"></i>
+                    <div class="teimasu-box">
+                        <span onclick="speakPhrase('${item.te}')" style="cursor:pointer; padding-right:5px;">
+                            ${item.te}<span style="font-size:0.7em;">います</span> 
+                            <i class="fa-solid fa-volume-high" style="color:${cardColor}; font-size: 0.8em;"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="example-sentence" onclick="speakExample('${item.example}')" style="cursor:pointer;">
+                    ${item.example} <i class="fa-solid fa-volume-high" style="float:right; color:#777; font-size: 0.8em;"></i>
+                </div>
+
+                <p class="simple-meaning">
+                    <span class="english-meaning">${item.meaning}</span>
+                    <br>${item.context}
+                </p>
+                
+                <p style="font-weight:bold; color: ${cardColor}; margin: 5px 0 5px 0; font-size: 0.9em;">
+                    <i class="fa-solid ${isAction ? 'fa-person-running' : 'fa-shirt'}"></i> 
+                    ${isAction ? 'いま しています (Action)' : 'ずっと しています (State)'}
+                </p>
+            `;
+            return card;
+        }
+
+        function renderLists() {
+            const actionList = document.getElementById('action-list');
+            const stateList = document.getElementById('state-list');
+
+            const actions = practiceData.filter(item => item.type === 'action');
+            const states = practiceData.filter(item => item.type === 'state');
+
+            actions.forEach(item => actionList.appendChild(createVerbCard(item)));
+            states.forEach(item => stateList.appendChild(createVerbCard(item)));
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLists);
+    </script>
+</body>
+</html>
