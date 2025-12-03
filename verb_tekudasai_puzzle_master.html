@@ -38,6 +38,7 @@
             box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
             position: sticky; top: 0; z-index: 100;
         }
+        /* ボタンのデザインをリンクからボタンタグ用に調整 */
         .back-to-practice {
             background: rgba(255,255,255,0.2); 
             border: 1px solid rgba(255,255,255,0.4);
@@ -48,6 +49,8 @@
             font-size: 0.9em;
             font-weight: bold;
             transition: background 0.2s;
+            cursor: pointer; /* クリックできるように */
+            font-family: inherit; /* フォント継承 */
         }
         .back-to-practice:hover { background: rgba(255,255,255,0.4); }
 
@@ -132,7 +135,7 @@
         .word-block:active { transform: translateY(2px); box-shadow: none; }
         /* 固定ブロック（ください）のスタイル */
         .fixed { background: var(--primary); color: white; box-shadow: none; cursor: default; }
-        .fixed:active { transform: translateY(0); } /* 固定ブロックは動かない */
+        .fixed:active { transform: translateY(0); } 
 
         /* ボタン */
         #check-btn {
@@ -145,7 +148,9 @@
 <body>
 
 <header>
-    <a href="verb_tekudasai_practice.html" class="back-to-practice"><i class="fa-solid fa-arrow-left"></i> れんしゅうにもどる</a>
+    <button class="back-to-practice" onclick="handleHeaderBack()">
+        <i class="fa-solid fa-arrow-left"></i> もどる
+    </button>
     <h1 style="margin:0; font-size:1.2em; color: white;">V-てください つかいかたパズル</h1>
     <div id="auth-status"></div>
 </header>
@@ -178,8 +183,7 @@
 
             <p style="font-size: 1.1em; color: #555;">ことばを ただしい じゅんばんで くみたててね：</p>
             
-            <div id="construction-area">
-                </div>
+            <div id="construction-area"></div>
             
             <div id="block-choices"></div>
             
@@ -272,12 +276,13 @@
         { verb_index: 8, scenario: "かりたほんをかえしてほしいです。", prefix: "すみません", particles: ["を"], verb: "かえして" },
         { verb_index: 9, scenario: "こわれたいすをなおしてほしいです。", prefix: "ちょっと", particles: ["を"], verb: "なおして" },
         
-        { verb_index: 0, scenario: "おかねがたりません。すこしかしてほしいです。", prefix: "すこし", particles: ["を"], verb: "かして" },
-        { verb_index: 1, scenario: "いっしょにそうじをするのをてつだってほしいです。", prefix: "そうじ", particles: ["を"], verb: "てつだって" },
-        { verb_index: 2, scenario: "じゅうしょをおしえてほしいです。", prefix: "じゅうしょ", particles: ["を"], verb: "おしえて" },
-        { verb_index: 3, scenario: "ドアをあけるのをてつだってほしいです。", prefix: "いっしょに", particles: ["を"], verb: "あけて" },
-        { verb_index: 5, scenario: "あのたなのたかいほんをとってほしいです。", prefix: "たかいほん", particles: ["を"], verb: "とって" },
-        { verb_index: 9, scenario: "こわれたとけいをなおしてほしいです。", prefix: "このとけい", particles: ["を"], verb: "なおして" },
+        // バリエーション
+        { verb_index: 0, scenario: "おかねがたりません。すこしかしてほしいです。", prefix: "すこし", custom_object: "おかね", particles: ["を"], verb: "かして" },
+        { verb_index: 1, scenario: "いっしょにそうじをするのをてつだってほしいです。", prefix: "そうじ", custom_object: "", particles: ["を"], verb: "てつだって" },
+        { verb_index: 2, scenario: "じゅうしょをおしえてほしいです。", prefix: "じゅうしょ", custom_object: "", particles: ["を"], verb: "おしえて" },
+        { verb_index: 3, scenario: "ドアをあけるのをてつだってほしいです。", prefix: "いっしょに", custom_object: "ドア", particles: ["を"], verb: "あけて" },
+        { verb_index: 5, scenario: "あのたなのたかいほんをとってほしいです。", prefix: "たかいほん", custom_object: "", particles: ["を"], verb: "とって" },
+        { verb_index: 9, scenario: "こわれたとけいをなおしてほしいです。", prefix: "このとけい", custom_object: "", particles: ["を"], verb: "なおして" },
     ];
 
     // Game 2: 勧め (Offer/Suggestion) - 30問生成
@@ -288,16 +293,16 @@
         { verb_index: 3, scenario: "じぶんのしゃしんをともだちにみせます。", prefix: "ちょっと", particles: ["を"], verb: "みて" },
         { verb_index: 4, scenario: "あたらしいおんがくをきくようすすめます。", prefix: "どうぞ", particles: ["を"], verb: "きいて" },
         { verb_index: 5, scenario: "へやにさきにはいるようすすめます。", prefix: "どうぞ", particles: ["に"], verb: "はいって" },
-        { verb_index: 6, scenario: "なまえをよぶようすすめます。", prefix: "なまえ", particles: ["を"], verb: "いって" },
-        { verb_index: 7, scenario: "あたらしいふくをためすようすすめます。", prefix: "これを", particles: ["を"], verb: "ためして" },
-        { verb_index: 8, scenario: "むりせずゆっくりやすむようすすめます。", prefix: "ゆっくり", particles: ["で"], verb: "やすんで" },
-        { verb_index: 9, scenario: "わすれないようにメモをとるようすすめます。", prefix: "メモ", particles: ["を"], verb: "かいて" },
+        { verb_index: 6, scenario: "なまえをよぶようすすめます。", prefix: "なまえ", custom_object: "", particles: ["を"], verb: "いって" },
+        { verb_index: 7, scenario: "あたらしいふくをためすようすすめます。", prefix: "これを", custom_object: "", particles: ["を"], verb: "ためして" },
+        { verb_index: 8, scenario: "むりせずゆっくりやすむようすすめます。", prefix: "ゆっくり", custom_object: "", particles: ["で"], verb: "やすんで" },
+        { verb_index: 9, scenario: "わすれないようにメモをとるようすすめます。", prefix: "メモ", custom_object: "", particles: ["を"], verb: "かいて" },
         
-        { verb_index: 0, scenario: "つくったクッキーをたべてほしいです。", prefix: "よかったら", particles: ["を"], verb: "たべて" },
-        { verb_index: 1, scenario: "のどがかわいたひとにみずをすすめます。", prefix: "どうぞ", particles: ["を"], verb: "のんで" },
-        { verb_index: 2, scenario: "かぞくといっしょにすわるようすすめます。", prefix: "みんな", particles: ["と"], verb: "すわって" },
-        { verb_index: 3, scenario: "あたらしいえいがのよこくをみてほしいです。", prefix: "このえいが", particles: ["を"], verb: "みて" },
-        { verb_index: 4, scenario: "このうたをいっしょにうたうようすすめます。", prefix: "いっしょに", particles: ["を"], verb: "きいて" },
+        { verb_index: 0, scenario: "つくったクッキーをたべてほしいです。", prefix: "よかったら", custom_object: "クッキー", particles: ["を"], verb: "たべて" },
+        { verb_index: 1, scenario: "のどがかわいたひとにみずをすすめます。", prefix: "どうぞ", custom_object: "みず", particles: ["を"], verb: "のんで" },
+        { verb_index: 2, scenario: "かぞくといっしょにすわるようすすめます。", prefix: "みんな", custom_object: "", particles: ["と"], verb: "すわって" },
+        { verb_index: 3, scenario: "あたらしいえいがのよこくをみてほしいです。", prefix: "このえいが", custom_object: "", particles: ["を"], verb: "みて" },
+        { verb_index: 4, scenario: "このうたをいっしょにうたうようすすめます。", prefix: "いっしょに", custom_object: "うた", particles: ["を"], verb: "きいて" },
     ];
 
 
@@ -333,9 +338,8 @@
         if(target) ut.voice = target;
         synth.speak(ut);
     }
-    function playSeikai() { /* Sound placeholder */ console.log("Correct Sound"); }
-    function playBubu() { /* Sound placeholder */ console.log("Incorrect Sound"); }
-    function showPointAnim(x, y) { /* Animation placeholder */ }
+    function playSeikai() { /* Sound placeholder */ }
+    function playBubu() { /* Sound placeholder */ }
     function updateScore() { document.getElementById('score').innerText = score; }
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -345,12 +349,25 @@
         return array;
     }
     
-    // ★修正: 問題文の読み上げのみ（答えは読まない）
     function readQuestion() {
         if (currentQ) {
             speak(currentQ.scenario);
         }
     }
+
+    // ★ヘッダーの戻るボタン処理
+    window.handleHeaderBack = function() {
+        if (mainGameArea.style.display !== 'none') {
+            // ゲーム中の場合 -> モード選択に戻る
+            mainGameArea.style.display = 'none';
+            modeSelection.style.display = 'block';
+            synth.cancel(); // 読み上げストップ
+        } else {
+            // モード選択画面の場合 -> 練習ページに戻る
+            window.location.href = 'verb_tekudasai_practice.html';
+        }
+    };
+
     // ----------------------------
 
 
@@ -369,9 +386,14 @@
             const scenario = scenarios[i % scenarios.length]; 
             const verbData = verbs[scenario.verb_index];
             
-            const variableBlocks = [scenario.prefix, verbData.object].concat(scenario.particles).concat(scenario.verb);
+            let objectBlock = verbData.object;
+            if (scenario.custom_object !== undefined) {
+                objectBlock = scenario.custom_object;
+            }
+
+            const variableBlocks = [scenario.prefix, objectBlock].concat(scenario.particles).concat(scenario.verb);
             
-            const correctOrder = variableBlocks.filter(b => b); 
+            const correctOrder = variableBlocks.filter(b => b && b !== ""); 
 
             currentQuizData.push({
                 id: i + 1,
@@ -472,7 +494,6 @@
             
             resultMessage.className = 'correct-msg';
             resultMessage.innerHTML = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}ください）</span>`;
-            // ★修正: 「せいかい！」のみ読み上げ
             speak("せいかい！"); 
             
             currentQIndex++;
@@ -487,7 +508,6 @@
             constructionArea.classList.add('shaking');
             resultMessage.className = 'incorrect-msg';
             resultMessage.innerHTML = `❌ **ちがいます...** もう一度ならびかえてみてね！`;
-            // ★修正: 「ちがいます」のみ読み上げ
             speak("ちがいます");
             
             setTimeout(() => {
