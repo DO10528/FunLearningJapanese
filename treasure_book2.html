@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>たからさがしワークブック (大きな枠バージョン)</title>
+<title>たからさがしワークブック (3ページ版)</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 
@@ -64,17 +64,17 @@
     .ph-title { font-size: 2.2em; font-weight: 900; display: flex; align-items: center; gap: 15px; }
     .page-num { font-size: 1.2em; color: white; background: #ccc; padding: 5px 15px; border-radius: 20px; margin-left: 10px; }
 
-    /* ★ここが変更点：2列×2行＝4個の大きなグリッド */
+    /* 大きな4マスのグリッド */
     .big-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr; /* 縦に2つ */
-        gap: 25px; /* 隙間も広く */
-        height: calc(100% - 80px); /* ヘッダー分を引く */
+        grid-template-rows: 1fr 1fr;
+        gap: 25px;
+        height: calc(100% - 80px);
     }
 
     .big-card {
-        border: 4px dashed; /* 線を太く */
+        border: 4px dashed;
         border-radius: 25px;
         padding: 15px;
         display: flex; flex-direction: column;
@@ -88,13 +88,22 @@
 
     /* お絵かき・写真エリア */
     .art-area {
-        flex-grow: 1; /* 残りのスペース全部使う */
+        flex-grow: 1;
         background: #fafafa; border-radius: 15px;
         border: 2px solid #f0f0f0;
-        display: flex; justify-content: center; align-items: center;
-        margin-bottom: 15px; position: relative;
+        /* 中央寄せを解除し、相対配置へ変更 */
+        position: relative;
+        margin-bottom: 15px;
     }
-    .camera-icon { font-size: 3em; color: #eee; }
+    
+    /* ★修正点：カメラアイコンを左上に配置 */
+    .camera-icon { 
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-size: 3em; 
+        color: #eee; 
+    }
 
     /* 文字を書くエリア */
     .text-area {
@@ -124,7 +133,7 @@
 
 <script>
     // --- 設定 ---
-    const PAGES_PER_CATEGORY = 2; // 各カテゴリー2ページずつ作成 (合計8アイテム)
+    const PAGES_PER_CATEGORY = 3; // ★修正点：各カテゴリー3ページ (合計12枠)
     
     const CATEGORIES = [
         { title: 'ぶんぼうぐ', color: '#fdd835', icon: 'fa-solid fa-pen-ruler' },
@@ -161,7 +170,6 @@
     // 2. 中身ページ生成
     function createPages() {
         CATEGORIES.forEach(cat => {
-            // 設定されたページ数分ループ (ここでは2回)
             for (let i = 1; i <= PAGES_PER_CATEGORY; i++) {
                 const sheet = document.createElement('div');
                 sheet.className = 'sheet';

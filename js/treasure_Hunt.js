@@ -36,15 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
             color: '#ffab91', 
             words: [
                 { id: 'ringo', name: 'りんご', img: 'apple.png' },
-                { id: 'banana', name: 'バナナ', img: 'banana.png' },
-                { id: 'pan', name: 'パン', img: 'bread.png' },
+                { id: 'banana', name: 'ばなな', img: 'banana.png' },
+                { id: 'pan', name: 'ぱん', img: 'bread.png' },
                 { id: 'gyunyu', name: 'ぎゅうにゅう', img: 'milk.png' },
                 { id: 'tamago', name: 'たまご', img: 'egg.png' },
                 { id: 'onigiri', name: 'おにぎり', img: 'onigiri.png' },
                 { id: 'mikan', name: 'みかん', img: 'orange.png' },
-                { id: 'juice', name: 'ジュース', img: 'juice.png' },
-                { id: 'cookie', name: 'クッキー', img: 'cookie.png' },
-                { id: 'tomato', name: 'トマト', img: 'tomato.png' }
+                { id: 'juice', name: 'じゅーす', img: 'juice.png' },
+                { id: 'cookie', name: 'くっきー', img: 'cookie.png' },
+                { id: 'tomato', name: 'とまと', img: 'tomato.png' }
             ]
         },
         clothing: {
