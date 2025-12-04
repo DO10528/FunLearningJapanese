@@ -20,15 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
             color: '#ffd54f',
             words: [
                 { id: 'enpitsu', name: 'えんぴつ', img: 'enpitsu.png' },
-                { id: 'keshigomu', name: 'けしゴム', img: 'keshigomu.png' },
-                { id: 'pen', name: 'ペン', img: 'pen.png' },
-                { id: 'note', name: 'ノート', img: 'note.png' },
+                { id: 'keshigomu', name: 'けしごむ', img: 'keshigomu.png' },
+                { id: 'pen', name: 'ぺん', img: 'pen.png' },
+                { id: 'note', name: 'のーと', img: 'note.png' },
                 { id: 'hasami', name: 'はさみ', img: 'hasami.png' },
                 { id: 'nori', name: 'のり', img: 'nori.png' },
-                { id: 'hotchkiss', name: 'ホッチキス', img: 'hotchkiss.png' },
+                { id: 'hotchkiss', name: 'ほっちきす', img: 'hotchkiss.png' },
                 { id: 'jougi', name: 'じょうぎ', img: 'jougi.png' },
                 { id: 'fudebako', name: 'ふでばこ', img: 'fudebako.png' },
-                { id: 'crayon', name: 'クレヨン', img: 'crayon.png' }
+                { id: 'crayon', name: 'くれよん', img: 'crayon.png' }
             ]
         },
         food: {

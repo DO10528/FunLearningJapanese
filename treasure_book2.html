@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>たからさがしワークブック (大きな枠バージョン)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- A4印刷設定 --- */
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+        body { background: white; -webkit-print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        .sheet {
+            width: 210mm; height: 297mm;
+            margin: 0 !important; padding: 15mm !important;
+            page-break-after: always; box-shadow: none !important;
+            border: none !important;
+        }
+    }
+
+    /* --- 画面表示用 --- */
+    body {
+        background: #525659;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        display: flex; flex-direction: column; align-items: center;
+        margin: 0; padding: 40px 0; color: #333;
+    }
+    .sheet {
+        background: white; width: 210mm; height: 297mm;
+        padding: 15mm; box-sizing: border-box;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        margin-bottom: 30px; position: relative; overflow: hidden;
+    }
+
+    /* --- 表紙デザイン --- */
+    .cover-frame {
+        border: 10px solid #ffcc5c; border-radius: 40px;
+        height: 100%; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: radial-gradient(circle, #fffdf5 0%, #fff 100%);
+        position: relative;
+    }
+    .cover-title {
+        font-size: 5.5em; color: #5c7aff; margin: 0;
+        text-shadow: 5px 5px 0px #dbeafe; letter-spacing: 5px; line-height: 1.2;
+    }
+    .cover-sub { font-size: 2em; color: #ffa726; margin-top: 20px; font-weight: bold; }
+    .name-area {
+        margin-top: 100px; width: 70%; border: 4px dashed #ccc;
+        padding: 30px; border-radius: 30px; background: white; text-align: left;
+    }
+    .name-line { border-bottom: 3px solid #333; height: 60px; margin-top: 10px; }
+    .deco { position: absolute; opacity: 0.2; font-size: 6em; }
+
+    /* --- ページレイアウト --- */
+    .page-header {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        border-bottom: 4px solid #eee; padding-bottom: 10px; margin-bottom: 20px;
+        height: 60px;
+    }
+    .ph-title { font-size: 2.2em; font-weight: 900; display: flex; align-items: center; gap: 15px; }
+    .page-num { font-size: 1.2em; color: white; background: #ccc; padding: 5px 15px; border-radius: 20px; margin-left: 10px; }
+
+    /* ★ここが変更点：2列×2行＝4個の大きなグリッド */
+    .big-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr; /* 縦に2つ */
+        gap: 25px; /* 隙間も広く */
+        height: calc(100% - 80px); /* ヘッダー分を引く */
+    }
+
+    .big-card {
+        border: 4px dashed; /* 線を太く */
+        border-radius: 25px;
+        padding: 15px;
+        display: flex; flex-direction: column;
+        background: #fff;
+    }
+
+    .card-top { display: flex; justify-content: flex-end; height: 30px; }
+    .check-box { 
+        width: 25px; height: 25px; border: 3px solid #ddd; border-radius: 50%; 
+    }
+
+    /* お絵かき・写真エリア */
+    .art-area {
+        flex-grow: 1; /* 残りのスペース全部使う */
+        background: #fafafa; border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        display: flex; justify-content: center; align-items: center;
+        margin-bottom: 15px; position: relative;
+    }
+    .camera-icon { font-size: 3em; color: #eee; }
+
+    /* 文字を書くエリア */
+    .text-area {
+        height: 50px;
+        border-bottom: 3px solid #aaa;
+        display: flex; align-items: flex-end;
+    }
+    .label { font-size: 1.1em; color: #888; margin-right: 10px; font-weight: bold; margin-bottom: 5px; }
+
+    /* --- FABボタン --- */
+    .fab {
+        position: fixed; bottom: 30px; right: 30px;
+        background: #333; color: white; padding: 20px 40px;
+        border-radius: 50px; font-weight: bold; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: none;
+        font-size: 1.4em; z-index: 100;
+    }
+</style>
+</head>
+<body>
+
+    <button class="fab no-print" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> 印刷する
+    </button>
+
+    <div id="workbook"></div>
+
+<script>
+    // --- 設定 ---
+    const PAGES_PER_CATEGORY = 2; // 各カテゴリー2ページずつ作成 (合計8アイテム)
+    
+    const CATEGORIES = [
+        { title: 'ぶんぼうぐ', color: '#fdd835', icon: 'fa-solid fa-pen-ruler' },
+        { title: 'たべもの',   color: '#ff8a65', icon: 'fa-solid fa-utensils' },
+        { title: 'おようふく', color: '#4fc3f7', icon: 'fa-solid fa-shirt' },
+        { title: 'おもちゃ',   color: '#aed581', icon: 'fa-solid fa-robot' },
+        { title: 'おへや',     color: '#ba68c8', icon: 'fa-solid fa-couch' }
+    ];
+
+    const container = document.getElementById('workbook');
+
+    // 1. 表紙生成
+    function createCover() {
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet';
+        sheet.innerHTML = `
+            <div class="cover-frame">
+                <i class="fa-solid fa-camera deco" style="top:50px; left:50px; color:#ffab91;"></i>
+                <i class="fa-solid fa-star deco" style="bottom:50px; right:50px; color:#ffd54f;"></i>
+                
+                <i class="fa-solid fa-camera-retro" style="font-size:8em; color:#5c7aff; margin-bottom:30px;"></i>
+                <h1 class="cover-title">たからさがし</h1>
+                <div class="cover-sub">みつけて 写真をとろう！</div>
+                
+                <div class="name-area">
+                    <span style="font-size:1.5em; color:#888;">なまえ</span>
+                    <div class="name-line"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(sheet);
+    }
+
+    // 2. 中身ページ生成
+    function createPages() {
+        CATEGORIES.forEach(cat => {
+            // 設定されたページ数分ループ (ここでは2回)
+            for (let i = 1; i <= PAGES_PER_CATEGORY; i++) {
+                const sheet = document.createElement('div');
+                sheet.className = 'sheet';
+
+                // ヘッダー
+                const header = `
+                    <div class="page-header">
+                        <div class="ph-title" style="color:${cat.color}">
+                            <i class="${cat.icon}"></i> ${cat.title}
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="page-num" style="background:${cat.color}">${i} / ${PAGES_PER_CATEGORY}</span>
+                        </div>
+                    </div>
+                `;
+
+                // グリッド (1ページに4つ)
+                let grid = '<div class="big-grid">';
+                for (let j = 0; j < 4; j++) {
+                    grid += `
+                        <div class="big-card" style="border-color:${cat.color};">
+                            <div class="card-top">
+                                <div class="check-box"></div>
+                            </div>
+                            <div class="art-area">
+                                <i class="fa-solid fa-camera camera-icon"></i>
+                            </div>
+                            <div class="text-area">
+                                <span class="label">なまえ：</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                grid += '</div>';
+
+                sheet.innerHTML = header + grid;
+                container.appendChild(sheet);
+            }
+        });
+    }
+
+    // 実行
+    createCover();
+    createPages();
+
+</script>
+</body>
+</html>
