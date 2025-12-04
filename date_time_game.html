@@ -48,7 +48,10 @@
             padding: 8px 15px; border-radius: 20px;
             transition: background 0.2s;
             text-decoration: none; font-weight: bold;
-            cursor: pointer; /* 追加 */
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            font-size: 1em;
         }
         .home-link:hover { background: rgba(255,255,255,0.4); }
 
@@ -264,8 +267,8 @@
             <i class="fa-solid fa-calendar-alt"></i> パズルマスター
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-            <button class="home-link" onclick="goBackToModeSelection()">
-                <i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ
+            <button id="header-back-btn" class="home-link" onclick="handleHeaderBack()">
+                <i class="fa-solid fa-arrow-left"></i> 練習に戻る
             </button>
             <div id="auth-status" style="font-size:0.9em;">ゲスト</div>
         </div>
@@ -562,7 +565,7 @@
         if (synth.speaking) synth.cancel();
         const ut = new SpeechSynthesisUtterance(text);
         ut.lang = 'ja-JP'; 
-        ut.rate = 0.8; // ★ 修正 2: スピードを落とす
+        ut.rate = 0.8; 
         const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
         let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Female'));
         if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
@@ -570,14 +573,13 @@
         synth.speak(ut);
     }
     
-    // ★ 修正 3: モード選択画面に戻る関数
-    window.goBackToModeSelection = function() {
-        if (currentMode !== 0) {
-            document.getElementById(`mode${currentMode}-game`).style.display = 'none';
+    // ★ 戻るボタンの制御: モード選択時なら練習画面へ、ゲーム中ならモード選択へ
+    window.handleHeaderBack = function() {
+        if (currentMode === 0) {
+            window.location.href = 'date_time_practice.html';
+        } else {
+            resetGame();
         }
-        document.getElementById('scoreboard').style.display = 'none';
-        resetGame(); // 状態リセット
-        document.getElementById('mode-selection').style.display = 'block';
     }
 
 
@@ -613,11 +615,22 @@
     }
     
     function resetGame() {
+        // UIのリセット
+        document.querySelectorAll('.game-area').forEach(el => el.style.display = 'none');
+        document.getElementById('scoreboard').style.display = 'none';
+        document.getElementById('mode-selection').style.display = 'block';
+        document.getElementById('daily-point-limit').textContent = ''; 
+
+        // 状態変数のリセット
         currentMode = 0;
         questionData = [];
         currentQuestionIndex = 0;
         score = 0;
-        document.getElementById('daily-point-limit').textContent = ''; 
+        isAnswered = false;
+
+        // ヘッダーボタンの更新
+        const btn = document.getElementById('header-back-btn');
+        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 練習に戻る';
     }
 
 
@@ -633,6 +646,10 @@
         document.getElementById('mode-selection').style.display = 'none';
         const gameArea = document.getElementById(`mode${mode}-game`);
         gameArea.style.display = 'block';
+
+        // ヘッダーボタンの更新
+        const btn = document.getElementById('header-back-btn');
+        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ';
 
         let sourceData;
         if (mode === 1) {
@@ -661,7 +678,6 @@
         document.getElementById(`mode${mode}-next-btn`).style.display = 'none';
         
         if (mode === 1) {
-            // ★ 修正 2: ゲーム1のボタンを初期はdisabledにする（選択肢が選ばれていないため）
             document.getElementById(`mode1-check-btn`).disabled = true; 
             const kanji = currentQ.kanji;
             const correctKana = currentQ.kana;
@@ -676,7 +692,6 @@
             const choicesEl = document.getElementById('mode1-choices');
             choicesEl.innerHTML = '';
             
-            // ★ 修正 1: 選択肢の生成ロジックを修正し、古いクラスが残らないようにする
             choices.forEach(kana => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
@@ -715,7 +730,7 @@
             
             setupDynamicDropdowns(3, currentComponents);
             
-            // ★ 修正 2: ゲーム3のボタンを初期から押せる状態に戻す
+            // ★ モード3のボタンを常に押せるように修正
             document.getElementById(`mode3-check-btn`).disabled = false;
         }
     }
@@ -780,7 +795,6 @@
         });
     }
     
-    // ★ 修正 2, 3: 音声再生関数をモード別に再利用
     window.speakCurrentQuestion = function(mode) {
         if (isAnswered) return;
         
@@ -865,7 +879,6 @@
             }
         }
         
-        // --- フィードバックと遷移 ---
         let feedback = '';
         
         if (correct) {
@@ -881,7 +894,6 @@
                 feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 正解です！ (今日はこの問題のポイント獲得済み)</span>`;
             }
 
-            // ★ 修正 1: 正解なら自動で次の問題に進む
             setTimeout(() => {
                 nextQuestion(mode);
             }, 1500); 
@@ -889,7 +901,6 @@
         } else {
             feedback = `<span style="color:${cssVars.incorrect};"><i class="fa-solid fa-circle-xmark"></i> 残念。もう一度考えてみましょう。</span>`;
             
-            // 不正解の場合はボタンを再有効化し、再回答を許可
             isAnswered = false;
             checkBtn.disabled = false;
         }
@@ -932,8 +943,6 @@
     // --- 初期化 ---
     document.addEventListener('DOMContentLoaded', () => {
         resetGame();
-        // ★ 修正 3: 初期化後、モード選択画面を表示
-        document.getElementById('mode-selection').style.display = 'block';
         if (synth.getVoices().length === 0) {
             synth.addEventListener('voiceschanged', () => {
                 voices = synth.getVoices();
