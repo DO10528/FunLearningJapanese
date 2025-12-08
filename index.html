@@ -554,12 +554,13 @@
             btn_transport: "こうつう",
             
             btn_clock1: "とけい1", btn_clock2: "とけい2",
-            // ★ 修正箇所: タイトル名を変更
             btn_datetime_practice: "日付・練習", 
 
             btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
             btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            
+            // ★追加: 形容詞の否定形ゲーム
+            btn_kei_neg: "ひていけい (～くない)",
+
             btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
             btn_tekudasai: "V-てください", 
             btn_tekudasaimasenka: "V-てくださいませんか",
@@ -606,11 +607,12 @@
             btn_transport: "Transport",
 
             btn_clock1: "Clock 1", btn_clock2: "Clock 2",
-            // ★ 修正箇所: タイトル名を変更 (英語は簡潔に維持)
             btn_datetime_practice: "Date Practice", 
 
             btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
             btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
+            // ★追加: 形容詞の否定形ゲーム
+            btn_kei_neg: "Negative Form",
             
             btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
             btn_tekudasai: "V-te Kudasai", 
@@ -637,7 +639,6 @@
         }
     };
 
-    // ★ 修正箇所: gameStructureから date_time_game を削除
     const gameStructure = [
         { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
             { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
@@ -669,7 +670,6 @@
             { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
         ]},
         { id: "date_time", icon: "fa-solid fa-calendar-alt", color: "#3f51b5", titleKey: "cat_date_time", games: [
-            // ★ ここに「日付・練習」のみを残す
             { url: "date_time_practice.html", titleKey: "btn_datetime_practice", icon: "fa-solid fa-book-open" }
         ]},
         { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
@@ -679,6 +679,8 @@
         { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
             { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
             { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
+            // ★ 追加: 3つ目に否定形ゲーム (練習ページへのリンク)
+            { url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
         ]},
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
             { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
