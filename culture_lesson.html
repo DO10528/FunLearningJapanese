@@ -171,19 +171,244 @@
 
     // 漢字データを含む辞書
     const CATEGORIES = {
+        // --- Lv.1 たべもの (Food) ---
         1: { title: "たべもの", words: [
             {hiragana:"おすし", kanji:"お寿司", en:"Sushi", icon:"fa-solid fa-fish"}, 
             {hiragana:"ラーメン", kanji:"ラーメン", en:"Ramen", icon:"fa-solid fa-bowl-food"},
             {hiragana:"うどん", kanji:"うどん", en:"Udon", icon:"fa-solid fa-bowl-rice"}, 
-            {hiragana:"おにぎり", kanji:"おにぎり", en:"Rice ball", icon:"fa-solid fa-mountain"},
+            {hiragana:"おにぎり", kanji:"おにぎり", en:"Rice Ball", icon:"fa-solid fa-mountain"},
             {hiragana:"てんぷら", kanji:"天ぷら", en:"Tempura", icon:"fa-solid fa-shrimp"}, 
-            {hiragana:"だんご", kanji:"団子", en:"Dango", icon:"fa-solid fa-ellipsis"},
+            {hiragana:"たこやき", kanji:"たこ焼き", en:"Takoyaki", icon:"fa-solid fa-circle-dot"},
             {hiragana:"なっとう", kanji:"納豆", en:"Natto", icon:"fa-solid fa-jar"}, 
-            {hiragana:"たこやき", kanji:"たこ焼き", en:"Takoyaki", icon:"fa-solid fa-circle-dot"}
+            {hiragana:"みそしる", kanji:"味噌汁", en:"Miso Soup", icon:"fa-solid fa-mug-hot"},
+            {hiragana:"やきとり", kanji:"焼き鳥", en:"Yakitori", icon:"fa-solid fa-drumstick-bite"},
+            {hiragana:"ぎゅうどん", kanji:"牛丼", en:"Beef Bowl", icon:"fa-solid fa-bowl-food"},
+            {hiragana:"カレー", kanji:"カレー", en:"Curry", icon:"fa-solid fa-utensil-spoon"},
+            {hiragana:"オムライス", kanji:"オムライス", en:"Omelette Rice", icon:"fa-solid fa-egg"},
+            {hiragana:"だんご", kanji:"団子", en:"Dango", icon:"fa-solid fa-ellipsis"},
+            {hiragana:"たいやき", kanji:"たい焼き", en:"Taiyaki", icon:"fa-solid fa-fish"},
+            {hiragana:"そば", kanji:"そば", en:"Soba", icon:"fa-solid fa-bacon"}, 
+            {hiragana:"さしみ", kanji:"刺身", en:"Sashimi", icon:"fa-solid fa-fish-fins"},
+            {hiragana:"もち", kanji:"餅", en:"Mochi", icon:"fa-solid fa-circle"},
+            {hiragana:"おちゃ", kanji:"お茶", en:"Green Tea", icon:"fa-solid fa-leaf"},
+            {hiragana:"おべんとう", kanji:"お弁当", en:"Bento", icon:"fa-solid fa-box-open"},
+            {hiragana:"すきやき", kanji:"すき焼き", en:"Sukiyaki", icon:"fa-solid fa-fire-burner"}
         ]},
-        // 他のカテゴリも同様に構造変更が必要です
+
+        // --- Lv.2 あいさつ (Greeting) ---
         2: { title: "あいさつ", words: [
-            {hiragana:"おはよう", kanji:"おはよう", en:"Morning", icon:"fa-solid fa-sun"}
+            {hiragana:"おはよう", kanji:"おはよう", en:"Good Morning", icon:"fa-solid fa-sun"},
+            {hiragana:"こんにちは", kanji:"こんにちは", en:"Hello", icon:"fa-regular fa-hand-spock"},
+            {hiragana:"こんばんは", kanji:"こんばんは", en:"Good Evening", icon:"fa-solid fa-moon"},
+            {hiragana:"おやすみ", kanji:"おやすみ", en:"Good Night", icon:"fa-solid fa-bed"},
+            {hiragana:"ありがとう", kanji:"ありがとう", en:"Thank you", icon:"fa-solid fa-heart"},
+            {hiragana:"ごめんね", kanji:"ごめんね", en:"Sorry", icon:"fa-solid fa-face-sad-tear"},
+            {hiragana:"いただきます", kanji:"頂きます", en:"Let's eat", icon:"fa-solid fa-utensils"},
+            {hiragana:"ごちそうさま", kanji:"ご馳走様", en:"Thanks for food", icon:"fa-solid fa-check"},
+            {hiragana:"いってきます", kanji:"行ってきます", en:"I'm leaving", icon:"fa-solid fa-person-walking-arrow-right"},
+            {hiragana:"いってらっしゃい", kanji:"行ってらっしゃい", en:"See you", icon:"fa-solid fa-hand"},
+            {hiragana:"ただいま", kanji:"ただいま", en:"I'm home", icon:"fa-solid fa-house-user"},
+            {hiragana:"おかえり", kanji:"おかえり", en:"Welcome back", icon:"fa-solid fa-door-open"},
+            {hiragana:"バイバイ", kanji:"バイバイ", en:"Bye Bye", icon:"fa-solid fa-hand-peace"},
+            {hiragana:"またね", kanji:"またね", en:"See you later", icon:"fa-solid fa-calendar-check"},
+            {hiragana:"はじめまして", kanji:"初めまして", en:"Nice to meet you", icon:"fa-solid fa-handshake"},
+            {hiragana:"よろしく", kanji:"よろしく", en:"Please treat me well", icon:"fa-solid fa-circle-check"},
+            {hiragana:"はい", kanji:"はい", en:"Yes", icon:"fa-solid fa-check"},
+            {hiragana:"いいえ", kanji:"いいえ", en:"No", icon:"fa-solid fa-xmark"},
+            {hiragana:"おねがい", kanji:"お願い", en:"Please", icon:"fa-solid fa-hands-praying"},
+            {hiragana:"かんぱい", kanji:"乾杯", en:"Cheers", icon:"fa-solid fa-beer-mug-empty"}
+        ]},
+
+        // --- Lv.3 がっこう (School) ---
+        3: { title: "がっこう", words: [
+            {hiragana:"せんせい", kanji:"先生", en:"Teacher", icon:"fa-solid fa-chalkboard-user"},
+            {hiragana:"がくせい", kanji:"学生", en:"Student", icon:"fa-solid fa-child"},
+            {hiragana:"えんぴつ", kanji:"鉛筆", en:"Pencil", icon:"fa-solid fa-pencil"},
+            {hiragana:"けしごむ", kanji:"消しゴム", en:"Eraser", icon:"fa-solid fa-eraser"},
+            {hiragana:"ノート", kanji:"ノート", en:"Notebook", icon:"fa-solid fa-book"},
+            {hiragana:"きょうかしょ", kanji:"教科書", en:"Textbook", icon:"fa-solid fa-book-open"},
+            {hiragana:"ランドセル", kanji:"ランドセル", en:"School Bag", icon:"fa-solid fa-suitcase"},
+            {hiragana:"つくえ", kanji:"机", en:"Desk", icon:"fa-solid fa-table"},
+            {hiragana:"いす", kanji:"椅子", en:"Chair", icon:"fa-solid fa-chair"},
+            {hiragana:"こくばん", kanji:"黒板", en:"Blackboard", icon:"fa-solid fa-chalkboard"},
+            {hiragana:"きょうしつ", kanji:"教室", en:"Classroom", icon:"fa-solid fa-school"},
+            {hiragana:"きゅうしょく", kanji:"給食", en:"School Lunch", icon:"fa-solid fa-utensils"},
+            {hiragana:"テスト", kanji:"テスト", en:"Test", icon:"fa-solid fa-file-pen"},
+            {hiragana:"しゅくだい", kanji:"宿題", en:"Homework", icon:"fa-solid fa-house-laptop"},
+            {hiragana:"ともだち", kanji:"友達", en:"Friend", icon:"fa-solid fa-user-group"},
+            {hiragana:"はさみ", kanji:"ハサミ", en:"Scissors", icon:"fa-solid fa-scissors"},
+            {hiragana:"のり", kanji:"のり", en:"Glue", icon:"fa-solid fa-bottle-droplet"},
+            {hiragana:"じょうぎ", kanji:"定規", en:"Ruler", icon:"fa-solid fa-ruler-horizontal"},
+            {hiragana:"とけい", kanji:"時計", en:"Clock", icon:"fa-solid fa-clock"},
+            {hiragana:"チャイム", kanji:"チャイム", en:"Bell", icon:"fa-solid fa-bell"}
+        ]},
+
+        // --- Lv.4 おうち (Home) ---
+        4: { title: "おうち", words: [
+            {hiragana:"いえ", kanji:"家", en:"House", icon:"fa-solid fa-house"},
+            {hiragana:"へや", kanji:"部屋", en:"Room", icon:"fa-solid fa-door-open"},
+            {hiragana:"だいどころ", kanji:"台所", en:"Kitchen", icon:"fa-solid fa-kitchen-set"},
+            {hiragana:"おふろ", kanji:"お風呂", en:"Bath", icon:"fa-solid fa-bath"},
+            {hiragana:"トイレ", kanji:"トイレ", en:"Toilet", icon:"fa-solid fa-toilet"},
+            {hiragana:"テレビ", kanji:"テレビ", en:"TV", icon:"fa-solid fa-tv"},
+            {hiragana:"ベッド", kanji:"ベッド", en:"Bed", icon:"fa-solid fa-bed"},
+            {hiragana:"ソファー", kanji:"ソファー", en:"Sofa", icon:"fa-solid fa-couch"},
+            {hiragana:"まど", kanji:"窓", en:"Window", icon:"fa-regular fa-window-maximize"},
+            {hiragana:"れいぞうこ", kanji:"冷蔵庫", en:"Fridge", icon:"fa-solid fa-snowflake"},
+            {hiragana:"せんたくき", kanji:"洗濯機", en:"Washing Machine", icon:"fa-solid fa-shirt"},
+            {hiragana:"テーブル", kanji:"テーブル", en:"Table", icon:"fa-solid fa-table"},
+            {hiragana:"かぎ", kanji:"鍵", en:"Key", icon:"fa-solid fa-key"},
+            {hiragana:"でんわ", kanji:"電話", en:"Phone", icon:"fa-solid fa-phone"},
+            {hiragana:"でんき", kanji:"電気", en:"Light", icon:"fa-solid fa-lightbulb"},
+            {hiragana:"かいだん", kanji:"階段", en:"Stairs", icon:"fa-solid fa-stairs"},
+            {hiragana:"にわ", kanji:"庭", en:"Garden", icon:"fa-solid fa-tree"},
+            {hiragana:"かぞく", kanji:"家族", en:"Family", icon:"fa-solid fa-people-roof"},
+            {hiragana:"ねこ", kanji:"猫", en:"Cat", icon:"fa-solid fa-cat"},
+            {hiragana:"いぬ", kanji:"犬", en:"Dog", icon:"fa-solid fa-dog"}
+        ]},
+
+        // --- Lv.5 しぜん (Nature) ---
+        5: { title: "しぜん", words: [
+            {hiragana:"やま", kanji:"山", en:"Mountain", icon:"fa-solid fa-mountain"},
+            {hiragana:"かわ", kanji:"川", en:"River", icon:"fa-solid fa-water"},
+            {hiragana:"うみ", kanji:"海", en:"Sea", icon:"fa-solid fa-umbrella-beach"},
+            {hiragana:"そら", kanji:"空", en:"Sky", icon:"fa-solid fa-cloud-sun"},
+            {hiragana:"たいよう", kanji:"太陽", en:"Sun", icon:"fa-solid fa-sun"},
+            {hiragana:"つき", kanji:"月", en:"Moon", icon:"fa-solid fa-moon"},
+            {hiragana:"ほし", kanji:"星", en:"Star", icon:"fa-solid fa-star"},
+            {hiragana:"くも", kanji:"雲", en:"Cloud", icon:"fa-solid fa-cloud"},
+            {hiragana:"あめ", kanji:"雨", en:"Rain", icon:"fa-solid fa-cloud-rain"},
+            {hiragana:"ゆき", kanji:"雪", en:"Snow", icon:"fa-regular fa-snowflake"},
+            {hiragana:"き", kanji:"木", en:"Tree", icon:"fa-solid fa-tree"},
+            {hiragana:"はな", kanji:"花", en:"Flower", icon:"fa-solid fa-plant-wilt"}, // Plant icon
+            {hiragana:"はっぱ", kanji:"葉っぱ", en:"Leaf", icon:"fa-solid fa-leaf"},
+            {hiragana:"むし", kanji:"虫", en:"Bug", icon:"fa-solid fa-bug"},
+            {hiragana:"とり", kanji:"鳥", en:"Bird", icon:"fa-solid fa-crow"},
+            {hiragana:"さかな", kanji:"魚", en:"Fish", icon:"fa-solid fa-fish"},
+            {hiragana:"かぜ", kanji:"風", en:"Wind", icon:"fa-solid fa-wind"},
+            {hiragana:"ひ", kanji:"火", en:"Fire", icon:"fa-solid fa-fire"},
+            {hiragana:"いし", kanji:"石", en:"Stone", icon:"fa-solid fa-gem"},
+            {hiragana:"にじ", kanji:"虹", en:"Rainbow", icon:"fa-solid fa-rainbow"}
+        ]},
+
+        // --- Lv.6 からだ (Body) ---
+        6: { title: "からだ", words: [
+            {hiragana:"あたま", kanji:"頭", en:"Head", icon:"fa-solid fa-user"},
+            {hiragana:"め", kanji:"目", en:"Eye", icon:"fa-regular fa-eye"},
+            {hiragana:"みみ", kanji:"耳", en:"Ear", icon:"fa-solid fa-ear-listen"},
+            {hiragana:"くち", kanji:"口", en:"Mouth", icon:"fa-regular fa-face-smile"},
+            {hiragana:"はな", kanji:"鼻", en:"Nose", icon:"fa-regular fa-face-flushed"},
+            {hiragana:"て", kanji:"手", en:"Hand", icon:"fa-regular fa-hand"},
+            {hiragana:"あし", kanji:"足", en:"Foot/Leg", icon:"fa-solid fa-shoe-prints"},
+            {hiragana:"ゆび", kanji:"指", en:"Finger", icon:"fa-solid fa-hand-point-up"},
+            {hiragana:"おなか", kanji:"お腹", en:"Stomach", icon:"fa-solid fa-person-pregnant"}, // Approximate
+            {hiragana:"せなか", kanji:"背中", en:"Back", icon:"fa-solid fa-person-walking"},
+            {hiragana:"は", kanji:"歯", en:"Tooth", icon:"fa-solid fa-tooth"},
+            {hiragana:"かみのけ", kanji:"髪の毛", en:"Hair", icon:"fa-solid fa-user-hair-long"}, // Approximate
+            {hiragana:"かお", kanji:"顔", en:"Face", icon:"fa-solid fa-face-smile"},
+            {hiragana:"うで", kanji:"腕", en:"Arm", icon:"fa-solid fa-dumbbell"},
+            {hiragana:"くび", kanji:"首", en:"Neck", icon:"fa-solid fa-user-tie"},
+            {hiragana:"ひざ", kanji:"膝", en:"Knee", icon:"fa-solid fa-person-kneeling"},
+            {hiragana:"しんぞう", kanji:"心臓", en:"Heart", icon:"fa-solid fa-heart-pulse"},
+            {hiragana:"ち", kanji:"血", en:"Blood", icon:"fa-solid fa-droplet"},
+            {hiragana:"ほね", kanji:"骨", en:"Bone", icon:"fa-solid fa-bone"},
+            {hiragana:"こえ", kanji:"声", en:"Voice", icon:"fa-solid fa-microphone"}
+        ]},
+
+        // --- Lv.7 いろ・かず (Colors & Numbers) ---
+        7: { title: "いろ・かず", words: [
+            {hiragana:"あか", kanji:"赤", en:"Red", icon:"fa-solid fa-circle", color:"#f44336"},
+            {hiragana:"あお", kanji:"青", en:"Blue", icon:"fa-solid fa-circle", color:"#2196f3"},
+            {hiragana:"きいろ", kanji:"黄色", en:"Yellow", icon:"fa-solid fa-circle", color:"#ffeb3b"},
+            {hiragana:"みどり", kanji:"緑", en:"Green", icon:"fa-solid fa-circle", color:"#4caf50"},
+            {hiragana:"くろ", kanji:"黒", en:"Black", icon:"fa-solid fa-circle", color:"#000000"},
+            {hiragana:"しろ", kanji:"白", en:"White", icon:"fa-regular fa-circle", color:"#ffffff"},
+            {hiragana:"いち", kanji:"一", en:"One", icon:"fa-solid fa-1"},
+            {hiragana:"に", kanji:"二", en:"Two", icon:"fa-solid fa-2"},
+            {hiragana:"さん", kanji:"三", en:"Three", icon:"fa-solid fa-3"},
+            {hiragana:"よん", kanji:"四", en:"Four", icon:"fa-solid fa-4"},
+            {hiragana:"ご", kanji:"五", en:"Five", icon:"fa-solid fa-5"},
+            {hiragana:"ろく", kanji:"六", en:"Six", icon:"fa-solid fa-6"},
+            {hiragana:"なな", kanji:"七", en:"Seven", icon:"fa-solid fa-7"},
+            {hiragana:"はち", kanji:"八", en:"Eight", icon:"fa-solid fa-8"},
+            {hiragana:"きゅう", kanji:"九", en:"Nine", icon:"fa-solid fa-9"},
+            {hiragana:"じゅう", kanji:"十", en:"Ten", icon:"fa-solid fa-1+0"}, // Approximate
+            {hiragana:"ひゃく", kanji:"百", en:"Hundred", icon:"fa-solid fa-c"}, // C is 100 roman
+            {hiragana:"まる", kanji:"丸", en:"Circle", icon:"fa-regular fa-circle"},
+            {hiragana:"しかく", kanji:"四角", en:"Square", icon:"fa-regular fa-square"},
+            {hiragana:"さんかく", kanji:"三角", en:"Triangle", icon:"fa-solid fa-play", color:"#333"} // Play looks like triangle
+        ]},
+
+        // --- Lv.8 でんとう (Tradition) ---
+        8: { title: "でんとう", words: [
+            {hiragana:"きもの", kanji:"着物", en:"Kimono", icon:"fa-solid fa-user-tie"},
+            {hiragana:"げた", kanji:"下駄", en:"Geta", icon:"fa-solid fa-shoe-prints"},
+            {hiragana:"はし", kanji:"箸", en:"Chopsticks", icon:"fa-solid fa-utensils"},
+            {hiragana:"たたみ", kanji:"畳", en:"Tatami", icon:"fa-solid fa-border-all"},
+            {hiragana:"じんじゃ", kanji:"神社", en:"Shrine", icon:"fa-solid fa-torii-gate"},
+            {hiragana:"おてら", kanji:"お寺", en:"Temple", icon:"fa-solid fa-gopuram"}, // Approximate
+            {hiragana:"にんじゃ", kanji:"忍者", en:"Ninja", icon:"fa-solid fa-user-ninja"},
+            {hiragana:"さむらい", kanji:"侍", en:"Samurai", icon:"fa-solid fa-khanda"},
+            {hiragana:"すもう", kanji:"相撲", en:"Sumo", icon:"fa-solid fa-users"},
+            {hiragana:"おまつり", kanji:"お祭り", en:"Festival", icon:"fa-solid fa-drum"},
+            {hiragana:"はなび", kanji:"花火", en:"Fireworks", icon:"fa-solid fa-explosion"},
+            {hiragana:"さくら", kanji:"桜", en:"Cherry Blossom", icon:"fa-solid fa-fan"},
+            {hiragana:"おんせん", kanji:"温泉", en:"Hot Spring", icon:"fa-solid fa-hot-tub-person"},
+            {hiragana:"せんす", kanji:"扇子", en:"Fan", icon:"fa-solid fa-fan"},
+            {hiragana:"おめん", kanji:"お面", en:"Mask", icon:"fa-solid fa-mask"},
+            {hiragana:"かんじ", kanji:"漢字", en:"Kanji", icon:"fa-solid fa-font"},
+            {hiragana:"さどう", kanji:"茶道", en:"Tea Ceremony", icon:"fa-solid fa-mug-hot"},
+            {hiragana:"おりがみ", kanji:"折り紙", en:"Origami", icon:"fa-solid fa-note-sticky"},
+            {hiragana:"ふじさん", kanji:"富士山", en:"Mt. Fuji", icon:"fa-solid fa-mountain-sun"},
+            {hiragana:"おまもり", kanji:"お守り", en:"Charm", icon:"fa-solid fa-bag-shopping"}
+        ]},
+
+        // --- Lv.9 あそび (Play) ---
+        9: { title: "あそび", words: [
+            {hiragana:"ゲーム", kanji:"ゲーム", en:"Game", icon:"fa-solid fa-gamepad"},
+            {hiragana:"ボール", kanji:"ボール", en:"Ball", icon:"fa-solid fa-baseball"},
+            {hiragana:"にんぎょう", kanji:"人形", en:"Doll", icon:"fa-solid fa-robot"},
+            {hiragana:"ふうせん", kanji:"風船", en:"Balloon", icon:"fa-solid fa-soap"}, // Approximate
+            {hiragana:"すべりだい", kanji:"滑り台", en:"Slide", icon:"fa-solid fa-stairs"},
+            {hiragana:"ブランコ", kanji:"ブランコ", en:"Swing", icon:"fa-solid fa-anchor"}, // Approximate
+            {hiragana:"こうえん", kanji:"公園", en:"Park", icon:"fa-solid fa-tree"},
+            {hiragana:"はしる", kanji:"走る", en:"Run", icon:"fa-solid fa-person-running"},
+            {hiragana:"ジャンプ", kanji:"ジャンプ", en:"Jump", icon:"fa-solid fa-arrow-up"},
+            {hiragana:"うたう", kanji:"歌う", en:"Sing", icon:"fa-solid fa-microphone"},
+            {hiragana:"おどる", kanji:"踊る", en:"Dance", icon:"fa-solid fa-music"},
+            {hiragana:"おえかき", kanji:"お絵かき", en:"Drawing", icon:"fa-solid fa-palette"},
+            {hiragana:"えほん", kanji:"絵本", en:"Picture Book", icon:"fa-solid fa-book-open"},
+            {hiragana:"プール", kanji:"プール", en:"Pool", icon:"fa-solid fa-water-ladder"},
+            {hiragana:"サッカー", kanji:"サッカー", en:"Soccer", icon:"fa-solid fa-futbol"},
+            {hiragana:"やきゅう", kanji:"野球", en:"Baseball", icon:"fa-solid fa-baseball-bat-ball"},
+            {hiragana:"ピアノ", kanji:"ピアノ", en:"Piano", icon:"fa-solid fa-music"},
+            {hiragana:"ギター", kanji:"ギター", en:"Guitar", icon:"fa-solid fa-guitar"},
+            {hiragana:"カメラ", kanji:"カメラ", en:"Camera", icon:"fa-solid fa-camera"},
+            {hiragana:"りょこう", kanji:"旅行", en:"Travel", icon:"fa-solid fa-plane"}
+        ]},
+
+        // --- Lv.10 ばしょ (Places) ---
+        10: { title: "ばしょ", words: [
+            {hiragana:"えき", kanji:"駅", en:"Station", icon:"fa-solid fa-train"},
+            {hiragana:"でんしゃ", kanji:"電車", en:"Train", icon:"fa-solid fa-train-subway"},
+            {hiragana:"バス", kanji:"バス", en:"Bus", icon:"fa-solid fa-bus"},
+            {hiragana:"くるま", kanji:"車", en:"Car", icon:"fa-solid fa-car"},
+            {hiragana:"ひこうき", kanji:"飛行機", en:"Airplane", icon:"fa-solid fa-plane-up"},
+            {hiragana:"くうこう", kanji:"空港", en:"Airport", icon:"fa-solid fa-plane-arrival"},
+            {hiragana:"びょういん", kanji:"病院", en:"Hospital", icon:"fa-solid fa-hospital"},
+            {hiragana:"こうばん", kanji:"交番", en:"Police Box", icon:"fa-solid fa-building-shield"},
+            {hiragana:"ゆうびんきょく", kanji:"郵便局", en:"Post Office", icon:"fa-solid fa-envelope"},
+            {hiragana:"コンビニ", kanji:"コンビニ", en:"Conv. Store", icon:"fa-solid fa-store"},
+            {hiragana:"スーパー", kanji:"スーパー", en:"Supermarket", icon:"fa-solid fa-cart-shopping"},
+            {hiragana:"レストラン", kanji:"レストラン", en:"Restaurant", icon:"fa-solid fa-utensils"},
+            {hiragana:"ホテル", kanji:"ホテル", en:"Hotel", icon:"fa-solid fa-hotel"},
+            {hiragana:"としょかん", kanji:"図書館", en:"Library", icon:"fa-solid fa-book"},
+            {hiragana:"ぎんこう", kanji:"銀行", en:"Bank", icon:"fa-solid fa-building-columns"},
+            {hiragana:"はし", kanji:"橋", en:"Bridge", icon:"fa-solid fa-archway"},
+            {hiragana:"みち", kanji:"道", en:"Street", icon:"fa-solid fa-road"},
+            {hiragana:"まち", kanji:"町", en:"Town", icon:"fa-solid fa-city"},
+            {hiragana:"うみ", kanji:"海", en:"Sea", icon:"fa-solid fa-water"},
+            {hiragana:"にほん", kanji:"日本", en:"Japan", icon:"fa-solid fa-map"}
         ]}
     };
     
