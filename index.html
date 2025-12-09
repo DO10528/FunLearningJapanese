@@ -219,11 +219,22 @@
 </div>
 
 <div class="section-header">
-    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span id="game-section-title" data-i18n="group_game">ゲームで遊ぶ</span></h3>
+    <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> <span id="game-section-title" data-i18n="group_learning">学習メニュー</span></h3>
     <button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i> もどる</button>
 </div>
 
 <div id="game-grid" class="grid-container fade-in"></div>
+
+<div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
+    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
+</div>
+<div class="grid-container">
+    <a href="culture_map.html" class="game-card" style="border-color:#b71c1c;">
+        <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
+        <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
+    </a>
+</div>
+
 
 <div id="fab-ranking" class="ranking-fab" onclick="window.toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
 
@@ -533,7 +544,12 @@
     const i18nData = {
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト", 
-            group_kiso: "基礎・単語", group_game: "ゲームで遊ぶ",
+            group_kiso: "基礎・単語", 
+            // 変更: 学習メニュー
+            group_learning: "学習メニュー", 
+            // 追加: ゲーム
+            group_fun_games: "ゲーム",
+            
             btn_kiso: "ひらがな<br>カタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
             cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
             cat_clock: "とけい", 
@@ -558,7 +574,6 @@
 
             btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
             btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            // ★追加: 形容詞の否定形ゲーム
             btn_kei_neg: "ひていけい (～くない)",
 
             btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
@@ -571,6 +586,9 @@
             
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
             btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
+            
+            // 追加: 戦国日本語伝
+            btn_sengoku: "戦国・日本語伝",
 
             // 認証モーダル
             modal_login: "ログイン", modal_signup: "新規登録",
@@ -586,7 +604,12 @@
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
-            group_kiso: "Basics", group_game: "Play Games",
+            group_kiso: "Basics", 
+            // Changed: Learning Menu
+            group_learning: "Learning Menu", 
+            // Added: Games
+            group_fun_games: "Games",
+
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
             cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
             cat_clock: "Clock", 
@@ -611,7 +634,6 @@
 
             btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
             btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
-            // ★追加: 形容詞の否定形ゲーム
             btn_kei_neg: "Negative Form",
             
             btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
@@ -624,6 +646,9 @@
             
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
             btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
+            
+            // Added: Sengoku
+            btn_sengoku: "Sengoku RPG",
 
             // Auth Modal
             modal_login: "Login", modal_signup: "Sign Up",
@@ -679,7 +704,6 @@
         { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
             { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
             { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
-            // ★ 追加: 3つ目に否定形ゲーム (練習ページへのリンク)
             { url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
         ]},
         { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
@@ -711,7 +735,8 @@
     window.renderGameCategories = () => {
         gameGrid.innerHTML = '';
         backBtn.style.display = 'none';
-        document.getElementById('game-section-title').textContent = i18nData[currentLang].group_game;
+        // group_learning を使用
+        document.getElementById('game-section-title').textContent = i18nData[currentLang].group_learning;
 
         gameStructure.forEach(cat => {
             const div = document.createElement('div');

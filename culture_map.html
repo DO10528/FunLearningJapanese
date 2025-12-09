@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>戦国・日本語伝</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-paper: #f3e5ab;
+        --urushi-red: #b71c1c;
+        --indigo: #1a237e;
+        --gold: #ffd700;
+        --ink: #212121;
+    }
+
+    body {
+        font-family: 'Yuji Syuku', serif;
+        background-color: var(--bg-paper);
+        background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+        margin: 0; padding: 0;
+        height: 100vh; overflow: hidden;
+        color: var(--ink);
+        display: flex; flex-direction: column;
+    }
+
+    header {
+        background: var(--ink); color: #fff;
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 4px solid var(--gold);
+        z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .game-title { font-size: 1.5em; display: flex; align-items: center; gap: 10px; }
+    
+    /* 言語切り替えスイッチ */
+    .lang-switch {
+        background: #3e2723; border: 1px solid var(--gold);
+        color: var(--gold); padding: 5px; border-radius: 5px;
+        font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer;
+    }
+
+    .header-right { display: flex; gap: 15px; align-items: center; }
+    .status-item { color: var(--gold); font-size: 0.9em; }
+
+    /* --- マップ共通 --- */
+    .map-wrapper {
+        flex-grow: 1;
+        overflow-x: auto; overflow-y: hidden;
+        white-space: nowrap;
+        position: relative;
+        display: flex; align-items: center;
+        padding: 0 100px;
+        background: radial-gradient(circle at center, #fff8e1 0%, #d7ccc8 100%);
+        cursor: grab;
+    }
+    .map-wrapper:active { cursor: grabbing; }
+
+    .path {
+        position: absolute; top: 60%; left: 0;
+        height: 8px; background: #5d4037;
+        z-index: 0; border-top: 2px dashed #8d6e63;
+    }
+
+    /* --- ノード --- */
+    .node-container {
+        display: inline-flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        width: 180px; height: 300px;
+        margin-right: 80px;
+        position: relative;
+        z-index: 2; vertical-align: bottom;
+        transition: transform 0.2s;
+        cursor: not-allowed; opacity: 0.6; filter: grayscale(80%);
+    }
+
+    .node-container.unlocked {
+        cursor: pointer; opacity: 1; filter: grayscale(0%);
+    }
+    .node-container.unlocked:hover { transform: scale(1.05); }
+
+    .node-icon-area {
+        position: relative; display: flex; justify-content: center; align-items: flex-end;
+        height: 180px; width: 100%;
+    }
+    .node-img {
+        color: #5d4037; filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.2));
+        transition: color 0.3s;
+    }
+    
+    .size-s { font-size: 4em; } 
+    .size-m { font-size: 6em; } 
+    .size-l { font-size: 8em; } 
+    .size-xl { font-size: 10em; color: var(--urushi-red); filter: drop-shadow(0 0 10px var(--gold)); }
+
+    .node-label {
+        background: var(--ink); color: #fff;
+        padding: 5px 10px; border-radius: 5px;
+        margin-top: 10px; text-align: center;
+        border: 2px solid var(--gold);
+        font-size: 1em; white-space: normal; width: 140px;
+    }
+    .node-sub { font-size: 0.7em; color: #bdbdbd; display: block; }
+
+    .flag {
+        position: absolute; top: 0; right: 20px;
+        font-size: 2em; color: var(--gold);
+        display: none; text-shadow: 2px 2px 0 #000;
+        animation: wave 2s infinite ease-in-out;
+    }
+    .node-container.cleared .flag { display: block; }
+    .node-container.cleared .node-img { color: var(--urushi-red); }
+
+    @keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
+
+    /* --- アバター --- */
+    #hero-avatar {
+        position: absolute; top: 40%; left: 100px;
+        width: 80px; height: 80px;
+        z-index: 10; pointer-events: none;
+        transition: left 0.8s ease-in-out;
+    }
+    .avatar-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+    .layer-body { font-size: 4em; color: #333; }
+    .layer-armor { font-size: 2.5em; color: #555; margin-top: 15px; }
+    .layer-helm { font-size: 2em; color: #555; margin-top: -30px; }
+    .layer-weapon { font-size: 2.5em; color: #aaa; margin-left: 40px; margin-top: 10px; transform: rotate(15deg); }
+
+    .walking { animation: hop 0.3s infinite alternate; }
+    @keyframes hop { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+    /* --- 蔵 --- */
+    .kura-btn {
+        position: fixed; bottom: 30px; right: 30px;
+        width: 80px; height: 80px;
+        background: var(--urushi-red); color: white;
+        border-radius: 50%; border: 4px solid var(--gold);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        font-size: 2em; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 90;
+    }
+    .kura-label { font-size: 0.4em; font-weight: bold; margin-top: -5px; }
+
+    /* --- モーダル --- */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); z-index: 200;
+        display: none; justify-content: center; align-items: center;
+    }
+    .kura-box {
+        width: 90%; max-width: 600px; height: 80%;
+        background: #fff8e1; border: 8px solid #5d4037;
+        border-radius: 10px; padding: 20px;
+        display: flex; flex-direction: column;
+        position: relative;
+    }
+    .item-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 15px; overflow-y: auto; flex-grow: 1; padding: 10px;
+    }
+    .item-slot {
+        background: #d7ccc8; border: 3px solid #a1887f;
+        aspect-ratio: 1; border-radius: 8px;
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer; position: relative;
+    }
+    .item-slot.equipped { border-color: var(--urushi-red); background: #ffccbc; }
+    .item-slot.equipped::after { content: "装備中"; position: absolute; bottom: 0; font-size: 0.6em; background: var(--urushi-red); color: white; width: 100%; text-align: center; }
+    .item-icon { font-size: 3em; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="game-title"><i class="fa-solid fa-khanda"></i> 天下統一</div>
+    
+    <div class="header-right">
+        <select id="lang-select" class="lang-switch" onchange="changeLang(this.value)">
+            <option value="hiragana">ひらがな</option>
+            <option value="kanji">漢字</option>
+            <option value="en">English</option>
+        </select>
+
+        <div class="status-item"><i class="fa-solid fa-coins"></i> <span id="money-display">0</span> 両</div>
+        <button onclick="goBack()" style="background:none; border:1px solid #fff; color:#fff; padding:5px 10px; cursor:pointer;">戻る</button>
+    </div>
+</header>
+
+<div class="map-wrapper" id="map-scroll">
+    <div class="path" id="path-line"></div>
+    
+    <div id="hero-avatar">
+        <div class="avatar-layer layer-body"><i class="fa-solid fa-user"></i></div>
+        <div class="avatar-layer layer-armor" id="vis-armor"></div>
+        <div class="avatar-layer layer-helm" id="vis-helm"></div>
+        <div class="avatar-layer layer-weapon" id="vis-weapon"></div>
+    </div>
+
+    <div id="nodes-container" style="display:flex; align-items:flex-end; height:100%; padding-bottom: 50px;"></div>
+</div>
+
+<div class="kura-btn" onclick="openKura()">
+    <i class="fa-solid fa-warehouse"></i>
+    <span class="kura-label">蔵</span>
+</div>
+
+<div class="modal-overlay" id="kura-modal">
+    <div class="kura-box">
+        <h2 style="text-align:center; margin:0 0 20px 0; color:#5d4037;">所持品一覧</h2>
+        <div class="item-grid" id="inventory-grid"></div>
+        <button onclick="closeKura()" style="margin-top:10px; padding:15px; background:var(--ink); color:white; border:none; font-size:1.2em; cursor:pointer;">閉じる</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    let currentUser = null;
+
+    // --- データ定義 ---
+    const WARLORDS = [
+        { id: 1, name: "織田 信長", title: "たべもの", castle: "岐阜城" },
+        { id: 2, name: "豊臣 秀吉", title: "あいさつ", castle: "大阪城" },
+        { id: 3, name: "上杉 謙信", title: "がっこう", castle: "春日山城" },
+        { id: 4, name: "武田 信玄", title: "おうち", castle: "躑躅ヶ崎館" },
+        { id: 5, name: "伊達 政宗", title: "しぜん", castle: "仙台城" },
+        { id: 6, name: "真田 幸村", title: "からだ", castle: "上田城" },
+        { id: 7, name: "毛利 元就", title: "いろ・かず", castle: "吉田郡山城" },
+        { id: 8, name: "明智 光秀", title: "でんとう", castle: "坂本城" },
+        { id: 9, name: "源 義経", title: "あそび", castle: "平泉" },
+        { id: 10, name: "徳川 家康", title: "ばしょ", castle: "江戸城" }
+    ];
+
+    window.ITEM_DB = {
+        'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common' },
+        'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color:'#d32f2f' },
+        'helm_3': { type: 'helm', name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', rarity: 'legend', color:'#ffd700' },
+        'armor_1': { type: 'armor', name: 'ボロの着物', icon: 'fa-solid fa-shirt', rarity: 'common' },
+        'armor_2': { type: 'armor', name: '侍の鎧', icon: 'fa-solid fa-shield-halved', rarity: 'rare', color:'#1a237e' },
+        'weapon_1': { type: 'weapon', name: '竹刀', icon: 'fa-solid fa-candy-cane', rarity: 'common' },
+        'weapon_2': { type: 'weapon', name: '名刀・虎徹', icon: 'fa-solid fa-khanda', rarity: 'rare', color:'#cfd8dc' },
+        'weapon_3': { type: 'weapon', name: '妖刀・村正', icon: 'fa-solid fa-fire', rarity: 'legend', color:'#b71c1c' }
+    };
+
+    let userState = { level: 1, subLevel: 1, inventory: ['helm_1', 'armor_1', 'weapon_1'], equipped: { helm: 'helm_1', armor: 'armor_1', weapon: 'weapon_1' }, money: 100 };
+
+    const nodesContainer = document.getElementById('nodes-container');
+    const heroAvatar = document.getElementById('hero-avatar');
+    const pathLine = document.getElementById('path-line');
+    
+    let currentView = 'world';
+    let selectedRegionId = null;
+
+    // 言語設定の初期化
+    const savedLang = localStorage.getItem('culture_lang') || 'hiragana';
+    document.getElementById('lang-select').value = savedLang;
+
+    // 言語変更
+    window.changeLang = (lang) => {
+        localStorage.setItem('culture_lang', lang);
+        // マップ再描画（ラベルなどに適用する場合）
+        // 現状のマップは日本語固定ですが、レッスン画面に影響します
+        alert("ことばの設定を変更しました。");
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        if (user) {
+            const snap = await getDoc(doc(db, "users", user.uid, "progress", "sengoku_rpg_v2"));
+            if (snap.exists()) userState = snap.data();
+        } else {
+            const saved = sessionStorage.getItem('sengoku_save_v2');
+            if (saved) userState = JSON.parse(saved);
+        }
+        renderWorldMap();
+        updateAvatar();
+        document.getElementById('money-display').innerText = userState.money || 0;
+    });
+
+    function renderWorldMap() {
+        currentView = 'world';
+        nodesContainer.innerHTML = '';
+        pathLine.style.width = `${WARLORDS.length * 260}px`;
+
+        WARLORDS.forEach((lord, index) => {
+            const node = createNode(
+                lord.id, 
+                lord.name, 
+                lord.title,
+                'fa-solid fa-chess-rook',
+                'size-l',
+                (lord.id <= userState.level),
+                (lord.id < userState.level)
+            );
+            
+            if (node.classList.contains('unlocked')) {
+                node.onclick = () => {
+                    moveAvatarTo(index);
+                    setTimeout(() => renderRegionMap(lord), 800);
+                };
+            }
+            nodesContainer.appendChild(node);
+        });
+        setTimeout(() => moveAvatarTo(userState.level - 1, false), 100);
+    }
+
+    function renderRegionMap(lord) {
+        currentView = 'region';
+        selectedRegionId = lord.id;
+        nodesContainer.innerHTML = '';
+        
+        const STAGE_COUNT = 10;
+        pathLine.style.width = `${STAGE_COUNT * 260}px`;
+        heroAvatar.style.left = '100px'; 
+        document.getElementById('map-scroll').scrollLeft = 0;
+
+        for (let i = 1; i <= STAGE_COUNT; i++) {
+            let sizeClass = 'size-s';
+            let iconClass = 'fa-solid fa-campground'; 
+            if (i >= 4) { sizeClass = 'size-m'; iconClass = 'fa-solid fa-chess-rook'; }
+            if (i >= 8) { sizeClass = 'size-l'; iconClass = 'fa-brands fa-fort-awesome'; }
+            if (i === 10) { sizeClass = 'size-xl'; }
+
+            let isUnlocked = false;
+            let isCleared = false;
+            
+            if (lord.id < userState.level) {
+                isUnlocked = true; isCleared = true;
+            } else if (lord.id === userState.level) {
+                if (i <= userState.subLevel) isUnlocked = true;
+                if (i < userState.subLevel) isCleared = true;
+            }
+
+            const node = createNode(
+                i,
+                `第${i}の城`,
+                i === 10 ? '本丸決戦' : '攻略せよ',
+                iconClass,
+                sizeClass,
+                isUnlocked,
+                isCleared
+            );
+
+            if (isUnlocked) {
+                node.onclick = () => {
+                    moveAvatarTo(i - 1);
+                    setTimeout(() => {
+                        window.location.href = `culture_lesson.html?level=${lord.id}&sub=${i}`;
+                    }, 800);
+                };
+            }
+            nodesContainer.appendChild(node);
+        }
+
+        let targetSub = 0;
+        if(lord.id === userState.level) targetSub = userState.subLevel - 1;
+        if(targetSub >= STAGE_COUNT) targetSub = STAGE_COUNT - 1;
+        setTimeout(() => moveAvatarTo(targetSub, false), 100);
+    }
+
+    function createNode(id, mainText, subText, iconClass, sizeClass, isUnlocked, isCleared) {
+        const div = document.createElement('div');
+        div.className = `node-container ${isUnlocked ? 'unlocked' : ''} ${isCleared ? 'cleared' : ''}`;
+        div.innerHTML = `
+            <div class="node-icon-area">
+                <i class="${iconClass} node-img ${sizeClass}"></i>
+                <div class="flag"><i class="fa-solid fa-flag"></i></div>
+            </div>
+            <div class="node-label">
+                ${mainText}
+                <span class="node-sub">${subText}</span>
+            </div>
+        `;
+        return div;
+    }
+
+    function moveAvatarTo(index, animate = true) {
+        const xPos = index * 260 + 100;
+        if (animate) heroAvatar.classList.add('walking');
+        heroAvatar.style.left = `${xPos}px`;
+        const mapScroll = document.getElementById('map-scroll');
+        mapScroll.scrollTo({ left: xPos - window.innerWidth/2 + 100, behavior: 'smooth' });
+        if (animate) setTimeout(() => heroAvatar.classList.remove('walking'), 800);
+    }
+
+    window.goBack = () => {
+        if (currentView === 'region') renderWorldMap();
+        else window.location.href = 'index.html';
+    };
+
+    function updateAvatar() {
+        const eq = userState.equipped || {};
+        const helm = window.ITEM_DB[eq.helm];
+        const armor = window.ITEM_DB[eq.armor];
+        const weapon = window.ITEM_DB[eq.weapon];
+
+        document.getElementById('vis-helm').innerHTML = helm ? `<i class="${helm.icon}" style="${helm.color ? 'color:'+helm.color : ''}"></i>` : '';
+        document.getElementById('vis-armor').innerHTML = armor ? `<i class="${armor.icon}" style="${armor.color ? 'color:'+armor.color : ''}"></i>` : '';
+        document.getElementById('vis-weapon').innerHTML = weapon ? `<i class="${weapon.icon}" style="${weapon.color ? 'color:'+weapon.color : ''}"></i>` : '';
+    }
+
+    window.openKura = () => {
+        const grid = document.getElementById('inventory-grid');
+        grid.innerHTML = '';
+        (userState.inventory || []).forEach(itemId => {
+            const item = window.ITEM_DB[itemId];
+            if (!item) return;
+            const div = document.createElement('div');
+            const isEquipped = Object.values(userState.equipped).includes(itemId);
+            div.className = `item-slot ${isEquipped ? 'equipped' : ''}`;
+            div.innerHTML = `<i class="${item.icon} item-icon" style="color:${item.color || '#333'}"></i>`;
+            div.onclick = () => equipItem(itemId, item.type);
+            grid.appendChild(div);
+        });
+        document.getElementById('kura-modal').style.display = 'flex';
+    };
+    window.closeKura = () => document.getElementById('kura-modal').style.display = 'none';
+
+    async function equipItem(itemId, type) {
+        userState.equipped[type] = itemId;
+        updateAvatar();
+        if(currentUser) await setDoc(doc(db, "users", currentUser.uid, "progress", "sengoku_rpg_v2"), userState);
+        else sessionStorage.setItem('sengoku_save_v2', JSON.stringify(userState));
+        window.openKura();
+    }
+</script>
+
+</body>
+</html>
