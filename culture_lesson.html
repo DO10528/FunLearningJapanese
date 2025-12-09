@@ -43,7 +43,6 @@
     .card-word { font-size: 3em; font-family: 'Yuji Syuku', serif; margin: 0; }
     
     /* クイズ */
-    /* いざ、勝負！をど真ん中に配置 */
     .quiz-title-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; justify-content: center; align-items: center;
@@ -169,9 +168,8 @@
         }
     });
 
-    // 漢字データを含む辞書
+    // --- 200単語データ ---
     const CATEGORIES = {
-        // --- Lv.1 たべもの (Food) ---
         1: { title: "たべもの", words: [
             {hiragana:"おすし", kanji:"お寿司", en:"Sushi", icon:"fa-solid fa-fish"}, 
             {hiragana:"ラーメン", kanji:"ラーメン", en:"Ramen", icon:"fa-solid fa-bowl-food"},
@@ -194,8 +192,6 @@
             {hiragana:"おべんとう", kanji:"お弁当", en:"Bento", icon:"fa-solid fa-box-open"},
             {hiragana:"すきやき", kanji:"すき焼き", en:"Sukiyaki", icon:"fa-solid fa-fire-burner"}
         ]},
-
-        // --- Lv.2 あいさつ (Greeting) ---
         2: { title: "あいさつ", words: [
             {hiragana:"おはよう", kanji:"おはよう", en:"Good Morning", icon:"fa-solid fa-sun"},
             {hiragana:"こんにちは", kanji:"こんにちは", en:"Hello", icon:"fa-regular fa-hand-spock"},
@@ -218,8 +214,6 @@
             {hiragana:"おねがい", kanji:"お願い", en:"Please", icon:"fa-solid fa-hands-praying"},
             {hiragana:"かんぱい", kanji:"乾杯", en:"Cheers", icon:"fa-solid fa-beer-mug-empty"}
         ]},
-
-        // --- Lv.3 がっこう (School) ---
         3: { title: "がっこう", words: [
             {hiragana:"せんせい", kanji:"先生", en:"Teacher", icon:"fa-solid fa-chalkboard-user"},
             {hiragana:"がくせい", kanji:"学生", en:"Student", icon:"fa-solid fa-child"},
@@ -242,8 +236,6 @@
             {hiragana:"とけい", kanji:"時計", en:"Clock", icon:"fa-solid fa-clock"},
             {hiragana:"チャイム", kanji:"チャイム", en:"Bell", icon:"fa-solid fa-bell"}
         ]},
-
-        // --- Lv.4 おうち (Home) ---
         4: { title: "おうち", words: [
             {hiragana:"いえ", kanji:"家", en:"House", icon:"fa-solid fa-house"},
             {hiragana:"へや", kanji:"部屋", en:"Room", icon:"fa-solid fa-door-open"},
@@ -266,8 +258,6 @@
             {hiragana:"ねこ", kanji:"猫", en:"Cat", icon:"fa-solid fa-cat"},
             {hiragana:"いぬ", kanji:"犬", en:"Dog", icon:"fa-solid fa-dog"}
         ]},
-
-        // --- Lv.5 しぜん (Nature) ---
         5: { title: "しぜん", words: [
             {hiragana:"やま", kanji:"山", en:"Mountain", icon:"fa-solid fa-mountain"},
             {hiragana:"かわ", kanji:"川", en:"River", icon:"fa-solid fa-water"},
@@ -280,7 +270,7 @@
             {hiragana:"あめ", kanji:"雨", en:"Rain", icon:"fa-solid fa-cloud-rain"},
             {hiragana:"ゆき", kanji:"雪", en:"Snow", icon:"fa-regular fa-snowflake"},
             {hiragana:"き", kanji:"木", en:"Tree", icon:"fa-solid fa-tree"},
-            {hiragana:"はな", kanji:"花", en:"Flower", icon:"fa-solid fa-plant-wilt"}, // Plant icon
+            {hiragana:"はな", kanji:"花", en:"Flower", icon:"fa-solid fa-plant-wilt"},
             {hiragana:"はっぱ", kanji:"葉っぱ", en:"Leaf", icon:"fa-solid fa-leaf"},
             {hiragana:"むし", kanji:"虫", en:"Bug", icon:"fa-solid fa-bug"},
             {hiragana:"とり", kanji:"鳥", en:"Bird", icon:"fa-solid fa-crow"},
@@ -290,8 +280,6 @@
             {hiragana:"いし", kanji:"石", en:"Stone", icon:"fa-solid fa-gem"},
             {hiragana:"にじ", kanji:"虹", en:"Rainbow", icon:"fa-solid fa-rainbow"}
         ]},
-
-        // --- Lv.6 からだ (Body) ---
         6: { title: "からだ", words: [
             {hiragana:"あたま", kanji:"頭", en:"Head", icon:"fa-solid fa-user"},
             {hiragana:"め", kanji:"目", en:"Eye", icon:"fa-regular fa-eye"},
@@ -301,10 +289,10 @@
             {hiragana:"て", kanji:"手", en:"Hand", icon:"fa-regular fa-hand"},
             {hiragana:"あし", kanji:"足", en:"Foot/Leg", icon:"fa-solid fa-shoe-prints"},
             {hiragana:"ゆび", kanji:"指", en:"Finger", icon:"fa-solid fa-hand-point-up"},
-            {hiragana:"おなか", kanji:"お腹", en:"Stomach", icon:"fa-solid fa-person-pregnant"}, // Approximate
+            {hiragana:"おなか", kanji:"お腹", en:"Stomach", icon:"fa-solid fa-person-pregnant"},
             {hiragana:"せなか", kanji:"背中", en:"Back", icon:"fa-solid fa-person-walking"},
             {hiragana:"は", kanji:"歯", en:"Tooth", icon:"fa-solid fa-tooth"},
-            {hiragana:"かみのけ", kanji:"髪の毛", en:"Hair", icon:"fa-solid fa-user-hair-long"}, // Approximate
+            {hiragana:"かみのけ", kanji:"髪の毛", en:"Hair", icon:"fa-solid fa-user-hair-long"},
             {hiragana:"かお", kanji:"顔", en:"Face", icon:"fa-solid fa-face-smile"},
             {hiragana:"うで", kanji:"腕", en:"Arm", icon:"fa-solid fa-dumbbell"},
             {hiragana:"くび", kanji:"首", en:"Neck", icon:"fa-solid fa-user-tie"},
@@ -314,8 +302,6 @@
             {hiragana:"ほね", kanji:"骨", en:"Bone", icon:"fa-solid fa-bone"},
             {hiragana:"こえ", kanji:"声", en:"Voice", icon:"fa-solid fa-microphone"}
         ]},
-
-        // --- Lv.7 いろ・かず (Colors & Numbers) ---
         7: { title: "いろ・かず", words: [
             {hiragana:"あか", kanji:"赤", en:"Red", icon:"fa-solid fa-circle", color:"#f44336"},
             {hiragana:"あお", kanji:"青", en:"Blue", icon:"fa-solid fa-circle", color:"#2196f3"},
@@ -332,21 +318,19 @@
             {hiragana:"なな", kanji:"七", en:"Seven", icon:"fa-solid fa-7"},
             {hiragana:"はち", kanji:"八", en:"Eight", icon:"fa-solid fa-8"},
             {hiragana:"きゅう", kanji:"九", en:"Nine", icon:"fa-solid fa-9"},
-            {hiragana:"じゅう", kanji:"十", en:"Ten", icon:"fa-solid fa-1+0"}, // Approximate
-            {hiragana:"ひゃく", kanji:"百", en:"Hundred", icon:"fa-solid fa-c"}, // C is 100 roman
+            {hiragana:"じゅう", kanji:"十", en:"Ten", icon:"fa-solid fa-1"},
+            {hiragana:"ひゃく", kanji:"百", en:"Hundred", icon:"fa-solid fa-c"},
             {hiragana:"まる", kanji:"丸", en:"Circle", icon:"fa-regular fa-circle"},
             {hiragana:"しかく", kanji:"四角", en:"Square", icon:"fa-regular fa-square"},
-            {hiragana:"さんかく", kanji:"三角", en:"Triangle", icon:"fa-solid fa-play", color:"#333"} // Play looks like triangle
+            {hiragana:"さんかく", kanji:"三角", en:"Triangle", icon:"fa-solid fa-play", color:"#333"}
         ]},
-
-        // --- Lv.8 でんとう (Tradition) ---
         8: { title: "でんとう", words: [
             {hiragana:"きもの", kanji:"着物", en:"Kimono", icon:"fa-solid fa-user-tie"},
             {hiragana:"げた", kanji:"下駄", en:"Geta", icon:"fa-solid fa-shoe-prints"},
             {hiragana:"はし", kanji:"箸", en:"Chopsticks", icon:"fa-solid fa-utensils"},
             {hiragana:"たたみ", kanji:"畳", en:"Tatami", icon:"fa-solid fa-border-all"},
             {hiragana:"じんじゃ", kanji:"神社", en:"Shrine", icon:"fa-solid fa-torii-gate"},
-            {hiragana:"おてら", kanji:"お寺", en:"Temple", icon:"fa-solid fa-gopuram"}, // Approximate
+            {hiragana:"おてら", kanji:"お寺", en:"Temple", icon:"fa-solid fa-gopuram"},
             {hiragana:"にんじゃ", kanji:"忍者", en:"Ninja", icon:"fa-solid fa-user-ninja"},
             {hiragana:"さむらい", kanji:"侍", en:"Samurai", icon:"fa-solid fa-khanda"},
             {hiragana:"すもう", kanji:"相撲", en:"Sumo", icon:"fa-solid fa-users"},
@@ -362,15 +346,13 @@
             {hiragana:"ふじさん", kanji:"富士山", en:"Mt. Fuji", icon:"fa-solid fa-mountain-sun"},
             {hiragana:"おまもり", kanji:"お守り", en:"Charm", icon:"fa-solid fa-bag-shopping"}
         ]},
-
-        // --- Lv.9 あそび (Play) ---
         9: { title: "あそび", words: [
             {hiragana:"ゲーム", kanji:"ゲーム", en:"Game", icon:"fa-solid fa-gamepad"},
             {hiragana:"ボール", kanji:"ボール", en:"Ball", icon:"fa-solid fa-baseball"},
             {hiragana:"にんぎょう", kanji:"人形", en:"Doll", icon:"fa-solid fa-robot"},
-            {hiragana:"ふうせん", kanji:"風船", en:"Balloon", icon:"fa-solid fa-soap"}, // Approximate
+            {hiragana:"ふうせん", kanji:"風船", en:"Balloon", icon:"fa-solid fa-soap"},
             {hiragana:"すべりだい", kanji:"滑り台", en:"Slide", icon:"fa-solid fa-stairs"},
-            {hiragana:"ブランコ", kanji:"ブランコ", en:"Swing", icon:"fa-solid fa-anchor"}, // Approximate
+            {hiragana:"ブランコ", kanji:"ブランコ", en:"Swing", icon:"fa-solid fa-anchor"},
             {hiragana:"こうえん", kanji:"公園", en:"Park", icon:"fa-solid fa-tree"},
             {hiragana:"はしる", kanji:"走る", en:"Run", icon:"fa-solid fa-person-running"},
             {hiragana:"ジャンプ", kanji:"ジャンプ", en:"Jump", icon:"fa-solid fa-arrow-up"},
@@ -386,8 +368,6 @@
             {hiragana:"カメラ", kanji:"カメラ", en:"Camera", icon:"fa-solid fa-camera"},
             {hiragana:"りょこう", kanji:"旅行", en:"Travel", icon:"fa-solid fa-plane"}
         ]},
-
-        // --- Lv.10 ばしょ (Places) ---
         10: { title: "ばしょ", words: [
             {hiragana:"えき", kanji:"駅", en:"Station", icon:"fa-solid fa-train"},
             {hiragana:"でんしゃ", kanji:"電車", en:"Train", icon:"fa-solid fa-train-subway"},
@@ -415,30 +395,37 @@
     // 設定言語取得
     const displayLang = localStorage.getItem('culture_lang') || 'hiragana';
 
-    const DROP_TABLE = ['helm_1', 'armor_1', 'weapon_1', 'helm_2', 'armor_2', 'weapon_2', 'helm_3', 'weapon_3'];
-    window.ITEM_DB = {
-    // --- 頭 (Helm) ---
-    'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common', color: '#8d6e63' },
-    'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color: '#d32f2f' },
-    'helm_3': { type: 'helm', name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', rarity: 'legend', color: '#ffd700' },
-    'helm_nobu': { type: 'helm', name: '魔王の兜', icon: 'fa-solid fa-crown', rarity: 'legend', color: '#212121' },
-    'helm_hide': { type: 'helm', name: '日輪の兜', icon: 'fa-solid fa-sun', rarity: 'legend', color: '#ffca28' },
-    'helm_ninja': { type: 'helm', name: '忍び頭巾', icon: 'fa-solid fa-user-ninja', rarity: 'rare', color: '#424242' },
+    // ドロップアイテム設定 (ここも武将・忍者を加えて更新)
+    const DROP_TABLE = [
+        // コモン
+        'helm_1', 'armor_1', 'weapon_1', 'weapon_shuri',
+        // レア
+        'helm_2', 'armor_2', 'weapon_2', 'helm_ninja', 'armor_ninja', 'weapon_gun', 'weapon_fan',
+        // レジェンド
+        'helm_3', 'weapon_3', 'helm_nobu', 'armor_nobu', 'helm_hide'
+    ];
+    
+    // アイテムDB (マップと同じ)
+    const ITEM_DB = {
+        'helm_1': { name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', color:'#fff' },
+        'helm_2': { name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', color:'#d32f2f' },
+        'helm_3': { name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', color:'#ffd700' },
+        'helm_nobu': { name: '魔王の兜', icon: 'fa-solid fa-crown', color: '#212121' },
+        'helm_hide': { name: '日輪の兜', icon: 'fa-solid fa-sun', color: '#ffca28' },
+        'helm_ninja': { name: '忍び頭巾', icon: 'fa-solid fa-user-ninja', color: '#424242' },
 
-    // --- 体 (Armor) ---
-    'armor_1': { type: 'armor', name: 'ボロの着物', icon: 'fa-solid fa-shirt', rarity: 'common', color: '#d7ccc8' },
-    'armor_2': { type: 'armor', name: '侍の鎧', icon: 'fa-solid fa-shield-halved', rarity: 'rare', color: '#1a237e' },
-    'armor_nobu': { type: 'armor', name: '南蛮マント', icon: 'fa-solid fa-user-secret', rarity: 'legend', color: '#b71c1c' },
-    'armor_ninja': { type: 'armor', name: '忍び装束', icon: 'fa-solid fa-user-large', rarity: 'rare', color: '#000000' },
+        'armor_1': { name: 'ボロの着物', icon: 'fa-solid fa-shirt', color:'#fff' },
+        'armor_2': { name: '侍の鎧', icon: 'fa-solid fa-shield-halved', color:'#1a237e' },
+        'armor_nobu': { name: '南蛮マント', icon: 'fa-solid fa-user-secret', color: '#b71c1c' },
+        'armor_ninja': { name: '忍び装束', icon: 'fa-solid fa-user-large', color: '#000000' },
 
-    // --- 武器 (Weapon) ---
-    'weapon_1': { type: 'weapon', name: '竹刀', icon: 'fa-solid fa-candy-cane', rarity: 'common', color: '#a1887f' },
-    'weapon_2': { type: 'weapon', name: '名刀・虎徹', icon: 'fa-solid fa-khanda', rarity: 'rare', color: '#cfd8dc' },
-    'weapon_3': { type: 'weapon', name: '妖刀・村正', icon: 'fa-solid fa-fire', rarity: 'legend', color: '#d50000' },
-    'weapon_gun': { type: 'weapon', name: '火縄銃', icon: 'fa-solid fa-gun', rarity: 'rare', color: '#5d4037' },
-    'weapon_fan': { type: 'weapon', name: '軍配', icon: 'fa-solid fa-fan', rarity: 'rare', color: '#fbc02d' },
-    'weapon_shuri': { type: 'weapon', name: '手裏剣', icon: 'fa-solid fa-star', rarity: 'common', color: '#757575' }
-};
+        'weapon_1': { name: '竹刀', icon: 'fa-solid fa-candy-cane', color:'#fff' },
+        'weapon_2': { name: '名刀・虎徹', icon: 'fa-solid fa-khanda', color:'#cfd8dc' },
+        'weapon_3': { name: '妖刀・村正', icon: 'fa-solid fa-fire', color:'#b71c1c' },
+        'weapon_gun': { name: '火縄銃', icon: 'fa-solid fa-gun', color: '#5d4037' },
+        'weapon_fan': { name: '軍配', icon: 'fa-solid fa-fan', color: '#fbc02d' },
+        'weapon_shuri': { name: '手裏剣', icon: 'fa-solid fa-star', color: '#757575' }
+    };
 
     const params = new URLSearchParams(window.location.search);
     const levelId = parseInt(params.get('level')) || 1;
@@ -462,7 +449,6 @@
 
     document.getElementById('level-display').innerText = `${catData.title}・第${subLevel}戦`;
 
-    // 単語表示用ヘルパー
     function getWordText(word) {
         if (displayLang === 'kanji') return word.kanji;
         if (displayLang === 'en') return word.en;
@@ -482,9 +468,7 @@
                 actionBtn.innerText = "次へ";
 
                 const word = targetWords[currentStep];
-                // 表示言語設定を反映
                 document.getElementById('learn-jp').innerText = getWordText(word);
-                // 英語設定の時は、サブテキストを日本語にするなどの工夫も可能だが、今回はそのまま
                 document.getElementById('learn-en').innerText = (displayLang === 'en') ? word.hiragana : word.en;
                 
                 const img = document.getElementById('learn-img');
@@ -559,7 +543,6 @@
     function startQuizMode() { 
         isQuizMode = true; 
         updateUI();
-        // アニメーション再生
         const overlay = document.getElementById('quiz-overlay');
         overlay.style.display = 'flex';
         overlay.style.animation = 'none';
