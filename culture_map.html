@@ -46,7 +46,7 @@
     .header-right { display: flex; gap: 15px; align-items: center; }
     .status-item { color: var(--gold); font-size: 0.9em; }
 
-    /* --- マップエリア (全体) --- */
+    /* --- マップエリア --- */
     .map-viewport {
         flex-grow: 1;
         overflow: auto;
@@ -61,7 +61,6 @@
     }
     .map-viewport:active { cursor: grabbing; }
 
-    /* マップの中身 */
     .map-world {
         position: relative;
         width: 2000px; height: 1200px;
@@ -96,15 +95,18 @@
     .deco-torii { color: #b71c1c; }
     .deco-tree { color: #33691e; font-size: 5em; }
 
-    /* --- ノード（城・武将アイコン）--- */
+    /* --- ノード（城・武将アイコン） --- */
     .node-container {
         position: absolute;
         display: flex; flex-direction: column; align-items: center;
-        z-index: 5; /* 通常時の重なり順 */
-        transition: all 0.3s ease-out; /* 滑らかな変化 */
+        z-index: 5;
+        /* 重要: transition: all を廃止し、transform（動き）のみアニメーションさせる */
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: not-allowed; opacity: 0.7; filter: grayscale(70%);
-        /* 基準点を底辺中央に */
         transform-origin: bottom center;
+        /* チラつき防止のおまじない */
+        backface-visibility: hidden;
+        transform: translateZ(0); 
     }
     .node-container > * { transform: translateY(-100%); }
 
@@ -112,46 +114,47 @@
     .node-container.unlocked {
         cursor: pointer; opacity: 1; filter: grayscale(0%);
     }
-    
-    /* ★★★ ホバー時のリッチな演出 ★★★ */
+
+    /* ホバー時の挙動 */
     .node-container.unlocked:hover {
-        z-index: 30; /* アバター(z:20)より手前に表示 */
-        transform: scale(1.15) translateY(-10px); /* 拡大して少し浮き上がる */
+        z-index: 50; /* 最前面へ */
+        transform: scale(1.15) translateY(-10px) translateZ(0);
     }
 
-    /* ホバー時の後光エフェクト（疑似要素で表現） */
+    /* 後光エフェクト */
     .node-container.unlocked::before {
         content: '';
         position: absolute;
         top: -50%; left: 50%;
-        width: 160px; height: 160px; /* 城より一回り大きい円 */
-        background: radial-gradient(circle, rgba(255,215,0,0.7) 0%, rgba(255,215,0,0.1) 60%, transparent 70%);
+        width: 160px; height: 160px;
+        background: radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.1) 60%, transparent 70%);
         transform: translate(-50%, -50%) scale(0.5);
         opacity: 0;
-        transition: all 0.4s ease-out;
-        z-index: -1; /* 城の後ろに配置 */
+        transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        z-index: -1;
         border-radius: 50%;
         pointer-events: none;
     }
     .node-container.unlocked:hover::before {
-        transform: translate(-50%, -50%) scale(1.2); /* ホバー時にふわっと広がる */
+        transform: translate(-50%, -50%) scale(1.3);
         opacity: 1;
     }
 
-    /* 城アイコンエリア */
+    /* 城アイコン画像 */
     .node-castle-area {
         position: relative; display: flex; justify-content: center; align-items: flex-end;
     }
     .node-img {
         color: #4e342e;
-        /* 通常時の影 */
         filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
-        transition: all 0.3s ease-out;
+        /* 重要: 色の変化のみをアニメーションさせ、フィルタの変化は分離する */
+        transition: color 0.3s ease, filter 0.3s ease;
+        will-change: filter, color;
     }
-    /* ホバー時の城アイコンの発光 */
+    
+    /* ホバー時の発光 */
     .node-container.unlocked:hover .node-img {
-        color: var(--urushi-red); /* 少し赤みを帯びさせる */
-        /* 強力な金色の輝き */
+        color: var(--urushi-red);
         filter: drop-shadow(0 0 15px var(--gold)) drop-shadow(0 0 5px var(--gold));
     }
     
@@ -161,10 +164,10 @@
     .nobori {
         position: absolute; top: 10px; left: -30px;
         display: flex; flex-direction: column; align-items: center;
-        z-index: 2; transition: all 0.3s;
+        z-index: 2; transition: transform 0.3s ease;
     }
     .node-container.unlocked:hover .nobori {
-        transform: translateX(-5px) rotate(-5deg); /* ホバー時に少し傾く演出 */
+        transform: translateX(-5px) rotate(-5deg);
     }
     .nobori-flag {
         writing-mode: vertical-rl; font-family: 'Yuji Syuku', serif;
@@ -172,7 +175,6 @@
         padding: 10px 5px 5px 5px; border: 2px solid var(--ink);
         font-size: 0.9em; border-bottom: none;
         box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-        transition: background 0.3s;
     }
     .nobori-pole {
         width: 4px; height: 80px; background: var(--ink); margin-top: -2px;
@@ -203,13 +205,12 @@
         border: 2px solid var(--gold);
         font-size: 0.9em; white-space: nowrap;
         box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-        transition: all 0.3s;
+        transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
     }
-    /* ホバー時のラベル強調 */
     .node-container.unlocked:hover .node-label {
         background: var(--urushi-red);
-        color: var(--gold);
         border-color: var(--gold);
+        color: var(--gold);
         transform: scale(1.1);
     }
     .node-sub { font-size: 0.7em; color: #ccc; display: block; margin-top: 2px;}
@@ -220,7 +221,7 @@
     #hero-avatar {
         position: absolute;
         width: 80px; height: 80px;
-        z-index: 20; /* 通常時の城(z:5)より手前、ホバー時の城(z:30)より奥 */
+        z-index: 20; 
         pointer-events: none;
         transition: all 1.5s ease-in-out;
         transform: translate(-50%, -100%);
@@ -235,7 +236,7 @@
     .walking { animation: hop 0.4s infinite alternate; }
     @keyframes hop { from { margin-top: 0; } to { margin-top: -15px; } }
 
-    /* --- 蔵ボタン・モーダル --- */
+    /* --- 蔵ボタン --- */
     .kura-btn {
         position: fixed; bottom: 30px; right: 30px;
         width: 90px; height: 90px;
@@ -369,19 +370,16 @@
 
     // --- アイテムデータベース ---
     window.ITEM_DB = {
-        // --- 頭 (Helm) ---
         'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common', color: '#8d6e63' },
         'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color: '#d32f2f' },
         'helm_3': { type: 'helm', name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', rarity: 'legend', color: '#ffd700' },
         'helm_nobu': { type: 'helm', name: '魔王の兜', icon: 'fa-solid fa-crown', rarity: 'legend', color: '#212121' },
         'helm_hide': { type: 'helm', name: '日輪の兜', icon: 'fa-solid fa-sun', rarity: 'legend', color: '#ffca28' },
         'helm_ninja': { type: 'helm', name: '忍び頭巾', icon: 'fa-solid fa-user-ninja', rarity: 'rare', color: '#424242' },
-        // --- 体 (Armor) ---
         'armor_1': { type: 'armor', name: 'ボロの着物', icon: 'fa-solid fa-shirt', rarity: 'common', color: '#d7ccc8' },
         'armor_2': { type: 'armor', name: '侍の鎧', icon: 'fa-solid fa-shield-halved', rarity: 'rare', color: '#1a237e' },
         'armor_nobu': { type: 'armor', name: '南蛮マント', icon: 'fa-solid fa-user-secret', rarity: 'legend', color: '#b71c1c' },
         'armor_ninja': { type: 'armor', name: '忍び装束', icon: 'fa-solid fa-user-large', rarity: 'rare', color: '#000000' },
-        // --- 武器 (Weapon) ---
         'weapon_1': { type: 'weapon', name: '竹刀', icon: 'fa-solid fa-candy-cane', rarity: 'common', color: '#a1887f' },
         'weapon_2': { type: 'weapon', name: '名刀・虎徹', icon: 'fa-solid fa-khanda', rarity: 'rare', color: '#cfd8dc' },
         'weapon_3': { type: 'weapon', name: '妖刀・村正', icon: 'fa-solid fa-fire', rarity: 'legend', color: '#d50000' },
@@ -421,7 +419,6 @@
         document.getElementById('money-display').innerText = userState.money || 0;
     });
 
-    // --- ワールドマップ描画 (座標ベース) ---
     function renderWorldMap() {
         currentView = 'world';
         nodesContainer.innerHTML = '';
@@ -429,13 +426,10 @@
         let pathD = "";
 
         WARLORDS.forEach((lord, index) => {
-            // 街道のパスデータを生成
             if (index > 0) {
                 const prev = WARLORDS[index - 1];
-                // ベジェ曲線で少しカーブさせる
                 const midX = (prev.x + lord.x) / 2;
                 const midY = (prev.y + lord.y) / 2;
-                // カーブの制御点（少しずらす）
                 const cpX = midX + (lord.y - prev.y) * 0.2;
                 const cpY = midY - (lord.x - prev.x) * 0.2;
                 pathD += ` M ${prev.x} ${prev.y} Q ${cpX} ${cpY} ${lord.x} ${lord.y}`;
@@ -445,7 +439,7 @@
                 lord.id, 
                 lord.name, 
                 lord.title,
-                'fa-solid fa-chess-rook', // 砦アイコン
+                'fa-solid fa-chess-rook',
                 'size-l',
                 (lord.id <= userState.level),
                 (lord.id < userState.level),
@@ -456,7 +450,7 @@
             if (node.classList.contains('unlocked')) {
                 node.onclick = () => {
                     moveAvatarTo(lord.x, lord.y);
-                    setTimeout(() => renderRegionMap(lord), 1500); // 移動時間を考慮
+                    setTimeout(() => renderRegionMap(lord), 1500);
                 };
             }
             nodesContainer.appendChild(node);
@@ -464,22 +458,19 @@
         
         roadPath.setAttribute('d', pathD);
 
-        // アバター初期位置
         const currentLord = WARLORDS[userState.level - 1];
         if (currentLord) {
             setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 100);
         }
     }
 
-    // --- お城（ステージ）描画 (横スクロールのまま維持) ---
     function renderRegionMap(lord) {
         currentView = 'region';
         selectedRegionId = lord.id;
         nodesContainer.innerHTML = '';
-        roadPath.setAttribute('d', ''); // 街道は非表示
+        roadPath.setAttribute('d', '');
         
         const STAGE_COUNT = 10;
-        // ステージは横並びのままにするため、マップ幅を調整
         document.getElementById('map-world-content').style.width = `${STAGE_COUNT * 260 + 200}px`;
 
         for (let i = 1; i <= STAGE_COUNT; i++) {
@@ -499,9 +490,8 @@
                 if (i < userState.subLevel) isCleared = true;
             }
 
-            // ステージは横一列に配置
             const posX = i * 260;
-            const posY = 600; // 固定Y座標
+            const posY = 600;
 
             const node = createNode(
                 i,
@@ -512,7 +502,7 @@
                 isUnlocked,
                 isCleared,
                 posX, posY,
-                lord.crest // 同じ家紋を使用
+                lord.crest
             );
 
             if (isUnlocked) {
@@ -526,14 +516,12 @@
             nodesContainer.appendChild(node);
         }
 
-        // 現在のステージ位置へアバターを移動
         let targetSub = 1;
         if(lord.id === userState.level) targetSub = userState.subLevel;
         const targetX = targetSub * 260;
         setTimeout(() => moveAvatarTo(targetX, 600, false), 100);
     }
 
-    // ノード生成ヘルパー (座標対応版)
     function createNode(id, mainText, subText, iconClass, sizeClass, isUnlocked, isCleared, x, y, crestIcon) {
         const div = document.createElement('div');
         div.className = `node-container ${isUnlocked ? 'unlocked' : ''} ${isCleared ? 'cleared' : ''}`;
@@ -558,13 +546,11 @@
         return div;
     }
 
-    // アバター移動 (座標ベース)
     function moveAvatarTo(x, y, animate = true) {
         if (animate) heroAvatar.classList.add('walking');
         heroAvatar.style.left = `${x}px`;
         heroAvatar.style.top = `${y}px`;
         
-        // 画面中央にスクロール
         const viewportWidth = mapScroll.clientWidth;
         const viewportHeight = mapScroll.clientHeight;
         mapScroll.scrollTo({ 
