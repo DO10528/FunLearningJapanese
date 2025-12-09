@@ -46,7 +46,7 @@
     .header-right { display: flex; gap: 15px; align-items: center; }
     .status-item { color: var(--gold); font-size: 0.9em; }
 
-    /* --- マップエリア --- */
+    /* --- マップエリア (全体) --- */
     .map-viewport {
         flex-grow: 1;
         overflow: auto;
@@ -61,6 +61,7 @@
     }
     .map-viewport:active { cursor: grabbing; }
 
+    /* マップの中身 */
     .map-world {
         position: relative;
         width: 2000px; height: 1200px;
@@ -100,11 +101,9 @@
         position: absolute;
         display: flex; flex-direction: column; align-items: center;
         z-index: 5;
-        /* 重要: transition: all を廃止し、transform（動き）のみアニメーションさせる */
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: not-allowed; opacity: 0.7; filter: grayscale(70%);
         transform-origin: bottom center;
-        /* チラつき防止のおまじない */
         backface-visibility: hidden;
         transform: translateZ(0); 
     }
@@ -117,7 +116,7 @@
 
     /* ホバー時の挙動 */
     .node-container.unlocked:hover {
-        z-index: 50; /* 最前面へ */
+        z-index: 50;
         transform: scale(1.15) translateY(-10px) translateZ(0);
     }
 
@@ -147,7 +146,6 @@
     .node-img {
         color: #4e342e;
         filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
-        /* 重要: 色の変化のみをアニメーションさせ、フィルタの変化は分離する */
         transition: color 0.3s ease, filter 0.3s ease;
         will-change: filter, color;
     }
@@ -217,24 +215,180 @@
 
     @keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
 
-    /* --- アバター --- */
+    /* --- パワプロ風アバター (CSSイラスト) --- */
     #hero-avatar {
         position: absolute;
-        width: 80px; height: 80px;
+        width: 60px; height: 80px; /* サイズ調整 */
         z-index: 20; 
         pointer-events: none;
         transition: all 1.5s ease-in-out;
         transform: translate(-50%, -100%);
         filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
     }
-    .avatar-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-    .layer-body { font-size: 4em; color: #333; }
-    .layer-armor { font-size: 2.5em; color: #555; margin-top: 15px; }
-    .layer-helm { font-size: 2em; color: #555; margin-top: -30px; }
-    .layer-weapon { font-size: 2.5em; color: #aaa; margin-left: 40px; margin-top: 10px; transform: rotate(15deg); }
 
-    .walking { animation: hop 0.4s infinite alternate; }
-    @keyframes hop { from { margin-top: 0; } to { margin-top: -15px; } }
+    .avatar-parts { position: absolute; }
+
+    /* 基本体型 */
+    .pawa-head {
+        width: 50px; height: 45px; background: #fdd835; /* 肌色 */
+        border-radius: 50%; top: 0; left: 5px;
+        box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+        z-index: 10;
+    }
+    .pawa-body {
+        width: 40px; height: 35px; background: #1a237e; /* デフォルトの服色 */
+        border-radius: 20px 20px 10px 10px; top: 35px; left: 10px;
+        z-index: 5;
+    }
+    .pawa-arm {
+        width: 15px; height: 25px; background: #fdd835;
+        border-radius: 10px; top: 38px;
+        z-index: 6;
+    }
+    .pawa-arm.left { left: -5px; transform: rotate(20deg); }
+    .pawa-arm.right { right: -5px; transform: rotate(-20deg); }
+    .pawa-leg {
+        width: 18px; height: 25px; background: #5d4037; /* 足の色 */
+        border-radius: 10px; top: 60px;
+        z-index: 4;
+    }
+    .pawa-leg.left { left: 5px; }
+    .pawa-leg.right { right: 5px; }
+
+    /* --- 装備 (CSSイラスト) --- */
+    /* 兜 (Helm) */
+    .helm-part { position: absolute; z-index: 11; pointer-events: none; display: none; }
+    /* 足軽笠 */
+    .helm-1 { 
+        width: 60px; height: 30px; background: #8d6e63; 
+        border-radius: 50% 50% 10% 10%; top: -5px; left: 0;
+        box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3);
+    }
+    /* 赤備え兜 */
+    .helm-2 {
+        width: 54px; height: 40px; background: #d32f2f;
+        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
+    }
+    .helm-2::before { /* 鍬形 */
+        content: ''; position: absolute; top: -15px; left: 10px;
+        width: 34px; height: 20px; background: #ffd700;
+        clip-path: polygon(0 100%, 50% 0, 100% 100%, 50% 80%);
+    }
+    /* 三日月兜 */
+    .helm-3 {
+        width: 54px; height: 40px; background: #212121;
+        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
+    }
+    .helm-3::before { /* 三日月前立て */
+        content: ''; position: absolute; top: -25px; left: 5px;
+        width: 44px; height: 25px; background: #ffd700;
+        border-radius: 50%; box-shadow: inset -5px -5px 0 #212121;
+    }
+    /* 魔王の兜 */
+    .helm-nobu {
+        width: 54px; height: 45px; background: #212121;
+        border-radius: 20% 20% 10% 10%; top: -15px; left: 3px;
+    }
+    .helm-nobu::before { /* 角 */
+        content: ''; position: absolute; top: -10px; left: 0;
+        width: 54px; height: 20px; background: #ffd700;
+        clip-path: polygon(0 0, 20% 100%, 80% 100%, 100% 0, 50% 30%);
+    }
+    /* 日輪の兜 */
+    .helm-hide {
+        width: 54px; height: 40px; background: #ffca28;
+        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
+    }
+    .helm-hide::before { /* 日輪後光 */
+        content: ''; position: absolute; top: -30px; left: -10px;
+        width: 74px; height: 74px; background: #ffca28;
+        border-radius: 50%; z-index: -1; opacity: 0.5;
+    }
+    /* 忍び頭巾 */
+    .helm-ninja {
+        width: 54px; height: 50px; background: #424242;
+        border-radius: 50% 50% 10% 10%; top: -5px; left: 3px;
+    }
+    .helm-ninja::after { /* 目の部分 */
+        content: ''; position: absolute; top: 20px; left: 10px;
+        width: 34px; height: 10px; background: #fdd835;
+    }
+
+    /* 鎧 (Armor) */
+    .armor-part { position: absolute; z-index: 5; pointer-events: none; display: none; }
+    .armor-1 { background: #d7ccc8; } /* ボロ */
+    .armor-2 { background: #1a237e; border: 2px solid #ffd700; } /* 侍 */
+    .armor-nobu { background: #b71c1c; } /* 南蛮マント（体色変更） */
+    .armor-nobu::after { /* マント追加 */
+        content: ''; position: absolute; top: 0; left: -10px;
+        width: 60px; height: 50px; background: #b71c1c;
+        border-radius: 10px; z-index: -1; transform: rotate(-5deg);
+    }
+    .armor-ninja { background: #000000; } /* 忍び */
+
+    /* 武器 (Weapon) */
+    .weapon-part { position: absolute; z-index: 7; pointer-events: none; display: none; }
+    /* 刀（共通） */
+    .weapon-katana {
+        width: 8px; height: 50px; background: #cfd8dc; /* 刃 */
+        border-radius: 4px; top: 25px; right: -15px;
+        transform: rotate(45deg); border: 1px solid #546e7a;
+    }
+    .weapon-katana::after { /* 柄 */
+        content: ''; position: absolute; bottom: -10px; left: 0;
+        width: 8px; height: 15px; background: #3e2723;
+    }
+    .weapon-2 { /* 名刀 */
+        background: #cfd8dc;
+    }
+    .weapon-3 { /* 妖刀 */
+        background: #d50000; box-shadow: 0 0 10px #d50000;
+    }
+    /* 火縄銃 */
+    .weapon-gun {
+        width: 10px; height: 40px; background: #5d4037;
+        border-radius: 2px; top: 30px; right: -15px;
+        transform: rotate(30deg);
+    }
+    .weapon-gun::before { /* 銃身 */
+        content: ''; position: absolute; top: 0; left: 2px;
+        width: 6px; height: 30px; background: #8d6e63;
+    }
+    /* 軍配 */
+    .weapon-fan {
+        width: 30px; height: 30px; background: #fbc02d;
+        border-radius: 50% 50% 5px 5px; top: 30px; right: -20px;
+        transform: rotate(20deg);
+    }
+    .weapon-fan::after { /* 柄 */
+        content: ''; position: absolute; bottom: -15px; left: 12px;
+        width: 6px; height: 20px; background: #3e2723;
+    }
+    /* 手裏剣 */
+    .weapon-shuri {
+        width: 20px; height: 20px; background: #757575;
+        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        top: 35px; right: -15px; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+
+    /* 歩行アニメーション (パワプロ風) */
+    .walking #hero-avatar { animation: pawa-walk 0.6s infinite alternate ease-in-out; }
+    @keyframes pawa-walk {
+        0% { transform: translate(-50%, -100%) rotate(-2deg) translateY(0); }
+        100% { transform: translate(-50%, -100%) rotate(2deg) translateY(-5px); }
+    }
+    .walking .pawa-arm.left { animation: arm-swing-l 0.6s infinite alternate; }
+    .walking .pawa-arm.right { animation: arm-swing-r 0.6s infinite alternate; }
+    .walking .pawa-leg.left { animation: leg-walk-l 0.6s infinite alternate; }
+    .walking .pawa-leg.right { animation: leg-walk-r 0.6s infinite alternate; }
+
+    @keyframes arm-swing-l { from { transform: rotate(20deg); } to { transform: rotate(-10deg); } }
+    @keyframes arm-swing-r { from { transform: rotate(-20deg); } to { transform: rotate(10deg); } }
+    @keyframes leg-walk-l { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+    @keyframes leg-walk-r { from { transform: translateY(-5px); } to { transform: translateY(0); } }
+
 
     /* --- 蔵ボタン --- */
     .kura-btn {
@@ -311,10 +465,29 @@
         <i class="fa-solid fa-village map-deco" style="top:550px; left:300px; font-size:3em;"></i>
 
         <div id="hero-avatar">
-            <div class="avatar-layer layer-body"><i class="fa-solid fa-user"></i></div>
-            <div class="avatar-layer layer-armor" id="vis-armor"></div>
-            <div class="avatar-layer layer-helm" id="vis-helm"></div>
-            <div class="avatar-layer layer-weapon" id="vis-weapon"></div>
+            <div class="avatar-parts pawa-head"></div>
+            <div class="avatar-parts pawa-body"></div>
+            <div class="avatar-parts pawa-arm left"></div>
+            <div class="avatar-parts pawa-arm right"></div>
+            <div class="avatar-parts pawa-leg left"></div>
+            <div class="avatar-parts pawa-leg right"></div>
+            
+            <div id="helm-parts">
+                <div class="helm-part helm-1"></div>
+                <div class="helm-part helm-2"></div>
+                <div class="helm-part helm-3"></div>
+                <div class="helm-part helm-nobu"></div>
+                <div class="helm-part helm-hide"></div>
+                <div class="helm-part helm-ninja"></div>
+            </div>
+            
+            <div id="weapon-parts">
+                <div class="weapon-part weapon-1 weapon-katana" style="background:#a1887f; border-color:#5d4037;"></div> <div class="weapon-part weapon-2 weapon-katana"></div>
+                <div class="weapon-part weapon-3 weapon-katana"></div>
+                <div class="weapon-part weapon-gun"></div>
+                <div class="weapon-part weapon-fan"></div>
+                <div class="weapon-part weapon-shuri"></div>
+            </div>
         </div>
 
         <div id="nodes-container"></div>
@@ -368,7 +541,7 @@
         { id: 10, name: "徳川 家康", title: "ばしょ", castle: "江戸城", x: 1750, y: 700, crest: "fa-leaf" }
     ];
 
-    // --- アイテムデータベース ---
+    // --- アイテムデータベース (アイコンは蔵表示用) ---
     window.ITEM_DB = {
         'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common', color: '#8d6e63' },
         'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color: '#d32f2f' },
@@ -547,7 +720,9 @@
     }
 
     function moveAvatarTo(x, y, animate = true) {
-        if (animate) heroAvatar.classList.add('walking');
+        if (animate) {
+            heroAvatar.classList.add('walking');
+        }
         heroAvatar.style.left = `${x}px`;
         heroAvatar.style.top = `${y}px`;
         
@@ -567,15 +742,30 @@
         else window.location.href = 'index.html';
     };
 
+    // --- アバター更新 (CSSクラス切り替え方式) ---
     function updateAvatar() {
         const eq = userState.equipped || {};
-        const helm = window.ITEM_DB[eq.helm];
-        const armor = window.ITEM_DB[eq.armor];
-        const weapon = window.ITEM_DB[eq.weapon];
+        
+        // 全パーツを非表示にする
+        document.querySelectorAll('.helm-part, .weapon-part').forEach(el => el.style.display = 'none');
+        
+        // 装備中のパーツのみ表示
+        if (eq.helm && document.querySelector(`.${eq.helm}`)) {
+            document.querySelector(`.${eq.helm}`).style.display = 'block';
+        }
+        if (eq.weapon && document.querySelector(`.${eq.weapon}`)) {
+            document.querySelector(`.${eq.weapon}`).style.display = 'block';
+        }
 
-        document.getElementById('vis-helm').innerHTML = helm ? `<i class="${helm.icon}" style="${helm.color ? 'color:'+helm.color : ''}"></i>` : '';
-        document.getElementById('vis-armor').innerHTML = armor ? `<i class="${armor.icon}" style="${armor.color ? 'color:'+armor.color : ''}"></i>` : '';
-        document.getElementById('vis-weapon').innerHTML = weapon ? `<i class="${weapon.icon}" style="${weapon.color ? 'color:'+weapon.color : ''}"></i>` : '';
+        // 体の色を変更
+        const body = document.querySelector('.pawa-body');
+        const armorItem = window.ITEM_DB[eq.armor];
+        if (armorItem) {
+            // 鎧の種類に応じてクラスを付与（CSSでスタイル定義）
+            body.className = 'avatar-parts pawa-body ' + eq.armor;
+        } else {
+            body.className = 'avatar-parts pawa-body armor-1'; // デフォルト
+        }
     }
 
     window.openKura = () => {
