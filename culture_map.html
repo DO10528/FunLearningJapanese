@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>戦国・日本語伝</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
@@ -20,7 +20,9 @@
     body {
         font-family: 'Yuji Syuku', serif;
         margin: 0; padding: 0;
-        height: 100vh; overflow: hidden;
+        height: 100vh; /* スマホのアドレスバー対策が必要な場合はJSで補正 */
+        height: 100dvh; /* 対応ブラウザ向け */
+        overflow: hidden;
         color: var(--ink);
         display: flex; flex-direction: column;
         background-color: var(--map-bg);
@@ -28,23 +30,29 @@
 
     /* --- ヘッダー --- */
     header {
-        background: rgba(33, 33, 33, 0.9); color: #fff;
-        padding: 10px 20px;
+        background: rgba(33, 33, 33, 0.95); color: #fff;
+        padding: 8px 15px; /* スマホ向けに少し狭く */
         display: flex; justify-content: space-between; align-items: center;
         border-bottom: 3px solid var(--gold);
         z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         backdrop-filter: blur(5px);
+        flex-shrink: 0; /* 縮まないように */
     }
-    .game-title { font-size: 1.5em; display: flex; align-items: center; gap: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    .game-title { 
+        font-size: 1.2em; display: flex; align-items: center; gap: 8px; 
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+        white-space: nowrap;
+    }
     
     .lang-switch {
         background: #3e2723; border: 1px solid var(--gold);
-        color: var(--gold); padding: 5px; border-radius: 5px;
+        color: var(--gold); padding: 3px; border-radius: 5px;
         font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer;
+        font-size: 0.8em;
     }
 
-    .header-right { display: flex; gap: 15px; align-items: center; }
-    .status-item { color: var(--gold); font-size: 0.9em; }
+    .header-right { display: flex; gap: 10px; align-items: center; }
+    .status-item { color: var(--gold); font-size: 0.8em; white-space: nowrap; }
 
     /* --- マップエリア (全体) --- */
     .map-viewport {
@@ -58,6 +66,8 @@
             radial-gradient(circle at 20% 30%, #efebe9 0%, transparent 40%),
             radial-gradient(circle at 80% 70%, #efebe9 0%, transparent 40%);
         background-blend-mode: multiply, normal, normal;
+        /* スマホでの慣性スクロールを有効化 */
+        -webkit-overflow-scrolling: touch; 
     }
     .map-viewport:active { cursor: grabbing; }
 
@@ -93,6 +103,10 @@
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
         pointer-events: none;
     }
+    /* スマホで装飾が邪魔にならないよう調整 */
+    @media (max-width: 600px) {
+        .map-deco { font-size: 2.5em; }
+    }
     .deco-torii { color: #b71c1c; }
     .deco-tree { color: #33691e; font-size: 5em; }
 
@@ -109,64 +123,49 @@
     }
     .node-container > * { transform: translateY(-100%); }
 
-    /* アンロック状態 */
-    .node-container.unlocked {
-        cursor: pointer; opacity: 1; filter: grayscale(0%);
-    }
+    .node-container.unlocked { cursor: pointer; opacity: 1; filter: grayscale(0%); }
 
-    /* ホバー時の挙動 */
     .node-container.unlocked:hover {
         z-index: 50;
         transform: scale(1.15) translateY(-10px) translateZ(0);
     }
 
-    /* 後光エフェクト */
     .node-container.unlocked::before {
-        content: '';
-        position: absolute;
-        top: -50%; left: 50%;
-        width: 160px; height: 160px;
+        content: ''; position: absolute; top: -50%; left: 50%; width: 160px; height: 160px;
         background: radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.1) 60%, transparent 70%);
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0;
-        transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-        z-index: -1;
-        border-radius: 50%;
-        pointer-events: none;
+        transform: translate(-50%, -50%) scale(0.5); opacity: 0;
+        transition: transform 0.4s ease-out, opacity 0.4s ease-out; z-index: -1;
+        border-radius: 50%; pointer-events: none;
     }
-    .node-container.unlocked:hover::before {
-        transform: translate(-50%, -50%) scale(1.3);
-        opacity: 1;
-    }
+    .node-container.unlocked:hover::before { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
 
-    /* 城アイコン画像 */
-    .node-castle-area {
-        position: relative; display: flex; justify-content: center; align-items: flex-end;
-    }
+    .node-castle-area { position: relative; display: flex; justify-content: center; align-items: flex-end; }
     .node-img {
-        color: #4e342e;
-        filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
-        transition: color 0.3s ease, filter 0.3s ease;
-        will-change: filter, color;
+        color: #4e342e; filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
+        transition: color 0.3s ease, filter 0.3s ease; will-change: filter, color;
     }
-    
-    /* ホバー時の発光 */
     .node-container.unlocked:hover .node-img {
         color: var(--urushi-red);
         filter: drop-shadow(0 0 15px var(--gold)) drop-shadow(0 0 5px var(--gold));
     }
     
+    /* PCサイズ */
     .size-s { font-size: 4em; } .size-m { font-size: 6em; } .size-l { font-size: 8em; } .size-xl { font-size: 10em; color: var(--urushi-red); }
 
-    /* 幟（のぼり） */
+    /* ★ スマホ対応: お城のサイズを小さく調整 ★ */
+    @media (max-width: 600px) {
+        .size-s { font-size: 3em; } 
+        .size-m { font-size: 4em; } 
+        .size-l { font-size: 5em; } 
+        .size-xl { font-size: 7em; }
+    }
+
     .nobori {
         position: absolute; top: 10px; left: -30px;
         display: flex; flex-direction: column; align-items: center;
         z-index: 2; transition: transform 0.3s ease;
     }
-    .node-container.unlocked:hover .nobori {
-        transform: translateX(-5px) rotate(-5deg);
-    }
+    .node-container.unlocked:hover .nobori { transform: translateX(-5px) rotate(-5deg); }
     .nobori-flag {
         writing-mode: vertical-rl; font-family: 'Yuji Syuku', serif;
         background: var(--urushi-red); color: var(--gold);
@@ -174,9 +173,7 @@
         font-size: 0.9em; border-bottom: none;
         box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
     }
-    .nobori-pole {
-        width: 4px; height: 80px; background: var(--ink); margin-top: -2px;
-    }
+    .nobori-pole { width: 4px; height: 80px; background: var(--ink); margin-top: -2px; }
     .clan-crest {
         position: absolute; top: -15px; background: var(--gold); color: var(--ink);
         width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink);
@@ -184,18 +181,14 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
-    /* クリア済みの旗 */
     .clear-flag {
-        position: absolute; top: -20px; right: -20px;
-        font-size: 2.5em; color: var(--gold);
-        display: none; text-shadow: 2px 2px 0 #000;
-        animation: wave 2s infinite ease-in-out; z-index: 3;
+        position: absolute; top: -20px; right: -20px; font-size: 2.5em; color: var(--gold);
+        display: none; text-shadow: 2px 2px 0 #000; animation: wave 2s infinite ease-in-out; z-index: 3;
     }
     .node-container.cleared .clear-flag { display: block; }
     .node-container.cleared .node-img { color: var(--urushi-red); }
     .node-container.cleared .nobori-flag { background: var(--indigo); }
 
-    /* ラベル */
     .node-label {
         background: rgba(33, 33, 33, 0.9); color: #fff;
         padding: 5px 12px; border-radius: 4px;
@@ -206,95 +199,43 @@
         transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
     }
     .node-container.unlocked:hover .node-label {
-        background: var(--urushi-red);
-        border-color: var(--gold);
-        color: var(--gold);
-        transform: scale(1.1);
+        background: var(--urushi-red); border-color: var(--gold); color: var(--gold); transform: scale(1.1);
     }
     .node-sub { font-size: 0.7em; color: #ccc; display: block; margin-top: 2px;}
 
     @keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
 
-    /* --- パワプロ風アバター (CSSイラスト) --- */
+    /* --- アバター --- */
     #hero-avatar {
-        position: absolute;
-        width: 60px; height: 80px;
-        z-index: 20; 
-        pointer-events: none;
-        transition: all 1.5s ease-in-out;
-        transform: translate(-50%, -100%);
-        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        position: absolute; width: 60px; height: 80px; z-index: 20; 
+        pointer-events: none; transition: all 1.5s ease-in-out;
+        transform: translate(-50%, -100%); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
     }
 
     .avatar-parts { position: absolute; }
-
-    /* 基本体型 */
-    .pawa-head {
-        width: 50px; height: 45px; background: #fdd835; /* 肌色 */
-        border-radius: 50%; top: 0; left: 5px;
-        box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
-        z-index: 10;
-    }
-    .pawa-body {
-        width: 40px; height: 35px; background: #1a237e; /* デフォルトの服色 */
-        border-radius: 20px 20px 10px 10px; top: 35px; left: 10px;
-        z-index: 5;
-    }
-    .pawa-arm {
-        width: 15px; height: 25px; background: #fdd835;
-        border-radius: 10px; top: 38px;
-        z-index: 6;
-    }
+    .pawa-head { width: 50px; height: 45px; background: #fdd835; border-radius: 50%; top: 0; left: 5px; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2); z-index: 10; }
+    .pawa-body { width: 40px; height: 35px; background: #1a237e; border-radius: 20px 20px 10px 10px; top: 35px; left: 10px; z-index: 5; }
+    .pawa-arm { width: 15px; height: 25px; background: #fdd835; border-radius: 10px; top: 38px; z-index: 6; }
     .pawa-arm.left { left: -5px; transform: rotate(20deg); }
     .pawa-arm.right { right: -5px; transform: rotate(-20deg); }
-    .pawa-leg {
-        width: 18px; height: 25px; background: #5d4037; /* 足の色 */
-        border-radius: 10px; top: 60px;
-        z-index: 4;
-    }
+    .pawa-leg { width: 18px; height: 25px; background: #5d4037; border-radius: 10px; top: 60px; z-index: 4; }
     .pawa-leg.left { left: 5px; }
     .pawa-leg.right { right: 5px; }
 
-    /* --- 装備 (CSSイラスト) --- */
-    /* 兜 (Helm) - クラス名はハイフン区切り */
+    /* 装備CSS */
     .helm-part { position: absolute; z-index: 11; pointer-events: none; display: none; }
-    
-    .helm-1 { 
-        width: 60px; height: 30px; background: #8d6e63; 
-        border-radius: 50% 50% 10% 10%; top: -5px; left: 0;
-        box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3);
-    }
-    .helm-2 {
-        width: 54px; height: 40px; background: #d32f2f;
-        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
-    }
+    .helm-1 { width: 60px; height: 30px; background: #8d6e63; border-radius: 50% 50% 10% 10%; top: -5px; left: 0; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3); }
+    .helm-2 { width: 54px; height: 40px; background: #d32f2f; border-radius: 30% 30% 10% 10%; top: -10px; left: 3px; }
     .helm-2::before { content: ''; position: absolute; top: -15px; left: 10px; width: 34px; height: 20px; background: #ffd700; clip-path: polygon(0 100%, 50% 0, 100% 100%, 50% 80%); }
-    
-    .helm-3 {
-        width: 54px; height: 40px; background: #212121;
-        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
-    }
+    .helm-3 { width: 54px; height: 40px; background: #212121; border-radius: 30% 30% 10% 10%; top: -10px; left: 3px; }
     .helm-3::before { content: ''; position: absolute; top: -25px; left: 5px; width: 44px; height: 25px; background: #ffd700; border-radius: 50%; box-shadow: inset -5px -5px 0 #212121; }
-    
-    .helm-nobu {
-        width: 54px; height: 45px; background: #212121;
-        border-radius: 20% 20% 10% 10%; top: -15px; left: 3px;
-    }
+    .helm-nobu { width: 54px; height: 45px; background: #212121; border-radius: 20% 20% 10% 10%; top: -15px; left: 3px; }
     .helm-nobu::before { content: ''; position: absolute; top: -10px; left: 0; width: 54px; height: 20px; background: #ffd700; clip-path: polygon(0 0, 20% 100%, 80% 100%, 100% 0, 50% 30%); }
-    
-    .helm-hide {
-        width: 54px; height: 40px; background: #ffca28;
-        border-radius: 30% 30% 10% 10%; top: -10px; left: 3px;
-    }
+    .helm-hide { width: 54px; height: 40px; background: #ffca28; border-radius: 30% 30% 10% 10%; top: -10px; left: 3px; }
     .helm-hide::before { content: ''; position: absolute; top: -30px; left: -10px; width: 74px; height: 74px; background: #ffca28; border-radius: 50%; z-index: -1; opacity: 0.5; }
-    
-    .helm-ninja {
-        width: 54px; height: 50px; background: #424242;
-        border-radius: 50% 50% 10% 10%; top: -5px; left: 3px;
-    }
+    .helm-ninja { width: 54px; height: 50px; background: #424242; border-radius: 50% 50% 10% 10%; top: -5px; left: 3px; }
     .helm-ninja::after { content: ''; position: absolute; top: 20px; left: 10px; width: 34px; height: 10px; background: #fdd835; }
 
-    /* 鎧 (Armor) - クラス名はハイフン区切り */
     .armor-part { position: absolute; z-index: 5; pointer-events: none; display: none; }
     .armor-1 { background: #d7ccc8; } 
     .armor-2 { background: #1a237e; border: 2px solid #ffd700; } 
@@ -302,42 +243,18 @@
     .armor-nobu::after { content: ''; position: absolute; top: 0; left: -10px; width: 60px; height: 50px; background: #b71c1c; border-radius: 10px; z-index: -1; transform: rotate(-5deg); }
     .armor-ninja { background: #000000; } 
 
-    /* 武器 (Weapon) - クラス名はハイフン区切り */
     .weapon-part { position: absolute; z-index: 7; pointer-events: none; display: none; }
-    
-    .weapon-katana {
-        width: 8px; height: 50px; background: #cfd8dc; 
-        border-radius: 4px; top: 25px; right: -15px;
-        transform: rotate(45deg); border: 1px solid #546e7a;
-    }
+    .weapon-katana { width: 8px; height: 50px; background: #cfd8dc; border-radius: 4px; top: 25px; right: -15px; transform: rotate(45deg); border: 1px solid #546e7a; }
     .weapon-katana::after { content: ''; position: absolute; bottom: -10px; left: 0; width: 8px; height: 15px; background: #3e2723; }
-    
     .weapon-2 { background: #cfd8dc; }
     .weapon-3 { background: #d50000; box-shadow: 0 0 10px #d50000; }
-    
-    .weapon-gun {
-        width: 10px; height: 40px; background: #5d4037;
-        border-radius: 2px; top: 30px; right: -15px;
-        transform: rotate(30deg);
-    }
+    .weapon-gun { width: 10px; height: 40px; background: #5d4037; border-radius: 2px; top: 30px; right: -15px; transform: rotate(30deg); }
     .weapon-gun::before { content: ''; position: absolute; top: 0; left: 2px; width: 6px; height: 30px; background: #8d6e63; }
-    
-    .weapon-fan {
-        width: 30px; height: 30px; background: #fbc02d;
-        border-radius: 50% 50% 5px 5px; top: 30px; right: -20px;
-        transform: rotate(20deg);
-    }
+    .weapon-fan { width: 30px; height: 30px; background: #fbc02d; border-radius: 50% 50% 5px 5px; top: 30px; right: -20px; transform: rotate(20deg); }
     .weapon-fan::after { content: ''; position: absolute; bottom: -15px; left: 12px; width: 6px; height: 20px; background: #3e2723; }
-    
-    .weapon-shuri {
-        width: 20px; height: 20px; background: #757575;
-        clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-        top: 35px; right: -15px; animation: spin 1s linear infinite;
-    }
+    .weapon-shuri { width: 20px; height: 20px; background: #757575; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); top: 35px; right: -15px; animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-
-    /* 歩行アニメーション */
     .walking #hero-avatar { animation: pawa-walk 0.6s infinite alternate ease-in-out; }
     @keyframes pawa-walk {
         0% { transform: translate(-50%, -100%) rotate(-2deg) translateY(0); }
@@ -353,19 +270,20 @@
     @keyframes leg-walk-l { from { transform: translateY(0); } to { transform: translateY(-5px); } }
     @keyframes leg-walk-r { from { transform: translateY(-5px); } to { transform: translateY(0); } }
 
-
     /* --- 蔵ボタン --- */
     .kura-btn {
-        position: fixed; bottom: 30px; right: 30px;
-        width: 90px; height: 90px;
+        position: fixed; bottom: 20px; right: 20px; /* スマホで押しやすい位置 */
+        width: 80px; height: 80px;
         background: var(--urushi-red); color: white;
         border-radius: 50%; border: 4px solid var(--gold);
         display: flex; flex-direction: column; justify-content: center; align-items: center;
-        font-size: 2.2em; cursor: pointer;
+        font-size: 2em; cursor: pointer;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 90;
         background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
         background-blend-mode: multiply;
+        transition: transform 0.1s;
     }
+    .kura-btn:active { transform: scale(0.95); }
     .kura-label { font-size: 0.5em; font-weight: bold; margin-top: -5px; color: var(--gold); text-shadow: 1px 1px 0 #000; }
 
     .modal-overlay {
@@ -374,19 +292,30 @@
         display: none; justify-content: center; align-items: center;
         backdrop-filter: blur(5px);
     }
+    /* ★ スマホ対応: 蔵（インベントリ）の表示を最適化 ★ */
     .kura-box {
-        width: 90%; max-width: 600px; height: 80%;
+        width: 95%; max-width: 600px; /* スマホなら画面いっぱい使う */
+        height: 90%; /* 高さを確保 */
         background: #fff8e1; border: 8px solid #5d4037;
-        border-radius: 10px; padding: 20px;
+        border-radius: 10px; padding: 15px;
         display: flex; flex-direction: column;
         position: relative;
         background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        box-sizing: border-box;
     }
+    
     .item-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        gap: 15px; overflow-y: auto; flex-grow: 1; padding: 10px;
+        display: grid; 
+        /* スマホ向けにグリッドを小さくして、たくさん並ぶようにする */
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 10px; 
+        overflow-y: auto; flex-grow: 1; 
+        padding: 5px;
+        /* スマホでのスクロール改善 */
+        -webkit-overflow-scrolling: touch; 
     }
+    
     .item-slot {
         background: #d7ccc8; border: 3px solid #a1887f;
         aspect-ratio: 1; border-radius: 12px;
@@ -395,9 +324,14 @@
         box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
     }
     .item-slot.equipped { border-color: var(--urushi-red); background: #ffccbc; box-shadow: 0 0 10px var(--urushi-red); }
-    .item-slot.equipped::after { content: "装備中"; position: absolute; bottom: 0; font-size: 0.7em; background: var(--urushi-red); color: white; width: 100%; text-align: center; border-radius: 0 0 10px 10px; padding: 2px 0; }
-    .item-icon { font-size: 3.5em; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
+    .item-slot.equipped::after { content: "装備中"; position: absolute; bottom: 0; font-size: 0.6em; background: var(--urushi-red); color: white; width: 100%; text-align: center; border-radius: 0 0 8px 8px; padding: 2px 0; }
+    /* アイコンサイズも少し調整 */
+    .item-icon { font-size: 3em; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
 
+    /* iPhone X以降の下部バー対策 */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .kura-btn { bottom: calc(20px + env(safe-area-inset-bottom)); }
+    }
 </style>
 </head>
 <body>
@@ -446,7 +380,8 @@
             </div>
             
             <div id="weapon-parts">
-                <div class="weapon-part weapon-1 weapon-katana" style="background:#a1887f; border-color:#5d4037;"></div> <div class="weapon-part weapon-2 weapon-katana"></div>
+                <div class="weapon-part weapon-1 weapon-katana" style="background:#a1887f; border-color:#5d4037;"></div>
+                <div class="weapon-part weapon-2 weapon-katana"></div>
                 <div class="weapon-part weapon-3 weapon-katana"></div>
                 <div class="weapon-part weapon-gun"></div>
                 <div class="weapon-part weapon-fan"></div>
@@ -465,9 +400,9 @@
 
 <div class="modal-overlay" id="kura-modal">
     <div class="kura-box">
-        <h2 style="text-align:center; margin:0 0 20px 0; color:#5d4037; font-family:'Yuji Syuku', serif;"><i class="fa-solid fa-treasure-chest"></i> 所持品一覧</h2>
+        <h2 style="text-align:center; margin:0 0 15px 0; color:#5d4037; font-family:'Yuji Syuku', serif; font-size:1.5em;"><i class="fa-solid fa-treasure-chest"></i> 所持品一覧</h2>
         <div class="item-grid" id="inventory-grid"></div>
-        <button onclick="closeKura()" style="margin-top:10px; padding:15px; background:var(--ink); color:white; border:none; font-size:1.2em; cursor:pointer; border-radius: 5px; font-family:'Yuji Syuku', serif;">閉じる</button>
+        <button onclick="closeKura()" style="margin-top:10px; padding:10px; background:var(--ink); color:white; border:none; font-size:1.1em; cursor:pointer; border-radius: 5px; font-family:'Yuji Syuku', serif;">閉じる</button>
     </div>
 </div>
 
@@ -491,7 +426,7 @@
     const auth = getAuth(app);
     let currentUser = null;
 
-    // --- 武将データ (座標 x, y を追加) ---
+    // --- 武将データ ---
     const WARLORDS = [
         { id: 1, name: "織田 信長", title: "たべもの", castle: "岐阜城", x: 150, y: 650, crest: "fa-flower" },
         { id: 2, name: "豊臣 秀吉", title: "あいさつ", castle: "大阪城", x: 450, y: 450, crest: "fa-sun" },
@@ -505,7 +440,6 @@
         { id: 10, name: "徳川 家康", title: "ばしょ", castle: "江戸城", x: 1750, y: 700, crest: "fa-leaf" }
     ];
 
-    // --- アイテムデータベース (IDはアンダースコア) ---
     window.ITEM_DB = {
         'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common', color: '#8d6e63' },
         'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color: '#d32f2f' },
@@ -597,7 +531,8 @@
 
         const currentLord = WARLORDS[userState.level - 1];
         if (currentLord) {
-            setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 100);
+            // スマホでの読み込みズレを防ぐため、少し時間を置いてからスクロール
+            setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 300);
         }
     }
 
@@ -692,6 +627,8 @@
         
         const viewportWidth = mapScroll.clientWidth;
         const viewportHeight = mapScroll.clientHeight;
+        
+        // 画面中央に来るようにスクロール
         mapScroll.scrollTo({ 
             left: x - viewportWidth / 2, 
             top: y - viewportHeight / 2, 
@@ -706,14 +643,10 @@
         else window.location.href = 'index.html';
     };
 
-    // --- アバター更新 (CSSクラス切り替え方式: IDのアンダースコアをハイフンに変換) ---
     function updateAvatar() {
         const eq = userState.equipped || {};
-        
-        // 全パーツを非表示にする
         document.querySelectorAll('.helm-part, .weapon-part').forEach(el => el.style.display = 'none');
         
-        // 装備中のパーツのみ表示 (IDの _ を - に変換してクラス名を検索)
         if (eq.helm) {
             const helmClass = eq.helm.replace(/_/g, '-');
             const helmEl = document.querySelector(`.${helmClass}`);
@@ -725,13 +658,12 @@
             if (weaponEl) weaponEl.style.display = 'block';
         }
 
-        // 体の色を変更 (鎧)
         const body = document.querySelector('.pawa-body');
         if (eq.armor) {
             const armorClass = eq.armor.replace(/_/g, '-');
             body.className = 'avatar-parts pawa-body ' + armorClass;
         } else {
-            body.className = 'avatar-parts pawa-body armor-1'; // デフォルト
+            body.className = 'avatar-parts pawa-body armor-1';
         }
     }
 
