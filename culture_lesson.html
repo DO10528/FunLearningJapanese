@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>合戦</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>合戦 - 戦国・日本語伝</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -12,18 +12,23 @@
         background-color: #333;
         background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.transparenttextures.com/patterns/shattered-island.png');
         color: white; margin: 0; padding: 0;
-        height: 100vh;
+        height: 100vh; height: 100dvh;
         display: flex; flex-direction: column; align-items: center;
+        overflow: hidden;
     }
 
     .battle-header {
-        width: 100%; padding: 15px; background: rgba(0,0,0,0.8);
+        width: 100%; padding: 10px 15px; background: rgba(0,0,0,0.8);
         display: flex; justify-content: space-between; align-items: center;
-        border-bottom: 2px solid #b71c1c;
+        border-bottom: 2px solid #b71c1c; box-sizing: border-box;
     }
     .level-badge {
-        font-family: 'Yuji Syuku', serif; font-size: 1.5em; color: #ffd700;
+        font-family: 'Yuji Syuku', serif; font-size: 1.2em; color: #ffd700;
         text-shadow: 2px 2px 0 #b71c1c;
+    }
+    .retreat-btn {
+        color: white; text-decoration: none; border: 1px solid #fff;
+        padding: 5px 10px; border-radius: 5px; font-size: 0.9em;
     }
 
     .main-area {
@@ -35,12 +40,14 @@
     /* 学習（巻物） */
     .scroll-paper {
         background: #fdf5e6; color: #333;
-        width: 100%; padding: 40px 20px;
+        width: 100%; padding: 30px 20px;
         border-radius: 5px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         text-align: center; border-top: 10px solid #5d4037; border-bottom: 10px solid #5d4037;
+        box-sizing: border-box;
     }
-    .card-img { font-size: 6em; color: #1a237e; margin-bottom: 10px; }
-    .card-word { font-size: 3em; font-family: 'Yuji Syuku', serif; margin: 0; }
+    .card-img { font-size: 5em; color: #1a237e; margin-bottom: 10px; }
+    .card-word { font-size: 2.5em; font-family: 'Yuji Syuku', serif; margin: 0; }
+    .card-en { font-size: 1.2em; color: #666; margin-top: 5px; }
     
     /* クイズ */
     .quiz-title-overlay {
@@ -58,35 +65,41 @@
     @keyframes zoomIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     @keyframes fadeOut { 0%, 70% { opacity: 1; } 100% { opacity: 0; display: none; } }
 
-    .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 20px; }
+    .quiz-grid { 
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 20px; 
+    }
     .quiz-btn {
         background: #fff; border: 4px solid #5d4037;
-        border-radius: 10px; padding: 15px;
-        display: flex; flex-direction: column; align-items: center;
+        border-radius: 10px; padding: 10px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
         cursor: pointer; position: relative; color: #333;
-        min-height: 120px; justify-content: center;
+        min-height: 100px; /* スマホで見やすく */
+        transition: transform 0.1s;
     }
+    .quiz-btn:active { transform: scale(0.95); background: #eee; }
     
     .quiz-btn.slashed { border-color: #2e7d32; background: #e8f5e9; }
     .quiz-btn.wrong { border-color: #b71c1c; background: #ffebee; }
-    .quiz-btn i { font-size: 3em; margin-bottom: 10px; color: #1a237e; }
-    .quiz-btn span { font-weight: bold; font-size: 1.5em; }
+    .quiz-btn i { font-size: 2.5em; margin-bottom: 10px; color: #1a237e; }
+    .quiz-btn span { font-weight: bold; font-size: 1.2em; text-align: center; }
 
     .next-btn {
-        margin-top: 30px; padding: 10px 40px;
+        margin-top: 30px; padding: 15px 50px;
         background: #b71c1c; color: #fff; font-family: 'Yuji Syuku', serif; font-size: 1.5em;
         border: 2px solid #ffd700; border-radius: 30px; cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
+    .next-btn:active { transform: translateY(2px); }
 
     /* 獲得モーダル */
     .loot-modal {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.95); z-index: 200;
         display: none; flex-direction: column; justify-content: center; align-items: center;
-        color: white; text-align: center;
+        color: white; text-align: center; padding: 20px; box-sizing: border-box;
     }
-    .loot-item { font-size: 5em; margin: 20px 0; animation: popIn 0.5s; }
-    .loot-name { font-size: 2.5em; font-family: 'Yuji Syuku', serif; color: #ffeb3b; }
+    .loot-item { font-size: 6em; margin: 20px 0; animation: popIn 0.5s; filter: drop-shadow(0 0 10px #ffd700); }
+    .loot-name { font-size: 2em; font-family: 'Yuji Syuku', serif; color: #ffeb3b; margin-bottom: 10px; }
     @keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
 
     .hidden { display: none !important; }
@@ -96,27 +109,26 @@
 
 <div class="battle-header">
     <div class="level-badge" id="level-display">出陣</div>
-    <a href="culture_map.html" style="color:white; text-decoration:none;">撤退</a>
+    <a href="culture_map.html" class="retreat-btn">撤退</a>
 </div>
 
 <div class="main-area">
     <div id="learn-area" class="scroll-paper">
         <i id="learn-img" class="fa-solid fa-question card-img"></i>
         <h1 id="learn-jp" class="card-word">...</h1>
-        <div id="learn-en" class="card-en" style="color:#555;">...</div>
-        <button class="next-btn" style="margin-top:20px; width:50px; height:50px; padding:0; border-radius:50%;" onclick="playAudio()">
+        <div id="learn-en" class="card-en">...</div>
+        <button class="next-btn" style="margin-top:20px; width:60px; height:60px; padding:0; border-radius:50%;" onclick="playAudio()">
             <i class="fa-solid fa-volume-high"></i>
         </button>
     </div>
 
     <div id="quiz-area" class="hidden" style="width:100%;">
-        
         <div class="quiz-title-overlay" id="quiz-overlay">
             <div class="quiz-title-text">いざ、勝負！</div>
         </div>
 
         <div style="text-align:center; margin-bottom:20px;">
-             <button onclick="playQuizAudio()" style="background:#ffca28; border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
+             <button onclick="playQuizAudio()" style="background:#ffca28; border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:1.1em; color:#333;">
                 <i class="fa-solid fa-volume-high"></i> 音をきく
             </button>
         </div>
@@ -127,11 +139,11 @@
 </div>
 
 <div class="loot-modal" id="loot-modal">
-    <h1 style="color:#f44336; font-family:'Yuji Syuku', serif; font-size:3em;">勝利!!</h1>
+    <h1 style="color:#f44336; font-family:'Yuji Syuku', serif; font-size:3em; margin:0;">勝利!!</h1>
     <div id="item-view" class="hidden">
         <div class="loot-item" id="loot-icon"></div>
         <div class="loot-name" id="loot-name"></div>
-        <p>戦利品を獲得しました</p>
+        <p style="font-size:1.2em;">戦利品を獲得しました</p>
     </div>
     <button class="next-btn" onclick="goBackToMap()">凱旋する</button>
 </div>
@@ -168,7 +180,7 @@
         }
     });
 
-    // --- 200単語データ ---
+    // --- 200単語データ (全カテゴリ含む) ---
     const CATEGORIES = {
         1: { title: "たべもの", words: [
             {hiragana:"おすし", kanji:"お寿司", en:"Sushi", icon:"fa-solid fa-fish"}, 
@@ -392,36 +404,36 @@
         ]}
     };
     
-    // 設定言語取得
     const displayLang = localStorage.getItem('culture_lang') || 'hiragana';
 
-    // ドロップアイテム設定 (ここも武将・忍者を加えて更新)
+    // ★ 更新されたドロップテーブル (新アイテムを含む) ★
     const DROP_TABLE = [
-        // コモン
-        'helm_1', 'armor_1', 'weapon_1', 'weapon_shuri',
-        // レア
-        'helm_2', 'armor_2', 'weapon_2', 'helm_ninja', 'armor_ninja', 'weapon_gun', 'weapon_fan',
-        // レジェンド
+        // コモン (40%)
+        'helm_1', 'helm_1', 'armor_1', 'armor_1', 'weapon_1', 'weapon_1', 'weapon_shuri', 'weapon_shuri',
+        // レア (40%)
+        'helm_2', 'armor_2', 'weapon_2', 
+        'helm_ninja', 'armor_ninja', 'weapon_gun', 'weapon_fan',
+        // レジェンド (20%)
         'helm_3', 'weapon_3', 'helm_nobu', 'armor_nobu', 'helm_hide'
     ];
     
-    // アイテムDB (マップと同じ)
+    // ★ 更新されたアイテムDB (マップ側と同期) ★
     const ITEM_DB = {
-        'helm_1': { name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', color:'#fff' },
+        'helm_1': { name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', color:'#8d6e63' },
         'helm_2': { name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', color:'#d32f2f' },
         'helm_3': { name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', color:'#ffd700' },
         'helm_nobu': { name: '魔王の兜', icon: 'fa-solid fa-crown', color: '#212121' },
         'helm_hide': { name: '日輪の兜', icon: 'fa-solid fa-sun', color: '#ffca28' },
         'helm_ninja': { name: '忍び頭巾', icon: 'fa-solid fa-user-ninja', color: '#424242' },
 
-        'armor_1': { name: 'ボロの着物', icon: 'fa-solid fa-shirt', color:'#fff' },
+        'armor_1': { name: 'ボロの着物', icon: 'fa-solid fa-shirt', color:'#d7ccc8' },
         'armor_2': { name: '侍の鎧', icon: 'fa-solid fa-shield-halved', color:'#1a237e' },
         'armor_nobu': { name: '南蛮マント', icon: 'fa-solid fa-user-secret', color: '#b71c1c' },
         'armor_ninja': { name: '忍び装束', icon: 'fa-solid fa-user-large', color: '#000000' },
 
-        'weapon_1': { name: '竹刀', icon: 'fa-solid fa-candy-cane', color:'#fff' },
+        'weapon_1': { name: '竹刀', icon: 'fa-solid fa-candy-cane', color:'#a1887f' },
         'weapon_2': { name: '名刀・虎徹', icon: 'fa-solid fa-khanda', color:'#cfd8dc' },
-        'weapon_3': { name: '妖刀・村正', icon: 'fa-solid fa-fire', color:'#b71c1c' },
+        'weapon_3': { name: '妖刀・村正', icon: 'fa-solid fa-fire', color:'#d50000' },
         'weapon_gun': { name: '火縄銃', icon: 'fa-solid fa-gun', color: '#5d4037' },
         'weapon_fan': { name: '軍配', icon: 'fa-solid fa-fan', color: '#fbc02d' },
         'weapon_shuri': { name: '手裏剣', icon: 'fa-solid fa-star', color: '#757575' }
@@ -461,7 +473,6 @@
         const actionBtn = document.getElementById('action-btn');
 
         if (!isQuizMode) {
-            // 学習
             if (currentStep < targetWords.length) {
                 learnArea.classList.remove('hidden');
                 quizArea.classList.add('hidden');
@@ -479,7 +490,6 @@
                 startQuizMode();
             }
         } else {
-            // クイズ
             if (quizCount < MAX_QUIZ) {
                 learnArea.classList.add('hidden');
                 quizArea.classList.remove('hidden');
@@ -500,7 +510,11 @@
         let choices = [correctWord];
         const others = wordList.filter(w => w.hiragana !== correctWord.hiragana);
         for(let i=0; i<3; i++) {
-            choices.push(others[Math.floor(Math.random() * others.length)]);
+            if(others.length > 0) {
+                const randIndex = Math.floor(Math.random() * others.length);
+                choices.push(others[randIndex]);
+                others.splice(randIndex, 1);
+            }
         }
         choices.sort(() => Math.random() - 0.5);
 
@@ -561,7 +575,6 @@
         document.getElementById('loot-icon').innerHTML = `<i class="${itemInfo.icon}" style="color:${itemInfo.color}"></i>`;
         document.getElementById('loot-name').innerText = itemInfo.name;
 
-        // 進捗更新
         let nextLvl = userState.level;
         let nextSub = userState.subLevel;
 
