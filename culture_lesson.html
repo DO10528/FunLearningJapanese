@@ -191,16 +191,29 @@
     const displayLang = localStorage.getItem('culture_lang') || 'hiragana';
 
     const DROP_TABLE = ['helm_1', 'armor_1', 'weapon_1', 'helm_2', 'armor_2', 'weapon_2', 'helm_3', 'weapon_3'];
-    const ITEM_DB = {
-        'helm_1': { name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', color:'#fff' },
-        'helm_2': { name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', color:'#d32f2f' },
-        'helm_3': { name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', color:'#ffd700' },
-        'armor_1': { name: 'ボロの着物', icon: 'fa-solid fa-shirt', color:'#fff' },
-        'armor_2': { name: '侍の鎧', icon: 'fa-solid fa-shield-halved', color:'#1a237e' },
-        'weapon_1': { name: '竹刀', icon: 'fa-solid fa-candy-cane', color:'#fff' },
-        'weapon_2': { name: '名刀・虎徹', icon: 'fa-solid fa-khanda', color:'#cfd8dc' },
-        'weapon_3': { name: '妖刀・村正', icon: 'fa-solid fa-fire', color:'#b71c1c' }
-    };
+    window.ITEM_DB = {
+    // --- 頭 (Helm) ---
+    'helm_1': { type: 'helm', name: '足軽の笠', icon: 'fa-solid fa-hat-cowboy', rarity: 'common', color: '#8d6e63' },
+    'helm_2': { type: 'helm', name: '赤備えの兜', icon: 'fa-solid fa-helmet-safety', rarity: 'rare', color: '#d32f2f' },
+    'helm_3': { type: 'helm', name: '三日月の兜', icon: 'fa-brands fa-fort-awesome', rarity: 'legend', color: '#ffd700' },
+    'helm_nobu': { type: 'helm', name: '魔王の兜', icon: 'fa-solid fa-crown', rarity: 'legend', color: '#212121' },
+    'helm_hide': { type: 'helm', name: '日輪の兜', icon: 'fa-solid fa-sun', rarity: 'legend', color: '#ffca28' },
+    'helm_ninja': { type: 'helm', name: '忍び頭巾', icon: 'fa-solid fa-user-ninja', rarity: 'rare', color: '#424242' },
+
+    // --- 体 (Armor) ---
+    'armor_1': { type: 'armor', name: 'ボロの着物', icon: 'fa-solid fa-shirt', rarity: 'common', color: '#d7ccc8' },
+    'armor_2': { type: 'armor', name: '侍の鎧', icon: 'fa-solid fa-shield-halved', rarity: 'rare', color: '#1a237e' },
+    'armor_nobu': { type: 'armor', name: '南蛮マント', icon: 'fa-solid fa-user-secret', rarity: 'legend', color: '#b71c1c' },
+    'armor_ninja': { type: 'armor', name: '忍び装束', icon: 'fa-solid fa-user-large', rarity: 'rare', color: '#000000' },
+
+    // --- 武器 (Weapon) ---
+    'weapon_1': { type: 'weapon', name: '竹刀', icon: 'fa-solid fa-candy-cane', rarity: 'common', color: '#a1887f' },
+    'weapon_2': { type: 'weapon', name: '名刀・虎徹', icon: 'fa-solid fa-khanda', rarity: 'rare', color: '#cfd8dc' },
+    'weapon_3': { type: 'weapon', name: '妖刀・村正', icon: 'fa-solid fa-fire', rarity: 'legend', color: '#d50000' },
+    'weapon_gun': { type: 'weapon', name: '火縄銃', icon: 'fa-solid fa-gun', rarity: 'rare', color: '#5d4037' },
+    'weapon_fan': { type: 'weapon', name: '軍配', icon: 'fa-solid fa-fan', rarity: 'rare', color: '#fbc02d' },
+    'weapon_shuri': { type: 'weapon', name: '手裏剣', icon: 'fa-solid fa-star', rarity: 'common', color: '#757575' }
+};
 
     const params = new URLSearchParams(window.location.search);
     const levelId = parseInt(params.get('level')) || 1;
