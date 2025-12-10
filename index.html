@@ -14,6 +14,7 @@
         --accent: #ffcc5c;
         --bg-color: #f4f7fc;
         --text-color: #333;
+        --line-green: #06c755; /* LINE色追加 */
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -35,11 +36,24 @@
         position: sticky; top: 0; z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    
+    /* ヘッダー右側のグループ化 */
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
     .lang-switch button {
         background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
         color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
     }
     .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
+
+    /* 設定ボタン (New) */
+    .settings-trigger {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+        color: white; width: 32px; height: 32px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; cursor: pointer;
+        font-size: 1em; transition: background 0.2s;
+    }
+    .settings-trigger:active { background: rgba(255,255,255,0.4); }
 
     /* --- ヒーロー --- */
     .hero-section {
@@ -133,6 +147,18 @@
         border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
     }
     
+    /* 設定モーダル用スタイル (New) */
+    .setting-row {
+        display: flex; justify-content: space-between; align-items: center;
+        background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
+        border: 1px solid #e0e0e0; text-align: left;
+    }
+    .line-btn {
+        background-color: var(--line-green); color: white; border: none;
+        padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        display: flex; align-items: center; gap: 8px; font-size: 0.9em;
+    }
+    
     .ranking-fab {
         position: fixed; bottom: 20px; right: 20px;
         background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
@@ -156,9 +182,16 @@
 
 <header>
     <div class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</div>
-    <div class="lang-switch">
-        <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
-        <button id="lang-en" onclick="setLanguage('en')">EN</button>
+    
+    <div class="header-right">
+        <button class="settings-trigger" onclick="openSettingsModal()">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+
+        <div class="lang-switch">
+            <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
+            <button id="lang-en" onclick="setLanguage('en')">EN</button>
+        </div>
     </div>
 </header>
 
@@ -196,22 +229,18 @@
         <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
         <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
     </a>
-    
     <a href="hiragana_video_list.html" class="game-card" style="border-color:#ffa726;">
         <i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
         <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
     </a>
-    
     <a href="verb_list.html" class="game-card" style="border-color:#ab47bc;">
         <i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
         <span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
     </a>
-    
     <a href="keiyoshi_list.html" class="game-card" style="border-color:#66bb6a;">
         <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
         <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
     </a>
-    
     <a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
         <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
         <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
@@ -234,7 +263,6 @@
         <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
     </a>
 </div>
-
 
 <div id="fab-ranking" class="ranking-fab" onclick="window.toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
 
@@ -259,6 +287,36 @@
     </div>
 </div>
 
+<div id="settings-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
+
+        <div class="setting-row">
+            <div>
+                <div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
+                <div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
+            </div>
+            <button onclick="requestNotificationPermission()" style="padding:6px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; cursor:pointer; font-size:0.85em;">
+                <i class="fa-solid fa-bell"></i> 許可
+            </button>
+        </div>
+
+        <div class="setting-row">
+            <div>
+                <div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
+                <div style="font-size:0.75em; color:#888;">学習通知を受け取る</div>
+            </div>
+            <button class="line-btn" onclick="alert('LINE連携は現在準備中です。\n(バックエンド実装後に有効になります)')">
+                <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
+            </button>
+        </div>
+        
+        <div style="margin-top:20px;">
+             <button onclick="closeSettingsModal()" style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { 
@@ -269,6 +327,8 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    // ★ 通知機能用に追加
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
@@ -283,9 +343,37 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app); 
+    const messaging = getMessaging(app); // 通知用
 
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
+
+    // --- 設定モーダル制御 ---
+    window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
+    window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
+
+    // --- Web Push通知の許可リクエスト ---
+    window.requestNotificationPermission = async () => {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                // VAPIDキーが必要ですが、簡易的にトークン取得のみ試行
+                const token = await getToken(messaging);
+                if (token) {
+                    console.log("FCM Token:", token);
+                    alert("通知が許可されました！\n(準備ができ次第、お知らせが届きます)");
+                    // TODO: ここでtokenをDBのusersコレクションに保存する処理を追加すると実際に送信可能になります
+                } else {
+                    alert("トークンの取得に失敗しました。(VAPID設定などを確認してください)");
+                }
+            } else {
+                alert("通知がブロックされています。ブラウザの設定から許可してください。");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("エラーが発生しました: " + error.message);
+        }
+    };
 
     // --- 認証モーダル制御 (多言語対応) ---
     window.openAuthModal = (mode) => {
@@ -545,9 +633,7 @@
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト", 
             group_kiso: "基礎・単語", 
-            // 変更: 学習メニュー
             group_learning: "学習メニュー", 
-            // 追加: ゲーム
             group_fun_games: "ゲーム",
             
             btn_kiso: "ひらがな<br>カタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
@@ -587,7 +673,6 @@
             btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
             btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
             
-            // 追加: 戦国日本語伝
             btn_sengoku: "戦国・日本語伝",
 
             // 認証モーダル
@@ -605,9 +690,7 @@
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
             group_kiso: "Basics", 
-            // Changed: Learning Menu
             group_learning: "Learning Menu", 
-            // Added: Games
             group_fun_games: "Games",
 
             btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
@@ -647,7 +730,6 @@
             btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
             btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
             
-            // Added: Sengoku
             btn_sengoku: "Sengoku RPG",
 
             // Auth Modal
