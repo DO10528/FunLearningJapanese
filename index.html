@@ -327,8 +327,9 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    // ★ 通知機能用に追加
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
+    
+    // ★ 追加1：onMessage をインポートに追加しました
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
@@ -345,6 +346,15 @@
     const auth = getAuth(app); 
     const messaging = getMessaging(app); // 通知用
 
+    // ★ 追加2：サイトを見ている時に通知が来た場合の処理
+    onMessage(messaging, (payload) => {
+        console.log('フォアグラウンドで通知を受信:', payload);
+        const title = payload.notification.title;
+        const body = payload.notification.body;
+        // 画面にアラートを出します
+        alert(`【通知】\n${title}\n${body}`);
+    });
+
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
@@ -352,12 +362,12 @@
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
-    // --- Web Push通知の許可リクエスト（修正版） ---
+    // --- Web Push通知の許可リクエスト ---
     window.requestNotificationPermission = async () => {
         try {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                // ★修正ここから: Service Workerを明示的に登録して場所を教える
+                // Service Workerを明示的に登録して場所を教える
                 let swReg;
                 try {
                     // 同じフォルダにあるファイルを指定して登録
@@ -370,9 +380,7 @@
                 }
 
                 // 登録したService Workerを使ってトークンを取得
-                // ※本来はここに { vapidKey: 'YOUR_PUBLIC_KEY' } が必要ですが、まずは接続確認
                 const token = await getToken(messaging, { serviceWorkerRegistration: swReg });
-                // ★修正ここまで
 
                 if (token) {
                     console.log("FCM Token:", token);
@@ -695,11 +703,11 @@
             btn_exec: "実行", btn_cancel: "キャンセル",
             err_input_req: "メールアドレスとパスワードを入力してください",
             err_pass_len: "パスワードは6文字以上にする必要があります。",
-            err_name_req: "ゲーム名を入力してください（2文字以上）。",
-            err_name_taken: "そのゲーム名は既に使用されています。",
+            err_name_req: "Please enter a game name (2+ chars).",
+            err_name_taken: "That game name is already taken.",
             err_generic: "認証中にエラーが発生しました。",
-            err_email_taken: "そのメールアドレスは既に使用されています。",
-            err_auth_fail: "メールアドレスまたはパスワードが正しくありません。"
+            err_email_taken: "Email is already in use.",
+            err_auth_fail: "Incorrect email or password."
         },
         en: { 
             main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
