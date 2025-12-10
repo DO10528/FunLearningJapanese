@@ -1,31 +1,36 @@
-// firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js');
+// --- Web Push通知の許可リクエスト（修正版） ---
+    window.requestNotificationPermission = async () => {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                // ★修正ここから: Service Workerを明示的に登録して場所を教える
+                let swReg;
+                try {
+                    // 同じフォルダにあるファイルを指定して登録
+                    swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                    console.log("Service Worker登録成功:", swReg);
+                } catch (err) {
+                    console.error("Service Worker登録失敗:", err);
+                    alert("Service Workerファイルの読み込みに失敗しました。\nファイルの場所を確認してください。");
+                    return;
+                }
 
-// index.htmlにあるのと同じ設定
-const firebaseConfig = {
-  apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-  authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-  projectId: "funlearningjapanese-b8e08",
-  storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
-  messagingSenderId: "1055688629268",
-  appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-  measurementId: "G-LCMXVLPS81"
-};
+                // 登録したService Workerを使ってトークンを取得
+                // ※本来はここに { vapidKey: 'YOUR_PUBLIC_KEY' } が必要ですが、まずは接続確認
+                const token = await getToken(messaging, { serviceWorkerRegistration: swReg });
+                // ★修正ここまで
 
-firebase.initializeApp(firebaseConfig);
-
-const messaging = firebase.messaging();
-
-// バックグラウンドで通知を受け取った時の処理
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/icon.png' // アイコンがあれば指定
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+                if (token) {
+                    console.log("FCM Token:", token);
+                    alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
+                } else {
+                    alert("トークンの取得に失敗しました。");
+                }
+            } else {
+                alert("通知がブロックされています。ブラウザの設定から許可してください。");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("エラーが発生しました: " + error.message);
+        }
+    };
