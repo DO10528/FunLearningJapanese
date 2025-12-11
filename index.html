@@ -324,8 +324,8 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
+    // モジュール用設定
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -340,31 +340,6 @@
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
     const auth = getAuth(app); 
-    const messaging = getMessaging(app);
-
-    // ★GitHub Pages対策: 正しいパスを判定する魔法のコード
-    // ローカル(localhost)なら './'、GitHub Pagesなら '/FunLearningJapanese/' を使います
-    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-    const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-
-    // Service Workerの自動登録
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register(swPath)
-        .then((registration) => {
-            console.log('Service Worker 自動登録成功:', registration);
-        })
-        .catch((err) => {
-            console.error('Service Worker 自動登録失敗:', err);
-        });
-    }
-
-    // サイトを開いている時の通知処理
-    onMessage(messaging, (payload) => {
-        console.log('フォアグラウンドで通知を受信:', payload);
-        const title = payload.notification.title;
-        const body = payload.notification.body;
-        alert(`【通知】\n${title}\n${body}`);
-    });
 
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
@@ -372,38 +347,7 @@
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
-    // 通知許可リクエスト（手動）
-    window.requestNotificationPermission = async () => {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                let swReg;
-                try {
-                    // ★ここも修正: 自動判定したパス(swPath)を使います
-                    swReg = await navigator.serviceWorker.register(swPath);
-                } catch (err) {
-                    alert("Service Workerファイルの読み込みに失敗しました。");
-                    return;
-                }
-
-                const token = await getToken(messaging, { serviceWorkerRegistration: swReg });
-
-                if (token) {
-                    console.log("FCM Token:", token);
-                    alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
-                } else {
-                    alert("トークンの取得に失敗しました。");
-                }
-            } else {
-                alert("通知がブロックされています。設定を確認してください。");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("エラーが発生しました: " + error.message);
-        }
-    };
-
-    // ... (認証関連のコードは変更なし) ...
+    // ... (認証関連のコード) ...
     window.openAuthModal = (mode) => {
         window.authMode = mode;
         const modal = document.getElementById('auth-modal');
@@ -915,7 +859,76 @@
     // 初回レンダリング
     renderGameCategories();
 </script>
+
 <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js"></script>
+
+<script>
+    const firebaseConfigCompat = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    // 初期化 (すでに初期化されているか確認)
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfigCompat);
+    }
+    const messaging = firebase.messaging();
+
+    // 通知受信時の処理
+    messaging.onMessage((payload) => {
+        console.log('フォアグラウンド通知:', payload);
+        const title = payload.notification.title;
+        const body = payload.notification.body;
+        alert(`【通知】\n${title}\n${body}`);
+    });
+</script>
+
+<script>
+    const vapidKey = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
+
+    // "設定"ボタンのonclickから呼ばれる関数
+    window.requestNotificationPermission = function() {
+        Notification.requestPermission().then((permission) => {
+            console.log("通知許可:", permission);
+
+            if (permission === "granted") {
+                // Service Workerを登録してからトークンを取得
+                const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+                const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+
+                navigator.serviceWorker.register(swPath).then((registration) => {
+                    return messaging.getToken({ vapidKey: vapidKey, serviceWorkerRegistration: registration });
+                }).then((token) => {
+                    console.log("FCM Token:", token);
+                    alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
+                })
+                .catch((err) => {
+                    console.error("トークン取得エラー:", err);
+                    alert("トークン取得に失敗しました: " + err.message);
+                });
+            } else {
+                alert("通知がブロックされました。ブラウザの設定を確認してください。");
+            }
+        });
+    };
+</script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+
+        navigator.serviceWorker.register(swPath)
+            .then((reg) => console.log("Service Worker 自動登録成功:", reg))
+            .catch((e) => console.error("SW 自動登録エラー:", e));
+    }
+</script>
+
 </body>
 </html>
