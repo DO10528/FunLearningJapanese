@@ -6,7 +6,6 @@
 <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
     /* --- 基本設定 --- */
@@ -303,7 +302,7 @@
                 <div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
                 <div style="font-size:0.75em; color:#888;">学習通知を受け取る</div>
             </div>
-            <button class="line-btn" onclick="linkLineAccount()">
+            <button class="line-btn" onclick="alert('LINE連携は現在準備中です。\n(バックエンド実装後に有効になります)')">
                 <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
             </button>
         </div>
@@ -325,6 +324,7 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    // メッセージング（通知）の機能をインポート
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
     const firebaseConfig = {
@@ -347,21 +347,18 @@
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
-    // 通知用VAPIDキー
+    // あなたのVAPIDキー（ここに統合しました）
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-    // ★ LINE LIFF ID (ここに組み込みました)
-    const MY_LIFF_ID = "2008673707-D8TLYqYg";
+    // --- 通知関連の関数 ---
 
-    // --- 通知機能 ---
-    // 1. Service Worker自動登録
+    // 1. Service Workerの自動登録（GitHub Pagesパス対応）
     const registerServiceWorker = async () => {
         if ('serviceWorker' in navigator) {
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
             try {
-                // scopeを指定しないと、階層の違うファイルで問題が起きることがあるため修正
-                const registration = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/' });
+                const registration = await navigator.serviceWorker.register(swPath);
                 console.log('Service Worker 自動登録成功:', registration);
                 return registration;
             } catch (err) {
@@ -372,7 +369,7 @@
     };
     registerServiceWorker();
 
-    // 2. フォアグラウンド通知受信
+    // 2. サイトを見ている時の通知処理 (Foreground)
     onMessage(messaging, (payload) => {
         console.log("Message received (foreground)", payload);
         const title = payload.notification.title;
@@ -380,22 +377,22 @@
         alert(`【通知】\n${title}\n${body}`);
     });
 
-    // 3. 通知許可リクエスト
+    // 3. 通知許可リクエスト（設定ボタンから呼ばれる）
     window.requestNotificationPermission = async () => {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-            alert("通知がブロックされています。");
+            alert("通知がブロックされています。ブラウザの設定を確認してください。");
             return;
         }
 
         try {
-            // 現在の登録状況を確認
+            // SWを取得または登録してからトークンを取得
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-            let swReg = await navigator.serviceWorker.getRegistration();
             
+            let swReg = await navigator.serviceWorker.getRegistration(swPath);
             if (!swReg) {
-                swReg = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/' });
+                swReg = await navigator.serviceWorker.register(swPath);
             }
 
             const token = await getToken(messaging, {
@@ -404,41 +401,14 @@
             });
 
             console.log("FCM Token:", token);
-            alert("通知設定が完了しました！\n(トークンを取得しました)");
+            alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
         } catch (err) {
             console.error("FCM Token error:", err);
-            alert("エラー: " + err.message);
+            alert("トークンの取得に失敗しました: " + err.message);
         }
     };
 
-    // --- LINE連携機能 (LIFF) ---
-    window.linkLineAccount = async () => {
-        try {
-            // LIFF初期化
-            await liff.init({ liffId: MY_LIFF_ID });
-            
-            if (!liff.isLoggedIn()) {
-                // ログインしていなければLINEログイン画面へ
-                liff.login();
-            } else {
-                // ログイン済みならプロフィール取得
-                const profile = await liff.getProfile();
-                const lineUserId = profile.userId;
-                const lineName = profile.displayName;
-                
-                // 確認用のアラート（本番では消してもOK）
-                alert(`LINE連携成功！\nこんにちは、${lineName}さん。`);
-                
-                // ★ここでFirebaseに情報を保存する処理などが将来的に入ります
-                console.log("LINE User ID:", lineUserId);
-            }
-        } catch (err) {
-            console.error("LIFF Error:", err);
-            alert("LINE連携に失敗しました: " + err.message);
-        }
-    };
-
-    // --- UI・認証関連 (既存コード) ---
+    // --- UI・認証関連 ---
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
@@ -448,17 +418,22 @@
         const displayNameInput = document.getElementById('auth-display-name');
         
         modal.style.display = 'flex';
+        
         const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
         document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
         document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
+        
         displayNameInput.classList.toggle('hidden', mode === 'login');
+
         document.getElementById('modal-msg').textContent = '';
         document.getElementById('auth-email').value = ''; 
         document.getElementById('auth-pass').value = '';
         displayNameInput.value = '';
     };
 
-    window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
+    window.closeAuthModal = () => {
+        document.getElementById('auth-modal').style.display = 'none';
+    };
 
     window.submitAuth = async () => {
         const email = document.getElementById('auth-email').value.trim(); 
@@ -472,31 +447,55 @@
 
         try {
             if (window.authMode === 'signup') {
-                if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
+                if (!displayName || displayName.length < 2) { 
+                    msg.textContent = errs.err_name_req; 
+                    return; 
+                }
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("displayName", "==", displayName), limit(1));
                 const snap = await getDocs(q);
-                if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
+                if (!snap.empty) {
+                    msg.textContent = errs.err_name_taken;
+                    return;
+                }
 
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
+                
                 await setDoc(doc(db, "users", user.uid), {
-                    email: email, displayName: displayName, points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
+                    email: email, 
+                    displayName: displayName,
+                    points: 0,
+                    streak: 1,
+                    lastLogin: new Date().toISOString(),
+                    dailyTracker: {} 
                 });
+                
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
+
             } else {
                 const userCredential = await signInWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
+
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef); 
+
                 if (!userSnap.exists()) {
                     await setDoc(userRef, {
-                        email: email, displayName: email.split('@')[0] || 'UnknownUser', points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
+                        email: email,
+                        displayName: email.split('@')[0] || 'UnknownUser', 
+                        points: 0,
+                        streak: 1,
+                        lastLogin: new Date().toISOString(),
+                        dailyTracker: {} 
                     });
                 } else {
-                    if (!userSnap.data().dailyTracker) await updateDoc(userRef, { dailyTracker: {} });
+                    if (!userSnap.data().dailyTracker) {
+                        await updateDoc(userRef, { dailyTracker: {} });
+                    }
                 }
+
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
             }
@@ -525,12 +524,15 @@
     const checkMonthlyReset = async (user) => {
         const userRef = doc(db, "users", user.uid);
         const snapshot = await getDoc(userRef);
+        
         if (snapshot.exists()) {
             const data = snapshot.data();
             const now = new Date();
             const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+
             if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
                 await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+                console.log("月が変わったため、ポイントをリセットしました。");
             } else {
                 await updateDoc(userRef, { lastLogin: now.toISOString() });
             }
@@ -540,6 +542,7 @@
     function updateUI(userState) {
         const dash = document.getElementById('user-dashboard');
         const welcome = document.getElementById('guest-welcome');
+
         if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
         
         if (userState === 'guest') {
@@ -550,22 +553,29 @@
             document.getElementById('level-fill').style.width = '0%';
             document.getElementById('streak-val').textContent = 0;
             document.getElementById('point-val').textContent = 0;
+            
         } else if (userState && userState.uid) {
             welcome.classList.add('hidden');
             dash.classList.remove('hidden');
+
             const userId = userState.uid;
+            
             currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
                 if (doc.exists()) {
                     const data = doc.data();
                     document.getElementById('user-name').textContent = data.displayName || 'ユーザー'; 
                     document.getElementById('streak-val').textContent = data.streak || 0;
                     document.getElementById('point-val').textContent = data.points || 0;
+                    
                     const pts = data.points || 0;
                     const level = Math.floor(pts / 100) + 1;
                     document.getElementById('user-lvl').textContent = level;
                     document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+                } else {
+                    document.getElementById('user-name').textContent = 'エラー';
                 }
             });
+
         } else {
             welcome.classList.remove('hidden');
             dash.classList.add('hidden');
@@ -576,26 +586,45 @@
         const modal = document.getElementById('ranking-modal');
         const list = document.getElementById('ranking-list');
         const loading = document.getElementById('ranking-loading');
+        
         modal.style.display = 'flex';
         list.innerHTML = '';
         loading.style.display = 'block';
+
         try {
             const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
             const querySnapshot = await getDocs(q);
+            
             loading.style.display = 'none';
+            
             let rank = 1;
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const name = data.displayName || 'Unknown'; 
                 const pt = data.points || 0;
+                
                 const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                
                 const li = document.createElement('li');
                 li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
-                li.innerHTML = `<span>${icon} ${name}</span><span style="color:#f0ad4e">${pt}pt</span>`;
+                
+                const leftSpan = document.createElement('span');
+                leftSpan.textContent = `${icon} ${name}`;
+                
+                const rightSpan = document.createElement('span');
+                rightSpan.style.color = "#f0ad4e";
+                rightSpan.textContent = `${pt}pt`;
+                
+                li.appendChild(leftSpan);
+                li.appendChild(rightSpan);
                 list.appendChild(li);
                 rank++;
             });
-            if (rank === 1) list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
+
+            if (rank === 1) {
+                list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
+            }
+
         } catch (e) {
             console.error(e);
             loading.innerText = '読み込みエラー';
@@ -621,12 +650,278 @@
     document.getElementById('modal-close').onclick = () => window.closeAuthModal();
     document.getElementById('modal-submit').onclick = () => window.submitAuth();
 
-    const handleEnter = (e) => { if (e.key === 'Enter') window.submitAuth(); };
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') window.submitAuth();
+    };
     document.getElementById('auth-email').onkeydown = handleEnter;
     document.getElementById('auth-pass').onkeydown = handleEnter;
     document.getElementById('auth-display-name').onkeydown = handleEnter;
 
     window.renderGameCategories(); 
+</script>
+
+<script>
+    const i18nData = {
+        ja: { 
+            main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト", 
+            group_kiso: "基礎・単語", 
+            group_learning: "学習メニュー", 
+            group_fun_games: "ゲーム",
+            
+            btn_kiso: "ひらがな<br>カタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
+            cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
+            cat_clock: "とけい", 
+            cat_date_time: "日付・時間",
+            cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
+            cat_practice: "じっせん",
+            
+            // ゲームタイトル
+            btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
+            btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
+            btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", 
+            btn_k_pair: "ひらカタあわせ",
+            btn_shiri1: "しりとり1", btn_shiri2: "しりとり2",
+            btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
+            
+            btn_imasu: "います<br>あります",
+            btn_money: "お金の学習",
+            btn_transport: "こうつう",
+            
+            btn_clock1: "とけい1", btn_clock2: "とけい2",
+            btn_datetime_practice: "日付・練習", 
+
+            btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
+            btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
+            btn_kei_neg: "ひていけい (～くない)",
+
+            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
+            btn_tekudasai: "V-てください", 
+            btn_tekudasaimasenka: "V-てくださいませんか",
+            btn_mashouka: "V-ましょうか", 
+            btn_teimasu: "V-ています", 
+            btn_temoii: "V-てもいいですか",
+            btn_kata: "V-方",
+            
+            btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
+            btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
+            
+            btn_sengoku: "戦国・日本語伝",
+
+            // 認証モーダル
+            modal_login: "ログイン", modal_signup: "新規登録",
+            ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
+            btn_exec: "実行", btn_cancel: "キャンセル",
+            err_input_req: "メールアドレスとパスワードを入力してください",
+            err_pass_len: "パスワードは6文字以上にする必要があります。",
+            err_name_req: "Please enter a game name (2+ chars).",
+            err_name_taken: "That game name is already taken.",
+            err_generic: "認証中にエラーが発生しました。",
+            err_email_taken: "Email is already in use.",
+            err_auth_fail: "Incorrect email or password."
+        },
+        en: { 
+            main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
+            group_kiso: "Basics", 
+            group_learning: "Learning Menu", 
+            group_fun_games: "Games",
+
+            btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
+            cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
+            cat_clock: "Clock", 
+            cat_date_time: "Date & Time",
+            cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
+            cat_practice: "Practice",
+
+            // Game Titles
+            btn_h_write: "Writing Practice", btn_h_sound: "Sound Quiz", btn_h_match: "Hiragana Match",
+            btn_h_vocab: "Hiragana Vocab", btn_h_reorder: "Reordering", btn_h_meteor: "Meteor Quiz",
+            btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Katakana Match",
+            btn_k_pair: "Hira/Kata Pair",
+            btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2",
+            btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
+            
+            btn_imasu: "Imasu<br>Arimasu",
+            btn_money: "Money Learning",
+            btn_transport: "Transport",
+
+            btn_clock1: "Clock 1", btn_clock2: "Clock 2",
+            btn_datetime_practice: "Date Practice", 
+
+            btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
+            btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
+            btn_kei_neg: "Negative Form",
+            
+            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
+            btn_tekudasai: "V-te Kudasai", 
+            btn_tekudasaimasenka: "V-te Kudasaimasenka",
+            btn_mashouka: "V-mashouka",
+            btn_teimasu: "V-te Imasu",
+            btn_temoii: "May I...?",
+            btn_kata: "How to V (V-kata)",
+            
+            btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
+            btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
+            
+            btn_sengoku: "Sengoku RPG",
+
+            // Auth Modal
+            modal_login: "Login", modal_signup: "Sign Up",
+            ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
+            btn_exec: "Submit", btn_cancel: "Cancel",
+            err_input_req: "Please enter email and password.",
+            err_pass_len: "Password must be at least 6 characters.",
+            err_name_req: "Please enter a game name (2+ chars).",
+            err_name_taken: "That game name is already taken.",
+            err_generic: "An error occurred during authentication.",
+            err_email_taken: "Email is already in use.",
+            err_auth_fail: "Incorrect email or password."
+        }
+    };
+
+    const gameStructure = [
+        { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
+            { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
+            { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
+            { url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
+            { url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
+            { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
+            { url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
+        ]},
+        { id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
+            { url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
+            { url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" }, 
+            { url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
+            { url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
+        ]},
+        { id: "shiritori", icon: "fa-solid fa-comments", color: "#fdd835", titleKey: "cat_shiritori", games: [
+            { url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
+            { url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
+        ]},
+        { id: "word_other", icon: "fa-solid fa-microphone", color: "#26c6da", titleKey: "cat_word_other", games: [
+            { url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
+            { url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
+            { url: "imasu_arimasu.html", titleKey: "btn_imasu", icon: "fa-solid fa-cat" },
+            { url: "money.html", titleKey: "btn_money", icon: "fa-solid fa-coins" },
+            { url: "transport_game.html", titleKey: "btn_transport", icon: "fa-solid fa-car" },
+        ]},
+        { id: "clock", icon: "fa-solid fa-clock", color: "#5c6bc0", titleKey: "cat_clock", games: [
+            { url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
+            { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
+        ]},
+        { id: "date_time", icon: "fa-solid fa-calendar-alt", color: "#3f51b5", titleKey: "cat_date_time", games: [
+            { url: "date_time_practice.html", titleKey: "btn_datetime_practice", icon: "fa-solid fa-book-open" }
+        ]},
+        { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
+            { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
+            { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
+        ]},
+        { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
+            { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
+            { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
+            { url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
+        ]},
+        { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
+            { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
+            { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
+            { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
+            { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
+            { url: "verb_tekudasaimasenka_practice.html", titleKey: "btn_tekudasaimasenka", icon: "fa-solid fa-hands-praying" },
+            { url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" },
+            { url: "verb_teimasu_practice.html", titleKey: "btn_teimasu", icon: "fa-solid fa-spinner" },
+            { url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" },
+            { url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" }
+        ]},
+        { id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
+            { url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
+            { url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
+            { url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
+        ]},
+        { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ 
+            { url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
+            { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
+        ]}
+    ];
+
+    const gameGrid = document.getElementById('game-grid');
+    const backBtn = document.getElementById('game-back-btn');
+    let currentLang = 'ja';
+
+    window.renderGameCategories = () => {
+        gameGrid.innerHTML = '';
+        backBtn.style.display = 'none';
+        // group_learning を使用
+        document.getElementById('game-section-title').textContent = i18nData[currentLang].group_learning;
+
+        gameStructure.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'game-card';
+            div.style.borderColor = cat.color;
+            div.onclick = () => renderGameList(cat);
+            
+            const title = i18nData[currentLang][cat.titleKey] || cat.titleKey;
+            
+            div.innerHTML = `
+                <i class="${cat.icon} card-icon" style="color:${cat.color}"></i>
+                <span class="card-title">${title}</span>
+                <span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>
+            `;
+            gameGrid.appendChild(div);
+        });
+        gameGrid.classList.remove('fade-in');
+        void gameGrid.offsetWidth;
+        gameGrid.classList.add('fade-in');
+    };
+
+    function renderGameList(category) {
+        gameGrid.innerHTML = '';
+        backBtn.style.display = 'block';
+        document.getElementById('game-section-title').textContent = i18nData[currentLang][category.titleKey];
+
+        category.games.forEach(game => {
+            const a = document.createElement('a');
+            a.href = game.url;
+            a.className = 'game-card';
+            a.style.borderColor = category.color;
+
+            const gameTitle = i18nData[currentLang][game.titleKey] || game.title;
+            
+            a.innerHTML = `
+                <i class="${game.icon} card-icon" style="color:${category.color}"></i>
+                <span class="card-title">${gameTitle}</span>
+            `;
+            gameGrid.appendChild(a);
+        });
+        gameGrid.classList.remove('fade-in');
+        void gameGrid.offsetWidth;
+        gameGrid.classList.add('fade-in');
+    }
+
+    window.setLanguage = (lang) => {
+        currentLang = lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if(i18nData[lang][key]) el.textContent = i18nData[lang][key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.dataset.i18nPlaceholder;
+            if(i18nData[lang][key]) el.placeholder = i18nData[lang][key];
+        });
+
+        document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        
+        if(backBtn.style.display === 'none') renderGameCategories();
+        else renderGameCategories(); 
+
+        if(document.getElementById('auth-modal').style.display === 'flex') {
+             const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
+             document.getElementById('modal-title').textContent = i18nData[lang][modeKey];
+             document.getElementById('modal-submit').textContent = i18nData[lang]['btn_exec'];
+        }
+    };
+    
+    // 初回レンダリング
+    renderGameCategories();
 </script>
 </body>
 </html>
