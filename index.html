@@ -314,7 +314,9 @@
 </div>
 
 <script type="module">
+    // ★ 修正: Analyticsを追加し、CDN形式で統一しました
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
     import { 
         getFirestore, doc, setDoc, updateDoc, getDocs, collection, 
         query, orderBy, limit, onSnapshot, where, getDoc, increment 
@@ -325,23 +327,26 @@
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
+    // ★ 修正: storageBucketを正しいアドレスに修正しました
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
       projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
+      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
       messagingSenderId: "1055688629268",
       appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
       measurementId: "G-LCMXVLPS81"
     };
 
     const app = initializeApp(firebaseConfig);
+    // ★ 追加: Analyticsを初期化
+    const analytics = getAnalytics(app);
+    
     const db = getFirestore(app);
     const auth = getAuth(app); 
     const messaging = getMessaging(app);
 
-    // ★ 追加したコード：Service Workerの自動登録
-    // ページが開かれたときに、自動的にService Workerを準備しておきます
+    // Service Workerの自動登録
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./firebase-messaging-sw.js')
         .then((registration) => {
