@@ -324,30 +324,94 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    // メッセージング（通知）の機能をインポート
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
-    // モジュール用設定
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
       projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
       messagingSenderId: "1055688629268",
       appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
       measurementId: "G-LCMXVLPS81"
     };
 
+    // Firebase初期化
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
     const auth = getAuth(app); 
+    const messaging = getMessaging(app);
 
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
+    // あなたのVAPIDキー（ここに統合しました）
+    const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
+
+    // --- 通知関連の関数 ---
+
+    // 1. Service Workerの自動登録（GitHub Pagesパス対応）
+    const registerServiceWorker = async () => {
+        if ('serviceWorker' in navigator) {
+            const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+            const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+            try {
+                const registration = await navigator.serviceWorker.register(swPath);
+                console.log('Service Worker 自動登録成功:', registration);
+                return registration;
+            } catch (err) {
+                console.error('Service Worker 自動登録失敗:', err);
+                return null;
+            }
+        }
+    };
+    registerServiceWorker();
+
+    // 2. サイトを見ている時の通知処理 (Foreground)
+    onMessage(messaging, (payload) => {
+        console.log("Message received (foreground)", payload);
+        const title = payload.notification.title;
+        const body = payload.notification.body;
+        alert(`【通知】\n${title}\n${body}`);
+    });
+
+    // 3. 通知許可リクエスト（設定ボタンから呼ばれる）
+    window.requestNotificationPermission = async () => {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+            alert("通知がブロックされています。ブラウザの設定を確認してください。");
+            return;
+        }
+
+        try {
+            // SWを取得または登録してからトークンを取得
+            const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+            const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+            
+            let swReg = await navigator.serviceWorker.getRegistration(swPath);
+            if (!swReg) {
+                swReg = await navigator.serviceWorker.register(swPath);
+            }
+
+            const token = await getToken(messaging, {
+                vapidKey: VAPID_KEY,
+                serviceWorkerRegistration: swReg
+            });
+
+            console.log("FCM Token:", token);
+            alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
+        } catch (err) {
+            console.error("FCM Token error:", err);
+            alert("トークンの取得に失敗しました: " + err.message);
+        }
+    };
+
+    // --- UI・認証関連 ---
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
-    // ... (認証関連のコード) ...
     window.openAuthModal = (mode) => {
         window.authMode = mode;
         const modal = document.getElementById('auth-modal');
@@ -859,76 +923,5 @@
     // 初回レンダリング
     renderGameCategories();
 </script>
-
-<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js"></script>
-
-<script>
-    const firebaseConfigCompat = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebasestorage.app",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    // 初期化 (すでに初期化されているか確認)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfigCompat);
-    }
-    const messaging = firebase.messaging();
-
-    // 通知受信時の処理
-    messaging.onMessage((payload) => {
-        console.log('フォアグラウンド通知:', payload);
-        const title = payload.notification.title;
-        const body = payload.notification.body;
-        alert(`【通知】\n${title}\n${body}`);
-    });
-</script>
-
-<script>
-    const vapidKey = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
-
-    // "設定"ボタンのonclickから呼ばれる関数
-    window.requestNotificationPermission = function() {
-        Notification.requestPermission().then((permission) => {
-            console.log("通知許可:", permission);
-
-            if (permission === "granted") {
-                // Service Workerを登録してからトークンを取得
-                const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-                const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-
-                navigator.serviceWorker.register(swPath).then((registration) => {
-                    return messaging.getToken({ vapidKey: vapidKey, serviceWorkerRegistration: registration });
-                }).then((token) => {
-                    console.log("FCM Token:", token);
-                    alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
-                })
-                .catch((err) => {
-                    console.error("トークン取得エラー:", err);
-                    alert("トークン取得に失敗しました: " + err.message);
-                });
-            } else {
-                alert("通知がブロックされました。ブラウザの設定を確認してください。");
-            }
-        });
-    };
-</script>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-        const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-
-        navigator.serviceWorker.register(swPath)
-            .then((reg) => console.log("Service Worker 自動登録成功:", reg))
-            .catch((e) => console.error("SW 自動登録エラー:", e));
-    }
-</script>
-
 </body>
 </html>

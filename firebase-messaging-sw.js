@@ -1,31 +1,32 @@
-// firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js');
+// firebase-messaging-sw.js (modular)
 
-// index.htmlにあるのと同じ設定
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getMessaging, onBackgroundMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-sw.js";
+
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
   authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
   projectId: "funlearningjapanese-b8e08",
-  storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
+  storageBucket: "funlearningjapanese-b8e08.appspot.com",
   messagingSenderId: "1055688629268",
   appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
   measurementId: "G-LCMXVLPS81"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialize
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
 
-const messaging = firebase.messaging();
+// Background Notification Handler
+onBackgroundMessage(messaging, (payload) => {
+  console.log("[SW] Background message received", payload);
 
-// バックグラウンドで通知を受け取った時の処理
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/icon.png' // アイコンがあれば指定
+  const title = payload.notification?.title ?? "通知";
+  const options = {
+    body: payload.notification?.body,
+    icon: "/icon.png"
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  self.registration.showNotification(title, options);
 });
