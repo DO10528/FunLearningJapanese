@@ -347,7 +347,7 @@
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
-    // あなたのVAPIDキー（ここに統合しました）
+    // あなたのVAPIDキー（Firebase Consoleから取得したもの）
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
     // --- 通知関連の関数 ---
@@ -356,6 +356,7 @@
     const registerServiceWorker = async () => {
         if ('serviceWorker' in navigator) {
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+            // GitHub Pagesの場合はサブディレクトリを含むパス、ローカルならルート
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
             try {
                 const registration = await navigator.serviceWorker.register(swPath);
@@ -367,6 +368,7 @@
             }
         }
     };
+    // ページ読み込み時に実行
     registerServiceWorker();
 
     // 2. サイトを見ている時の通知処理 (Foreground)
@@ -377,31 +379,45 @@
         alert(`【通知】\n${title}\n${body}`);
     });
 
-    // 3. 通知許可リクエスト（設定ボタンから呼ばれる）
+    // 3. 通知許可リクエスト（設定ボタンから呼ばれるアクション）
     window.requestNotificationPermission = async () => {
+        // まず許可ダイアログを出す
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-            alert("通知がブロックされています。ブラウザの設定を確認してください。");
+            alert("通知がブロックされています。ブラウザのアドレスバーの鍵アイコンから設定を変更してください。");
             return;
         }
 
         try {
-            // SWを取得または登録してからトークンを取得
+            // Service Workerの登録情報を取得
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
             
             let swReg = await navigator.serviceWorker.getRegistration(swPath);
             if (!swReg) {
+                // 万が一なければ再登録
                 swReg = await navigator.serviceWorker.register(swPath);
             }
 
+            // トークンを取得
             const token = await getToken(messaging, {
                 vapidKey: VAPID_KEY,
                 serviceWorkerRegistration: swReg
             });
 
-            console.log("FCM Token:", token);
-            alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
+            if (token) {
+                console.log("--------------------------------------");
+                console.log("★FCMトークンはこちらです:");
+                console.log(token);
+                console.log("--------------------------------------");
+                alert("通知が許可されました！\nコンソール(F12)にトークンが表示されました。");
+                
+                // TODO: ここでデータベース(Firestore)にトークンを保存する処理を追加すると良いです
+                // saveTokenToDatabase(token); 
+            } else {
+                console.log('No registration token available.');
+            }
+
         } catch (err) {
             console.error("FCM Token error:", err);
             alert("トークンの取得に失敗しました: " + err.message);
