@@ -14,7 +14,7 @@
         --accent: #ffcc5c;
         --bg-color: #f4f7fc;
         --text-color: #333;
-        --line-green: #06c755; /* LINE色追加 */
+        --line-green: #06c755;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -36,8 +36,6 @@
         position: sticky; top: 0; z-index: 100;
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-    
-    /* ヘッダー右側のグループ化 */
     .header-right { display: flex; align-items: center; gap: 10px; }
 
     .lang-switch button {
@@ -46,7 +44,6 @@
     }
     .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
 
-    /* 設定ボタン (New) */
     .settings-trigger {
         background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
         color: white; width: 32px; height: 32px; border-radius: 50%;
@@ -147,7 +144,6 @@
         border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
     }
     
-    /* 設定モーダル用スタイル (New) */
     .setting-row {
         display: flex; justify-content: space-between; align-items: center;
         background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
@@ -327,8 +323,6 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    
-    // ★ 追加1：onMessage をインポートに追加しました
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
     const firebaseConfig = {
@@ -344,42 +338,48 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app); 
-    const messaging = getMessaging(app); // 通知用
+    const messaging = getMessaging(app);
 
-    // ★ 追加2：サイトを見ている時に通知が来た場合の処理
+    // ★ 追加したコード：Service Workerの自動登録
+    // ページが開かれたときに、自動的にService Workerを準備しておきます
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./firebase-messaging-sw.js')
+        .then((registration) => {
+            console.log('Service Worker 自動登録成功:', registration);
+        })
+        .catch((err) => {
+            console.error('Service Worker 自動登録失敗:', err);
+        });
+    }
+
+    // サイトを開いている時の通知処理
     onMessage(messaging, (payload) => {
         console.log('フォアグラウンドで通知を受信:', payload);
         const title = payload.notification.title;
         const body = payload.notification.body;
-        // 画面にアラートを出します
         alert(`【通知】\n${title}\n${body}`);
     });
 
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
-    // --- 設定モーダル制御 ---
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
-    // --- Web Push通知の許可リクエスト ---
+    // 通知許可リクエスト（手動）
     window.requestNotificationPermission = async () => {
         try {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                // Service Workerを明示的に登録して場所を教える
+                // 自動登録されているはずだが、念のためここでも登録を確認
                 let swReg;
                 try {
-                    // 同じフォルダにあるファイルを指定して登録
                     swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-                    console.log("Service Worker登録成功:", swReg);
                 } catch (err) {
-                    console.error("Service Worker登録失敗:", err);
-                    alert("Service Workerファイルの読み込みに失敗しました。\nファイルの場所を確認してください。");
+                    alert("Service Workerファイルの読み込みに失敗しました。");
                     return;
                 }
 
-                // 登録したService Workerを使ってトークンを取得
                 const token = await getToken(messaging, { serviceWorkerRegistration: swReg });
 
                 if (token) {
@@ -389,7 +389,7 @@
                     alert("トークンの取得に失敗しました。");
                 }
             } else {
-                alert("通知がブロックされています。ブラウザの設定から許可してください。");
+                alert("通知がブロックされています。設定を確認してください。");
             }
         } catch (error) {
             console.error(error);
@@ -397,7 +397,7 @@
         }
     };
 
-    // --- 認証モーダル制御 (多言語対応) ---
+    // ... (認証関連のコードは変更なし) ...
     window.openAuthModal = (mode) => {
         window.authMode = mode;
         const modal = document.getElementById('auth-modal');
@@ -405,15 +405,12 @@
         
         modal.style.display = 'flex';
         
-        // 言語に応じたテキストをセット
         const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
         document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
         document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
         
-        // 登録時のみゲーム名フィールドを表示
         displayNameInput.classList.toggle('hidden', mode === 'login');
 
-        // フィールドクリア
         document.getElementById('modal-msg').textContent = '';
         document.getElementById('auth-email').value = ''; 
         document.getElementById('auth-pass').value = '';
@@ -424,7 +421,6 @@
         document.getElementById('auth-modal').style.display = 'none';
     };
 
-    // --- 認証実行 ---
     window.submitAuth = async () => {
         const email = document.getElementById('auth-email').value.trim(); 
         const pass = document.getElementById('auth-pass').value.trim();
