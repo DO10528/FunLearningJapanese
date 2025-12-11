@@ -1,7 +1,6 @@
-// firebase-messaging-sw.js (modular)
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getMessaging, onBackgroundMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-sw.js";
+// firebase-messaging-sw.js (compat version)
+importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js');
 
 // Firebase Config
 const firebaseConfig = {
@@ -14,19 +13,19 @@ const firebaseConfig = {
   measurementId: "G-LCMXVLPS81"
 };
 
-// Initialize
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+firebase.initializeApp(firebaseConfig);
+
+const messaging = firebase.messaging();
 
 // Background Notification Handler
-onBackgroundMessage(messaging, (payload) => {
-  console.log("[SW] Background message received", payload);
+messaging.onBackgroundMessage((payload) => {
+  console.log("[firebase-messaging-sw.js] Background message received:", payload);
 
-  const title = payload.notification?.title ?? "通知";
-  const options = {
+  const notificationTitle = payload.notification?.title ?? "通知";
+  const notificationOptions = {
     body: payload.notification?.body,
     icon: "/icon.png"
   };
 
-  self.registration.showNotification(title, options);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
