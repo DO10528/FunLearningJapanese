@@ -350,7 +350,7 @@
     // 通知用VAPIDキー
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-    // ★ LINE LIFF ID (確実に書き換えました！)
+    // ★ LINE LIFF ID (ここに組み込みました)
     const MY_LIFF_ID = "2008673707-D8TLYqYg";
 
     // --- 通知機能 ---
@@ -426,7 +426,7 @@
                 const lineUserId = profile.userId;
                 const lineName = profile.displayName;
                 
-                // 確認用のアラート
+                // 確認用のアラート（本番では消してもOK）
                 alert(`LINE連携成功！\nこんにちは、${lineName}さん。`);
                 
                 // ★ここでFirebaseに情報を保存する処理などが将来的に入ります
