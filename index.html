@@ -350,7 +350,7 @@
     // 通知用VAPIDキー
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-    // ★ LINE LIFF ID
+    // ★ LINE LIFF ID (確実に書き換えました！)
     const MY_LIFF_ID = "2008673707-D8TLYqYg";
 
     // --- 通知機能 ---
@@ -412,16 +412,7 @@
     };
 
     // --- LINE連携機能 (LIFF) ---
-    // ここでLINE IDをデータベースに保存します
     window.linkLineAccount = async () => {
-        // まず、Firebaseにログインしているか確認
-        const user = auth.currentUser;
-        if (!user) {
-            alert("先にゲームにログイン（または登録）してください！");
-            window.openAuthModal('login');
-            return;
-        }
-
         try {
             // LIFF初期化
             await liff.init({ liffId: MY_LIFF_ID });
@@ -430,21 +421,16 @@
                 // ログインしていなければLINEログイン画面へ
                 liff.login();
             } else {
-                // LINEのプロフィールを取得
+                // ログイン済みならプロフィール取得
                 const profile = await liff.getProfile();
                 const lineUserId = profile.userId;
                 const lineName = profile.displayName;
                 
-                // ★ここでFirebaseに保存！
-                const userRef = doc(db, "users", user.uid);
-                await updateDoc(userRef, {
-                    lineUserId: lineUserId,       // LINEのID
-                    lineDisplayName: lineName,    // LINEの名前
-                    isLineLinked: true            // 連携済みフラグ
-                });
-
                 // 確認用のアラート
-                alert(`LINE連携成功！\n${lineName}さんのアカウントを紐付けました。\nこれで特別な通知が受け取れます！`);
+                alert(`LINE連携成功！\nこんにちは、${lineName}さん。`);
+                
+                // ★ここでFirebaseに情報を保存する処理などが将来的に入ります
+                console.log("LINE User ID:", lineUserId);
             }
         } catch (err) {
             console.error("LIFF Error:", err);
@@ -641,270 +627,6 @@
     document.getElementById('auth-display-name').onkeydown = handleEnter;
 
     window.renderGameCategories(); 
-</script>
-
-<script>
-    const i18nData = {
-        ja: { 
-            main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト", 
-            group_kiso: "基礎・単語", 
-            group_learning: "学習メニュー", 
-            group_fun_games: "ゲーム",
-            
-            btn_kiso: "ひらがな<br>カタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
-            cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
-            cat_clock: "とけい", 
-            cat_date_time: "日付・時間",
-            cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう",
-            cat_practice: "じっせん",
-            
-            // ゲームタイトル
-            btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
-            btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
-            btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", 
-            btn_k_pair: "ひらカタあわせ",
-            btn_shiri1: "しりとり1", btn_shiri2: "しりとり2",
-            btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
-            
-            btn_imasu: "います<br>あります",
-            btn_money: "お金の学習",
-            btn_transport: "こうつう",
-            
-            btn_clock1: "とけい1", btn_clock2: "とけい2",
-            btn_datetime_practice: "日付・練習", 
-
-            btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
-            btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？",
-            btn_kei_neg: "ひていけい (～くない)",
-
-            btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
-            btn_tekudasai: "V-てください", 
-            btn_tekudasaimasenka: "V-てくださいませんか",
-            btn_mashouka: "V-ましょうか", 
-            btn_teimasu: "V-ています", 
-            btn_temoii: "V-てもいいですか",
-            btn_kata: "V-方",
-            
-            btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
-            btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク",
-            
-            btn_sengoku: "戦国・日本語伝",
-
-            // 認証モーダル
-            modal_login: "ログイン", modal_signup: "新規登録",
-            ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
-            btn_exec: "実行", btn_cancel: "キャンセル",
-            err_input_req: "メールアドレスとパスワードを入力してください",
-            err_pass_len: "パスワードは6文字以上にする必要があります。",
-            err_name_req: "Please enter a game name (2+ chars).",
-            err_name_taken: "That game name is already taken.",
-            err_generic: "認証中にエラーが発生しました。",
-            err_email_taken: "Email is already in use.",
-            err_auth_fail: "Incorrect email or password."
-        },
-        en: { 
-            main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest", 
-            group_kiso: "Basics", 
-            group_learning: "Learning Menu", 
-            group_fun_games: "Games",
-
-            btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
-            cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
-            cat_clock: "Clock", 
-            cat_date_time: "Date & Time",
-            cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence",
-            cat_practice: "Practice",
-
-            // Game Titles
-            btn_h_write: "Writing Practice", btn_h_sound: "Sound Quiz", btn_h_match: "Hiragana Match",
-            btn_h_vocab: "Hiragana Vocab", btn_h_reorder: "Reordering", btn_h_meteor: "Meteor Quiz",
-            btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Katakana Match",
-            btn_k_pair: "Hira/Kata Pair",
-            btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2",
-            btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
-            
-            btn_imasu: "Imasu<br>Arimasu",
-            btn_money: "Money Learning",
-            btn_transport: "Transport",
-
-            btn_clock1: "Clock 1", btn_clock2: "Clock 2",
-            btn_datetime_practice: "Date Practice", 
-
-            btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
-            btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?",
-            btn_kei_neg: "Negative Form",
-            
-            btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
-            btn_tekudasai: "V-te Kudasai", 
-            btn_tekudasaimasenka: "V-te Kudasaimasenka",
-            btn_mashouka: "V-mashouka",
-            btn_teimasu: "V-te Imasu",
-            btn_temoii: "May I...?",
-            btn_kata: "How to V (V-kata)",
-            
-            btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
-            btn_shoptalk: "Shopping Talk", btn_bustalk: "Business Talk",
-            
-            btn_sengoku: "Sengoku RPG",
-
-            // Auth Modal
-            modal_login: "Login", modal_signup: "Sign Up",
-            ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
-            btn_exec: "Submit", btn_cancel: "Cancel",
-            err_input_req: "Please enter email and password.",
-            err_pass_len: "Password must be at least 6 characters.",
-            err_name_req: "Please enter a game name (2+ chars).",
-            err_name_taken: "That game name is already taken.",
-            err_generic: "An error occurred during authentication.",
-            err_email_taken: "Email is already in use.",
-            err_auth_fail: "Incorrect email or password."
-        }
-    };
-
-    const gameStructure = [
-        { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
-            { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
-            { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
-            { url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
-            { url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
-            { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
-            { url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
-        ]},
-        { id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
-            { url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
-            { url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" }, 
-            { url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
-            { url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
-        ]},
-        { id: "shiritori", icon: "fa-solid fa-comments", color: "#fdd835", titleKey: "cat_shiritori", games: [
-            { url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
-            { url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
-        ]},
-        { id: "word_other", icon: "fa-solid fa-microphone", color: "#26c6da", titleKey: "cat_word_other", games: [
-            { url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
-            { url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
-            { url: "imasu_arimasu.html", titleKey: "btn_imasu", icon: "fa-solid fa-cat" },
-            { url: "money.html", titleKey: "btn_money", icon: "fa-solid fa-coins" },
-            { url: "transport_game.html", titleKey: "btn_transport", icon: "fa-solid fa-car" },
-        ]},
-        { id: "clock", icon: "fa-solid fa-clock", color: "#5c6bc0", titleKey: "cat_clock", games: [
-            { url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
-            { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
-        ]},
-        { id: "date_time", icon: "fa-solid fa-calendar-alt", color: "#3f51b5", titleKey: "cat_date_time", games: [
-            { url: "date_time_practice.html", titleKey: "btn_datetime_practice", icon: "fa-solid fa-book-open" }
-        ]},
-        { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
-            { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
-            { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
-        ]},
-        { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
-            { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
-            { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
-            { url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
-        ]},
-        { id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
-            { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
-            { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
-            { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
-            { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
-            { url: "verb_tekudasaimasenka_practice.html", titleKey: "btn_tekudasaimasenka", icon: "fa-solid fa-hands-praying" },
-            { url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" },
-            { url: "verb_teimasu_practice.html", titleKey: "btn_teimasu", icon: "fa-solid fa-spinner" },
-            { url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" },
-            { url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" }
-        ]},
-        { id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
-            { url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
-            { url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
-            { url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
-        ]},
-        { id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [ 
-            { url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
-            { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
-        ]}
-    ];
-
-    const gameGrid = document.getElementById('game-grid');
-    const backBtn = document.getElementById('game-back-btn');
-    let currentLang = 'ja';
-
-    window.renderGameCategories = () => {
-        gameGrid.innerHTML = '';
-        backBtn.style.display = 'none';
-        // group_learning を使用
-        document.getElementById('game-section-title').textContent = i18nData[currentLang].group_learning;
-
-        gameStructure.forEach(cat => {
-            const div = document.createElement('div');
-            div.className = 'game-card';
-            div.style.borderColor = cat.color;
-            div.onclick = () => renderGameList(cat);
-            
-            const title = i18nData[currentLang][cat.titleKey] || cat.titleKey;
-            
-            div.innerHTML = `
-                <i class="${cat.icon} card-icon" style="color:${cat.color}"></i>
-                <span class="card-title">${title}</span>
-                <span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>
-            `;
-            gameGrid.appendChild(div);
-        });
-        gameGrid.classList.remove('fade-in');
-        void gameGrid.offsetWidth;
-        gameGrid.classList.add('fade-in');
-    };
-
-    function renderGameList(category) {
-        gameGrid.innerHTML = '';
-        backBtn.style.display = 'block';
-        document.getElementById('game-section-title').textContent = i18nData[currentLang][category.titleKey];
-
-        category.games.forEach(game => {
-            const a = document.createElement('a');
-            a.href = game.url;
-            a.className = 'game-card';
-            a.style.borderColor = category.color;
-
-            const gameTitle = i18nData[currentLang][game.titleKey] || game.title;
-            
-            a.innerHTML = `
-                <i class="${game.icon} card-icon" style="color:${category.color}"></i>
-                <span class="card-title">${gameTitle}</span>
-            `;
-            gameGrid.appendChild(a);
-        });
-        gameGrid.classList.remove('fade-in');
-        void gameGrid.offsetWidth;
-        gameGrid.classList.add('fade-in');
-    }
-
-    window.setLanguage = (lang) => {
-        currentLang = lang;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.dataset.i18n;
-            if(i18nData[lang][key]) el.textContent = i18nData[lang][key];
-        });
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            const key = el.dataset.i18nPlaceholder;
-            if(i18nData[lang][key]) el.placeholder = i18nData[lang][key];
-        });
-
-        document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
-        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-        
-        if(backBtn.style.display === 'none') renderGameCategories();
-        else renderGameCategories(); 
-
-        if(document.getElementById('auth-modal').style.display === 'flex') {
-             const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
-             document.getElementById('modal-title').textContent = i18nData[lang][modeKey];
-             document.getElementById('modal-submit').textContent = i18nData[lang]['btn_exec'];
-        }
-    };
-    
-    // 初回レンダリング
-    renderGameCategories();
 </script>
 </body>
 </html>
