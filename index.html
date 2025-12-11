@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax-libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -34,7 +34,7 @@
         color: white; padding: 15px 20px; width: 100%;
         display: flex; justify-content: space-between; align-items: center;
         box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        position: sticky; top: 0; z-index: 100;
+        position: sticky; top: 0; z-index: 100; /* ヘッダーは最前面 */
     }
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
     .header-right { display: flex; align-items: center; gap: 10px; }
@@ -84,8 +84,12 @@
     .badge-streak { color: #ff6f61; }
     .badge-points { color: #f0ad4e; }
 
-    /* --- 認証ボタン --- */
-    .auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+    /* --- 認証ボタン (クリック可能にするためz-indexを考慮) --- */
+    .auth-action-area { 
+        display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
+        position: relative; /* 他のコンテンツの上に表示されやすくするため */
+        z-index: 10; /* デフォルトの要素より上に */
+    }
     .btn-auth {
         padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
         box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
@@ -134,7 +138,8 @@
     .modal-overlay {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-        display: none; justify-content: center; align-items: center; z-index: 1000;
+        display: none; justify-content: center; align-items: center; 
+        z-index: 1000; /* モーダルは一番上 */
     }
     .modal-box {
         background: white; width: 90%; max-width: 400px; padding: 30px;
