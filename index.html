@@ -26,6 +26,8 @@
         color: var(--text-color);
         margin: 0; padding: 0; padding-bottom: 80px;
         overflow-x: hidden; width: 100%;
+        /* モバイルでよくある、クリックイベントの遅延を防ぐ設定 */
+        touch-action: manipulation; 
     }
 
     /* --- ヘッダー --- */
@@ -140,10 +142,19 @@
         background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
         display: none; justify-content: center; align-items: center; 
         z-index: 1000; /* モーダルは一番上 */
+        /* ★ モバイル向け修正: オーバーレイが見えなくてもクリックをブロックしないように */
+        pointer-events: none;
     }
+    .modal-overlay[style*="display: flex"] {
+        /* モーダル表示中はクリックを受け付ける */
+        pointer-events: auto; 
+    }
+    
     .modal-box {
         background: white; width: 90%; max-width: 400px; padding: 30px;
         border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+        /* モーダル内の要素はクリックを受け付ける */
+        pointer-events: auto; 
     }
     .modal-box input {
         width: 100%; padding: 12px; margin: 10px 0;
@@ -352,7 +363,8 @@
 
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
-    let currentLang = 'ja'; // 言語変数をモジュール内に保持
+    // currentLang はDOMロード後にグローバル変数として定義されますが、モジュール内でも使用します。
+    let currentLang = 'ja'; 
 
     // 通知用VAPIDキー
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
@@ -372,7 +384,6 @@
         const displayNameInput = document.getElementById('auth-display-name');
         
         modal.style.display = 'flex';
-        // i18nDataはDOMがロードされた後のscriptタグで定義されているため、windowから取得またはグローバルに定義が必要
         const i18nData = window.i18nData || {}; 
         const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
         document.getElementById('modal-title').textContent = (i18nData[currentLang] && i18nData[currentLang][titleKey]) || titleKey;
@@ -390,7 +401,7 @@
     window.renderGameCategories = () => {
         const gameGrid = document.getElementById('game-grid');
         const backBtn = document.getElementById('game-back-btn');
-        const gameStructure = window.gameStructure || []; // グローバル変数から取得
+        const gameStructure = window.gameStructure || [];
         const i18nData = window.i18nData || {};
 
         gameGrid.innerHTML = '';
@@ -449,6 +460,7 @@
     // 言語切り替え
     window.setLanguage = (lang) => {
         currentLang = lang;
+        window.currentLang = lang; // グローバル変数も更新
         const i18nData = window.i18nData || {};
         const backBtn = document.getElementById('game-back-btn');
 
@@ -464,7 +476,6 @@
         document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
         
-        // 言語切り替え時にゲームリストを再レンダリング
         if(backBtn.style.display === 'none') window.renderGameCategories();
         else window.renderGameCategories(); 
 
@@ -652,7 +663,8 @@
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
             try {
-                const registration = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/' });
+                // Service Workerを確実に登録し、古いキャッシュを無効化
+                const registration = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/', updateViaCache: 'none' }); 
                 console.log('Service Worker 自動登録成功:', registration);
                 return registration;
             } catch (err) {
@@ -708,7 +720,8 @@
         document.getElementById('login-btn').addEventListener('click', () => window.openAuthModal('login'));
         document.getElementById('signup-btn').addEventListener('click', () => window.openAuthModal('signup'));
         document.getElementById('guest-btn').addEventListener('click', () => window.loginAsGuest());
-        document.getElementById('logout-btn').addEventListener('click', () => window.logout());
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.addEventListener('click', () => window.logout());
         
         // モーダル・設定関連
         document.getElementById('settings-trigger-btn').addEventListener('click', () => window.openSettingsModal());
@@ -755,8 +768,7 @@
 
 <script>
     // --- 言語データとゲーム構造 (モジュール外) ---
-    // module scriptとDOMContentLoadedのタイミングの問題を避けるため、i18nDataとgameStructureを
-    // windowオブジェクトにバインドしてグローバルアクセス可能にする
+    // モジュールスクリプト内からも確実にアクセスできるよう、windowオブジェクトにバインド
     window.i18nData = {
         ja: { 
             main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト", 
@@ -940,10 +952,7 @@
         ]}
     ];
 
-    window.currentLang = 'ja'; // モジュール外でも言語を追跡できるように再定義
-    
-    // 初回レンダリング
-    window.renderGameCategories();
+    window.currentLang = 'ja';
 </script>
 </body>
 </html>
