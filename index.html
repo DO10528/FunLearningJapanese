@@ -314,7 +314,6 @@
 </div>
 
 <script type="module">
-    // ★ 修正: Analyticsを追加し、CDN形式で統一しました
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
     import { 
@@ -327,7 +326,6 @@
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
-    // ★ 修正: storageBucketを正しいアドレスに修正しました
     const firebaseConfig = {
       apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
       authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -339,16 +337,19 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    // ★ 追加: Analyticsを初期化
     const analytics = getAnalytics(app);
-    
     const db = getFirestore(app);
     const auth = getAuth(app); 
     const messaging = getMessaging(app);
 
+    // ★GitHub Pages対策: 正しいパスを判定する魔法のコード
+    // ローカル(localhost)なら './'、GitHub Pagesなら '/FunLearningJapanese/' を使います
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+
     // Service Workerの自動登録
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./firebase-messaging-sw.js')
+        navigator.serviceWorker.register(swPath)
         .then((registration) => {
             console.log('Service Worker 自動登録成功:', registration);
         })
@@ -376,10 +377,10 @@
         try {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                // 自動登録されているはずだが、念のためここでも登録を確認
                 let swReg;
                 try {
-                    swReg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                    // ★ここも修正: 自動判定したパス(swPath)を使います
+                    swReg = await navigator.serviceWorker.register(swPath);
                 } catch (err) {
                     alert("Service Workerファイルの読み込みに失敗しました。");
                     return;
