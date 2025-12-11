@@ -379,6 +379,28 @@
         alert(`【通知】\n${title}\n${body}`);
     });
 
+    // ★追加: トークンをFirestoreに保存する関数
+    const saveTokenToDatabase = async (token) => {
+        const user = auth.currentUser;
+        if (!user) {
+            console.log("ゲスト、または未ログインのためトークンをDBに保存しませんでした。");
+            return;
+        }
+
+        try {
+            // usersコレクションの自分のドキュメントにトークンを書き込む
+            const userRef = doc(db, "users", user.uid);
+            // 既存のドキュメントを更新（トークン項目を追加/上書き）
+            await updateDoc(userRef, {
+                fcmToken: token,
+                tokenUpdatedAt: new Date().toISOString() // いつ保存したかの記録
+            });
+            console.log("【完了】Firestoreにトークンを保存しました！");
+        } catch (err) {
+            console.error("トークン保存エラー:", err);
+        }
+    };
+
     // 3. 通知許可リクエスト（設定ボタンから呼ばれるアクション）
     window.requestNotificationPermission = async () => {
         // まず許可ダイアログを出す
@@ -410,10 +432,11 @@
                 console.log("★FCMトークンはこちらです:");
                 console.log(token);
                 console.log("--------------------------------------");
-                alert("通知が許可されました！\nコンソール(F12)にトークンが表示されました。");
                 
-                // TODO: ここでデータベース(Firestore)にトークンを保存する処理を追加すると良いです
-                // saveTokenToDatabase(token); 
+                // ★ここで保存関数を実行！
+                await saveTokenToDatabase(token);
+
+                alert("通知設定が完了しました！\n（データベースにトークンを保存しました）");
             } else {
                 console.log('No registration token available.');
             }
