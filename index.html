@@ -6,6 +6,7 @@
 <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
     /* --- 基本設定 --- */
@@ -302,7 +303,7 @@
                 <div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
                 <div style="font-size:0.75em; color:#888;">学習通知を受け取る</div>
             </div>
-            <button class="line-btn" onclick="alert('LINE連携は現在準備中です。\n(バックエンド実装後に有効になります)')">
+            <button class="line-btn" onclick="linkLineAccount()">
                 <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
             </button>
         </div>
@@ -324,7 +325,6 @@
         getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
         signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    // メッセージング（通知）の機能をインポート
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
     const firebaseConfig = {
@@ -337,7 +337,7 @@
       measurementId: "G-LCMXVLPS81"
     };
 
-    // Firebase初期化
+    // Firebase初期化 (これ1回でOKです)
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
@@ -347,19 +347,18 @@
     const SESS_KEY = 'user_mode';
     let currentUserDocUnsubscribe = null;
 
-    // あなたのVAPIDキー（Firebase Consoleから取得したもの）
+    // 通知用VAPIDキー
     const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-    // --- 通知関連の関数 ---
-
-    // 1. Service Workerの自動登録（GitHub Pagesパス対応）
+    // --- 通知機能 ---
+    // 1. Service Worker自動登録
     const registerServiceWorker = async () => {
         if ('serviceWorker' in navigator) {
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-            // GitHub Pagesの場合はサブディレクトリを含むパス、ローカルならルート
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
             try {
-                const registration = await navigator.serviceWorker.register(swPath);
+                // scopeを指定しないと、階層の違うファイルで問題が起きることがあるため修正
+                const registration = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/' });
                 console.log('Service Worker 自動登録成功:', registration);
                 return registration;
             } catch (err) {
@@ -368,10 +367,9 @@
             }
         }
     };
-    // ページ読み込み時に実行
     registerServiceWorker();
 
-    // 2. サイトを見ている時の通知処理 (Foreground)
+    // 2. フォアグラウンド通知受信
     onMessage(messaging, (payload) => {
         console.log("Message received (foreground)", payload);
         const title = payload.notification.title;
@@ -379,75 +377,73 @@
         alert(`【通知】\n${title}\n${body}`);
     });
 
-    // ★追加: トークンをFirestoreに保存する関数
-    const saveTokenToDatabase = async (token) => {
-        const user = auth.currentUser;
-        if (!user) {
-            console.log("ゲスト、または未ログインのためトークンをDBに保存しませんでした。");
-            return;
-        }
-
-        try {
-            // usersコレクションの自分のドキュメントにトークンを書き込む
-            const userRef = doc(db, "users", user.uid);
-            // 既存のドキュメントを更新（トークン項目を追加/上書き）
-            await updateDoc(userRef, {
-                fcmToken: token,
-                tokenUpdatedAt: new Date().toISOString() // いつ保存したかの記録
-            });
-            console.log("【完了】Firestoreにトークンを保存しました！");
-        } catch (err) {
-            console.error("トークン保存エラー:", err);
-        }
-    };
-
-    // 3. 通知許可リクエスト（設定ボタンから呼ばれるアクション）
+    // 3. 通知許可リクエスト
     window.requestNotificationPermission = async () => {
-        // まず許可ダイアログを出す
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-            alert("通知がブロックされています。ブラウザのアドレスバーの鍵アイコンから設定を変更してください。");
+            alert("通知がブロックされています。");
             return;
         }
 
         try {
-            // Service Workerの登録情報を取得
+            // 現在の登録状況を確認
             const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
             const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+            let swReg = await navigator.serviceWorker.getRegistration();
             
-            let swReg = await navigator.serviceWorker.getRegistration(swPath);
             if (!swReg) {
-                // 万が一なければ再登録
-                swReg = await navigator.serviceWorker.register(swPath);
+                swReg = await navigator.serviceWorker.register(swPath, { scope: isLocalhost ? './' : '/FunLearningJapanese/' });
             }
 
-            // トークンを取得
             const token = await getToken(messaging, {
                 vapidKey: VAPID_KEY,
                 serviceWorkerRegistration: swReg
             });
 
-            if (token) {
-                console.log("--------------------------------------");
-                console.log("★FCMトークンはこちらです:");
-                console.log(token);
-                console.log("--------------------------------------");
-                
-                // ★ここで保存関数を実行！
-                await saveTokenToDatabase(token);
-
-                alert("通知設定が完了しました！\n（データベースにトークンを保存しました）");
-            } else {
-                console.log('No registration token available.');
-            }
-
+            console.log("FCM Token:", token);
+            alert("通知設定が完了しました！\n(トークンを取得しました)");
         } catch (err) {
             console.error("FCM Token error:", err);
-            alert("トークンの取得に失敗しました: " + err.message);
+            alert("エラー: " + err.message);
         }
     };
 
-    // --- UI・認証関連 ---
+    // --- LINE連携機能 (LIFF) ---
+    // ★重要: ここにあなたのLIFF IDを入れてください
+    const MY_LIFF_ID = "YOUR_LIFF_ID"; // 例: 1657000000-xxxxxx
+
+    window.linkLineAccount = async () => {
+        if (MY_LIFF_ID === "YOUR_LIFF_ID") {
+            alert("【開発者用メッセージ】\nLINE DevelopersでLIFF IDを取得し、\nコード内の 'YOUR_LIFF_ID' を書き換えてください。");
+            // window.open("https://developers.line.biz/ja/", "_blank");
+            return;
+        }
+
+        try {
+            // LIFF初期化
+            await liff.init({ liffId: MY_LIFF_ID });
+            
+            if (!liff.isLoggedIn()) {
+                // ログインしていなければLINEログイン画面へ
+                liff.login();
+            } else {
+                // ログイン済みならプロフィール取得
+                const profile = await liff.getProfile();
+                const lineUserId = profile.userId;
+                const lineName = profile.displayName;
+                
+                alert(`LINE連携成功！\nこんにちは、${lineName}さん。`);
+                
+                // ここでFirebaseにLINE IDを保存する処理を追加できます
+                // saveLineIdToFirestore(lineUserId);
+            }
+        } catch (err) {
+            console.error("LIFF Error:", err);
+            alert("LINE連携に失敗しました: " + err.message);
+        }
+    };
+
+    // --- UI・認証関連 (既存コード) ---
     window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
     window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
@@ -457,22 +453,17 @@
         const displayNameInput = document.getElementById('auth-display-name');
         
         modal.style.display = 'flex';
-        
         const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
         document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
         document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
-        
         displayNameInput.classList.toggle('hidden', mode === 'login');
-
         document.getElementById('modal-msg').textContent = '';
         document.getElementById('auth-email').value = ''; 
         document.getElementById('auth-pass').value = '';
         displayNameInput.value = '';
     };
 
-    window.closeAuthModal = () => {
-        document.getElementById('auth-modal').style.display = 'none';
-    };
+    window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 
     window.submitAuth = async () => {
         const email = document.getElementById('auth-email').value.trim(); 
@@ -486,55 +477,31 @@
 
         try {
             if (window.authMode === 'signup') {
-                if (!displayName || displayName.length < 2) { 
-                    msg.textContent = errs.err_name_req; 
-                    return; 
-                }
+                if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("displayName", "==", displayName), limit(1));
                 const snap = await getDocs(q);
-                if (!snap.empty) {
-                    msg.textContent = errs.err_name_taken;
-                    return;
-                }
+                if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
 
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
-                
                 await setDoc(doc(db, "users", user.uid), {
-                    email: email, 
-                    displayName: displayName,
-                    points: 0,
-                    streak: 1,
-                    lastLogin: new Date().toISOString(),
-                    dailyTracker: {} 
+                    email: email, displayName: displayName, points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
                 });
-                
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
-
             } else {
                 const userCredential = await signInWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
-
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef); 
-
                 if (!userSnap.exists()) {
                     await setDoc(userRef, {
-                        email: email,
-                        displayName: email.split('@')[0] || 'UnknownUser', 
-                        points: 0,
-                        streak: 1,
-                        lastLogin: new Date().toISOString(),
-                        dailyTracker: {} 
+                        email: email, displayName: email.split('@')[0] || 'UnknownUser', points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
                     });
                 } else {
-                    if (!userSnap.data().dailyTracker) {
-                        await updateDoc(userRef, { dailyTracker: {} });
-                    }
+                    if (!userSnap.data().dailyTracker) await updateDoc(userRef, { dailyTracker: {} });
                 }
-
                 sessionStorage.setItem(SESS_KEY, 'authenticated');
                 window.closeAuthModal();
             }
@@ -563,15 +530,12 @@
     const checkMonthlyReset = async (user) => {
         const userRef = doc(db, "users", user.uid);
         const snapshot = await getDoc(userRef);
-        
         if (snapshot.exists()) {
             const data = snapshot.data();
             const now = new Date();
             const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
-
             if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
                 await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
-                console.log("月が変わったため、ポイントをリセットしました。");
             } else {
                 await updateDoc(userRef, { lastLogin: now.toISOString() });
             }
@@ -581,7 +545,6 @@
     function updateUI(userState) {
         const dash = document.getElementById('user-dashboard');
         const welcome = document.getElementById('guest-welcome');
-
         if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); 
         
         if (userState === 'guest') {
@@ -592,29 +555,22 @@
             document.getElementById('level-fill').style.width = '0%';
             document.getElementById('streak-val').textContent = 0;
             document.getElementById('point-val').textContent = 0;
-            
         } else if (userState && userState.uid) {
             welcome.classList.add('hidden');
             dash.classList.remove('hidden');
-
             const userId = userState.uid;
-            
             currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
                 if (doc.exists()) {
                     const data = doc.data();
                     document.getElementById('user-name').textContent = data.displayName || 'ユーザー'; 
                     document.getElementById('streak-val').textContent = data.streak || 0;
                     document.getElementById('point-val').textContent = data.points || 0;
-                    
                     const pts = data.points || 0;
                     const level = Math.floor(pts / 100) + 1;
                     document.getElementById('user-lvl').textContent = level;
                     document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
-                } else {
-                    document.getElementById('user-name').textContent = 'エラー';
                 }
             });
-
         } else {
             welcome.classList.remove('hidden');
             dash.classList.add('hidden');
@@ -625,45 +581,26 @@
         const modal = document.getElementById('ranking-modal');
         const list = document.getElementById('ranking-list');
         const loading = document.getElementById('ranking-loading');
-        
         modal.style.display = 'flex';
         list.innerHTML = '';
         loading.style.display = 'block';
-
         try {
             const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
             const querySnapshot = await getDocs(q);
-            
             loading.style.display = 'none';
-            
             let rank = 1;
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const name = data.displayName || 'Unknown'; 
                 const pt = data.points || 0;
-                
                 const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-                
                 const li = document.createElement('li');
                 li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
-                
-                const leftSpan = document.createElement('span');
-                leftSpan.textContent = `${icon} ${name}`;
-                
-                const rightSpan = document.createElement('span');
-                rightSpan.style.color = "#f0ad4e";
-                rightSpan.textContent = `${pt}pt`;
-                
-                li.appendChild(leftSpan);
-                li.appendChild(rightSpan);
+                li.innerHTML = `<span>${icon} ${name}</span><span style="color:#f0ad4e">${pt}pt</span>`;
                 list.appendChild(li);
                 rank++;
             });
-
-            if (rank === 1) {
-                list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
-            }
-
+            if (rank === 1) list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
         } catch (e) {
             console.error(e);
             loading.innerText = '読み込みエラー';
@@ -689,9 +626,7 @@
     document.getElementById('modal-close').onclick = () => window.closeAuthModal();
     document.getElementById('modal-submit').onclick = () => window.submitAuth();
 
-    const handleEnter = (e) => {
-        if (e.key === 'Enter') window.submitAuth();
-    };
+    const handleEnter = (e) => { if (e.key === 'Enter') window.submitAuth(); };
     document.getElementById('auth-email').onkeydown = handleEnter;
     document.getElementById('auth-pass').onkeydown = handleEnter;
     document.getElementById('auth-display-name').onkeydown = handleEnter;
