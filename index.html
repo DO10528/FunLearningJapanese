@@ -27,7 +27,7 @@ body {
   overflow-x: hidden; 
   min-height: 100vh;
   width: 100%;
-  -webkit-tap-highlight-color: transparent; /* タップ時のハイライトを消す */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* --- ヘッダー --- */
@@ -41,7 +41,6 @@ header {
 .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; pointer-events: none; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
-/* 言語切り替えボタン */
 .lang-switch button {
   background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
   color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
@@ -49,13 +48,12 @@ header {
 }
 .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
 
-/* 設定ボタン */
 .settings-trigger {
   background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
   color: white; width: 32px; height: 32px; border-radius: 50%;
   display: flex; justify-content: center; align-items: center; cursor: pointer;
   font-size: 1em; transition: background 0.2s;
-  touch-action: manipulation; /* 連打・拡大防止 */
+  touch-action: manipulation;
 }
 .settings-trigger:active { background: rgba(255,255,255,0.4); }
 
@@ -99,7 +97,7 @@ header {
 .btn-auth {
   padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
   box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
-  touch-action: manipulation; /* スマホでの反応速度向上 */
+  touch-action: manipulation;
   -webkit-user-select: none; user-select: none;
 }
 .btn-auth:active { transform: translateY(4px); box-shadow: none; }
@@ -163,12 +161,34 @@ header {
   background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
   border: 1px solid #e0e0e0; text-align: left;
 }
+
+/* ★追加: 設定ボタン専用のクラス (スマホで押しやすくする) */
+.btn-setting-action {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #555;
+  /* スマホのタッチ反応を改善 */
+  touch-action: manipulation;
+  transition: background 0.1s, transform 0.1s;
+}
+.btn-setting-action:active {
+  background: #eee;
+  transform: translateY(2px);
+}
+
 .line-btn {
   background-color: var(--line-green); color: white; border: none;
   padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
   display: flex; align-items: center; gap: 8px; font-size: 0.9em;
   touch-action: manipulation;
 }
+.line-btn:active { transform: translateY(2px); opacity: 0.9; }
+
 .ranking-fab {
   position: fixed; bottom: 20px; right: 20px;
   background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
@@ -312,7 +332,7 @@ header {
   <div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
   <div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
   </div>
-  <button onclick="requestNotificationPermission()" style="padding:6px 12px; border:1px solid #ddd; border-radius:6px; background:#fff; cursor:pointer; font-size:0.85em;">
+  <button onclick="requestNotificationPermission()" class="btn-setting-action">
   <i class="fa-solid fa-bell"></i> 許可
   </button>
   </div>
@@ -365,7 +385,6 @@ try {
   messaging = getMessaging(app);
 } catch (e) {
   console.error("Firebase Initialization Error:", e);
-  alert("アプリの起動に失敗しました。通信環境を確認してください。");
 }
 
 const SESS_KEY = 'user_mode';
@@ -395,32 +414,50 @@ const body = payload.notification.body;
 alert(`【通知】\n${title}\n${body}`);
 });
 
+// ★修正: iPhone/スマホで通知許可が押せない問題を解消するためのロジック改善
 window.requestNotificationPermission = async () => {
-const permission = await Notification.requestPermission();
-if (permission !== "granted") {
-alert("通知がブロックされています。ブラウザの設定を確認してください。");
-return;
-}
-try {
-const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-let swReg = await navigator.serviceWorker.getRegistration(swPath);
-if (!swReg) {
-swReg = await navigator.serviceWorker.register(swPath);
-}
-const token = await getToken(messaging, {
-vapidKey: VAPID_KEY,
-serviceWorkerRegistration: swReg
-});
-console.log("FCM Token:", token);
-alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
-} catch (err) {
-console.error("FCM Token error:", err);
-alert("トークンの取得に失敗しました: " + err.message);
-}
+  // ブラウザが通知をサポートしているか確認
+  if (!('Notification' in window)) {
+    alert("お使いのブラウザは通知に対応していません。");
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    
+    if (permission !== "granted") {
+      alert("通知がブロックされています。\nブラウザの設定から通知を許可してください。");
+      return;
+    }
+
+    // 許可されたらトークン取得へ
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+    
+    let swReg = await navigator.serviceWorker.getRegistration(swPath);
+    if (!swReg) {
+      swReg = await navigator.serviceWorker.register(swPath);
+    }
+    
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: swReg
+    });
+
+    if(token) {
+      console.log("FCM Token:", token);
+      alert("通知が許可されました！\n(設定完了)");
+    } else {
+      alert("トークンの取得に失敗しました。");
+    }
+
+  } catch (err) {
+    console.error("FCM Token error:", err);
+    // iPhoneの場合のヒントを表示
+    alert("エラーが発生しました: " + err.message + "\n\n※iPhone(Safari)の場合、このサイトを「ホーム画面に追加」してからでないと通知が許可できない場合があります。");
+  }
 };
 
-// --- 関数をwindowオブジェクトに割り当て（HTMLのonclickから呼べるようにする） ---
 window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
 window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
@@ -623,7 +660,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Enterキー入力サポート
 const handleEnter = (e) => {
   if (e.key === 'Enter') window.submitAuth();
 };
