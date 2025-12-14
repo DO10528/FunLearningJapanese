@@ -162,7 +162,6 @@ header {
   border: 1px solid #e0e0e0; text-align: left;
 }
 
-/* ★追加: 設定ボタン専用のクラス (スマホで押しやすくする) */
 .btn-setting-action {
   padding: 8px 15px;
   border: 1px solid #ddd;
@@ -172,7 +171,6 @@ header {
   font-size: 0.9em;
   font-weight: bold;
   color: #555;
-  /* スマホのタッチ反応を改善 */
   touch-action: manipulation;
   transition: background 0.1s, transform 0.1s;
 }
@@ -414,11 +412,18 @@ const body = payload.notification.body;
 alert(`【通知】\n${title}\n${body}`);
 });
 
-// ★修正: iPhone/スマホで通知許可が押せない問題を解消するためのロジック改善
+// ★修正: iPhoneの判定と、解決策の提示
 window.requestNotificationPermission = async () => {
-  // ブラウザが通知をサポートしているか確認
+  // ブラウザが通知をサポートしていない場合
   if (!('Notification' in window)) {
-    alert("お使いのブラウザは通知に対応していません。");
+    // iPhone/iPadかどうかを簡易判定
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+      alert("【重要：iPhoneをお使いの方へ】\n\niPhoneのセキュリティ制限により、通常のブラウザでは通知機能がブロックされています。\n\n通知をオンにするには、以下の手順を行ってください：\n\n1. 画面下の「共有ボタン(↑)」を押す\n2. 「ホーム画面に追加」を選択\n3. 追加されたアプリアイコンから起動する\n\nこれで「許可」ボタンが押せるようになります！");
+    } else {
+      alert("お使いのブラウザは通知機能に対応していません。\n(Google Chromeの最新版などをご利用ください)");
+    }
     return;
   }
 
@@ -430,7 +435,6 @@ window.requestNotificationPermission = async () => {
       return;
     }
 
-    // 許可されたらトークン取得へ
     const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
     
@@ -446,15 +450,32 @@ window.requestNotificationPermission = async () => {
 
     if(token) {
       console.log("FCM Token:", token);
-      alert("通知が許可されました！\n(設定完了)");
+      
+      // ★トークン保存処理 (Auth済なら保存)
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          await updateDoc(userRef, {
+              fcmToken: token,
+              tokenUpdatedAt: new Date().toISOString()
+          });
+          alert("通知設定が完了しました！\n最新のお知らせをお届けします。");
+        } catch(e) {
+          console.error(e);
+          alert("通知は許可されましたが、保存に失敗しました。");
+        }
+      } else {
+        alert("通知が許可されました！（ゲストモード）");
+      }
+      
     } else {
       alert("トークンの取得に失敗しました。");
     }
 
   } catch (err) {
     console.error("FCM Token error:", err);
-    // iPhoneの場合のヒントを表示
-    alert("エラーが発生しました: " + err.message + "\n\n※iPhone(Safari)の場合、このサイトを「ホーム画面に追加」してからでないと通知が許可できない場合があります。");
+    alert("エラーが発生しました: " + err.message);
   }
 };
 
