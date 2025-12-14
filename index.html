@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
@@ -24,7 +24,12 @@ font-family: 'Zen Maru Gothic', sans-serif;
 background-color: var(--bg-color);
 color: var(--text-color);
 margin: 0; padding: 0; padding-bottom: 80px;
-overflow-x: hidden; width: 100%;
+/* 横スクロールを防ぎ、縦は最低でも画面いっぱいにする */
+overflow-x: hidden; 
+min-height: 100vh;
+width: 100%;
+/* スマホでのタップハイライト色を調整 */
+-webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 /* --- ヘッダー --- */
@@ -35,12 +40,14 @@ display: flex; justify-content: space-between; align-items: center;
 box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
 position: sticky; top: 0; z-index: 100;
 }
-.logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+.logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; pointer-events: none; }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
 .lang-switch button {
 background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
 color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
+/* スマホタッチ対策 */
+touch-action: manipulation;
 }
 .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
 
@@ -49,6 +56,8 @@ background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
 color: white; width: 32px; height: 32px; border-radius: 50%;
 display: flex; justify-content: center; align-items: center; cursor: pointer;
 font-size: 1em; transition: background 0.2s;
+/* スマホタッチ対策 */
+touch-action: manipulation;
 }
 .settings-trigger:active { background: rgba(255,255,255,0.4); }
 
@@ -57,6 +66,9 @@ font-size: 1em; transition: background 0.2s;
 background: white; text-align: center; padding: 30px 20px;
 width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 20px;
 box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+/* コンテンツが重ならないようにz-index指定 */
+position: relative;
+z-index: 1;
 }
 .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
 
@@ -84,10 +96,17 @@ background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; t
 .badge-points { color: #f0ad4e; }
 
 /* --- 認証ボタン --- */
-.auth-action-area { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.auth-action-area { 
+display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
+position: relative; z-index: 5;
+}
 .btn-auth {
 padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
 box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+/* スマホタッチ対策: タップの遅延をなくす */
+touch-action: manipulation;
+-webkit-user-select: none;
+user-select: none;
 }
 .btn-auth:active { transform: translateY(4px); box-shadow: none; }
 .btn-login { background: #4caf50; color: white; }
@@ -105,6 +124,7 @@ display: flex; align-items: center; justify-content: space-between;
 background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
 font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
 display: none;
+touch-action: manipulation;
 }
 .btn-back:hover { background: #ddd; }
 
@@ -122,6 +142,10 @@ box-shadow: 0 8px 15px rgba(0,0,0,0.05);
 transition: all 0.2s; cursor: pointer;
 display: flex; flex-direction: column; justify-content: center; align-items: center;
 height: 140px; position: relative; overflow: hidden;
+/* スマホタッチ対策 */
+touch-action: manipulation;
+-webkit-user-select: none;
+user-select: none;
 }
 .game-card:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
 
@@ -151,6 +175,7 @@ border: 1px solid #e0e0e0; text-align: left;
 background-color: var(--line-green); color: white; border: none;
 padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
 display: flex; align-items: center; gap: 8px; font-size: 0.9em;
+touch-action: manipulation;
 }
 .ranking-fab {
 position: fixed; bottom: 20px; right: 20px;
@@ -158,6 +183,9 @@ background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
 border-radius: 50%; display: flex; justify-content: center; align-items: center;
 font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 cursor: pointer; z-index: 90; border: 3px solid white;
+/* スマホタッチ対策 */
+touch-action: manipulation;
+-webkit-tap-highlight-color: transparent;
 }
 
 .hidden { display: none !important; }
@@ -176,7 +204,7 @@ cursor: pointer; z-index: 90; border: 3px solid white;
 <header>
 <div class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</div>
 <div class="header-right">
-<button class="settings-trigger" onclick="openSettingsModal()">
+<button class="settings-trigger" id="settings-btn">
 <i class="fa-solid fa-gear"></i>
 </button>
 
@@ -256,7 +284,7 @@ cursor: pointer; z-index: 90; border: 3px solid white;
 </a>
 </div>
 
-<div id="fab-ranking" class="ranking-fab" onclick="window.toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
+<div id="fab-ranking" class="ranking-fab"><i class="fa-solid fa-trophy"></i></div>
 
 <div id="ranking-modal" class="modal-overlay">
 <div class="modal-box" style="text-align:left;">
@@ -317,7 +345,6 @@ import {
 getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
 signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-// メッセージング（通知）の機能をインポート
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
 const firebaseConfig = {
@@ -330,22 +357,23 @@ appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
 measurementId: "G-LCMXVLPS81"
 };
 
-// Firebase初期化
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const messaging = getMessaging(app);
+// Firebase初期化 (エラーハンドリング追加)
+let app, analytics, db, auth, messaging;
+try {
+app = initializeApp(firebaseConfig);
+analytics = getAnalytics(app);
+db = getFirestore(app);
+auth = getAuth(app);
+messaging = getMessaging(app);
+} catch (e) {
+console.error("Firebase Initialization Error:", e);
+alert("アプリの起動に失敗しました。通信環境を確認してください。");
+}
 
 const SESS_KEY = 'user_mode';
 let currentUserDocUnsubscribe = null;
-
-// あなたのVAPIDキー（ここに統合しました）
 const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-// --- 通知関連の関数 ---
-
-// 1. Service Workerの自動登録（GitHub Pagesパス対応）
 const registerServiceWorker = async () => {
 if ('serviceWorker' in navigator) {
 const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
@@ -362,7 +390,6 @@ return null;
 };
 registerServiceWorker();
 
-// 2. サイトを見ている時の通知処理 (Foreground)
 onMessage(messaging, (payload) => {
 console.log("Message received (foreground)", payload);
 const title = payload.notification.title;
@@ -370,28 +397,23 @@ const body = payload.notification.body;
 alert(`【通知】\n${title}\n${body}`);
 });
 
-// 3. 通知許可リクエスト（設定ボタンから呼ばれる）
 window.requestNotificationPermission = async () => {
 const permission = await Notification.requestPermission();
 if (permission !== "granted") {
 alert("通知がブロックされています。ブラウザの設定を確認してください。");
 return;
 }
-
 try {
-// SWを取得または登録してからトークンを取得
 const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
 let swReg = await navigator.serviceWorker.getRegistration(swPath);
 if (!swReg) {
 swReg = await navigator.serviceWorker.register(swPath);
 }
-
 const token = await getToken(messaging, {
 vapidKey: VAPID_KEY,
 serviceWorkerRegistration: swReg
 });
-
 console.log("FCM Token:", token);
 alert("通知が許可されました！\n(コンソールにトークンが表示されました)");
 } catch (err) {
@@ -400,7 +422,6 @@ alert("トークンの取得に失敗しました: " + err.message);
 }
 };
 
-// --- UI・認証関連 ---
 window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
 window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
@@ -413,7 +434,6 @@ const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
 document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
 document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
 displayNameInput.classList.toggle('hidden', mode === 'login');
-
 document.getElementById('modal-msg').textContent = '';
 document.getElementById('auth-email').value = '';
 document.getElementById('auth-pass').value = '';
@@ -446,7 +466,6 @@ if (!snap.empty) {
 msg.textContent = errs.err_name_taken;
 return;
 }
-
 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
 const user = userCredential.user;
 await setDoc(doc(db, "users", user.uid), {
@@ -459,14 +478,11 @@ dailyTracker: {}
 });
 sessionStorage.setItem(SESS_KEY, 'authenticated');
 window.closeAuthModal();
-
 } else {
 const userCredential = await signInWithEmailAndPassword(auth, email, pass);
 const user = userCredential.user;
-
 const userRef = doc(db, "users", user.uid);
 const userSnap = await getDoc(userRef);
-
 if (!userSnap.exists()) {
 await setDoc(userRef, {
 email: email,
@@ -481,7 +497,6 @@ if (!userSnap.data().dailyTracker) {
 await updateDoc(userRef, { dailyTracker: {} });
 }
 }
-
 sessionStorage.setItem(SESS_KEY, 'authenticated');
 window.closeAuthModal();
 }
@@ -514,7 +529,6 @@ if (snapshot.exists()) {
 const data = snapshot.data();
 const now = new Date();
 const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
-
 if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
 await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
 console.log("月が変わったため、ポイントをリセットしました。");
@@ -527,7 +541,6 @@ await updateDoc(userRef, { lastLogin: now.toISOString() });
 function updateUI(userState) {
 const dash = document.getElementById('user-dashboard');
 const welcome = document.getElementById('guest-welcome');
-
 if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
 if (userState === 'guest') {
 welcome.classList.add('hidden');
@@ -540,7 +553,6 @@ document.getElementById('point-val').textContent = 0;
 } else if (userState && userState.uid) {
 welcome.classList.add('hidden');
 dash.classList.remove('hidden');
-
 const userId = userState.uid;
 currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
 if (doc.exists()) {
@@ -556,7 +568,6 @@ document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
 document.getElementById('user-name').textContent = 'エラー';
 }
 });
-
 } else {
 welcome.classList.remove('hidden');
 dash.classList.add('hidden');
@@ -570,7 +581,6 @@ const loading = document.getElementById('ranking-loading');
 modal.style.display = 'flex';
 list.innerHTML = '';
 loading.style.display = 'block';
-
 try {
 const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
 const querySnapshot = await getDocs(q);
@@ -593,11 +603,9 @@ li.appendChild(rightSpan);
 list.appendChild(li);
 rank++;
 });
-
 if (rank === 1) {
 list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
 }
-
 } catch (e) {
 console.error(e);
 loading.innerText = '読み込みエラー';
@@ -615,12 +623,17 @@ updateUI('guest');
 updateUI(null);
 }
 });
+
+// イベントリスナーの一括設定
 document.getElementById('login-btn').onclick = () => window.openAuthModal('login');
 document.getElementById('signup-btn').onclick = () => window.openAuthModal('signup');
 document.getElementById('guest-btn').onclick = () => window.loginAsGuest();
 document.getElementById('logout-btn').onclick = () => window.logout();
 document.getElementById('modal-close').onclick = () => window.closeAuthModal();
 document.getElementById('modal-submit').onclick = () => window.submitAuth();
+// 追加したIDのイベント設定
+document.getElementById('fab-ranking').onclick = () => window.toggleRanking();
+document.getElementById('settings-btn').onclick = () => window.openSettingsModal();
 
 const handleEnter = (e) => {
 if (e.key === 'Enter') window.submitAuth();
