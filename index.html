@@ -340,7 +340,7 @@ header {
 <div class="modal-box" style="text-align:left;">
   <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
   <div id="ranking-loading" style="text-align:center;">読み込み中...</div>
-  <ul id="ranking-list" style="list-style:none; padding:0;"></ul>
+  <ul id="ranking-list" style="list-style:none; padding:0; max-height: 300px; overflow-y: auto;"></ul>
   <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
 </div>
 </div>
@@ -692,6 +692,7 @@ function updateUI(userState) {
   }
 }
 
+// ★変更点: ランキングを20位まで表示 (limit 5 -> 20)
 window.toggleRanking = async () => {
   const modal = document.getElementById('ranking-modal');
   const list = document.getElementById('ranking-list');
@@ -700,7 +701,8 @@ window.toggleRanking = async () => {
   list.innerHTML = '';
   loading.style.display = 'block';
   try {
-    const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+    // limitを5から20に変更
+    const q = query(collection(db, "users"), orderBy("points", "desc"), limit(20));
     const querySnapshot = await getDocs(q);
     loading.style.display = 'none';
     let rank = 1;
@@ -748,6 +750,14 @@ document.getElementById('auth-pass').onkeydown = handleEnter;
 document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
+
+// ★追加コード: URLに「?mode=ranking」がついていたら、自動でランキングを開く
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('mode') === 'ranking') {
+    setTimeout(() => {
+        window.toggleRanking();
+    }, 800);
+}
 </script>
 
 <script>
