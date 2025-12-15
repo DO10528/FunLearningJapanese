@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/images/favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon.png">
 <link rel="icon" sizes="192x192" href="assets/images/icon.png">
@@ -13,19 +13,26 @@
 <link rel="manifest" href="manifest.json">
 
 <style>
-/* --- 基本設定 --- */
+/* --- 基本設定 (ポップデザイン) --- */
 :root {
-  --primary: #5c7aff;
-  --accent: #ffcc5c;
-  --bg-color: #f4f7fc;
+  /* 鮮やかなカラーパレット */
+  --primary: #007bff; /* 鮮やかな青 */
+  --primary-dark: #0056b3;
+  --accent: #ffcc00; /* 鮮やかな黄色 */
+  --accent-dark: #e6b800;
+  --bg-color: #eef2f7; /* 少し青みがかった明るいグレー */
   --text-color: #333;
+  --card-bg-blue: #6c92b4; 
+  --card-bg-yellow: #f8f4a6;
   --line-green: #06c755;
+  --font-family-pop: 'Mochiy Pop P One', sans-serif;
+  --font-family-base: 'Zen Maru Gothic', sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  font-family: 'Zen Maru Gothic', sans-serif;
+  font-family: var(--font-family-base);
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0; padding: 0; padding-bottom: 80px;
@@ -37,47 +44,51 @@ body {
 
 /* --- ヘッダー --- */
 header {
-  background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+  background: var(--primary); /* 鮮やかな青のベタ塗り */
   color: white; padding: 15px 20px; width: 100%;
   display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
   position: sticky; top: 0; z-index: 100;
 }
 .logo { 
-  font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; pointer-events: none; 
+  font-family: var(--font-family-pop);
+  font-size: 1.5em; font-weight: 400; display: flex; align-items: center; gap: 10px; pointer-events: none; 
 }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
 .lang-switch button {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
-  touch-action: manipulation;
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+  color: white; padding: 5px 12px; border-radius: 25px; cursor: pointer; font-size: 0.9em;
+  touch-action: manipulation; font-weight: bold;
 }
-.lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
+.lang-switch button.active { background: white; color: var(--primary); }
 
 .settings-trigger {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.6);
+  color: white; width: 36px; height: 36px; border-radius: 50%;
   display: flex; justify-content: center; align-items: center; cursor: pointer;
-  font-size: 1em; transition: background 0.2s;
+  font-size: 1.2em; transition: background 0.2s;
   touch-action: manipulation;
 }
 .settings-trigger:active { background: rgba(255,255,255,0.4); }
 
 /* --- ヒーロー --- */
 .hero-section {
-  background: white; text-align: center; padding: 30px 20px;
-  width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  background: transparent; text-align: center; padding: 30px 20px 20px;
+  width: 100%; margin-bottom: 10px;
   position: relative; z-index: 1;
 }
-.hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
+.hero-section h1 { 
+  margin: 0; color: var(--primary); font-family: var(--font-family-pop); 
+  font-size: 1.8em; text-shadow: 2px 2px 0px white, 4px 4px 0px rgba(0,0,0,0.1);
+}
 
 /* --- ダッシュボード --- */
 .dashboard-card {
   background: white; margin: 20px; padding: 20px;
-  border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-radius: 20px; box-shadow: 0 6px 0 rgba(0,0,0,0.1);
   display: flex; align-items: center; gap: 15px;
+  border: 2px solid #eee;
 }
 .avatar-circle {
   width: 60px; height: 60px; border-radius: 50%;
@@ -87,10 +98,11 @@ header {
 }
 .user-meta { flex-grow: 1; }
 .level-bar-container {
-  background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
+  background: #eee; height: 12px; border-radius: 6px; margin-top: 8px; overflow: hidden;
+  border: 1px solid #ddd;
 }
 .level-bar-fill {
-  background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
+  background: linear-gradient(90deg, #ffcc00, #ff8c00); height: 100%; width: 0%; transition: width 0.5s ease;
 }
 .status-badges { display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; font-weight: bold; }
 .badge-streak { color: #ff6f61; }
@@ -98,32 +110,37 @@ header {
 
 /* --- 認証ボタン --- */
 .auth-action-area { 
-  display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
-  position: relative; z-index: 5;
+  display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; 
+  position: relative; z-index: 5; padding: 0 10px;
 }
 .btn-auth {
-  padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+  padding: 12px 20px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
   touch-action: manipulation;
   -webkit-user-select: none; user-select: none;
+  font-family: var(--font-family-pop); color: white;
+  display: flex; align-items: center; gap: 8px;
 }
-.btn-auth:active { transform: translateY(4px); box-shadow: none; }
-.btn-login { background: #4caf50; color: white; }
-.btn-signup { background: var(--primary); color: white; }
-.btn-guest { background: #90a4ae; color: white; }
+.btn-auth:active { transform: translateY(5px); box-shadow: none; }
+.btn-login { background: #28a745; }
+.btn-signup { background: var(--primary); }
+.btn-guest { background: #ffc107; color: #333; }
 
 /* --- グリッドレイアウト --- */
 .section-header {
   padding: 0 20px; margin-bottom: 15px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
-.section-title i { color: var(--primary); }
+.section-title { 
+  font-size: 1.4em; color: var(--primary); display: flex; align-items: center; gap: 8px; margin: 0; 
+  font-family: var(--font-family-pop);
+}
+.section-title i { color: var(--accent); }
 .btn-back {
   background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
   font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
   display: none;
-  touch-action: manipulation;
+  touch-action: manipulation; font-family: var(--font-family-pop);
 }
 .btn-back:hover { background: #ddd; }
 
@@ -134,110 +151,116 @@ header {
 }
 
 .game-card {
-  background: white; border-radius: 20px; padding: 20px;
-  text-align: center; text-decoration: none; color: var(--text-color);
-  border: 4px solid transparent;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+  /* ポップな塗りつぶしスタイル */
+  border-radius: 20px; padding: 20px 15px;
+  text-align: center; text-decoration: none;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.1);
   transition: all 0.2s; cursor: pointer;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
-  height: 140px; position: relative; overflow: hidden;
+  height: 160px; position: relative; overflow: hidden;
   touch-action: manipulation;
   -webkit-user-select: none; user-select: none;
+  border: none !important; /* JSのボーダー指定を無視 */
 }
-.game-card:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
+.game-card:active { transform: translateY(6px); box-shadow: none; }
 
-.card-icon { font-size: 2.5em; margin-bottom: 10px; }
-.card-title { font-weight: 800; font-size: 1.1em; line-height: 1.3; color: #555; }
+/* 交互のカラーリング */
+.game-card:nth-child(odd) {
+  background-color: var(--card-bg-blue); color: white;
+}
+.game-card:nth-child(even) {
+  background-color: var(--card-bg-yellow); color: var(--text-color);
+}
+
+/* コーナーアクセント */
+.game-card::after {
+  content: ''; position: absolute; bottom: 0; right: 0; width: 0; height: 0;
+  border-style: solid; border-width: 0 0 30px 30px;
+  border-color: transparent transparent var(--accent) transparent; opacity: 0.8;
+}
+.game-card:nth-child(even)::after {
+  border-color: transparent transparent var(--primary) transparent;
+}
+
+.card-icon { 
+  font-size: 3em; margin-bottom: 10px; 
+}
+/* アイコンの色調整 */
+.game-card:nth-child(odd) .card-icon { color: var(--accent); }
+.game-card:nth-child(even) .card-icon { color: var(--primary); }
+
+.card-title { 
+  font-family: var(--font-family-pop); font-weight: 400; font-size: 1.2em; line-height: 1.3; 
+}
+.game-card:nth-child(odd) .card-title { color: white; }
+.game-card:nth-child(even) .card-title { color: #333; }
 
 /* --- モーダル --- */
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(3px);
   display: none; justify-content: center; align-items: center; z-index: 1000;
 }
 .modal-box {
   background: white; width: 90%; max-width: 400px; padding: 30px;
-  border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+  border-radius: 25px; box-shadow: 0 10px 0 rgba(0,0,0,0.1); text-align: center;
+  border: 4px solid var(--accent);
 }
 .modal-box input {
   width: 100%; padding: 12px; margin: 10px 0;
-  border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
+  border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box;
+  font-family: var(--font-family-base);
 }
 .setting-row {
   display: flex; justify-content: space-between; align-items: center;
   background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
-  border: 1px solid #e0e0e0; text-align: left;
+  border: 2px solid #eee; text-align: left;
 }
 
 .btn-setting-action {
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: #555;
-  touch-action: manipulation;
-  transition: background 0.1s, transform 0.1s;
+  padding: 8px 15px; border: 2px solid #ddd; border-radius: 10px;
+  background: #fff; cursor: pointer; font-size: 0.9em; font-weight: bold; color: #555;
+  touch-action: manipulation; transition: transform 0.1s;
 }
-.btn-setting-action:active {
-  background: #eee;
-  transform: translateY(2px);
-}
+.btn-setting-action:active { transform: translateY(2px); }
 
 /* LINEボタン */
 .line-btn {
   background-color: var(--line-green); color: white; border: none;
-  padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+  padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer;
   display: flex; align-items: center; gap: 8px; font-size: 0.9em;
-  touch-action: manipulation;
-  justify-content: center;
-}
-.line-btn:active { transform: translateY(2px); opacity: 0.9; }
-
-/* モーダル内のLINEボタン（大きめ） */
-.btn-line-login {
-  background-color: #06c755;
-  color: white;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1em;
+  touch-action: manipulation; justify-content: center;
   box-shadow: 0 4px 0 #05a546;
-  transition: transform 0.1s;
 }
-.btn-line-login:active {
-  transform: translateY(4px);
-  box-shadow: none;
+.line-btn:active { transform: translateY(4px); box-shadow: none; opacity: 1; }
+
+.btn-line-login {
+  background-color: #06c755; color: white; width: 100%; padding: 12px;
+  border: none; border-radius: 15px; font-weight: bold; cursor: pointer;
+  margin-bottom: 15px; display: flex; align-items: center; justify-content: center;
+  gap: 10px; font-size: 1.1em; box-shadow: 0 5px 0 #05a546;
+  transition: transform 0.1s; font-family: var(--font-family-pop);
 }
+.btn-line-login:active { transform: translateY(5px); box-shadow: none; }
 
 .ranking-fab {
-  position: fixed; bottom: 20px; right: 20px;
-  background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
+  position: fixed; bottom: 25px; right: 25px;
+  background: var(--accent); color: white; width: 70px; height: 70px;
   border-radius: 50%; display: flex; justify-content: center; align-items: center;
-  font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer; z-index: 90; border: 3px solid white;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  font-size: 2em; box-shadow: 0 6px 0 #c7a000;
+  cursor: pointer; z-index: 90; border: 4px solid white;
+  touch-action: manipulation; transition: transform 0.1s;
 }
+.ranking-fab:active { transform: translateY(6px); box-shadow: none; }
 
 .hidden { display: none !important; }
 .fade-in { animation: fadeIn 0.3s ease-in; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 400px) {
-  .grid-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .game-card { height: 120px; padding: 10px; }
-  .card-icon { font-size: 2em; }
+  .grid-container { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+  .game-card { height: 150px; padding: 10px; }
+  .card-icon { font-size: 2.5em; }
 }
 </style>
 </head>
@@ -279,7 +302,7 @@ header {
 <div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
 <div class="user-meta">
 <div style="display:flex; justify-content:space-between;">
-  <span id="user-name" style="font-weight:bold; font-size:1.1em;">Loading...</span>
+  <span id="user-name" style="font-weight:bold; font-size:1.1em; font-family:var(--font-family-pop);">Loading...</span>
   <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
 </div>
 <div class="level-bar-container"><div id="level-fill" class="level-bar-fill"></div></div>
@@ -295,24 +318,24 @@ header {
 <h3 class="section-title"><i class="fa-solid fa-book-open"></i> <span data-i18n="group_kiso">基礎・単語</span></h3>
 </div>
 <div class="grid-container">
-<a href="kiso.html" class="game-card" style="border-color:#ff6f61;">
-  <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
+<a href="kiso.html" class="game-card">
+  <i class="fa-solid fa-pen-nib card-icon"></i>
   <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
 </a>
-<a href="hiragana_video_list.html" class="game-card" style="border-color:#ffa726;">
-  <i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
+<a href="hiragana_video_list.html" class="game-card">
+  <i class="fa-solid fa-video card-icon"></i>
   <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
 </a>
-<a href="verb_list.html" class="game-card" style="border-color:#ab47bc;">
-  <i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
+<a href="verb_list.html" class="game-card">
+  <i class="fa-solid fa-book card-icon"></i>
   <span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
 </a>
-<a href="keiyoshi_list.html" class="game-card" style="border-color:#66bb6a;">
-  <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
+<a href="keiyoshi_list.html" class="game-card">
+  <i class="fa-solid fa-book card-icon"></i>
   <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
 </a>
-<a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
-  <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
+<a href="kanji_list.html" class="game-card">
+  <i class="fa-solid fa-scroll card-icon"></i>
   <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
 </a>
 </div>
@@ -328,8 +351,8 @@ header {
 <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
 </div>
 <div class="grid-container">
-<a href="culture_map.html" class="game-card" style="border-color:#b71c1c;">
-  <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
+<a href="culture_map.html" class="game-card">
+  <i class="fa-solid fa-khanda card-icon"></i>
   <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
 </a>
 </div>
@@ -338,16 +361,16 @@ header {
 
 <div id="ranking-modal" class="modal-overlay">
 <div class="modal-box" style="text-align:left;">
-  <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
+  <h2 style="text-align:center; color:#f0ad4e; font-family:var(--font-family-pop);"><i class="fa-solid fa-crown"></i> ランキング</h2>
   <div id="ranking-loading" style="text-align:center;">読み込み中...</div>
-  <ul id="ranking-list" style="list-style:none; padding:0;"></ul>
-  <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
+  <ul id="ranking-list" style="list-style:none; padding:0; max-height: 300px; overflow-y: auto;"></ul>
+  <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee; border-radius:10px;">閉じる</button>
 </div>
 </div>
 
 <div id="auth-modal" class="modal-overlay">
 <div class="modal-box">
-  <h2 id="modal-title"></h2> 
+  <h2 id="modal-title" style="font-family:var(--font-family-pop);"></h2> 
   <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
 
   <button class="btn-line-login" onclick="loginWithLine()">
@@ -371,7 +394,7 @@ header {
 
 <div id="settings-modal" class="modal-overlay">
 <div class="modal-box">
-  <h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
+  <h2 style="margin-bottom:20px; color:#555; font-family:var(--font-family-pop);"><i class="fa-solid fa-gear"></i> 設定</h2>
 
   <div class="setting-row">
   <div>
@@ -437,8 +460,6 @@ const SESS_KEY = 'user_mode';
 let currentUserDocUnsubscribe = null;
 const VAPID_KEY = "BOp9ikY5zWsK4tBsSWaZ2wxa_uEoS4VOnJzWN0u7HqyDNMO7K4xchPkKKQu1iEyxx-X1yrV3uLyt8mwY7NVBdo0";
 
-// --- LINE認証プロバイダの設定 ---
-// 注意: FirebaseコンソールのOpenID Connect設定で名前を「line」にしている場合、IDは「oidc.line」になります
 const lineProvider = new OAuthProvider('oidc.line');
 
 const registerServiceWorker = async () => {
@@ -506,59 +527,40 @@ window.requestNotificationPermission = async () => {
   }
 };
 
-// --- LINEログイン処理 ---
 window.loginWithLine = async () => {
   try {
-    // ポップアップでLINEログイン画面を開く
     const result = await signInWithPopup(auth, lineProvider);
     const user = result.user;
-    
-    // 初回ログインならFirestoreにデータを作る
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
-    
     if (!userSnap.exists()) {
       await setDoc(userRef, {
-        email: user.email || "", // LINEはメールが取れない場合もある
-        displayName: user.displayName || "LINE User",
-        points: 0,
-        streak: 1,
-        lastLogin: new Date().toISOString(),
-        dailyTracker: {} 
+        email: user.email || "", displayName: user.displayName || "LINE User",
+        points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
       });
     } else {
       await updateDoc(userRef, { lastLogin: new Date().toISOString() });
     }
-    
     sessionStorage.setItem(SESS_KEY, 'authenticated');
     window.closeAuthModal();
     alert("LINEログインに成功しました！");
-    
   } catch (error) {
     console.error(error);
     alert("LINEログインエラー: " + error.message);
   }
 };
 
-// --- LINE連携処理 (設定画面から) ---
 window.linkLineAccount = async () => {
   const user = auth.currentUser;
-  if (!user) {
-    alert("先にログインしてください。");
-    return;
-  }
-  
-  if(confirm("現在の学習データにLINEアカウントを紐付けますか？\n(次回からLINEでログインできるようになります)")) {
+  if (!user) { alert("先にログインしてください。"); return; }
+  if(confirm("現在の学習データにLINEアカウントを紐付けますか？")) {
     try {
       await linkWithPopup(user, lineProvider);
       alert("LINE連携に成功しました！");
     } catch (error) {
       console.error(error);
-      if (error.code === 'auth/credential-already-in-use') {
-        alert("このLINEアカウントは既に他のデータと紐付いています。");
-      } else {
-        alert("連携エラー: " + error.message);
-      }
+      if (error.code === 'auth/credential-already-in-use') alert("このLINEアカウントは既に他のデータと紐付いています。");
+      else alert("連携エラー: " + error.message);
     }
   }
 };
@@ -580,7 +582,6 @@ window.openAuthModal = (mode) => {
   document.getElementById('auth-pass').value = '';
   displayNameInput.value = '';
 };
-
 window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 
 window.submitAuth = async () => {
@@ -591,7 +592,6 @@ window.submitAuth = async () => {
   const errs = i18nData[currentLang];
   if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
   if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
-
   try {
     if (window.authMode === 'signup') {
       if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
@@ -599,7 +599,6 @@ window.submitAuth = async () => {
       const q = query(usersRef, where("displayName", "==", displayName), limit(1));
       const snap = await getDocs(q);
       if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
-      
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
       const user = userCredential.user;
       await setDoc(doc(db, "users", user.uid), {
@@ -692,6 +691,7 @@ function updateUI(userState) {
   }
 }
 
+// ★修正: ランキングを20位まで表示
 window.toggleRanking = async () => {
   const modal = document.getElementById('ranking-modal');
   const list = document.getElementById('ranking-list');
@@ -700,7 +700,8 @@ window.toggleRanking = async () => {
   list.innerHTML = '';
   loading.style.display = 'block';
   try {
-    const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+    // limitを5から20に変更
+    const q = query(collection(db, "users"), orderBy("points", "desc"), limit(20));
     const querySnapshot = await getDocs(q);
     loading.style.display = 'none';
     let rank = 1;
@@ -708,9 +709,15 @@ window.toggleRanking = async () => {
       const data = doc.data();
       const name = data.displayName || 'Unknown';
       const pt = data.points || 0;
-      const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+      let icon;
+      // アイコンも見やすく変更
+      if(rank === 1) icon = '🥇';
+      else if(rank === 2) icon = '🥈';
+      else if(rank === 3) icon = '🥉';
+      else icon = rank + '.';
+      
       const li = document.createElement('li');
-      li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
+      li.style.cssText = "padding:12px; border-bottom:1px dashed #ddd; font-weight:bold; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-family-base);";
       const leftSpan = document.createElement('span');
       leftSpan.textContent = `${icon} ${name}`;
       const rightSpan = document.createElement('span');
@@ -748,6 +755,14 @@ document.getElementById('auth-pass').onkeydown = handleEnter;
 document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
+
+// ★追加: リッチメニューからの自動ランキングオープン
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('mode') === 'ranking') {
+    setTimeout(() => {
+        window.toggleRanking();
+    }, 800);
+}
 </script>
 
 <script>
