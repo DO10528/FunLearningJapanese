@@ -15,97 +15,97 @@
 <style>
 /* --- 基本設定 --- */
 :root {
-  --primary: #5c7aff;
-  --accent: #ffcc5c;
-  --bg-color: #f4f7fc;
-  --text-color: #333;
-  --line-green: #06c755;
+--primary: #5c7aff;
+--accent: #ffcc5c;
+--bg-color: #f4f7fc;
+--text-color: #333;
+--line-green: #06c755;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  margin: 0; padding: 0; padding-bottom: 80px;
-  overflow-x: hidden; 
-  min-height: 100vh;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
+font-family: 'Zen Maru Gothic', sans-serif;
+background-color: var(--bg-color);
+color: var(--text-color);
+margin: 0; padding: 0; padding-bottom: 80px;
+overflow-x: hidden;
+min-height: 100vh;
+width: 100%;
+-webkit-tap-highlight-color: transparent;
 }
 
 /* --- ヘッダー --- */
 header {
-  background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-  color: white; padding: 15px 20px; width: 100%;
-  display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-  position: sticky; top: 0; z-index: 100;
+background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+color: white; padding: 15px 20px; width: 100%;
+display: flex; justify-content: space-between; align-items: center;
+box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+position: sticky; top: 0; z-index: 100;
 }
-.logo { 
-  font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; pointer-events: none; 
+.logo {
+font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; pointer-events: none;
 }
 .header-right { display: flex; align-items: center; gap: 10px; }
 
 .lang-switch button {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
-  touch-action: manipulation;
+background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
+touch-action: manipulation;
 }
 .lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
 
 .settings-trigger {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; width: 32px; height: 32px; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center; cursor: pointer;
-  font-size: 1em; transition: background 0.2s;
-  touch-action: manipulation;
+background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+color: white; width: 32px; height: 32px; border-radius: 50%;
+display: flex; justify-content: center; align-items: center; cursor: pointer;
+font-size: 1em; transition: background 0.2s;
+touch-action: manipulation;
 }
 .settings-trigger:active { background: rgba(255,255,255,0.4); }
 
 /* --- ヒーロー --- */
 .hero-section {
-  background: white; text-align: center; padding: 30px 20px;
-  width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  position: relative; z-index: 1;
+background: white; text-align: center; padding: 30px 20px;
+width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 20px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+position: relative; z-index: 1;
 }
 .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
 
 /* --- ダッシュボード --- */
 .dashboard-card {
-  background: white; margin: 20px; padding: 20px;
-  border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  display: flex; align-items: center; gap: 15px;
+background: white; margin: 20px; padding: 20px;
+border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+display: flex; align-items: center; gap: 15px;
 }
 .avatar-circle {
-  width: 60px; height: 60px; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center;
-  font-size: 1.8em; background: #e0e7ff; color: var(--primary);
-  flex-shrink: 0;
+width: 60px; height: 60px; border-radius: 50%;
+display: flex; justify-content: center; align-items: center;
+font-size: 1.8em; background: #e0e7ff; color: var(--primary);
+flex-shrink: 0;
 }
 .user-meta { flex-grow: 1; }
 .level-bar-container {
-  background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
+background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
 }
 .level-bar-fill {
-  background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
+background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
 }
 .status-badges { display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; font-weight: bold; }
 .badge-streak { color: #ff6f61; }
 .badge-points { color: #f0ad4e; }
 
 /* --- 認証ボタン --- */
-.auth-action-area { 
-  display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
-  position: relative; z-index: 5;
+.auth-action-area {
+display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+position: relative; z-index: 5;
 }
 .btn-auth {
-  padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
+padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
+box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+touch-action: manipulation;
+-webkit-user-select: none; user-select: none;
 }
 .btn-auth:active { transform: translateY(4px); box-shadow: none; }
 .btn-login { background: #4caf50; color: white; }
@@ -114,35 +114,35 @@ header {
 
 /* --- グリッドレイアウト --- */
 .section-header {
-  padding: 0 20px; margin-bottom: 15px;
-  display: flex; align-items: center; justify-content: space-between;
+padding: 0 20px; margin-bottom: 15px;
+display: flex; align-items: center; justify-content: space-between;
 }
 .section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
 .section-title i { color: var(--primary); }
 .btn-back {
-  background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
-  font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
-  display: none;
-  touch-action: manipulation;
+background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
+font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
+display: none;
+touch-action: manipulation;
 }
 .btn-back:hover { background: #ddd; }
 
 .grid-container {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px; padding: 0 20px 40px 20px;
-  max-width: 1000px; margin: 0 auto;
+display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+gap: 15px; padding: 0 20px 40px 20px;
+max-width: 1000px; margin: 0 auto;
 }
 
 .game-card {
-  background: white; border-radius: 20px; padding: 20px;
-  text-align: center; text-decoration: none; color: var(--text-color);
-  border: 4px solid transparent;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-  transition: all 0.2s; cursor: pointer;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  height: 140px; position: relative; overflow: hidden;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
+background: white; border-radius: 20px; padding: 20px;
+text-align: center; text-decoration: none; color: var(--text-color);
+border: 4px solid transparent;
+box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+transition: all 0.2s; cursor: pointer;
+display: flex; flex-direction: column; justify-content: center; align-items: center;
+height: 140px; position: relative; overflow: hidden;
+touch-action: manipulation;
+-webkit-user-select: none; user-select: none;
 }
 .game-card:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
 
@@ -151,83 +151,83 @@ header {
 
 /* --- モーダル --- */
 .modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-  display: none; justify-content: center; align-items: center; z-index: 1000;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+display: none; justify-content: center; align-items: center; z-index: 1000;
 }
 .modal-box {
-  background: white; width: 90%; max-width: 400px; padding: 30px;
-  border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
+background: white; width: 90%; max-width: 400px; padding: 30px;
+border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
 }
 .modal-box input {
-  width: 100%; padding: 12px; margin: 10px 0;
-  border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
+width: 100%; padding: 12px; margin: 10px 0;
+border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
 }
 .setting-row {
-  display: flex; justify-content: space-between; align-items: center;
-  background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
-  border: 1px solid #e0e0e0; text-align: left;
+display: flex; justify-content: space-between; align-items: center;
+background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
+border: 1px solid #e0e0e0; text-align: left;
 }
 
 .btn-setting-action {
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: #555;
-  touch-action: manipulation;
-  transition: background 0.1s, transform 0.1s;
+padding: 8px 15px;
+border: 1px solid #ddd;
+border-radius: 8px;
+background: #fff;
+cursor: pointer;
+font-size: 0.9em;
+font-weight: bold;
+color: #555;
+touch-action: manipulation;
+transition: background 0.1s, transform 0.1s;
 }
 .btn-setting-action:active {
-  background: #eee;
-  transform: translateY(2px);
+background: #eee;
+transform: translateY(2px);
 }
 
 /* LINEボタン */
 .line-btn {
-  background-color: var(--line-green); color: white; border: none;
-  padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
-  display: flex; align-items: center; gap: 8px; font-size: 0.9em;
-  touch-action: manipulation;
-  justify-content: center;
+background-color: var(--line-green); color: white; border: none;
+padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+display: flex; align-items: center; gap: 8px; font-size: 0.9em;
+touch-action: manipulation;
+justify-content: center;
 }
 .line-btn:active { transform: translateY(2px); opacity: 0.9; }
 
 /* モーダル内のLINEボタン（大きめ） */
 .btn-line-login {
-  background-color: #06c755;
-  color: white;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1em;
-  box-shadow: 0 4px 0 #05a546;
-  transition: transform 0.1s;
+background-color: #06c755;
+color: white;
+width: 100%;
+padding: 12px;
+border: none;
+border-radius: 12px;
+font-weight: bold;
+cursor: pointer;
+margin-bottom: 15px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+font-size: 1em;
+box-shadow: 0 4px 0 #05a546;
+transition: transform 0.1s;
 }
 .btn-line-login:active {
-  transform: translateY(4px);
-  box-shadow: none;
+transform: translateY(4px);
+box-shadow: none;
 }
 
 .ranking-fab {
-  position: fixed; bottom: 20px; right: 20px;
-  background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
-  border-radius: 50%; display: flex; justify-content: center; align-items: center;
-  font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer; z-index: 90; border: 3px solid white;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+position: fixed; bottom: 20px; right: 20px;
+background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
+border-radius: 50%; display: flex; justify-content: center; align-items: center;
+font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+cursor: pointer; z-index: 90; border: 3px solid white;
+touch-action: manipulation;
+-webkit-tap-highlight-color: transparent;
 }
 
 .hidden { display: none !important; }
@@ -235,9 +235,9 @@ header {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 400px) {
-  .grid-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .game-card { height: 120px; padding: 10px; }
-  .card-icon { font-size: 2em; }
+.grid-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.game-card { height: 120px; padding: 10px; }
+.card-icon { font-size: 2em; }
 }
 </style>
 </head>
@@ -245,17 +245,17 @@ header {
 
 <header>
 <div class="logo">
-  <i class="fa-solid fa-shapes"></i> FunLearnJP
+<i class="fa-solid fa-shapes"></i> FunLearnJP
 </div>
 <div class="header-right">
-  <button class="settings-trigger" onclick="openSettingsModal()">
-    <i class="fa-solid fa-gear"></i>
-  </button>
+<button class="settings-trigger" onclick="openSettingsModal()">
+<i class="fa-solid fa-gear"></i>
+</button>
 
-  <div class="lang-switch">
-    <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
-    <button id="lang-en" onclick="setLanguage('en')">EN</button>
-  </div>
+<div class="lang-switch">
+<button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
+<button id="lang-en" onclick="setLanguage('en')">EN</button>
+</div>
 </div>
 </header>
 
@@ -264,28 +264,28 @@ header {
 </div>
 
 <div id="guest-welcome" class="auth-action-area">
-  <button id="login-btn" class="btn-auth btn-login" onclick="openAuthModal('login')">
-    <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span>
-  </button>
-  <button id="signup-btn" class="btn-auth btn-signup" onclick="openAuthModal('signup')">
-    <i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span>
-  </button>
-  <button id="guest-btn" class="btn-auth btn-guest" onclick="loginAsGuest()">
-    <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span>
-  </button>
+<button id="login-btn" class="btn-auth btn-login" onclick="openAuthModal('login')">
+<i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span>
+</button>
+<button id="signup-btn" class="btn-auth btn-signup" onclick="openAuthModal('signup')">
+<i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span>
+</button>
+<button id="guest-btn" class="btn-auth btn-guest" onclick="loginAsGuest()">
+<i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span>
+</button>
 </div>
 
 <div id="user-dashboard" class="dashboard-card hidden">
 <div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
 <div class="user-meta">
 <div style="display:flex; justify-content:space-between;">
-  <span id="user-name" style="font-weight:bold; font-size:1.1em;">Loading...</span>
-  <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
+<span id="user-name" style="font-weight:bold; font-size:1.1em;">Loading...</span>
+<span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
 </div>
 <div class="level-bar-container"><div id="level-fill" class="level-bar-fill"></div></div>
 <div class="status-badges">
-  <span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
-  <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
+<span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
+<span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
 </div>
 </div>
 <button id="logout-btn" onclick="logout()" style="background:none; border:none; color:#999; cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -296,24 +296,24 @@ header {
 </div>
 <div class="grid-container">
 <a href="kiso.html" class="game-card" style="border-color:#ff6f61;">
-  <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
-  <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
+<i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
+<span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
 </a>
 <a href="hiragana_video_list.html" class="game-card" style="border-color:#ffa726;">
-  <i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
-  <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
+<i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
+<span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
 </a>
 <a href="verb_list.html" class="game-card" style="border-color:#ab47bc;">
-  <i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
-  <span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
+<i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
+<span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
 </a>
 <a href="keiyoshi_list.html" class="game-card" style="border-color:#66bb6a;">
-  <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
-  <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
+<i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
+<span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
 </a>
 <a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
-  <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
-  <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
+<i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
+<span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
 </a>
 </div>
 
@@ -329,8 +329,8 @@ header {
 </div>
 <div class="grid-container">
 <a href="culture_map.html" class="game-card" style="border-color:#b71c1c;">
-  <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
-  <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
+<i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
+<span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
 </a>
 </div>
 
@@ -338,63 +338,62 @@ header {
 
 <div id="ranking-modal" class="modal-overlay">
 <div class="modal-box" style="text-align:left;">
-  <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
-  <div id="ranking-loading" style="text-align:center;">読み込み中...</div>
-  <ul id="ranking-list" style="list-style:none; padding:0; max-height: 300px; overflow-y: auto;"></ul>
-  <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
+<h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
+<div id="ranking-loading" style="text-align:center;">読み込み中...</div>
+<ul id="ranking-list" style="list-style:none; padding:0;"></ul>
+<button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
 </div>
 </div>
 
 <div id="auth-modal" class="modal-overlay">
 <div class="modal-box">
-  <h2 id="modal-title"></h2> 
-  <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
+<h2 id="modal-title"></h2>
+<p id="modal-msg" style="color:red; font-size:0.9em;"></p>
 
-  <button class="btn-line-login" onclick="loginWithLine()">
-    <i class="fa-brands fa-line" style="font-size:1.5em;"></i> LINEでログイン
-  </button>
+<button class="btn-line-login" onclick="loginWithLine()">
+<i class="fa-brands fa-line" style="font-size:1.5em;"></i> LINEでログイン
+</button>
 
-  <div style="display:flex; align-items:center; margin:10px 0;">
-    <hr style="flex:1; border:none; border-top:1px solid #ccc;">
-    <span style="padding:0 10px; color:#999; font-size:0.8em;">またはメールで</span>
-    <hr style="flex:1; border:none; border-top:1px solid #ccc;">
-  </div>
+<div style="display:flex; align-items:center; margin:10px 0;">
+<hr style="flex:1; border:none; border-top:1px solid #ccc;">
+<span style="padding:0 10px; color:#999; font-size:0.8em;">またはメールで</span>
+<hr style="flex:1; border:none; border-top:1px solid #ccc;">
+</div>
 
-  <input type="email" id="auth-email" data-i18n-placeholder="ph_email">
-  <input type="password" id="auth-pass" data-i18n-placeholder="ph_pass">
-  <input type="text" id="auth-display-name" data-i18n-placeholder="ph_name" class="hidden">
-  
-  <button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login" style="width:100%; margin-top:10px;"></button> 
-  <button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
+<input type="email" id="auth-email" data-i18n-placeholder="ph_email">
+<input type="password" id="auth-pass" data-i18n-placeholder="ph_pass">
+<input type="text" id="auth-display-name" data-i18n-placeholder="ph_name" class="hidden">
+<button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login" style="width:100%; margin-top:10px;"></button>
+<button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
 </div>
 </div>
 
 <div id="settings-modal" class="modal-overlay">
 <div class="modal-box">
-  <h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
+<h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
 
-  <div class="setting-row">
-  <div>
-  <div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
-  <div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
-  </div>
-  <button onclick="requestNotificationPermission()" class="btn-setting-action">
-  <i class="fa-solid fa-bell"></i> 許可
-  </button>
-  </div>
+<div class="setting-row">
+<div>
+<div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
+<div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
+</div>
+<button onclick="requestNotificationPermission()" class="btn-setting-action">
+<i class="fa-solid fa-bell"></i> 許可
+</button>
+</div>
 
-  <div class="setting-row">
-  <div>
-  <div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
-  <div style="font-size:0.75em; color:#888;">ログインを便利にする</div>
-  </div>
-  <button class="line-btn" onclick="linkLineAccount()">
-  <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
-  </button>
-  </div>
-  <div style="margin-top:20px;">
-  <button onclick="closeSettingsModal()" style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
-  </div>
+<div class="setting-row">
+<div>
+<div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
+<div style="font-size:0.75em; color:#888;">ログインを便利にする</div>
+</div>
+<button class="line-btn" onclick="linkLineAccount()">
+<i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
+</button>
+</div>
+<div style="margin-top:20px;">
+<button onclick="closeSettingsModal()" style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
+</div>
 </div>
 </div>
 
@@ -424,13 +423,13 @@ measurementId: "G-LCMXVLPS81"
 // Firebase初期化
 let app, analytics, db, auth, messaging;
 try {
-  app = initializeApp(firebaseConfig);
-  analytics = getAnalytics(app);
-  db = getFirestore(app);
-  auth = getAuth(app);
-  messaging = getMessaging(app);
+app = initializeApp(firebaseConfig);
+analytics = getAnalytics(app);
+db = getFirestore(app);
+auth = getAuth(app);
+messaging = getMessaging(app);
 } catch (e) {
-  console.error("Firebase Initialization Error:", e);
+console.error("Firebase Initialization Error:", e);
 }
 
 const SESS_KEY = 'user_mode';
@@ -465,299 +464,282 @@ alert(`【通知】\n${title}\n${body}`);
 });
 
 window.requestNotificationPermission = async () => {
-  if (!('Notification' in window)) {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
-      alert("【iPhoneの方へ】\nホーム画面に追加してから起動すると、通知を許可できるようになります！");
-    } else {
-      alert("お使いのブラウザは通知に対応していません。");
-    }
-    return;
-  }
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("通知がブロックされています。設定から許可してください。");
-      return;
-    }
-    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-    const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
-    let swReg = await navigator.serviceWorker.getRegistration(swPath);
-    if (!swReg) swReg = await navigator.serviceWorker.register(swPath);
-    
-    const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: swReg
-    });
-    if(token) {
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          await updateDoc(userRef, { fcmToken: token, tokenUpdatedAt: new Date().toISOString() });
-          alert("通知設定完了！");
-        } catch(e) { alert("保存に失敗しました。"); }
-      } else {
-        alert("通知が許可されました！（ゲスト）");
-      }
-    }
-  } catch (err) {
-    alert("エラー: " + err.message);
-  }
+if (!('Notification' in window)) {
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+if (isIOS) {
+alert("【iPhoneの方へ】\nホーム画面に追加してから起動すると、通知を許可できるようになります！");
+} else {
+alert("お使いのブラウザは通知に対応していません。");
+}
+return;
+}
+try {
+const permission = await Notification.requestPermission();
+if (permission !== "granted") {
+alert("通知がブロックされています。設定から許可してください。");
+return;
+}
+const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const swPath = isLocalhost ? './firebase-messaging-sw.js' : '/FunLearningJapanese/firebase-messaging-sw.js';
+let swReg = await navigator.serviceWorker.getRegistration(swPath);
+if (!swReg) swReg = await navigator.serviceWorker.register(swPath);
+const token = await getToken(messaging, {
+vapidKey: VAPID_KEY,
+serviceWorkerRegistration: swReg
+});
+if(token) {
+const user = auth.currentUser;
+if (user) {
+try {
+const userRef = doc(db, "users", user.uid);
+await updateDoc(userRef, { fcmToken: token, tokenUpdatedAt: new Date().toISOString() });
+alert("通知設定完了！");
+} catch(e) { alert("保存に失敗しました。"); }
+} else {
+alert("通知が許可されました！（ゲスト）");
+}
+}
+} catch (err) {
+alert("エラー: " + err.message);
+}
 };
 
 // --- LINEログイン処理 ---
 window.loginWithLine = async () => {
-  try {
-    // ポップアップでLINEログイン画面を開く
-    const result = await signInWithPopup(auth, lineProvider);
-    const user = result.user;
-    
-    // 初回ログインならFirestoreにデータを作る
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email || "", // LINEはメールが取れない場合もある
-        displayName: user.displayName || "LINE User",
-        points: 0,
-        streak: 1,
-        lastLogin: new Date().toISOString(),
-        dailyTracker: {} 
-      });
-    } else {
-      await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-    }
-    
-    sessionStorage.setItem(SESS_KEY, 'authenticated');
-    window.closeAuthModal();
-    alert("LINEログインに成功しました！");
-    
-  } catch (error) {
-    console.error(error);
-    alert("LINEログインエラー: " + error.message);
-  }
+try {
+// ポップアップでLINEログイン画面を開く
+const result = await signInWithPopup(auth, lineProvider);
+const user = result.user;
+// 初回ログインならFirestoreにデータを作る
+const userRef = doc(db, "users", user.uid);
+const userSnap = await getDoc(userRef);
+if (!userSnap.exists()) {
+await setDoc(userRef, {
+email: user.email || "", // LINEはメールが取れない場合もある
+displayName: user.displayName || "LINE User",
+points: 0,
+streak: 1,
+lastLogin: new Date().toISOString(),
+dailyTracker: {}
+});
+} else {
+await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+}
+sessionStorage.setItem(SESS_KEY, 'authenticated');
+window.closeAuthModal();
+alert("LINEログインに成功しました！");
+} catch (error) {
+console.error(error);
+alert("LINEログインエラー: " + error.message);
+}
 };
 
 // --- LINE連携処理 (設定画面から) ---
 window.linkLineAccount = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("先にログインしてください。");
-    return;
-  }
-  
-  if(confirm("現在の学習データにLINEアカウントを紐付けますか？\n(次回からLINEでログインできるようになります)")) {
-    try {
-      await linkWithPopup(user, lineProvider);
-      alert("LINE連携に成功しました！");
-    } catch (error) {
-      console.error(error);
-      if (error.code === 'auth/credential-already-in-use') {
-        alert("このLINEアカウントは既に他のデータと紐付いています。");
-      } else {
-        alert("連携エラー: " + error.message);
-      }
-    }
-  }
+const user = auth.currentUser;
+if (!user) {
+alert("先にログインしてください。");
+return;
+}
+if(confirm("現在の学習データにLINEアカウントを紐付けますか？\n(次回からLINEでログインできるようになります)")) {
+try {
+await linkWithPopup(user, lineProvider);
+alert("LINE連携に成功しました！");
+} catch (error) {
+console.error(error);
+if (error.code === 'auth/credential-already-in-use') {
+alert("このLINEアカウントは既に他のデータと紐付いています。");
+} else {
+alert("連携エラー: " + error.message);
+}
+}
+}
 };
 
 window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
 window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
 window.openAuthModal = (mode) => {
-  window.authMode = mode;
-  const modal = document.getElementById('auth-modal');
-  const displayNameInput = document.getElementById('auth-display-name');
-  modal.style.display = 'flex';
-  const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
-  document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
-  document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
-  displayNameInput.classList.toggle('hidden', mode === 'login');
-  document.getElementById('modal-msg').textContent = '';
-  document.getElementById('auth-email').value = '';
-  document.getElementById('auth-pass').value = '';
-  displayNameInput.value = '';
+window.authMode = mode;
+const modal = document.getElementById('auth-modal');
+const displayNameInput = document.getElementById('auth-display-name');
+modal.style.display = 'flex';
+const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
+document.getElementById('modal-title').textContent = i18nData[currentLang][titleKey];
+document.getElementById('modal-submit').textContent = i18nData[currentLang]['btn_exec'];
+displayNameInput.classList.toggle('hidden', mode === 'login');
+document.getElementById('modal-msg').textContent = '';
+document.getElementById('auth-email').value = '';
+document.getElementById('auth-pass').value = '';
+displayNameInput.value = '';
 };
 
 window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 
 window.submitAuth = async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass = document.getElementById('auth-pass').value.trim();
-  const displayName = document.getElementById('auth-display-name').value.trim();
-  const msg = document.getElementById('modal-msg');
-  const errs = i18nData[currentLang];
-  if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
-  if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
+const email = document.getElementById('auth-email').value.trim();
+const pass = document.getElementById('auth-pass').value.trim();
+const displayName = document.getElementById('auth-display-name').value.trim();
+const msg = document.getElementById('modal-msg');
+const errs = i18nData[currentLang];
+if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
+if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
 
-  try {
-    if (window.authMode === 'signup') {
-      if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("displayName", "==", displayName), limit(1));
-      const snap = await getDocs(q);
-      if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
-      
-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      const user = userCredential.user;
-      await setDoc(doc(db, "users", user.uid), {
-        email: email, displayName: displayName, points: 0, streak: 1,
-        lastLogin: new Date().toISOString(), dailyTracker: {}
-      });
-      sessionStorage.setItem(SESS_KEY, 'authenticated');
-      window.closeAuthModal();
-    } else {
-      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-      const user = userCredential.user;
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          email: email, displayName: email.split('@')[0], points: 0, streak: 1,
-          lastLogin: new Date().toISOString(), dailyTracker: {}
-        });
-      } else {
-        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-      }
-      sessionStorage.setItem(SESS_KEY, 'authenticated');
-      window.closeAuthModal();
-    }
-  } catch (error) {
-    console.error(error);
-    msg.textContent = "認証エラー: " + error.code;
-  }
+try {
+if (window.authMode === 'signup') {
+if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
+const usersRef = collection(db, "users");
+const q = query(usersRef, where("displayName", "==", displayName), limit(1));
+const snap = await getDocs(q);
+if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
+const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+const user = userCredential.user;
+await setDoc(doc(db, "users", user.uid), {
+email: email, displayName: displayName, points: 0, streak: 1,
+lastLogin: new Date().toISOString(), dailyTracker: {}
+});
+sessionStorage.setItem(SESS_KEY, 'authenticated');
+window.closeAuthModal();
+} else {
+const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+const user = userCredential.user;
+const userRef = doc(db, "users", user.uid);
+const userSnap = await getDoc(userRef);
+if (!userSnap.exists()) {
+await setDoc(userRef, {
+email: email, displayName: email.split('@')[0], points: 0, streak: 1,
+lastLogin: new Date().toISOString(), dailyTracker: {}
+});
+} else {
+await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+}
+sessionStorage.setItem(SESS_KEY, 'authenticated');
+window.closeAuthModal();
+}
+} catch (error) {
+console.error(error);
+msg.textContent = "認証エラー: " + error.code;
+}
 };
 
 window.logout = async () => {
-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
-  sessionStorage.removeItem(SESS_KEY);
-  await signOut(auth);
-  updateUI(null);
+if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+sessionStorage.removeItem(SESS_KEY);
+await signOut(auth);
+updateUI(null);
 };
 
 window.loginAsGuest = () => {
-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
-  sessionStorage.setItem(SESS_KEY, 'guest');
-  updateUI('guest');
+if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+sessionStorage.setItem(SESS_KEY, 'guest');
+updateUI('guest');
 };
 
 const checkMonthlyReset = async (user) => {
-  const userRef = doc(db, "users", user.uid);
-  const snapshot = await getDoc(userRef);
-  if (snapshot.exists()) {
-    const data = snapshot.data();
-    const now = new Date();
-    const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
-    if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-      await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
-    } else {
-      await updateDoc(userRef, { lastLogin: now.toISOString() });
-    }
-  }
+const userRef = doc(db, "users", user.uid);
+const snapshot = await getDoc(userRef);
+if (snapshot.exists()) {
+const data = snapshot.data();
+const now = new Date();
+const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
+await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+} else {
+await updateDoc(userRef, { lastLogin: now.toISOString() });
+}
+}
 };
 
 function updateUI(userState) {
-  const dash = document.getElementById('user-dashboard');
-  const welcome = document.getElementById('guest-welcome');
-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
-  if (userState === 'guest') {
-    welcome.classList.add('hidden');
-    dash.classList.remove('hidden');
-    document.getElementById('user-name').textContent = 'ゲスト';
-    document.getElementById('user-lvl').textContent = 1;
-    document.getElementById('level-fill').style.width = '0%';
-    document.getElementById('streak-val').textContent = 0;
-    document.getElementById('point-val').textContent = 0;
-  } else if (userState && userState.uid) {
-    welcome.classList.add('hidden');
-    dash.classList.remove('hidden');
-    const userId = userState.uid;
-    currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
-        document.getElementById('streak-val').textContent = data.streak || 0;
-        document.getElementById('point-val').textContent = data.points || 0;
-        const pts = data.points || 0;
-        const level = Math.floor(pts / 100) + 1;
-        document.getElementById('user-lvl').textContent = level;
-        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
-      }
-    });
-  } else {
-    welcome.classList.remove('hidden');
-    dash.classList.add('hidden');
-  }
+const dash = document.getElementById('user-dashboard');
+const welcome = document.getElementById('guest-welcome');
+if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+if (userState === 'guest') {
+welcome.classList.add('hidden');
+dash.classList.remove('hidden');
+document.getElementById('user-name').textContent = 'ゲスト';
+document.getElementById('user-lvl').textContent = 1;
+document.getElementById('level-fill').style.width = '0%';
+document.getElementById('streak-val').textContent = 0;
+document.getElementById('point-val').textContent = 0;
+} else if (userState && userState.uid) {
+welcome.classList.add('hidden');
+dash.classList.remove('hidden');
+const userId = userState.uid;
+currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
+if (doc.exists()) {
+const data = doc.data();
+document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
+document.getElementById('streak-val').textContent = data.streak || 0;
+document.getElementById('point-val').textContent = data.points || 0;
+const pts = data.points || 0;
+const level = Math.floor(pts / 100) + 1;
+document.getElementById('user-lvl').textContent = level;
+document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+}
+});
+} else {
+welcome.classList.remove('hidden');
+dash.classList.add('hidden');
+}
 }
 
-// ★変更点: ランキングを20位まで表示 (limit 5 -> 20)
 window.toggleRanking = async () => {
-  const modal = document.getElementById('ranking-modal');
-  const list = document.getElementById('ranking-list');
-  const loading = document.getElementById('ranking-loading');
-  modal.style.display = 'flex';
-  list.innerHTML = '';
-  loading.style.display = 'block';
-  try {
-    // limitを5から20に変更
-    const q = query(collection(db, "users"), orderBy("points", "desc"), limit(20));
-    const querySnapshot = await getDocs(q);
-    loading.style.display = 'none';
-    let rank = 1;
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const name = data.displayName || 'Unknown';
-      const pt = data.points || 0;
-      const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-      const li = document.createElement('li');
-      li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
-      const leftSpan = document.createElement('span');
-      leftSpan.textContent = `${icon} ${name}`;
-      const rightSpan = document.createElement('span');
-      rightSpan.style.color = "#f0ad4e";
-      rightSpan.textContent = `${pt}pt`;
-      li.appendChild(leftSpan);
-      li.appendChild(rightSpan);
-      list.appendChild(li);
-      rank++;
-    });
-    if (rank === 1) list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
-  } catch (e) {
-    console.error(e);
-    loading.innerText = '読み込みエラー';
-  }
+const modal = document.getElementById('ranking-modal');
+const list = document.getElementById('ranking-list');
+const loading = document.getElementById('ranking-loading');
+modal.style.display = 'flex';
+list.innerHTML = '';
+loading.style.display = 'block';
+try {
+const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+const querySnapshot = await getDocs(q);
+loading.style.display = 'none';
+let rank = 1;
+querySnapshot.forEach((doc) => {
+const data = doc.data();
+const name = data.displayName || 'Unknown';
+const pt = data.points || 0;
+const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+const li = document.createElement('li');
+li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
+const leftSpan = document.createElement('span');
+leftSpan.textContent = `${icon} ${name}`;
+const rightSpan = document.createElement('span');
+rightSpan.style.color = "#f0ad4e";
+rightSpan.textContent = `${pt}pt`;
+li.appendChild(leftSpan);
+li.appendChild(rightSpan);
+list.appendChild(li);
+rank++;
+});
+if (rank === 1) list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
+} catch (e) {
+console.error(e);
+loading.innerText = '読み込みエラー';
+}
 };
 
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    sessionStorage.setItem(SESS_KEY, 'authenticated');
-    await checkMonthlyReset(user);
-    updateUI(user);
-  } else if (sessionStorage.getItem(SESS_KEY) === 'guest') {
-    updateUI('guest');
-  } else {
-    updateUI(null);
-  }
+if (user) {
+sessionStorage.setItem(SESS_KEY, 'authenticated');
+await checkMonthlyReset(user);
+updateUI(user);
+} else if (sessionStorage.getItem(SESS_KEY) === 'guest') {
+updateUI('guest');
+} else {
+updateUI(null);
+}
 });
 
 const handleEnter = (e) => {
-  if (e.key === 'Enter') window.submitAuth();
+if (e.key === 'Enter') window.submitAuth();
 };
 document.getElementById('auth-email').onkeydown = handleEnter;
 document.getElementById('auth-pass').onkeydown = handleEnter;
 document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
-
-// ★追加コード: URLに「?mode=ranking」がついていたら、自動でランキングを開く
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('mode') === 'ranking') {
-    setTimeout(() => {
-        window.toggleRanking();
-    }, 800);
-}
 </script>
 
 <script>
@@ -777,8 +759,8 @@ btn_imasu: "います<br>あります", btn_money: "お金の学習", btn_transp
 btn_clock1: "とけい1", btn_clock2: "とけい2", btn_datetime_practice: "日付・練習",
 btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
 btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？", btn_kei_neg: "ひていけい (～くない)",
-btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
-btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか", 
+btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング",
+btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか",
 btn_teimasu: "V-ています", btn_temoii: "V-てもいいですか", btn_kata: "V-方",
 btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
 btn_shoptalk: "お買い物トーク", btn_bustalk: "お仕事トーク", btn_sengoku: "戦国・日本語伝",
@@ -808,7 +790,7 @@ btn_imasu: "Imasu<br>Arimasu", btn_money: "Money Learning", btn_transport: "Tran
 btn_clock1: "Clock 1", btn_clock2: "Clock 2", btn_datetime_practice: "Date Practice",
 btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
 btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?", btn_kei_neg: "Negative Form",
-btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
+btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing",
 btn_tekudasai: "V-te Kudasai", btn_tekudasaimasenka: "V-te Kudasaimasenka", btn_mashouka: "V-mashouka",
 btn_teimasu: "V-te Imasu", btn_temoii: "May I...?", btn_kata: "How to V (V-kata)",
 btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
