@@ -48,7 +48,7 @@ header {
 }
 .header-right { 
   display: flex; align-items: center; gap: 10px; 
-  position: relative; z-index: 101; /* ボタンが確実に押せるように最前面へ */
+  position: relative; z-index: 101; 
 }
 
 .lang-switch button {
@@ -102,7 +102,7 @@ header {
 /* --- 認証ボタン --- */
 .auth-action-area { 
   display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
-  position: relative; z-index: 10; /* 重なり順を上げて確実に押せるように修正 */
+  position: relative; z-index: 10;
 }
 .btn-auth {
   padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
@@ -363,9 +363,9 @@ header {
     <hr style="flex:1; border:none; border-top:1px solid #ccc;">
   </div>
 
-  <input type="email" id="auth-email" data-i18n-placeholder="ph_email">
-  <input type="password" id="auth-pass" data-i18n-placeholder="ph_pass">
-  <input type="text" id="auth-display-name" data-i18n-placeholder="ph_name" class="hidden">
+  <input type="email" id="auth-email" placeholder="メールアドレス" data-i18n-placeholder="ph_email">
+  <input type="password" id="auth-pass" placeholder="パスワード" data-i18n-placeholder="ph_pass">
+  <input type="text" id="auth-display-name" placeholder="ゲーム名（ランキング用）" data-i18n-placeholder="ph_name" class="hidden">
   
   <button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login" style="width:100%; margin-top:10px;"></button> 
   <button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
@@ -461,7 +461,6 @@ const body = payload.notification.body;
 alert(`【通知】\n${title}\n${body}`);
 });
 
-// 通知許可
 window.requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
     alert("お使いのブラウザは通知に対応していません。");
@@ -544,7 +543,6 @@ window.submitAuth = async () => {
   const pass = document.getElementById('auth-pass').value.trim();
   const displayName = document.getElementById('auth-display-name').value.trim();
   const msg = document.getElementById('modal-msg');
-  // window.currentLang と window.i18nData を使用して確実にデータ取得
   const errs = window.i18nData[window.currentLang];
 
   if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
@@ -598,6 +596,7 @@ window.logout = async () => {
   updateUI(null);
 };
 
+// 【修正】ゲストログイン機能をここに配置し、確実に動作するように修正
 window.loginAsGuest = () => {
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
   sessionStorage.setItem(SESS_KEY, 'guest');
@@ -619,7 +618,8 @@ const checkMonthlyReset = async (user) => {
   }
 };
 
-function updateUI(userState) {
+// 【重要】UI更新関数（Firestoreデータを受け取るためモジュール内に配置）
+window.updateUI = function(userState) {
   const dash = document.getElementById('user-dashboard');
   const welcome = document.getElementById('guest-welcome');
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
@@ -651,7 +651,7 @@ function updateUI(userState) {
     welcome.classList.remove('hidden');
     dash.classList.add('hidden');
   }
-}
+};
 
 window.toggleRanking = async () => {
   const modal = document.getElementById('ranking-modal');
@@ -703,7 +703,7 @@ onAuthStateChanged(auth, async (user) => {
 </script>
 
 <script>
-window.currentLang = 'ja'; // グローバル変数として定義
+window.currentLang = 'ja'; 
 
 window.i18nData = {
 ja: {
@@ -887,7 +887,6 @@ document.getElementById('modal-submit').textContent = window.i18nData[lang]['btn
 }
 };
 
-// --- UI制御関数 (確実にボタンが反応するようにここに移動) ---
 window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
 window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
@@ -916,7 +915,9 @@ document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
 
-// URLに「?mode=ranking」がついていたら、自動でランキングを開く
+// ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
+window.setLanguage('ja');
+
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('mode') === 'ranking') {
     setTimeout(() => {
