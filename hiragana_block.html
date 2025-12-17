@@ -12,7 +12,7 @@
     :root {
         --primary: #5c7aff;
         --accent: #ffcc5c;
-        --bg-color: #f4f7fc; /* メイン画面に合わせました */
+        --bg-color: #f4f7fc;
         --text-color: #333;
     }
 
@@ -26,23 +26,28 @@
         min-height: 100vh;
         display: flex; flex-direction: column;
         user-select: none;
-        touch-action: none; /* ドラッグ操作のためにスクロール等を抑制 */
+        /* ★修正: 全体のスクロール禁止を解除しました */
+        /* touch-action: none; */ 
+        overflow-x: hidden;
     }
 
     header {
-        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%); /* メイン画面に合わせました */
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white; padding: 15px 20px;
         box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
         display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0; width: 100%; /* ヘッダーを固定 */
     }
     .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
     .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
 
     .container {
         flex-grow: 1; padding: 20px;
-        width: 100%; max-width: 1000px; /* 少し広げました */
+        width: 100%; max-width: 1000px;
         margin: 0 auto;
         display: flex; flex-direction: column; align-items: center;
+        /* スクロールが必要な場合に備える */
+        overflow-y: auto; 
     }
 
     /* --- 画面切り替え --- */
@@ -50,10 +55,10 @@
     .screen.active { display: flex; flex-direction: column; align-items: center; }
     @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- 【デザイン変更】レベル選択（メイン画面風） --- */
+    /* --- レベル選択（メイン画面風） --- */
     .level-grid {
         display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* メイン画面と同じグリッド設定 */
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 15px; 
         width: 100%; 
         padding: 10px 0 40px 0;
@@ -61,7 +66,7 @@
 
     .level-btn {
         background: white; 
-        border: 4px solid transparent; /* 色はJSで指定 */
+        border: 4px solid transparent;
         border-radius: 20px; 
         padding: 20px;
         text-align: center;
@@ -69,9 +74,11 @@
         box-shadow: 0 8px 15px rgba(0,0,0,0.05);
         transition: all 0.2s;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        height: 140px; /* メイン画面のカードと高さを合わせる */
+        height: 140px;
         text-decoration: none;
         color: var(--text-color);
+        /* ボタン内での誤操作防止 */
+        touch-action: manipulation;
     }
     .level-btn:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
 
@@ -99,7 +106,7 @@
     /* --- ゲーム画面 (ドラッグ&ドロップ) --- */
     .game-board {
         display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; margin-top: 20px; align-items: center;
-        max-width: 600px; /* ゲーム画面は広がりすぎないように制限 */
+        max-width: 600px;
     }
     .col { display: flex; flex-direction: column; gap: 15px; align-items: center; min-height: 300px; }
 
@@ -107,15 +114,17 @@
         width: 100%; aspect-ratio: 1; max-width: 80px; max-height: 80px;
         border-radius: 15px; display: flex; justify-content: center; align-items: center;
         font-size: 1.8em; font-weight: 900; position: relative;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.1); touch-action: none; /* 重要 */
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
     }
 
     /* 左: ドラッグ元 */
     .char-source {
         background: white; border: 3px solid #ff9800; color: #ff9800; cursor: grab; z-index: 10;
+        /* ★修正: ドラッグする要素だけタッチ操作を独占する設定に追加 */
+        touch-action: none; 
     }
     .char-source:active { cursor: grabbing; transform: scale(1.1); z-index: 100; }
-    .char-source.placeholder { opacity: 0.2; pointer-events: none; } /* 移動後の抜け殻 */
+    .char-source.placeholder { opacity: 0.2; pointer-events: none; }
 
     /* 中: ターゲット */
     .target-slot {
@@ -252,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const SOUND_BUBU = new Audio('assets/sounds/bubu.mp3');
 
     // --- データ ---
-    // colors: 各レベルのテーマカラーを定義 (borderなどに使用)
     const hiraganaData = [
         { id: 1, label: "あ", color: "#ff5252", chars: ['あ','い','う','え','お'] },
         { id: 2, label: "か", color: "#ff9800", chars: ['か','き','く','け','こ'] },
@@ -297,14 +305,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).classList.add('active');
     };
 
-    // --- 1. レベル画面 (デザインをメイン画面風に更新) ---
+    // --- 1. レベル画面 ---
     const levelGrid = document.getElementById('level-grid');
     hiraganaData.forEach(level => {
-        const btn = document.createElement('div'); // buttonタグだとflexレイアウトが崩れやすいためdivに変更
+        const btn = document.createElement('div'); 
         btn.className = 'level-btn';
-        btn.style.borderColor = level.color; // 枠線を色分け
+        btn.style.borderColor = level.color; 
         
-        // メイン画面と同じカードスタイル
         btn.innerHTML = `
             <div class="level-char-icon" style="color:${level.color}">${level.label}</div>
             <div class="level-title">${level.label}行</div>
@@ -343,35 +350,28 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('judge-msg').textContent = '';
         placedCount = 0;
 
-        // シャッフル
         const leftChars = [...level.chars].sort(() => Math.random() - 0.5);
-        // 右(音声)と中(穴)はペアだが表示順はシャッフル
         const rightPairs = level.chars.map(char => ({ char: char })).sort(() => Math.random() - 0.5);
 
         const colLeft = document.createElement('div'); colLeft.className = 'col';
         const colCenter = document.createElement('div'); colCenter.className = 'col';
         const colRight = document.createElement('div'); colRight.className = 'col';
 
-        // 左: ドラッグ元
         leftChars.forEach(char => {
             const block = document.createElement('div');
             block.className = 'block char-source';
             block.textContent = char;
             block.dataset.char = char;
-            // カスタムドラッグイベント
             setupDrag(block);
             colLeft.appendChild(block);
         });
 
-        // 中 & 右
         rightPairs.forEach(pair => {
-            // 中: 穴
             const slot = document.createElement('div');
             slot.className = 'block target-slot';
             slot.dataset.answer = pair.char;
             colCenter.appendChild(slot);
 
-            // 右: 音声
             const audioBtn = document.createElement('button');
             audioBtn.className = 'block audio-btn';
             audioBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
@@ -389,24 +389,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let ghost = null;
 
     function setupDrag(el) {
-        // マウス
         el.addEventListener('mousedown', startDrag);
-        // タッチ
         el.addEventListener('touchstart', startDrag, {passive: false});
     }
 
     function startDrag(e) {
-        // 既に埋まっている場合は無視(placeholder)
         if (e.target.classList.contains('placeholder')) return;
         
         e.preventDefault();
         dragItem = e.target;
         
-        // タッチかマウスかの座標取得
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        // ゴースト生成
         ghost = document.createElement('div');
         ghost.className = 'drag-ghost';
         ghost.textContent = dragItem.textContent;
@@ -414,7 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ghost.style.top = clientY + 'px';
         document.body.appendChild(ghost);
 
-        // イベントリスナー追加
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onEnd);
         document.addEventListener('touchmove', onMove, {passive: false});
@@ -433,25 +427,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function onEnd(e) {
         if (!ghost) return;
         
-        // ドロップ位置の要素を取得
         const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
         const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
         
-        // ゴーストを非表示にして下にある要素を判定
         ghost.style.display = 'none';
         const elemBelow = document.elementFromPoint(clientX, clientY);
         
-        // ターゲットスロットかチェック
         const slot = elemBelow ? elemBelow.closest('.target-slot') : null;
 
         if (slot && !slot.hasChildNodes()) {
-            // スロットに文字を入れる
             placeChar(slot, dragItem.dataset.char);
-            // 元のブロックを半透明にする
             dragItem.classList.add('placeholder');
         }
 
-        // 後始末
         if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
         ghost = null;
         dragItem = null;
@@ -461,7 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.removeEventListener('touchmove', onMove);
         document.removeEventListener('touchend', onEnd);
 
-        // 判定チェック
         checkAllFilled();
     }
 
@@ -471,9 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filledDiv.textContent = char;
         filledDiv.dataset.char = char;
         
-        // タップで元に戻す機能
         filledDiv.onclick = () => {
-            // 元のリストのブロックを復活
             const sourceBlocks = document.querySelectorAll('.char-source');
             sourceBlocks.forEach(b => {
                 if(b.dataset.char === char) b.classList.remove('placeholder');
@@ -486,12 +471,10 @@ document.addEventListener('DOMContentLoaded', () => {
         placedCount++;
     }
 
-    // --- 判定ロジック ---
     function checkAllFilled() {
         const total = currentLevel.chars.length;
-        if (placedCount < total) return; // まだ埋まってない
+        if (placedCount < total) return; 
 
-        // 全部埋まったら判定
         const slots = document.querySelectorAll('.target-slot');
         let allCorrect = true;
 
@@ -504,35 +487,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (allCorrect) {
-            // 正解
             SOUND_SEIKAI.currentTime = 0;
             SOUND_SEIKAI.play();
             document.getElementById('judge-msg').textContent = "せいかい！つぎのレベルへ！";
             
-            // ポイント加算
             if(window.addPointsToUser) window.addPointsToUser(currentLevel.id, `level_${currentLevel.id}`);
 
-            // 次のレベルへ自動遷移 (3秒後)
             setTimeout(() => {
                 const nextId = currentLevel.id + 1;
                 if (nextId <= 10) {
                     const nextLevel = hiraganaData.find(l => l.id === nextId);
                     currentLevel = nextLevel;
-                    // 次のレベルの練習は飛ばしてゲームへ？ それとも練習へ？
-                    // 「自動で次のレベルに進む」とのことなので、ゲーム再構築
                     setupGameBoard(nextLevel);
                 } else {
-                    // 全レベルクリア
-                    showScreen('level-screen'); // またはお祝い画面
+                    showScreen('level-screen'); 
                     alert("全レベルクリア！おめでとう！");
                 }
             }, 3000);
 
         } else {
-            // 不正解
             SOUND_BUBU.currentTime = 0;
             SOUND_BUBU.play();
-            // どれが違うかは表示しない（そのまま）
         }
     }
 
