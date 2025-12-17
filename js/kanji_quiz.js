@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 設定 ---
-    const DATA_URL = 'data/kanji.json';
+    const DATA_URL = 'data/kanji.json'; // JSONファイルがある場合
     const POINTS_PER_QUESTION = 1;
     const MAX_QUESTIONS = 10;
     const CHOICES_COUNT = 3;
@@ -29,18 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode = 'kun';
     let isAnswering = false; 
 
-    // Firebaseダミー
+    // Firebaseダミー (エラー防止)
     if (typeof window.addPointsToUser !== 'function') {
         window.addPointsToUser = async () => false;
     }
 
     // --- 初期化 ---
     async function init() {
+        // もしHTML側に直接 KANJI_DATA が書かれていればそれを使う
+        if (typeof KANJI_DATA !== 'undefined') {
+            kanjiData = KANJI_DATA;
+            startQuiz();
+            return;
+        }
+
+        // なければJSONを読みに行く
         try {
             const response = await fetch(DATA_URL);
             const data = await response.json();
             
-            // データ形式の揺らぎに対応
             if (data.kanji_list) {
                 kanjiData = data.kanji_list;
             } else if (Array.isArray(data)) {
@@ -51,28 +58,27 @@ document.addEventListener('DOMContentLoaded', () => {
             startQuiz();
         } catch (error) {
             console.error('読み込みエラー:', error);
-            kanjiDisplay.textContent = "Error";
-            resultMsg.textContent = "データを読み込めませんでした。";
+            // データがない場合のフォールバック（テスト用データ）
+            if (kanjiData.length === 0) {
+                 kanjiDisplay.textContent = "Error";
+                 resultMsg.textContent = "データを読み込めませんでした。";
+            }
         }
     }
 
-    // --- クイズ開始 ---
+    // --- クイズ開始（リセット） ---
     function startQuiz() {
+        // 現在のモードを取得
         modeRadios.forEach(r => { if(r.checked) currentMode = r.value; });
 
-        // 「なし」を除外し、読み方が存在するデータのみ抽出
-        const validData = kanjiData.filter(item => {
-            const r = currentMode === 'kun' ? item.kun : item.on;
-            return r && r !== "なし" && r.trim() !== "";
-        });
-
-        if (validData.length < CHOICES_COUNT) {
+        // データチェック
+        if (!kanjiData || kanjiData.length < CHOICES_COUNT) {
             resultMsg.textContent = "問題データが足りません。";
             return;
         }
 
-        // シャッフルして出題
-        currentQuestions = shuffleArray(validData).slice(0, MAX_QUESTIONS);
+        // ★ここで問題をシャッフル（ゲーム開始時のみ）
+        currentQuestions = shuffleArray(kanjiData).slice(0, MAX_QUESTIONS);
         
         currentIndex = 0;
         score = 0;
@@ -84,6 +90,24 @@ document.addEventListener('DOMContentLoaded', () => {
         loadQuestion();
     }
 
+    // --- ★修正箇所：モード切替（リセットしない） ---
+    function switchMode(e) {
+        // 正解演出中は切り替えない（バグ防止）
+        if (isAnswering) {
+            e.preventDefault(); 
+            // ラジオボタンの見た目を元に戻す処理が必要ならここで行うが、
+            // 複雑になるので今回は「演出が終わるまで待ってね」とするか、そのまま切り替える
+            // ここでは「即時切り替え」を実装します。
+        }
+
+        // 新しいモードをセット
+        currentMode = e.target.value;
+        
+        // ★重要：currentIndex（今の問題番号）や score（点数）はリセットせず、
+        // 今の画面を再描画するだけにする
+        loadQuestion();
+    }
+
     // --- 問題表示 ---
     function loadQuestion() {
         if (currentIndex >= currentQuestions.length) {
@@ -92,21 +116,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const question = currentQuestions[currentIndex];
-        isAnswering = false;
         
-        qNumEl.textContent = currentIndex + 1;
-        kanjiDisplay.textContent = question.kanji;
+        // 回答中フラグをリセット（モード切替時などに必要）
+        // ただし、「正解！」と出ている最中にモードを変えた場合は
+        // 次の問題に進む処理が待機しているので、無理にリセットしないほうが良いが
+        // シンプルにするため、モードを変えたら「回答待ち」状態に戻します
+        if (!isAnswering) {
+             resultMsg.textContent = '';
+        }
 
-        // 正解の読み方 (・より前を取得)
+        qNumEl.textContent = currentIndex + 1;
+        kanjiDisplay.textContent = question.kanji || question.char; // プロパティ名の揺らぎ対応
+
+        // 正解の読み方
         const rawReading = currentMode === 'kun' ? question.kun : question.on;
         const correctAnswer = formatReading(rawReading);
 
-        // ダミー選択肢作成
-        // 全データから、今のモードで有効な読み方を収集
+        // --- 選択肢の生成 ---
+        
+        // ダミー選択肢作成（自分以外の漢字から、今のモードの読みを取得）
         let pool = [];
         kanjiData.forEach(item => {
+            const itemChar = item.kanji || item.char;
+            const qChar = question.kanji || question.char;
+            
             // 自分自身は除外
-            if (item.kanji === question.kanji) return;
+            if (itemChar === qChar) return;
 
             const rRaw = currentMode === 'kun' ? item.kun : item.on;
             // 「なし」や空文字を除外
@@ -119,28 +154,35 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // プールからランダムに2つ選ぶ
-        const wrongAnswers = shuffleArray(pool).slice(0, CHOICES_COUNT - 1);
-        
-        // もしダミーが足りない場合の保険
-        while (wrongAnswers.length < CHOICES_COUNT - 1) {
-            wrongAnswers.push("---");
+        // もしダミー候補が足りなければ、固定のダミーを追加（エラー防止）
+        while (pool.length < CHOICES_COUNT - 1) {
+            pool.push("---");
         }
 
+        // プールからランダムに選ぶ
+        const wrongAnswers = shuffleArray(pool).slice(0, CHOICES_COUNT - 1);
+        
         // 正解と混ぜる
         const options = shuffleArray([correctAnswer, ...wrongAnswers]);
 
         // ボタン配置
         choicesContainer.innerHTML = '';
-        resultMsg.textContent = '';
+        
+        // ★もし正解演出中ならメッセージは消さない、そうでなければ消す
+        if (!isAnswering) {
+            resultMsg.textContent = '';
+        }
         
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'choice-btn';
             btn.textContent = opt;
-            if (opt === "---") btn.disabled = true; // 保険用
+            if (opt === "---" || opt === "") btn.disabled = true;
             
-            btn.onclick = () => checkAnswer(btn, opt, correctAnswer, question.kanji);
+            // もし正解演出中にモードを変えた場合、ボタンは押せないようにしておく
+            if (isAnswering) btn.disabled = true;
+
+            btn.onclick = () => checkAnswer(btn, opt, correctAnswer, (question.kanji || question.char));
             choicesContainer.appendChild(btn);
         });
     }
@@ -148,7 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 読み方の整形 (例: "うえ・あ" -> "うえ")
     function formatReading(str) {
         if (!str) return "";
-        return str.split('・')[0].trim();
+        // 全角・半角スペース削除
+        let s = str.replace(/[\s　]+/g, '');
+        // ・で分割して最初だけ使う
+        return s.split('・')[0].trim();
     }
 
     // --- 答え合わせ ---
@@ -165,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultMsg.style.color = "var(--correct-color)";
             if(soundCorrect) { soundCorrect.currentTime = 0; soundCorrect.play(); }
             score++;
-            // ポイント加算 (IDの代わりに漢字文字を使用)
+            // ポイント加算
             await window.addPointsToUser(POINTS_PER_QUESTION, kanjiId);
         } else {
             btn.classList.add('incorrect');
@@ -179,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         setTimeout(() => {
+            isAnswering = false; // フラグ解除
             currentIndex++;
             loadQuestion();
         }, 1500);
@@ -201,7 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return newArr;
     }
 
-    modeRadios.forEach(r => r.addEventListener('change', startQuiz));
+    // --- イベントリスナー設定 ---
+    
+    // ★修正: startQuizではなく、switchModeを呼ぶように変更
+    modeRadios.forEach(r => r.addEventListener('change', switchMode));
+    
     restartBtn.addEventListener('click', startQuiz);
+    
+    // 開始
     init();
 });
