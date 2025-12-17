@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <style>
-    /* --- index.html と共通のデザイン設定 --- */
+    /* --- 共通デザイン設定 --- */
     :root {
         --primary: #5c7aff;
         --bg-color: #f4f7fc;
@@ -18,45 +18,102 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
+    html { height: 100%; }
+
     body {
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0; padding: 0;
         display: flex; flex-direction: column;
-        min-height: 100vh;
-        overflow-x: hidden;
-        touch-action: manipulation; /* ダブルタップ拡大防止 */
+        min-height: 100%;
+        overflow-y: auto; /* スクロール許可 */
+        -webkit-overflow-scrolling: touch;
     }
 
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-        color: white;
-        padding: 15px 20px;
+        color: white; padding: 15px 20px;
         display: flex; justify-content: space-between; align-items: center;
         box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-        width: 100%;
+        flex-shrink: 0;
     }
     .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; gap: 10px; align-items: center; }
     .home-icon { color: white; font-size: 1.5em; }
 
     /* --- メインエリア --- */
-    .main-container {
-        flex-grow: 1;
-        padding: 20px;
-        width: 100%; max-width: 600px; margin: 0 auto;
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; 
+        margin: 0 auto;
         display: flex; flex-direction: column; align-items: center;
     }
 
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: fadeIn 0.3s ease-out; flex-direction: column; align-items: center; }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- レベル選択画面 (おとあてブロックと統一) --- */
+    .level-grid {
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px; 
+        width: 100%; 
+        padding: 10px 0 60px 0;
+    }
+
+    .level-btn {
+        background: white; 
+        border: 4px solid transparent;
+        border-radius: 20px; 
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 140px;
+        color: var(--text-color);
+        touch-action: manipulation;
+    }
+    .level-btn:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
+
+    .level-char-icon { font-size: 2.5em; margin-bottom: 10px; font-weight: 900; }
+    .level-title { font-weight: 800; font-size: 1.1em; color: #555; margin-bottom: 5px; }
+    .level-tag { font-size: 0.8em; color: white; background: #999; padding: 2px 10px; border-radius: 10px; font-weight: bold; }
+
+
+    /* --- 書き方道場 画面 --- */
     .dojo-card {
         background: white; border-radius: 25px;
-        padding: 20px; width: 100%;
+        padding: 20px; width: 100%; max-width: 500px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         text-align: center;
     }
 
-    h1 { color: var(--primary); margin-bottom: 10px; font-size: 1.8em; }
-    .sub-text { color: #666; margin-bottom: 20px; }
+    h1 { color: var(--primary); margin-bottom: 5px; font-size: 1.5em; }
+    .sub-text { color: #666; margin-bottom: 15px; font-size: 0.9em; }
+
+    /* パレット＆音声エリア */
+    .palette-area {
+        display: flex; align-items: center; justify-content: center; gap: 15px;
+        margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 50px;
+    }
+    .color-dot {
+        width: 35px; height: 35px; border-radius: 50%;
+        cursor: pointer; border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
+    }
+    .color-dot.active { transform: scale(1.2); border-color: #ddd; }
+
+    .btn-sound {
+        width: 40px; height: 40px; border-radius: 50%; border: none;
+        background: var(--accent); color: white; font-size: 1.2em;
+        cursor: pointer; box-shadow: 0 3px 0 #ffa000; display: flex; justify-content: center; align-items: center;
+    }
+    .btn-sound:active { transform: translateY(3px); box-shadow: none; }
 
     /* --- キャンバスエリア --- */
     .canvas-wrapper {
@@ -67,73 +124,58 @@
         border-radius: 20px;
         background-color: #fff;
         overflow: hidden;
-        /* 田の字グリッド (補助線) */
+        /* 田の字グリッド */
         background-image: 
             linear-gradient(to right, #eee 1px, transparent 1px),
             linear-gradient(to bottom, #eee 1px, transparent 1px);
-        background-size: 150px 150px; /* 300pxの半分 */
+        background-size: 150px 150px;
         background-position: center;
+        touch-action: none; /* ここだけスクロール禁止 */
     }
 
-    /* ガイド文字（薄い文字） */
     .guide-text {
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -54%);
         font-size: 240px;
-        
-        /* ★ここを変更！Klee Oneを指定★ */
         font-family: 'Klee One', cursive; 
-        font-weight: 600; /* 少し太めにして見やすく */
-        
+        font-weight: 600;
         color: #e0e0e0;
-        pointer-events: none;
-        user-select: none;
+        pointer-events: none; user-select: none;
         z-index: 1;
     }
 
-    /* 描画用キャンバス */
     canvas {
-        position: absolute; top: 0; left: 0;
-        z-index: 2;
+        position: absolute; top: 0; left: 0; z-index: 2;
         cursor: crosshair;
-        touch-action: none; /* スクロール防止 */
     }
 
     /* --- コントロールボタン --- */
     .controls {
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
         width: 100%;
     }
-
     .btn {
-        border: none; border-radius: 50px; padding: 12px 24px;
-        font-size: 1.1em; font-weight: bold; color: white;
+        border: none; border-radius: 50px; padding: 10px 20px;
+        font-size: 1em; font-weight: bold; color: white;
         cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-        transition: transform 0.1s; min-width: 120px;
+        transition: transform 0.1s; min-width: 110px;
         display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn:active { transform: translateY(4px); box-shadow: none; }
 
     .btn-clear { background-color: #ef5350; }
     .btn-next { background-color: var(--primary); }
-    .btn-back { background-color: #90a4ae; color: white; text-decoration: none; display: inline-block; margin-top: 20px; padding: 10px 30px; border-radius: 20px; font-weight: bold; }
-
-    /* 色変えパレット（オプション） */
-    .color-palette {
-        display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+    
+    .level-back-btn {
+        background: none; border: none; color: #999; 
+        margin-top: 15px; cursor: pointer; text-decoration: underline; font-weight: bold;
     }
-    .color-dot {
-        width: 35px; height: 35px; border-radius: 50%;
-        cursor: pointer; border: 3px solid white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: transform 0.1s;
-    }
-    .color-dot.active { transform: scale(1.2); border-color: #333; }
 
     @media (max-width: 400px) {
         .canvas-wrapper { width: 280px; height: 280px; }
         .guide-text { font-size: 220px; }
+        .level-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     }
 </style>
 </head>
@@ -144,104 +186,180 @@
     <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
 </header>
 
-<div class="main-container">
-    <div class="dojo-card">
-        <h1><i class="fa-solid fa-paintbrush"></i> かきかた 道場</h1>
-        <p class="sub-text">うすい もじを なぞって みよう！</p>
+<div class="container">
 
-        <div class="color-palette">
-            <div class="color-dot active" style="background: #333;" onclick="setColor('#333', this)"></div>
-            <div class="color-dot" style="background: #ef5350;" onclick="setColor('#ef5350', this)"></div>
-            <div class="color-dot" style="background: #5c7aff;" onclick="setColor('#5c7aff', this)"></div>
-            <div class="color-dot" style="background: #66bb6a;" onclick="setColor('#66bb6a', this)"></div>
-        </div>
-
-        <div class="canvas-wrapper">
-            <div id="guide-char" class="guide-text">あ</div>
-            <canvas id="drawing-canvas" width="300" height="300"></canvas>
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-eraser"></i> 消す</button>
-            <button class="btn btn-next" onclick="nextChar()"><i class="fa-solid fa-arrow-right"></i> つぎへ</button>
-        </div>
-
-        <a href="index.html" class="btn-back">メニューにもどる</a>
+    <div id="level-screen" class="screen active">
+        <h2 style="color:#555; margin-bottom:20px; text-align:center;"><i class="fa-solid fa-paintbrush"></i> かきたい もじを えらんでね</h2>
+        <div class="level-grid" id="level-grid"></div>
     </div>
+
+    <div id="dojo-screen" class="screen">
+        <div class="dojo-card">
+            <h1 id="dojo-title">あ行の れんしゅう</h1>
+            
+            <div class="palette-area">
+                <div class="color-dot active" style="background: #333;" onclick="setColor('#333', this)"></div>
+                <div class="color-dot" style="background: #ef5350;" onclick="setColor('#ef5350', this)"></div>
+                <div class="color-dot" style="background: #5c7aff;" onclick="setColor('#5c7aff', this)"></div>
+                <div class="color-dot" style="background: #66bb6a;" onclick="setColor('#66bb6a', this)"></div>
+                <button class="btn-sound" onclick="speakCurrentChar()">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+
+            <div class="canvas-wrapper">
+                <div id="guide-char" class="guide-text">あ</div>
+                <canvas id="drawing-canvas" width="300" height="300"></canvas>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-eraser"></i> 消す</button>
+                <button class="btn btn-next" onclick="nextChar()"><i class="fa-solid fa-arrow-right"></i> つぎへ</button>
+            </div>
+
+            <button class="level-back-btn" onclick="showLevelScreen()">レベルせんたくに もどる</button>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // --- 設定 ---
+    // --- 音声合成の準備 ---
+    const synth = window.speechSynthesis;
+    let voices = [];
+    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+
+    function speak(text) {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        
+        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        if (jpVoices.length > 0) utterThis.voice = jpVoices[0];
+        
+        synth.speak(utterThis);
+    }
+
+    // --- データ定義 (レベル分け) ---
+    const hiraganaLevels = [
+        { id: 1, label: "あ", color: "#ff5252", chars: ['あ','い','う','え','お'] },
+        { id: 2, label: "か", color: "#ff9800", chars: ['か','き','く','け','こ'] },
+        { id: 3, label: "さ", color: "#fbc02d", chars: ['さ','し','す','せ','そ'] },
+        { id: 4, label: "た", color: "#4caf50", chars: ['た','ち','つ','て','と'] },
+        { id: 5, label: "な", color: "#2196f3", chars: ['な','に','ぬ','ね','の'] },
+        { id: 6, label: "は", color: "#9c27b0", chars: ['は','ひ','ふ','へ','ほ'] },
+        { id: 7, label: "ま", color: "#e91e63", chars: ['ま','み','む','め','も'] },
+        { id: 8, label: "や", color: "#00bcd4", chars: ['や','ゆ','よ'] }, 
+        { id: 9, label: "ら", color: "#795548", chars: ['ら','り','る','れ','ろ'] },
+        { id: 10, label: "わ", color: "#607d8b", chars: ['わ','を','ん'] }
+    ];
+
+    let currentLevelChars = [];
+    let currentIndex = 0;
+    
+    // --- UI要素 ---
+    const levelGrid = document.getElementById('level-grid');
+    const levelScreen = document.getElementById('level-screen');
+    const dojoScreen = document.getElementById('dojo-screen');
+    const dojoTitle = document.getElementById('dojo-title');
+    const guideEl = document.getElementById('guide-char');
     const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
-    const guideEl = document.getElementById('guide-char');
-    
-    // なぞる文字リスト
-    const chars = [
-        "あ","い","う","え","お",
-        "か","き","く","け","こ",
-        "さ","し","す","せ","そ",
-        "た","ち","つ","て","と",
-        "な","に","ぬ","ね","の",
-        "は","ひ","ふ","へ","ほ",
-        "ま","み","む","め","も",
-        "や","ゆ","よ",
-        "ら","り","る","れ","ろ",
-        "わ","を","ん"
-    ];
-    let currentIndex = 0;
+
     let isDrawing = false;
     let currentColor = '#333';
-    let lineWidth = 12; // 線の太さ
+    let lineWidth = 12;
 
-    // --- 初期化 ---
-    function init() {
-        // Canvasのサイズ調整（高解像度対応）
-        // CSSサイズと実際の描画サイズを合わせる処理
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+    // --- 初期化: レベルボタン生成 ---
+    function initLevelMenu() {
+        levelGrid.innerHTML = '';
+        hiraganaLevels.forEach(level => {
+            const btn = document.createElement('div');
+            btn.className = 'level-btn';
+            btn.style.borderColor = level.color;
+            btn.innerHTML = `
+                <div class="level-char-icon" style="color:${level.color}">${level.label}</div>
+                <div class="level-title">${level.label}行</div>
+                <div class="level-tag" style="background:${level.color}">Level ${level.id}</div>
+            `;
+            btn.onclick = () => startLevel(level);
+            levelGrid.appendChild(btn);
+        });
+    }
 
-        // 線の設定
+    // --- ゲーム開始 (レベル選択後) ---
+    function startLevel(levelData) {
+        currentLevelChars = levelData.chars;
+        currentIndex = 0;
+        
+        dojoTitle.textContent = `${levelData.label}行の れんしゅう`;
+        
+        levelScreen.classList.remove('active');
+        dojoScreen.classList.add('active');
+        
+        // 画面切り替え後にキャンバスサイズ調整
+        setTimeout(resizeCanvas, 50);
+        
+        updateGuide();
+    }
+
+    function showLevelScreen() {
+        dojoScreen.classList.remove('active');
+        levelScreen.classList.add('active');
+    }
+
+    // --- 描画ロジック ---
+    function resizeCanvas() {
+        const wrapper = canvas.parentElement;
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        
+        // 設定のリセット
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = currentColor;
-
-        updateGuide();
     }
 
-    // --- ガイド文字の更新 ---
     function updateGuide() {
-        guideEl.textContent = chars[currentIndex];
-        clearCanvas(); // 文字が変わったらキャンバスも綺麗に
+        const char = currentLevelChars[currentIndex];
+        guideEl.textContent = char;
+        clearCanvas();
+        // 自動で読み上げる場合はコメントアウトを外す
+        // speak(char); 
     }
 
-    // --- 次の文字へ ---
-    function nextChar() {
+    window.speakCurrentChar = () => {
+        const char = currentLevelChars[currentIndex];
+        speak(char);
+    };
+
+    window.nextChar = () => {
         currentIndex++;
-        if (currentIndex >= chars.length) {
-            currentIndex = 0; // 最後まで行ったら最初に戻る
+        if (currentIndex >= currentLevelChars.length) {
+            // レベル終了時
+            if(confirm("この行は おわりです！\nメニューに もどりますか？")) {
+                showLevelScreen();
+                return;
+            } else {
+                currentIndex = 0; // 最初に戻る
+            }
         }
         updateGuide();
-    }
+    };
 
-    // --- 色の変更 ---
     window.setColor = (color, el) => {
         currentColor = color;
         ctx.strokeStyle = currentColor;
-        
-        // UI更新
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         el.classList.add('active');
     };
 
-    // --- キャンバスをクリア ---
     window.clearCanvas = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
-    // --- 描画イベント処理 ---
+    // --- ペン操作イベント ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -253,7 +371,7 @@
     }
 
     function startDraw(e) {
-        e.preventDefault(); // スクロール防止
+        if(e.type === 'touchstart') e.preventDefault(); // キャンバス内のみスクロール防止
         isDrawing = true;
         const pos = getPos(e);
         ctx.beginPath();
@@ -262,7 +380,7 @@
 
     function draw(e) {
         if (!isDrawing) return;
-        e.preventDefault();
+        if(e.type === 'touchmove') e.preventDefault();
         const pos = getPos(e);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
@@ -273,22 +391,20 @@
         ctx.closePath();
     }
 
-    // マウスイベント
+    // イベントリスナー登録
     canvas.addEventListener('mousedown', startDraw);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', endDraw);
     canvas.addEventListener('mouseout', endDraw);
 
-    // タッチイベント（スマホ対応）
     canvas.addEventListener('touchstart', startDraw, { passive: false });
     canvas.addEventListener('touchmove', draw, { passive: false });
     canvas.addEventListener('touchend', endDraw);
 
-    // 起動時実行
-    window.onload = init;
-    
-    // リサイズ対応（スマホ回転時など）
-    window.addEventListener('resize', init);
+    window.addEventListener('resize', resizeCanvas);
+
+    // 起動
+    initLevelMenu();
 
 </script>
 
