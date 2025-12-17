@@ -53,11 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
             words: [
                 { id: 'kutsu', name: 'くつ', img: 'shoes.png' },
                 { id: 'boushi', name: 'ぼうし', img: 'hat.png' },
-                { id: 'tshirt', name: 'Tシャツ', img: 'tshirt.png' },
+                { id: 'tshirt', name: 'Tしゃつ', img: 'tshirt.png' },
                 { id: 'kutsushita', name: 'くつした', img: 'socks.png' },
-                { id: 'zubon', name: 'ズボン', img: 'pants.png' },
+                { id: 'zubon', name: 'ずぼん', img: 'pants.png' },
                 { id: 'uwagi', name: 'うわぎ', img: 'jacket.png' },
-                { id: 'skirt', name: 'スカート', img: 'skirt.png' },
+                { id: 'skirt', name: 'すかーと', img: 'skirt.png' },
                 { id: 'kaban', name: 'かばん', img: 'bag.png' },
                 { id: 'kasa', name: 'かさ', img: 'umbrella.png' },
                 { id: 'megane', name: 'めがね', img: 'glasses.png' }
