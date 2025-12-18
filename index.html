@@ -500,6 +500,7 @@ window.requestNotificationPermission = async () => {
 
 window.loginWithLine = async () => {
   try {
+    // 【重要修正】ポップアップ方式を使用
     const result = await signInWithPopup(auth, lineProvider);
     const user = result.user;
     const userRef = doc(db, "users", user.uid);
@@ -517,7 +518,11 @@ window.loginWithLine = async () => {
     alert("LINEログインに成功しました！");
   } catch (error) {
     console.error(error);
-    alert("LINEログインエラー: " + error.message);
+    if (error.code === 'auth/popup-blocked') {
+        alert("ポップアップがブロックされました。設定を確認してください。");
+    } else {
+        alert("LINEログインエラー: " + error.message);
+    }
   }
 };
 
@@ -526,11 +531,15 @@ window.linkLineAccount = async () => {
   if (!user) { alert("先にログインしてください。"); return; }
   if(confirm("LINEアカウントを紐付けますか？")) {
     try {
+      // 【重要修正】ポップアップ方式を使用（リダイレクトによる初期状態ロスト回避）
       await linkWithPopup(user, lineProvider);
       alert("LINE連携に成功しました！");
     } catch (error) {
+      console.error("Link Error:", error);
       if (error.code === 'auth/credential-already-in-use') {
         alert("このLINEアカウントは既に他のデータと紐付いています。");
+      } else if (error.code === 'auth/popup-blocked') {
+        alert("ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。");
       } else {
         alert("連携エラー: " + error.message);
       }
@@ -596,7 +605,6 @@ window.logout = async () => {
   updateUI(null);
 };
 
-// 【修正】ゲストログイン機能をここに配置し、確実に動作するように修正
 window.loginAsGuest = () => {
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
   sessionStorage.setItem(SESS_KEY, 'guest');
@@ -618,7 +626,6 @@ const checkMonthlyReset = async (user) => {
   }
 };
 
-// 【重要】UI更新関数（Firestoreデータを受け取るためモジュール内に配置）
 window.updateUI = function(userState) {
   const dash = document.getElementById('user-dashboard');
   const welcome = document.getElementById('guest-welcome');
@@ -915,7 +922,6 @@ document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
 
-// ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
 window.setLanguage('ja');
 
 const urlParams = new URLSearchParams(window.location.search);
