@@ -498,9 +498,20 @@ window.requestNotificationPermission = async () => {
   }
 };
 
+// ★アプリ内ブラウザ判定
+const isInAppBrowser = () => {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  return (ua.indexOf("Line") > -1 || ua.indexOf("FBAN") > -1 || ua.indexOf("Instagram") > -1 || ua.indexOf("Twitter") > -1);
+};
+
 window.loginWithLine = async () => {
+  // アプリ内ブラウザなら警告
+  if (isInAppBrowser()) {
+    alert("エラー：LINEやSNSのアプリ内ブラウザではログインできません。\n\n右上のメニューや共有ボタンから「Safariで開く」または「Chromeで開く」を選んで、標準ブラウザで開き直してください。");
+    return;
+  }
+
   try {
-    // 【重要修正】ポップアップ方式を使用
     const result = await signInWithPopup(auth, lineProvider);
     const user = result.user;
     const userRef = doc(db, "users", user.uid);
@@ -519,7 +530,7 @@ window.loginWithLine = async () => {
   } catch (error) {
     console.error(error);
     if (error.code === 'auth/popup-blocked') {
-        alert("ポップアップがブロックされました。設定を確認してください。");
+        alert("ポップアップがブロックされました。ブラウザの設定を確認してください。");
     } else {
         alert("LINEログインエラー: " + error.message);
     }
@@ -529,20 +540,24 @@ window.loginWithLine = async () => {
 window.linkLineAccount = async () => {
   const user = auth.currentUser;
   if (!user) { alert("先にログインしてください。"); return; }
-  if(confirm("LINEアカウントを紐付けますか？")) {
-    try {
-      // 【重要修正】ポップアップ方式を使用（リダイレクトによる初期状態ロスト回避）
-      await linkWithPopup(user, lineProvider);
-      alert("LINE連携に成功しました！");
-    } catch (error) {
-      console.error("Link Error:", error);
-      if (error.code === 'auth/credential-already-in-use') {
-        alert("このLINEアカウントは既に他のデータと紐付いています。");
-      } else if (error.code === 'auth/popup-blocked') {
-        alert("ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。");
-      } else {
-        alert("連携エラー: " + error.message);
-      }
+  
+  if (isInAppBrowser()) {
+    alert("エラー：LINEやSNSのアプリ内ブラウザでは連携できません。\n\n「Safariで開く」または「Chromeで開く」でブラウザを開き直してから試してください。");
+    return;
+  }
+  
+  // スマホ対策：confirmを削除し、ボタンタップで即実行してポップアップブロックを回避
+  try {
+    await linkWithPopup(user, lineProvider);
+    alert("LINE連携に成功しました！");
+  } catch (error) {
+    console.error("Link Error:", error);
+    if (error.code === 'auth/credential-already-in-use') {
+      alert("このLINEアカウントは既に他のデータと紐付いています。");
+    } else if (error.code === 'auth/popup-blocked') {
+      alert("ポップアップがブロックされました。\niPhoneの設定 > Safari > 「ポップアップブロック」をOFFにするか、Chromeを使用してください。");
+    } else {
+      alert("連携エラー: " + error.message);
     }
   }
 };
@@ -922,6 +937,7 @@ document.getElementById('auth-display-name').onkeydown = handleEnter;
 
 window.renderGameCategories();
 
+// ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
 window.setLanguage('ja');
 
 const urlParams = new URLSearchParams(window.location.search);
