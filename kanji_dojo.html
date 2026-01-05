@@ -58,25 +58,26 @@
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- 1. レベル選択画面 (修正箇所) --- */
+    /* --- 1. レベル選択画面 (修正版) --- */
+    
+    /* PC・タブレット向けの基本設定（3列にする） */
     .level-grid {
         display: grid;
-        /* PCでは自動調整 */
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(3, 1fr); /* 強制的に3列 */
         gap: 20px; width: 100%; padding: 10px;
     }
 
-    /* ★スマホ対策：強制的に横2列にするCSS */
+    /* スマホ画面（幅600px以下）向けの調整 */
     @media (max-width: 600px) {
         .level-grid {
-            grid-template-columns: repeat(2, 1fr); /* 2列固定 */
+            grid-template-columns: repeat(2, 1fr); /* スマホは2列 */
             gap: 15px;
         }
         .level-card {
-            padding: 20px 10px; /* スマホ用に余白調整 */
+            padding: 20px 10px;
         }
         .level-title {
-            font-size: 2.5em; /* 少し文字サイズ調整 */
+            font-size: 2.5em;
         }
     }
 
@@ -89,6 +90,7 @@
         position: relative; overflow: hidden;
     }
     .level-card:active { transform: translateY(3px); border-bottom-width: 3px; }
+    .level-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     
     .level-badge {
         display: inline-block; padding: 5px 10px; border-radius: 15px;
@@ -96,8 +98,9 @@
         font-size: 0.8em; letter-spacing: 1px;
     }
     .level-title { font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
-    /* PCのデフォルトサイズ */
-    @media (min-width: 601px) { .level-title { font-size: 3em; } }
+    
+    /* PCでの文字サイズ */
+    @media (min-width: 601px) { .level-title { font-size: 3.5em; } }
 
     .level-desc { font-size: 0.85em; color: #888; font-weight: bold; }
 
