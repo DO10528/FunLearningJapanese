@@ -98,9 +98,43 @@
         }
         .quiz-card.active { display: block; animation: fadeIn 0.3s ease; }
 
-        .mode-select { margin-bottom: 20px; background: #e3f2fd; padding: 10px; border-radius: 15px; display: inline-block; }
-        .mode-select label { margin: 0 10px; font-weight: bold; cursor: pointer; color: #555; }
-        .mode-select input:checked + span { color: var(--primary); text-decoration: underline; }
+        /* スイッチデザイン */
+        .switch-container {
+            display: inline-flex;
+            background: #e0e0e0;
+            border-radius: 30px;
+            padding: 4px;
+            position: relative;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .switch-container input { display: none; }
+        .switch-label {
+            padding: 8px 20px;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #777;
+            z-index: 2;
+            transition: color 0.3s;
+            font-size: 0.9em;
+        }
+        .switch-bg {
+            position: absolute;
+            top: 4px; bottom: 4px;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: left 0.3s, width 0.3s;
+            z-index: 1;
+        }
+        /* スイッチの状態制御 */
+        #mode-kun:checked ~ .bg-indicator { left: 4px; width: 50%; }
+        #mode-kun:checked ~ label[for="mode-kun"] { color: var(--primary); }
+        
+        #mode-on:checked ~ .bg-indicator { left: 50%; width: 48%; }
+        #mode-on:checked ~ label[for="mode-on"] { color: var(--primary); }
+
 
         .kanji-display {
             font-size: 8rem; font-weight: 900; color: #333;
@@ -154,16 +188,8 @@
     <div class="container">
         
         <div id="level-select-view">
-            <h2 style="text-align:center; color:var(--primary); margin-bottom:10px;">レベルをえらんでね</h2>
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">レベルをえらんでね</h2>
             
-            <div style="text-align:center; margin-bottom:20px;">
-                <div class="mode-select">
-                    もんだい: 
-                    <label><input type="radio" name="mode-select" value="kun" checked onchange="updateMode(this.value)"> <span>くんよみ</span></label>
-                    <label><input type="radio" name="mode-select" value="on" onchange="updateMode(this.value)"> <span>オンヨミ</span></label>
-                </div>
-            </div>
-
             <div class="level-grid">
                 <div class="level-card lv-n5" onclick="startQuiz('n5')">
                     <span class="level-badge">BASIC</span>
@@ -196,7 +222,16 @@
             <div id="auth-status-kanji">認証中...</div>
 
             <div id="quiz-area">
-                <div id="question-info" style="color:#666; font-weight:bold;">
+                
+                <div class="switch-container">
+                    <input type="radio" name="read-mode" id="mode-kun" value="kun" checked onchange="toggleMode('kun')">
+                    <input type="radio" name="read-mode" id="mode-on" value="on" onchange="toggleMode('on')">
+                    <div class="switch-bg bg-indicator"></div>
+                    <label for="mode-kun" class="switch-label">くんよみ</label>
+                    <label for="mode-on" class="switch-label">オンヨミ</label>
+                </div>
+
+                <div id="question-info" style="color:#666; font-weight:bold; margin-top:10px;">
                     <span id="level-label" style="background:#ddd; padding:2px 8px; border-radius:10px; font-size:0.8em; margin-right:5px;">N5</span>
                     だい <span id="q-num" style="font-size:1.2em; color:var(--primary);">1</span> もん
                 </div>
@@ -275,7 +310,7 @@
     </script>
 
     <script>
-        // --- データセット (Kanji Dojoと同じデータ) ---
+        // --- データセット ---
         const kanjiDatabase = {
             "n5": [
                 { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" }, { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
@@ -502,7 +537,7 @@
         // --- ゲーム管理変数 ---
         let currentLevel = 'n5';
         let currentMode = 'kun';
-        let questions = [];
+        let questions = []; // 全問（10問）の漢字データを格納（選択肢は都度生成）
         let currentIndex = 0;
         let score = 0;
         const totalQuestions = 10;
@@ -514,85 +549,107 @@
             quiz: document.getElementById('quiz-view')
         };
 
-        function updateMode(mode) {
-            currentMode = mode;
-        }
-
         // --- クイズ開始処理 ---
         window.startQuiz = (level) => {
             currentLevel = level;
-            
-            // データ準備: 選択モードの読み仮名がないものは除外
+            // リセット
+            score = 0;
+            currentIndex = 0;
+            // デフォルトは訓読み
+            currentMode = 'kun';
+            document.getElementById('mode-kun').checked = true;
+
             const rawData = kanjiDatabase[level];
+            
+            // 【重要】切り替え可能なように、音読み・訓読みの両方が有効な漢字のみを抽出
+            // （どちらかが欠けていると、切り替えたときに答えがなくなるため）
             const validData = rawData.filter(item => {
-                const reading = item[currentMode];
-                return reading && reading !== "" && reading !== "-" && reading !== "なし";
+                const hasKun = (item.kun && item.kun !== "" && item.kun !== "-" && item.kun !== "なし");
+                const hasOn = (item.on && item.on !== "" && item.on !== "-" && item.on !== "なし");
+                return hasKun && hasOn;
             });
 
-            if (validData.length < 4) {
-                alert("このモードの問題が足りません。");
-                return;
+            if (validData.length < 10) {
+                // データが足りない場合は警告（通常はデータ充実により起きない想定）
+                console.warn("両方の読みがある漢字が10個未満です");
             }
 
-            // 問題をランダムに10問選出
-            questions = [];
-            for (let i = 0; i < totalQuestions; i++) {
-                const target = validData[Math.floor(Math.random() * validData.length)];
-                
-                // 選択肢（正解1 + 不正解3）
-                const choices = [target[currentMode]];
-                while (choices.length < 4) {
-                    const distractor = validData[Math.floor(Math.random() * validData.length)];
-                    const dRead = distractor[currentMode];
-                    if (!choices.includes(dRead)) {
-                        choices.push(dRead);
-                    }
-                }
-                
-                // シャッフル
-                for (let j = choices.length - 1; j > 0; j--) {
-                    const k = Math.floor(Math.random() * (j + 1));
-                    [choices[j], choices[k]] = [choices[k], choices[j]];
-                }
+            // ランダムに10問選出（足りない場合はあるだけ）
+            const count = Math.min(validData.length, totalQuestions);
+            const shuffled = [...validData].sort(() => 0.5 - Math.random());
+            questions = shuffled.slice(0, count);
 
-                questions.push({
-                    kanji: target.kanji,
-                    correct: target[currentMode],
-                    choices: choices
-                });
-            }
-
-            // 初期化
-            currentIndex = 0;
-            score = 0;
+            // 画面表示
             document.getElementById('score-area').style.display = 'none';
             document.getElementById('ingame-nav').style.display = 'block';
             document.getElementById('quiz-area').style.display = 'block';
             document.getElementById('level-label').textContent = level.toUpperCase();
             
-            // 画面遷移
+            // 遷移
             views.level.style.display = 'none';
             views.quiz.classList.add('active');
             
             showQuestion();
         };
 
+        // --- モード切り替え（クイズ中） ---
+        window.toggleMode = (mode) => {
+            if (currentMode === mode) return;
+            currentMode = mode;
+            // 問題は変えずに、表示（正解・選択肢）だけ更新
+            showQuestion();
+        };
+
+        // --- 問題表示 ---
         function showQuestion() {
+            // ゲーム終了後や配列外アクセス防止
+            if (currentIndex >= questions.length) return;
+
             isAnswering = true;
-            const q = questions[currentIndex];
+            const qData = questions[currentIndex];
+            const correctReading = qData[currentMode];
             
             document.getElementById('q-num').textContent = currentIndex + 1;
-            document.getElementById('kanji-display').textContent = q.kanji;
+            document.getElementById('kanji-display').textContent = qData.kanji;
             document.getElementById('result-message').textContent = "";
 
+            // 選択肢生成（正解1 + 不正解2）
+            // 不正解の候補は「同じレベル」かつ「現在のモード」の読みから選ぶ
+            const allCandidates = kanjiDatabase[currentLevel].filter(item => {
+                const r = item[currentMode];
+                return r && r !== "" && r !== "-" && r !== "なし" && r !== correctReading;
+            });
+
+            // 不正解を2つ選ぶ
+            let distractors = [];
+            if (allCandidates.length >= 2) {
+                const shuffledCandidates = allCandidates.sort(() => 0.5 - Math.random());
+                distractors = shuffledCandidates.slice(0, 2).map(item => item[currentMode]);
+            } else {
+                // 万が一候補が足りない場合のダミー
+                distractors = ["?", "??"];
+            }
+
+            const choices = [correctReading, ...distractors];
+            // シャッフル
+            for (let i = choices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [choices[i], choices[j]] = [choices[j], choices[i]];
+            }
+
+            // ボタン配置
             const container = document.getElementById('choices-container');
             container.innerHTML = "";
+            container.className = "choices-grid"; // 1列グリッド
 
-            q.choices.forEach(choice => {
+            // 3択にするため、スタイル調整が必要ならここで行うが、
+            // CSSの grid-template-columns: 1fr なので縦に3つ並ぶ
+            
+            choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.textContent = choice;
-                btn.onclick = () => checkAnswer(btn, choice, q.correct);
+                btn.onclick = () => checkAnswer(btn, choice, correctReading);
                 container.appendChild(btn);
             });
         }
@@ -612,7 +669,6 @@
                 document.getElementById('seikai-sound').play();
                 score += 10;
                 
-                // ポイント加算（1問正解ごとに1pt）
                 if(window.addPointsToUser) window.addPointsToUser(1);
             } else {
                 btn.classList.add('incorrect');
@@ -621,7 +677,7 @@
                 document.getElementById('bubu-sound').currentTime = 0;
                 document.getElementById('bubu-sound').play();
                 
-                // 正解ボタンを光らせる
+                // 正解を教える
                 buttons.forEach(b => {
                     if (b.textContent === correct) b.classList.add('correct');
                 });
@@ -630,7 +686,7 @@
             // 次へ進む
             setTimeout(() => {
                 currentIndex++;
-                if (currentIndex < totalQuestions) {
+                if (currentIndex < questions.length) {
                     showQuestion();
                 } else {
                     showResult();
