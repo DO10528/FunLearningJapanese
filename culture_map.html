@@ -33,7 +33,7 @@
         padding: 8px 15px;
         display: flex; justify-content: space-between; align-items: center;
         border-bottom: 3px solid var(--gold);
-        z-index: 200; /* ヘッダーは一番上 */
+        z-index: 200;
         box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         backdrop-filter: blur(5px);
         flex-shrink: 0;
@@ -73,17 +73,12 @@
     .map-world {
         position: relative;
         width: 2000px; height: 1200px;
+        /* 背景パターンを少し調整して見やすく */
         background-image: 
             linear-gradient(135deg, transparent 45%, #a7c0cd 48%, #a7c0cd 52%, transparent 55%),
-            linear-gradient(45deg, transparent 40%, #a7c0cd 43%, #a7c0cd 47%, transparent 50%),
-            radial-gradient(ellipse at 10% 90%, #546e7a 0%, transparent 30%),
-            radial-gradient(ellipse at 30% 80%, #78909c 0%, transparent 40%),
-            radial-gradient(ellipse at 60% 85%, #546e7a 0%, transparent 35%),
-            radial-gradient(ellipse at 85% 75%, #78909c 0%, transparent 45%);
-        background-size: 800px 800px, 600px 600px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-        background-position: 0 0, 300px 300px, 0 0, 0 0, 0 0, 0 0;
-        background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-        opacity: 0.8;
+            linear-gradient(45deg, transparent 40%, #a7c0cd 43%, #a7c0cd 47%, transparent 50%);
+        background-size: 800px 800px;
+        opacity: 1; /* 不透明度を上げて視認性向上 */
     }
 
     .road-svg {
@@ -109,7 +104,7 @@
     .node-container {
         position: absolute;
         display: flex; flex-direction: column; align-items: center;
-        z-index: 10; /* アバター(100)より低く */
+        z-index: 10;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: not-allowed; opacity: 0.7; filter: grayscale(70%);
         transform-origin: bottom center;
@@ -120,7 +115,7 @@
     .node-container.unlocked { cursor: pointer; opacity: 1; filter: grayscale(0%); }
 
     .node-container.unlocked:hover {
-        z-index: 50; /* ホバー時もアバター(100)より低く */
+        z-index: 50;
         transform: scale(1.15) translateY(-10px) translateZ(0);
     }
 
@@ -162,7 +157,7 @@
         font-size: 0.85em; border-bottom: none;
         box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
         letter-spacing: 2px;
-        min-height: 60px; /* 名前が短くても旗らしく */
+        min-height: 60px;
     }
     .nobori-pole { width: 4px; height: 90px; background: var(--ink); margin-top: -2px; }
     .clan-crest {
@@ -183,14 +178,13 @@
     .node-label {
         background: rgba(33, 33, 33, 0.9); color: #fff;
         padding: 5px 12px; border-radius: 4px;
-        /* ★修正: お城との距離を縮めるためにマイナスのマージンを設定 ★ */
         margin-top: -15px; 
         text-align: center;
         border: 2px solid var(--gold);
         font-size: 0.9em; white-space: nowrap;
         box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
-        z-index: 10; /* ラベルは城の手前 */
+        z-index: 10;
     }
     .node-container.unlocked:hover .node-label {
         background: var(--urushi-red); border-color: var(--gold); color: var(--gold); transform: scale(1.1);
@@ -199,16 +193,17 @@
 
     @keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
 
-    /* --- アバター --- */
+    /* --- アバター (初期位置を中心に設定) --- */
     #hero-avatar {
         position: absolute; width: 60px; height: 80px; 
-        z-index: 100; /* ★修正: お城(50)より常に手前 ★ */
+        z-index: 100;
         pointer-events: none; 
         transition: all 1.5s ease-in-out;
         transform: translate(-50%, -100%); 
         filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        /* 初期位置：画面外に行かないよう仮置き */
+        left: 150px; top: 650px;
     }
-    /* ★修正: アニメーション(pawa-walk)の定義を削除し、揺れないようにしました ★ */
 
     .avatar-parts { position: absolute; }
     .pawa-head { width: 50px; height: 45px; background: #fdd835; border-radius: 50%; top: 0; left: 5px; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2); z-index: 10; }
@@ -328,12 +323,12 @@
     <div class="map-world" id="map-world-content">
         <svg class="road-svg"><path id="road-path" class="road-path" d=""/></svg>
 
-        <i class="fa-solid fa-torii-gate map-deco deco-torii" style="top:150px; left:250px;"></i>
+        <i class="fa-solid fa-archway map-deco deco-torii" style="top:150px; left:250px;"></i>
         <i class="fa-solid fa-tree map-deco deco-tree" style="top:400px; left:50px;"></i>
         <i class="fa-solid fa-tree map-deco deco-tree" style="top:600px; left:700px;"></i>
-        <i class="fa-solid fa-mountain-sun map-deco" style="top:50px; left:800px; font-size:6em; color:#795548;"></i>
+        <i class="fa-solid fa-mountain map-deco" style="top:50px; left:800px; font-size:6em; color:#795548;"></i>
         <i class="fa-solid fa-water map-deco" style="top:300px; left:500px; font-size:5em; color:#29b6f6; opacity:0.4;"></i>
-        <i class="fa-solid fa-village map-deco" style="top:550px; left:300px; font-size:3em;"></i>
+        <i class="fa-solid fa-dungeon map-deco" style="top:550px; left:300px; font-size:3em;"></i>
 
         <div id="hero-avatar">
             <div class="avatar-parts pawa-head"></div>
@@ -400,8 +395,9 @@
     let currentUser = null;
     let playerName = "ゲスト";
 
+    // ★修正: 無料版アイコンに変更 (fa-flower等は有料版のため表示されません)
     const WARLORDS = [
-        { id: 1, name: "織田 信長", title: "たべもの", castle: "岐阜城", x: 150, y: 650, crest: "fa-flower" },
+        { id: 1, name: "織田 信長", title: "たべもの", castle: "岐阜城", x: 150, y: 650, crest: "fa-fan" },
         { id: 2, name: "豊臣 秀吉", title: "あいさつ", castle: "大阪城", x: 450, y: 450, crest: "fa-sun" },
         { id: 3, name: "上杉 謙信", title: "がっこう", castle: "春日山城", x: 750, y: 250, crest: "fa-dragon" },
         { id: 4, name: "武田 信玄", title: "おうち", castle: "躑躅ヶ崎館", x: 1050, y: 400, crest: "fa-horse-head" },
@@ -449,21 +445,34 @@
         localStorage.setItem('culture_lang', lang);
     };
 
+    // ★修正: 読み込み直後に一度描画を実行する (Firebaseの読み込みを待たない)
+    function init() {
+        const saved = sessionStorage.getItem('sengoku_save_v2');
+        if (saved) userState = JSON.parse(saved);
+        
+        renderWorldMap(); // まず初期状態で描画
+        updateAvatar();
+        document.getElementById('money-display').innerText = userState.money || 0;
+    }
+    
+    // 起動時に即時実行
+    init();
+
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
-            // ★ 修正: ユーザー名を取得 ★
             playerName = user.displayName || "ゲスト";
-            const snap = await getDoc(doc(db, "users", user.uid, "progress", "sengoku_rpg_v2"));
-            if (snap.exists()) userState = snap.data();
-        } else {
-            playerName = "ゲスト";
-            const saved = sessionStorage.getItem('sengoku_save_v2');
-            if (saved) userState = JSON.parse(saved);
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid, "progress", "sengoku_rpg_v2"));
+                if (snap.exists()) {
+                    userState = snap.data();
+                    // データロード後にもう一度再描画
+                    renderWorldMap();
+                    updateAvatar();
+                    document.getElementById('money-display').innerText = userState.money || 0;
+                }
+            } catch(e) { console.error(e); }
         }
-        renderWorldMap();
-        updateAvatar();
-        document.getElementById('money-display').innerText = userState.money || 0;
     });
 
     function renderWorldMap() {
@@ -507,7 +516,8 @@
 
         const currentLord = WARLORDS[userState.level - 1];
         if (currentLord) {
-            setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 300);
+            // ★修正: 最初はアニメーションなしで即移動
+            setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 100);
         }
     }
 
@@ -569,14 +579,12 @@
         setTimeout(() => moveAvatarTo(targetX, 600, false), 100);
     }
 
-    // ★ 修正: 旗の名前を動的に設定 ★
     function createNode(id, mainText, subText, iconClass, sizeClass, isUnlocked, isCleared, x, y, crestIcon) {
         const div = document.createElement('div');
         div.className = `node-container ${isUnlocked ? 'unlocked' : ''} ${isCleared ? 'cleared' : ''}`;
         div.style.left = `${x}px`;
         div.style.top = `${y}px`;
         
-        // 名前が長すぎる場合は省略
         const displayName = playerName.length > 6 ? playerName.substring(0,5)+".." : playerName;
 
         div.innerHTML = `
@@ -598,7 +606,6 @@
     }
 
     function moveAvatarTo(x, y, animate = true) {
-        // ★ 修正: walkingクラスの付与を削除 ★
         heroAvatar.style.left = `${x}px`;
         heroAvatar.style.top = `${y}px`;
         
@@ -608,7 +615,7 @@
         mapScroll.scrollTo({ 
             left: x - viewportWidth / 2, 
             top: y - viewportHeight / 2, 
-            behavior: 'smooth' 
+            behavior: animate ? 'smooth' : 'auto' 
         });
     }
 
