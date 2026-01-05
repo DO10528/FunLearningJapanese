@@ -35,7 +35,6 @@
         border-bottom: 3px solid var(--gold);
         z-index: 200;
         box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        backdrop-filter: blur(5px);
         flex-shrink: 0;
     }
     .game-title { 
@@ -57,15 +56,13 @@
     /* --- マップエリア --- */
     .map-viewport {
         flex-grow: 1;
+        min-height: 0; /* ★スマホでのFlexボックス崩れ防止 */
         overflow: auto;
         position: relative;
         cursor: grab;
         background-color: var(--map-bg);
-        background-image: 
-            url('https://www.transparenttextures.com/patterns/aged-paper.png'),
-            radial-gradient(circle at 20% 30%, #efebe9 0%, transparent 40%),
-            radial-gradient(circle at 80% 70%, #efebe9 0%, transparent 40%);
-        background-blend-mode: multiply, normal, normal;
+        /* スマホ向けに背景をシンプル化 */
+        background-image: radial-gradient(circle at 50% 50%, #efebe9 0%, #d7ccc8 100%);
         -webkit-overflow-scrolling: touch; 
     }
     .map-viewport:active { cursor: grabbing; }
@@ -73,12 +70,13 @@
     .map-world {
         position: relative;
         width: 2000px; height: 1200px;
-        /* 背景パターンを少し調整して見やすく */
+        /* スマホで重くなるパターン描画を削除し、シンプルなグリッド風に変更 */
+        background-color: #cfd8dc;
         background-image: 
-            linear-gradient(135deg, transparent 45%, #a7c0cd 48%, #a7c0cd 52%, transparent 55%),
-            linear-gradient(45deg, transparent 40%, #a7c0cd 43%, #a7c0cd 47%, transparent 50%);
-        background-size: 800px 800px;
-        opacity: 1; /* 不透明度を上げて視認性向上 */
+            linear-gradient(#b0bec5 2px, transparent 2px),
+            linear-gradient(90deg, #b0bec5 2px, transparent 2px);
+        background-size: 100px 100px;
+        opacity: 1;
     }
 
     .road-svg {
@@ -88,12 +86,10 @@
     .road-path {
         fill: none; stroke: var(--path-color); stroke-width: 6;
         stroke-dasharray: 15 5; stroke-linecap: round;
-        filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
     }
 
     .map-deco {
-        position: absolute; font-size: 4em; color: #5d4037; opacity: 0.6; z-index: 1;
-        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+        position: absolute; font-size: 4em; color: #5d4037; opacity: 0.8; z-index: 2;
         pointer-events: none;
     }
     @media (max-width: 600px) { .map-deco { font-size: 2.5em; } }
@@ -105,42 +101,38 @@
         position: absolute;
         display: flex; flex-direction: column; align-items: center;
         z-index: 10;
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        cursor: not-allowed; opacity: 0.7; filter: grayscale(70%);
+        /* ★スマホ対策：filterは重いので削除し、opacityだけで表現 */
+        opacity: 0.6; 
         transform-origin: bottom center;
-        backface-visibility: hidden; transform: translateZ(0); 
+        /* ハードウェアアクセラレーションを明示的にON */
+        transform: translate3d(0,0,0);
+        will-change: transform;
     }
     .node-container > * { transform: translateY(-100%); }
 
-    .node-container.unlocked { cursor: pointer; opacity: 1; filter: grayscale(0%); }
+    .node-container.unlocked { cursor: pointer; opacity: 1; }
 
     .node-container.unlocked:hover {
         z-index: 50;
-        transform: scale(1.15) translateY(-10px) translateZ(0);
+        transform: scale(1.15) translateY(-10px) translate3d(0,0,0);
     }
-
-    .node-container.unlocked::before {
-        content: ''; position: absolute; top: -50%; left: 50%; width: 160px; height: 160px;
-        background: radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0.1) 60%, transparent 70%);
-        transform: translate(-50%, -50%) scale(0.5); opacity: 0;
-        transition: transform 0.4s ease-out, opacity 0.4s ease-out; z-index: -1;
-        border-radius: 50%; pointer-events: none;
-    }
-    .node-container.unlocked:hover::before { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
 
     .node-castle-area { position: relative; display: flex; justify-content: center; align-items: flex-end; }
+    
     .node-img {
-        color: #4e342e; filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
-        transition: color 0.3s ease, filter 0.3s ease; will-change: filter, color;
+        color: #4e342e; 
+        /* ドロップシャドウも重いのでスマホでは控えめに */
+        filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.3));
+        transition: color 0.3s ease; 
     }
     .node-container.unlocked:hover .node-img {
         color: var(--urushi-red);
-        filter: drop-shadow(0 0 15px var(--gold)) drop-shadow(0 0 5px var(--gold));
     }
     
     .size-s { font-size: 4em; } .size-m { font-size: 6em; } .size-l { font-size: 8em; } .size-xl { font-size: 10em; color: var(--urushi-red); }
+    /* スマホ用にサイズを少し調整 */
     @media (max-width: 600px) {
-        .size-s { font-size: 3em; } .size-m { font-size: 4em; } .size-l { font-size: 5em; } .size-xl { font-size: 7em; }
+        .size-s { font-size: 3em; } .size-m { font-size: 4em; } .size-l { font-size: 5em; } .size-xl { font-size: 6em; }
     }
 
     .nobori {
@@ -155,7 +147,6 @@
         background: var(--urushi-red); color: var(--gold);
         padding: 8px 4px 5px 4px; border: 2px solid var(--ink);
         font-size: 0.85em; border-bottom: none;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
         letter-spacing: 2px;
         min-height: 60px;
     }
@@ -164,7 +155,6 @@
         position: absolute; top: -15px; background: var(--gold); color: var(--ink);
         width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink);
         display: flex; justify-content: center; align-items: center; font-size: 1.2em;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
     .clear-flag {
@@ -176,32 +166,25 @@
     .node-container.cleared .nobori-flag { background: var(--indigo); }
 
     .node-label {
-        background: rgba(33, 33, 33, 0.9); color: #fff;
+        background: rgba(33, 33, 33, 0.95); color: #fff;
         padding: 5px 12px; border-radius: 4px;
         margin-top: -15px; 
         text-align: center;
         border: 2px solid var(--gold);
         font-size: 0.9em; white-space: nowrap;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-        transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
-        z-index: 10;
-    }
-    .node-container.unlocked:hover .node-label {
-        background: var(--urushi-red); border-color: var(--gold); color: var(--gold); transform: scale(1.1);
+        z-index: 100; /* ラベルを最前面に */
     }
     .node-sub { font-size: 0.7em; color: #ccc; display: block; margin-top: 2px;}
 
     @keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
 
-    /* --- アバター (初期位置を中心に設定) --- */
+    /* --- アバター --- */
     #hero-avatar {
         position: absolute; width: 60px; height: 80px; 
-        z-index: 100;
+        z-index: 150; /* Z-indexを強化 */
         pointer-events: none; 
-        transition: all 1.5s ease-in-out;
+        transition: all 1s ease-in-out;
         transform: translate(-50%, -100%); 
-        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
-        /* 初期位置：画面外に行かないよう仮置き */
         left: 150px; top: 650px;
     }
 
