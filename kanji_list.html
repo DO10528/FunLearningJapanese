@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>漢字 一覧表 (小学1年生) - FunLearnJP</title>
+    <title>JLPT 漢字リスト - FunLearnJP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 共通設定 (V2デザイン) --- */
+        /* --- 共通設定 --- */
         :root {
             --primary: #42a5f5;
             --accent: #ffcc5c;
             --bg-color: #f0f4f8;
             --text-color: #333;
             --card-bg: #ffffff;
+            /* レベル別カラー */
+            --c-n5: #8bc34a; /* Green */
+            --c-n4: #26c6da; /* Cyan */
+            --c-n3: #ffa726; /* Orange */
+            --c-n2: #ab47bc; /* Purple */
+            --c-n1: #ef5350; /* Red */
         }
 
         body {
@@ -48,10 +54,69 @@
 
         h1 {
             text-align: center; color: var(--primary);
-            margin-bottom: 30px; font-size: 1.8em;
+            margin-bottom: 20px; font-size: 1.8em;
         }
 
-        /* --- 漢字グリッド (カードデザイン) --- */
+        /* --- 画面切り替え用 --- */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- レベル選択画面 --- */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-bottom: 5px solid #ddd;
+            position: relative; overflow: hidden;
+        }
+        .level-card:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .level-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        .level-title { font-size: 2.5em; font-weight: 900; margin-bottom: 5px; font-family: 'Klee One', cursive; }
+        .level-desc { font-size: 0.9em; color: #666; font-weight: bold; }
+        .level-count { 
+            position: absolute; top: 10px; right: 10px; 
+            background: #eee; padding: 3px 8px; border-radius: 10px; 
+            font-size: 0.7em; color: #555;
+        }
+
+        /* レベルごとの色 */
+        .lv-n5 { color: var(--c-n5); border-color: var(--c-n5); }
+        .lv-n4 { color: var(--c-n4); border-color: var(--c-n4); }
+        .lv-n3 { color: var(--c-n3); border-color: var(--c-n3); }
+        .lv-n2 { color: var(--c-n2); border-color: var(--c-n2); }
+        .lv-n1 { color: var(--c-n1); border-color: var(--c-n1); }
+
+        /* --- 漢字リスト画面 --- */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #eee; color: #555;
+            padding: 8px 15px; border-radius: 20px;
+            text-decoration: none; font-weight: bold;
+            margin-bottom: 20px; cursor: pointer; border: none;
+        }
+        .back-btn:hover { background: #ddd; }
+
+        .search-area { margin-bottom: 20px; text-align: center; }
+        #search-input {
+            padding: 12px 20px; border-radius: 25px; border: 2px solid #ddd;
+            width: 90%; max-width: 500px; font-size: 1em; outline: none;
+            transition: border-color 0.3s;
+        }
+        #search-input:focus { border-color: var(--primary); }
+
         .kanji-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -61,281 +126,332 @@
         .kanji-card {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             display: flex; flex-direction: row;
             align-items: center; gap: 15px;
-            border-left: 5px solid var(--primary);
+            border-left: 5px solid #ccc; /* デフォルト */
             transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer; /* 詳細画面への導線用 */
         }
-        .kanji-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
+        .kanji-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
-        /* 左側：大きな漢字 */
         .char-box {
-            background: #e3f2fd;
-            color: #333;
-            width: 80px; height: 80px;
-            border-radius: 12px;
+            background: #f5f5f5; color: #333;
+            width: 70px; height: 70px; border-radius: 12px;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Klee One', cursive; /* 教科書体 */
-            font-size: 3.5em;
+            font-family: 'Klee One', cursive; font-size: 3em;
             flex-shrink: 0;
         }
 
-        /* 中央：情報 */
-        .info-box {
-            flex-grow: 1;
-            display: flex; flex-direction: column; gap: 5px;
-        }
-        .meaning {
-            font-weight: 900; font-size: 1.1em; color: #555;
-            border-bottom: 2px solid #eee; padding-bottom: 2px; margin-bottom: 2px;
-        }
-        .reading-row { font-size: 0.9em; display: flex; align-items: baseline; gap: 5px; }
-        .label { font-size: 0.75em; color: #999; width: 30px; display: inline-block;}
-        
-        .kun { color: #1e88e5; font-weight: bold; } /* 青系 */
-        .on  { color: #e53935; font-weight: bold; } /* 赤系 */
+        .info-box { flex-grow: 1; display: flex; flex-direction: column; gap: 3px; }
+        .meaning { font-weight: 900; font-size: 1.1em; color: #444; border-bottom: 1px solid #eee; margin-bottom: 3px; }
+        .reading-row { font-size: 0.85em; display: flex; align-items: baseline; gap: 5px; }
+        .label { font-size: 0.7em; color: #999; width: 25px; display: inline-block;}
+        .kun { color: #1e88e5; font-weight: bold; }
+        .on  { color: #e53935; font-weight: bold; }
 
-        /* 右側：音声ボタン */
         .sound-btn {
-            background: var(--accent);
-            color: white; border: none;
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.2em;
-            box-shadow: 0 3px 0 #ffb300;
-            transition: all 0.1s;
+            background: var(--accent); color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1.1em; box-shadow: 0 3px 0 #ffb300; transition: all 0.1s;
         }
-        .sound-btn:active {
-            transform: translateY(3px);
-            box-shadow: none;
-        }
-
-        /* 検索バー */
-        .search-area {
-            margin-bottom: 20px; text-align: center;
-        }
-        #search-input {
-            padding: 10px 20px; border-radius: 25px; border: 2px solid #ddd;
-            width: 80%; max-width: 400px; font-size: 1em; outline: none;
-        }
-        #search-input:focus { border-color: var(--primary); }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        .sound-btn:hover { opacity: 0.9; }
 
         @media (max-width: 500px) {
-            .kanji-grid { grid-template-columns: 1fr; } /* スマホは1列 */
-            .kanji-card { padding: 15px; }
-            .char-box { width: 70px; height: 70px; font-size: 3em; }
+            .kanji-grid { grid-template-columns: 1fr; }
+            .level-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
-    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-0BX3DD42C1');
-    </script>
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo"><i class="fa-solid fa-book"></i> 漢字リスト</a>
+        <a href="#" class="logo"><i class="fa-solid fa-book"></i> 漢字リスト</a>
         <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
     </header>
 
     <div class="container">
-        <h1>小学1年生の漢字 (80字)</h1>
         
-        <div class="search-area">
-            <input type="text" id="search-input" placeholder="漢字や読み方でさがす...">
+        <div id="level-select-view" class="fade-in">
+            <h1>レベルを選んでください</h1>
+            <div class="level-grid">
+                <div class="level-card lv-n5" onclick="selectLevel('n5')">
+                    <span class="level-count" id="count-n5">0</span>
+                    <div class="level-title">N5</div>
+                    <div class="level-desc">Basic (Grade 1)</div>
+                </div>
+                <div class="level-card lv-n4" onclick="selectLevel('n4')">
+                    <span class="level-count" id="count-n4">0</span>
+                    <div class="level-title">N4</div>
+                    <div class="level-desc">Elementary</div>
+                </div>
+                <div class="level-card lv-n3" onclick="selectLevel('n3')">
+                    <span class="level-count" id="count-n3">0</span>
+                    <div class="level-title">N3</div>
+                    <div class="level-desc">Intermediate 1</div>
+                </div>
+                <div class="level-card lv-n2" style="opacity:0.5; cursor:not-allowed;">
+                    <div class="level-title">N2</div>
+                    <div class="level-desc">Coming Soon</div>
+                </div>
+                <div class="level-card lv-n1" style="opacity:0.5; cursor:not-allowed;">
+                    <div class="level-title">N1</div>
+                    <div class="level-desc">Coming Soon</div>
+                </div>
+            </div>
         </div>
 
-        <div class="kanji-grid" id="kanji-container">
+        <div id="kanji-list-view" class="hidden">
+            <button class="back-btn" onclick="showLevelSelect()">
+                <i class="fa-solid fa-arrow-left"></i> レベル選択に戻る
+            </button>
+            
+            <h1 id="list-title">N5 漢字リスト</h1>
+
+            <div class="search-area">
+                <input type="text" id="search-input" placeholder="漢字、読み方、英語の意味で検索...">
             </div>
+
+            <div class="kanji-grid" id="kanji-container">
+                </div>
+        </div>
+
     </div>
 
     <script>
-        // データ定義 (JSON形式で埋め込み)
-        const kanjiData = [
-            { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" },
-            { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
-            { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" },
-            { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
-            { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" },
-            { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
-            { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" },
-            { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
-            { "kanji": "九", "kun": "ここの", "on": "く・きゅう", "meaning": "Nine" },
-            { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
-            { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" },
-            { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
-            { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "Ten Thousand" },
-            { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen, Circle" },
-            { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
-            { "kanji": "月", "kun": "つき", "on": "げつ・がつ", "meaning": "Month, Moon" },
-            { "kanji": "日", "kun": "ひ・か", "on": "にち・じつ", "meaning": "Day, Sun" },
-            { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" },
-            { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
-            { "kanji": "木", "kun": "き", "on": "もく・ぼく", "meaning": "Tree, Wood" },
-            { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold, Money" },
-            { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Earth, Soil" },
-            { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
-            { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" },
-            { "kanji": "田", "kun": "た", "on": "でん", "meaning": "Rice field" },
-            { "kanji": "人", "kun": "ひと", "on": "じん・にん", "meaning": "Person" },
-            { "kanji": "大", "kun": "おお", "on": "だい・たい", "meaning": "Big, Large" },
-            { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small, Little" },
-            { "kanji": "上", "kun": "うえ・あ", "on": "じょう", "meaning": "Up, Above" },
-            { "kanji": "下", "kun": "した・さ", "on": "か・げ", "meaning": "Down, Below" },
-            { "kanji": "口", "kun": "くち", "on": "こう・く", "meaning": "Mouth" },
-            { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
-            { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
-            { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
-            { "kanji": "力", "kun": "ちから", "on": "りょく・りき", "meaning": "Power, Strength" },
-            { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
-            { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" },
-            { "kanji": "子", "kun": "こ", "on": "し・す", "meaning": "Child" },
-            { "kanji": "女", "kun": "おんな", "on": "じょ・にょ", "meaning": "Woman" },
-            { "kanji": "男", "kun": "おとこ", "on": "だん・なん", "meaning": "Man" },
-            { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Ahead, Previous" },
-            { "kanji": "生", "kun": "い・う・なま", "on": "せい・しょう", "meaning": "Life, Birth" },
-            { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study, Learning" },
-            { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
-            { "kanji": "文", "kun": "ふみ", "on": "ぶん・もん", "meaning": "Sentence, Writing" },
-            { "kanji": "字", "kun": "あざ", "on": "じ", "meaning": "Character, Letter" },
-            { "kanji": "語", "kun": "かた", "on": "ご", "meaning": "Word, Language" },
-            { "kanji": "前", "kun": "まえ", "on": "ぜん", "meaning": "Before, Front" },
-            { "kanji": "後", "kun": "のち・うし・あと", "on": "ご・こう", "meaning": "After, Back" },
-            { "kanji": "外", "kun": "そと・ほか", "on": "がい・げ", "meaning": "Outside" },
-            { "kanji": "右", "kun": "みぎ", "on": "う・ゆう", "meaning": "Right" },
-            { "kanji": "左", "kun": "ひだり", "on": "さ", "meaning": "Left" },
-            { "kanji": "入", "kun": "い・はい", "on": "にゅう・じゅ", "meaning": "Enter, Insert" },
-            { "kanji": "出", "kun": "で・だ", "on": "しゅつ・すい", "meaning": "Go out, Exit" },
-            { "kanji": "立", "kun": "た", "on": "りつ・りゅう", "meaning": "Stand" },
-            { "kanji": "休", "kun": "やす", "on": "きゅう", "meaning": "Rest, Day off" },
-            { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See, Look" },
-            { "kanji": "行", "kun": "い・ゆ", "on": "こう・ぎょう", "meaning": "Go, Travel" },
-            { "kanji": "来", "kun": "く・きた", "on": "らい", "meaning": "Come, Next" },
-            { "kanji": "気", "kun": "なし", "on": "き・け", "meaning": "Spirit, Air, Mood" },
-            { "kanji": "空", "kun": "そら・あ・から", "on": "くう", "meaning": "Sky, Empty" },
-            { "kanji": "天", "kun": "あめ・あま", "on": "てん", "meaning": "Heaven, Sky" },
-            { "kanji": "雨", "kun": "あめ・あま", "on": "う", "meaning": "Rain" },
-            { "kanji": "早", "kun": "はや", "on": "そう", "meaning": "Early" },
-            { "kanji": "草", "kun": "くさ", "on": "そう", "meaning": "Grass" },
-            { "kanji": "虫", "kun": "むし", "on": "ちゅう", "meaning": "Insect" },
-            { "kanji": "犬", "kun": "いぬ", "on": "けん", "meaning": "Dog" },
-            { "kanji": "竹", "kun": "たけ", "on": "ちく", "meaning": "Bamboo" },
-            { "kanji": "林", "kun": "はやし", "on": "りん", "meaning": "Woods" },
-            { "kanji": "森", "kun": "もり", "on": "しん", "meaning": "Forest" },
-            { "kanji": "石", "kun": "いし", "on": "せき", "meaning": "Stone" },
-            { "kanji": "王", "kun": "なし", "on": "おう", "meaning": "King" },
-            { "kanji": "玉", "kun": "たま", "on": "ぎょく", "meaning": "Ball, Jewel" },
-            { "kanji": "車", "kun": "くるま", "on": "しゃ", "meaning": "Car, Vehicle" },
-            { "kanji": "町", "kun": "まち", "on": "ちょう", "meaning": "Town, Village" },
-            { "kanji": "村", "kun": "むら", "on": "そん", "meaning": "Village" },
-            { "kanji": "音", "kun": "おと・ね", "on": "おん", "meaning": "Sound" },
-            { "kanji": "糸", "kun": "いと", "on": "し", "meaning": "Thread" },
-            { "kanji": "中", "kun": "なか", "on": "ちゅう", "meaning": "Middle, Inside" },
-            { "kanji": "北", "kun": "きた", "on": "ほく", "meaning": "North" },
-            { "kanji": "南", "kun": "みなみ", "on": "なん", "meaning": "South" },
-            { "kanji": "西", "kun": "にし", "on": "せい・さい", "meaning": "West" },
-            { "kanji": "東", "kun": "ひがし", "on": "とう", "meaning": "East" },
-            { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book, Origin" },
-            { "kanji": "名", "kun": "な", "on": "めい・みょう", "meaning": "Name" },
-            { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot, Leg" },
-            { "kanji": "赤", "kun": "あか", "on": "せき・しゃく", "meaning": "Red" },
-            { "kanji": "青", "kun": "あお", "on": "せい・しょう", "meaning": "Blue" },
-            { "kanji": "白", "kun": "しろ", "on": "はく", "meaning": "White" }
-        ];
+        // --- 漢字データベース (レベル別) ---
+        const kanjiDatabase = {
+            "n5": [
+                // 旧・小学1年生のデータをN5として定義
+                { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" },
+                { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
+                { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" },
+                { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
+                { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" },
+                { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
+                { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" },
+                { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
+                { "kanji": "九", "kun": "ここの", "on": "く・きゅう", "meaning": "Nine" },
+                { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
+                { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" },
+                { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
+                { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "Ten Thousand" },
+                { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen, Circle" },
+                { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
+                { "kanji": "月", "kun": "つき", "on": "げつ・がつ", "meaning": "Month, Moon" },
+                { "kanji": "日", "kun": "ひ・か", "on": "にち・じつ", "meaning": "Day, Sun" },
+                { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" },
+                { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
+                { "kanji": "木", "kun": "き", "on": "もく・ぼく", "meaning": "Tree, Wood" },
+                { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold, Money" },
+                { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Earth, Soil" },
+                { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
+                { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" },
+                { "kanji": "田", "kun": "た", "on": "でん", "meaning": "Rice field" },
+                { "kanji": "人", "kun": "ひと", "on": "じん・にん", "meaning": "Person" },
+                { "kanji": "大", "kun": "おお", "on": "だい・たい", "meaning": "Big, Large" },
+                { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small, Little" },
+                { "kanji": "上", "kun": "うえ・あ", "on": "じょう", "meaning": "Up, Above" },
+                { "kanji": "下", "kun": "した・さ", "on": "か・げ", "meaning": "Down, Below" },
+                { "kanji": "口", "kun": "くち", "on": "こう・く", "meaning": "Mouth" },
+                { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
+                { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
+                { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
+                { "kanji": "力", "kun": "ちから", "on": "りょく・りき", "meaning": "Power, Strength" },
+                { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
+                { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" },
+                { "kanji": "子", "kun": "こ", "on": "し・す", "meaning": "Child" },
+                { "kanji": "女", "kun": "おんな", "on": "じょ・にょ", "meaning": "Woman" },
+                { "kanji": "男", "kun": "おとこ", "on": "だん・なん", "meaning": "Man" },
+                { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Ahead, Previous" },
+                { "kanji": "生", "kun": "い・う", "on": "せい・しょう", "meaning": "Life, Birth" },
+                { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study, Learning" },
+                { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
+                { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book, Origin" },
+                { "kanji": "名", "kun": "な", "on": "めい・みょう", "meaning": "Name" },
+                { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot, Leg" },
+                { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See, Look" },
+                { "kanji": "行", "kun": "い・ゆ", "on": "こう・ぎょう", "meaning": "Go, Travel" },
+                { "kanji": "来", "kun": "く・きた", "on": "らい", "meaning": "Come, Next" },
+                { "kanji": "食", "kun": "た", "on": "しょく", "meaning": "Eat" },
+                { "kanji": "飲", "kun": "の", "on": "いん", "meaning": "Drink" },
+                { "kanji": "買", "kun": "か", "on": "ばい", "meaning": "Buy" },
+                { "kanji": "読", "kun": "よ", "on": "どく", "meaning": "Read" },
+                { "kanji": "書", "kun": "か", "on": "しょ", "meaning": "Write" },
+                { "kanji": "話", "kun": "はなし", "on": "わ", "meaning": "Talk, Speak" },
+                { "kanji": "聞", "kun": "き", "on": "ぶん・もん", "meaning": "Hear, Listen" },
+                { "kanji": "言", "kun": "い", "on": "げん・ごん", "meaning": "Say" }
+                // ※データが多すぎるため一部抜粋していますが、必要に応じて追加できます
+            ],
+            "n4": [
+                // 小学2年生・3年生レベルの漢字をN4として追加（サンプル）
+                { "kanji": "会", "kun": "あ", "on": "かい", "meaning": "Meet" },
+                { "kanji": "同", "kun": "おな", "on": "どう", "meaning": "Same" },
+                { "kanji": "事", "kun": "こと", "on": "じ", "meaning": "Matter, Thing" },
+                { "kanji": "自", "kun": "みずか", "on": "じ・し", "meaning": "Self" },
+                { "kanji": "社", "kun": "やしろ", "on": "しゃ", "meaning": "Company, Shrine" },
+                { "kanji": "発", "kun": "た", "on": "はつ", "meaning": "Departure, Emit" },
+                { "kanji": "者", "kun": "もの", "on": "しゃ", "meaning": "Person" },
+                { "kanji": "地", "kun": "なし", "on": "ち・じ", "meaning": "Ground, Earth" },
+                { "kanji": "業", "kun": "わざ", "on": "ぎょう", "meaning": "Business, Art" },
+                { "kanji": "方", "kun": "かた", "on": "ほう", "meaning": "Direction, Person" },
+                { "kanji": "新", "kun": "あたら", "on": "しん", "meaning": "New" },
+                { "kanji": "場", "kun": "ば", "on": "じょう", "meaning": "Place" },
+                { "kanji": "員", "kun": "なし", "on": "いん", "meaning": "Member" },
+                { "kanji": "立", "kun": "た", "on": "りつ", "meaning": "Stand" },
+                { "kanji": "開", "kun": "ひら・あ", "on": "かい", "meaning": "Open" },
+                { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
+                { "kanji": "力", "kun": "ちから", "on": "りょく", "meaning": "Power" },
+                { "kanji": "問", "kun": "と", "on": "もん", "meaning": "Question" },
+                { "kanji": "代", "kun": "か", "on": "だい", "meaning": "Substitute, Age" },
+                { "kanji": "明", "kun": "あか", "on": "めい", "meaning": "Bright" }
+            ],
+            "n3": [
+                // 小学3年生以上の少し難しい漢字（サンプル）
+                { "kanji": "最", "kun": "もっと", "on": "さい", "meaning": "Most" },
+                { "kanji": "続", "kun": "つづ", "on": "ぞく", "meaning": "Continue" },
+                { "kanji": "務", "kun": "つと", "on": "む", "meaning": "Duty, Work" },
+                { "kanji": "現", "kun": "あらわ", "on": "げん", "meaning": "Present, Appear" },
+                { "kanji": "選", "kun": "えら", "on": "せん", "meaning": "Choose" },
+                { "kanji": "果", "kun": "は", "on": "か", "meaning": "Fruit, Result" },
+                { "kanji": "機", "kun": "はた", "on": "き", "meaning": "Machine, Opportunity" }
+            ]
+        };
 
-        // ページ読み込み完了時
+        // DOM要素
+        const views = {
+            select: document.getElementById('level-select-view'),
+            list: document.getElementById('kanji-list-view')
+        };
+        const kanjiContainer = document.getElementById('kanji-container');
+        const listTitle = document.getElementById('list-title');
+        const searchInput = document.getElementById('search-input');
+        
+        let currentLevelData = []; // 現在表示中の漢字データ
+        let synth = window.speechSynthesis;
+        let voices = [];
+
+        // 音声ロード待ち
+        synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+        setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+        // 初期化：各レベルの漢字数を表示
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('kanji-container');
-            const searchInput = document.getElementById('search-input');
-            const synth = window.speechSynthesis;
-            let voices = [];
+            document.getElementById('count-n5').textContent = kanjiDatabase['n5'].length + "字";
+            document.getElementById('count-n4').textContent = kanjiDatabase['n4'].length + "字";
+            document.getElementById('count-n3').textContent = kanjiDatabase['n3'].length + "字";
+        });
+
+        // ▼ 画面切り替え関数 ▼
+        function selectLevel(level) {
+            // データ取得
+            currentLevelData = kanjiDatabase[level];
             
-            // 音声ロード
-            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
-            setTimeout(() => { voices = synth.getVoices(); }, 500);
+            // リスト画面の設定
+            listTitle.textContent = `${level.toUpperCase()} 漢字リスト`;
+            
+            // 色の設定 (左のボーダー色を変える)
+            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${level}`);
+            
+            // 画面切り替え
+            views.select.classList.add('hidden');
+            views.list.classList.remove('hidden');
+            views.list.classList.add('fade-in');
+            
+            // 検索ボックスをリセット
+            searchInput.value = '';
+            
+            // リスト描画
+            renderList(currentLevelData, colorVar);
+            
+            // ページ上部へ
+            window.scrollTo(0, 0);
+        }
 
-            // リスト描画関数
-            function renderList(list) {
-                container.innerHTML = '';
-                if (list.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
-                    return;
-                }
+        function showLevelSelect() {
+            views.list.classList.add('hidden');
+            views.select.classList.remove('hidden');
+            views.select.classList.add('fade-in');
+        }
 
-                list.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'kanji-card';
-                    card.innerHTML = `
-                        <div class="char-box">${item.kanji}</div>
-                        <div class="info-box">
-                            <div class="meaning">${item.meaning}</div>
-                            <div class="reading-row">
-                                <span class="label">訓</span>
-                                <span class="kun">${item.kun}</span>
-                            </div>
-                            <div class="reading-row">
-                                <span class="label">音</span>
-                                <span class="on">${item.on}</span>
-                            </div>
-                        </div>
-                        <button class="sound-btn" onclick="speak('${item.kanji}', '${item.kun}', '${item.on}')">
-                            <i class="fa-solid fa-volume-high"></i>
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
+        // ▼ リスト描画関数 ▼
+        function renderList(list, borderColor = '#ccc') {
+            kanjiContainer.innerHTML = '';
+            
+            if (list.length === 0) {
+                kanjiContainer.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';
+                return;
             }
 
-            // 音声再生関数 (Global)
-            window.speak = (kanji, kun, on) => {
-                if (synth.speaking) synth.cancel();
-
-                // 読みやすいテキストを作成 (例: "一。訓読み、ひと。音読み、いち")
-                // 'なし' の場合は読み飛ばす
-                let text = `${kanji}。`;
-                if(kun !== 'なし') text += `くん、${kun}。`;
-                if(on !== 'なし') text += `おん、${on}。`;
-
-                const utterThis = new SpeechSynthesisUtterance(text);
-                utterThis.lang = 'ja-JP';
-                utterThis.rate = 0.9;
-
-                // 女性の声を探す
-                const femaleKeywords = ['Google', 'Microsoft', 'Kyoko', 'O-Ren', 'Haruka', 'Ayumi', 'Female'];
-                const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
-                let targetVoice = jpVoices.find(v => femaleKeywords.some(k => v.name.includes(k)));
-                if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
-                if (targetVoice) utterThis.voice = targetVoice;
-
-                synth.speak(utterThis);
-            };
-
-            // 検索フィルタ機能
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const filtered = kanjiData.filter(item => {
-                    return item.kanji.includes(val) || 
-                           item.meaning.toLowerCase().includes(val) ||
-                           item.kun.includes(val) ||
-                           item.on.includes(val);
-                });
-                renderList(filtered);
+            list.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'kanji-card';
+                card.style.borderLeftColor = borderColor;
+                
+                // カードクリックで詳細ページへの遷移も可能（今回は音声再生のみ実装）
+                // card.onclick = () => showDetail(item); 
+                
+                card.innerHTML = `
+                    <div class="char-box">${item.kanji}</div>
+                    <div class="info-box">
+                        <div class="meaning">${item.meaning}</div>
+                        <div class="reading-row">
+                            <span class="label">訓</span>
+                            <span class="kun">${item.kun}</span>
+                        </div>
+                        <div class="reading-row">
+                            <span class="label">音</span>
+                            <span class="on">${item.on}</span>
+                        </div>
+                    </div>
+                    <button class="sound-btn" onclick="speak(event, '${item.kanji}', '${item.kun}', '${item.on}')">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                `;
+                kanjiContainer.appendChild(card);
             });
+        }
 
-            // 初回表示
-            renderList(kanjiData);
+        // ▼ 音声再生 ▼
+        window.speak = (e, kanji, kun, on) => {
+            e.stopPropagation(); // カードクリックイベントの発火を防ぐ
+            if (synth.speaking) synth.cancel();
+
+            let text = `${kanji}。`;
+            if(kun !== 'なし') text += `くん、${kun}。`;
+            if(on !== 'なし') text += `おん、${on}。`;
+
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.lang = 'ja-JP';
+            utterThis.rate = 0.9;
+
+            const femaleKeywords = ['Google', 'Microsoft', 'Kyoko', 'O-Ren', 'Haruka', 'Ayumi', 'Female'];
+            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            let targetVoice = jpVoices.find(v => femaleKeywords.some(k => v.name.includes(k)));
+            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+            if (targetVoice) utterThis.voice = targetVoice;
+
+            synth.speak(utterThis);
+        };
+
+        // ▼ 検索機能 ▼
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = currentLevelData.filter(item => {
+                return item.kanji.includes(val) || 
+                       item.meaning.toLowerCase().includes(val) ||
+                       item.kun.includes(val) ||
+                       item.on.includes(val);
+            });
+            // 現在のレベルの色を維持して再描画
+            const currentLevel = listTitle.textContent.split(' ')[0].toLowerCase();
+            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${currentLevel}`);
+            renderList(filtered, colorVar);
         });
+
     </script>
 
 </body>
