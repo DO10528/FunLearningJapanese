@@ -10,11 +10,17 @@
 <style>
     /* --- 共通デザイン --- */
     :root {
-        --primary: #42a5f5; /* 漢字テーマ色 (青系) */
+        --primary: #42a5f5;
         --accent: #ffcc5c;
         --bg-color: #f0f4f8;
         --text-color: #333;
-        --canvas-bg: #fff;
+        
+        /* レベルカラー (リストと同じ) */
+        --c-n5: #e57373; 
+        --c-n4: #d32f2f; 
+        --c-n3: #f57c00;
+        --c-n2: #7b1fa2;
+        --c-n1: #1976d2;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -27,7 +33,7 @@
         min-height: 100vh;
         display: flex; flex-direction: column;
         user-select: none;
-        touch-action: pan-y; /* スクロールは許可、ズーム等は抑制 */
+        touch-action: pan-y;
     }
 
     /* --- ヘッダー --- */
@@ -47,202 +53,210 @@
         display: flex; flex-direction: column; align-items: center;
     }
 
-    /* --- 認証ステータス --- */
-    #auth-status { font-size: 0.9em; color: #666; margin-bottom: 15px; background: white; padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    /* --- 画面切り替え --- */
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- 漢字グリッド --- */
+    /* --- 1. レベル選択画面 --- */
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px; width: 100%; padding: 10px;
+    }
+    .level-card {
+        background: white; border-radius: 20px; padding: 30px 15px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-bottom: 6px solid #ddd;
+        position: relative; overflow: hidden;
+    }
+    .level-card:active { transform: translateY(3px); border-bottom-width: 3px; }
+    
+    .level-badge {
+        display: inline-block; padding: 5px 15px; border-radius: 15px;
+        color: white; font-weight: bold; margin-bottom: 10px;
+        font-size: 0.9em; letter-spacing: 1px;
+    }
+    .level-title { font-size: 3em; font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
+    .level-desc { font-size: 0.85em; color: #888; font-weight: bold; }
+
+    .lv-n5 .level-badge { background-color: var(--c-n5); } .lv-n5 { border-bottom-color: var(--c-n5); }
+    .lv-n4 .level-badge { background-color: var(--c-n4); } .lv-n4 { border-bottom-color: var(--c-n4); }
+    .lv-n3 .level-badge { background-color: var(--c-n3); } .lv-n3 { border-bottom-color: var(--c-n3); }
+    .lv-locked { opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-bottom-color: #ccc; }
+    .lv-locked .level-badge { background-color: #999; }
+
+    /* --- 2. 練習リスト画面 --- */
+    .list-header { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .back-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: white; color: #555; padding: 10px 20px; border-radius: 25px;
+        border: 2px solid #eee; font-weight: bold; cursor: pointer;
+    }
+
     .kanji-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 15px; width: 100%;
-        padding-bottom: 40px;
+        gap: 15px; width: 100%; padding-bottom: 40px;
     }
 
     .kanji-card {
-        background: white;
-        border-radius: 15px;
-        aspect-ratio: 1;
-        display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-        transition: transform 0.1s;
-        border: 2px solid transparent;
+        background: white; border-radius: 15px; aspect-ratio: 1;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        transition: transform 0.1s; border: 2px solid transparent;
     }
-    .kanji-card:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.1); }
     .kanji-card:active { transform: translateY(2px); box-shadow: none; }
     
-    .kanji-char {
-        font-family: 'Klee One', cursive; /* 教科書体 */
-        font-size: 2.5em;
-        color: #333;
-        line-height: 1;
-    }
-    .kanji-meaning {
-        font-size: 0.7em;
-        color: #888;
-        margin-top: 5px;
-        text-align: center;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 90%;
-    }
+    .kanji-char { font-family: 'Klee One', cursive; font-size: 2.5em; color: #333; line-height: 1; }
 
     /* --- 練習モーダル --- */
     .modal-overlay {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px);
+        background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
         display: none; justify-content: center; align-items: center;
-        z-index: 1000; padding: 20px;
+        z-index: 1000; padding: 10px;
     }
     .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
 
     .modal-content {
-        background: white;
-        width: 100%; max-width: 800px;
-        border-radius: 20px;
-        overflow: hidden;
-        display: flex; flex-direction: column;
-        max-height: 90vh;
+        background: white; width: 100%; max-width: 800px;
+        border-radius: 20px; overflow: hidden;
+        display: flex; flex-direction: column; max-height: 95vh;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    /* ヘッダー */
     .modal-header {
-        background: var(--bg-color); padding: 15px 20px;
+        background: var(--bg-color); padding: 10px 15px;
         display: flex; justify-content: space-between; align-items: center;
         border-bottom: 2px solid #ddd;
     }
-    .modal-title { font-weight: bold; font-size: 1.2em; color: #555; }
+    .modal-title { font-weight: bold; font-size: 1.1em; color: #555; }
     .close-btn {
-        background: #ddd; border: none; width: 36px; height: 36px; border-radius: 50%;
+        background: #ddd; border: none; width: 32px; height: 32px; border-radius: 50%;
         font-size: 1.2em; color: #666; cursor: pointer;
     }
 
-    /* メインエリア（左右分割） */
     .modal-body {
         display: flex; flex-direction: row;
-        overflow-y: auto; flex-grow: 1;
-        padding: 20px; gap: 20px;
+        overflow-y: auto; flex-grow: 1; padding: 15px; gap: 20px;
         justify-content: center; align-items: flex-start;
     }
 
-    /* 左：情報エリア */
-    .info-panel {
-        flex: 1; max-width: 300px;
-        display: flex; flex-direction: column; gap: 15px;
-    }
-    .info-box {
-        background: #f9f9f9; padding: 15px; border-radius: 12px;
-        border-left: 5px solid var(--primary);
-    }
-    .info-label { font-size: 0.8em; color: #888; font-weight: bold; margin-bottom: 5px; }
-    .info-text { font-size: 1.1em; font-weight: bold; color: #333; line-height: 1.4; }
+    /* 情報パネル */
+    .info-panel { flex: 1; max-width: 250px; display: flex; flex-direction: column; gap: 10px; }
+    .info-box { background: #f9f9f9; padding: 10px; border-radius: 12px; border-left: 5px solid #ccc; }
+    .info-label { font-size: 0.75em; color: #888; font-weight: bold; margin-bottom: 2px; }
+    .info-text { font-size: 1em; font-weight: bold; color: #333; line-height: 1.3; }
 
-    /* 右：練習エリア */
-    .practice-panel {
-        display: flex; flex-direction: column; align-items: center; gap: 10px;
-    }
-    
+    /* キャンバス */
+    .practice-panel { display: flex; flex-direction: column; align-items: center; gap: 10px; }
     .canvas-container {
-        position: relative;
-        width: 300px; height: 300px;
-        background: white;
-        border: 4px solid #42a5f5; border-radius: 15px;
-        cursor: crosshair;
-        touch-action: none; /* キャンバス内のスクロール無効化 */
+        position: relative; width: 300px; height: 300px;
+        background: white; border: 4px solid var(--primary); border-radius: 15px;
+        cursor: crosshair; touch-action: none;
     }
-    
-    /* ガイド用背景文字 */
     .canvas-guide {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; justify-content: center; align-items: center;
-        font-family: 'Klee One', cursive;
-        font-size: 220px;
-        color: #e0e0e0; /* 薄いグレー */
-        pointer-events: none; /* タッチイベントを通す */
-        user-select: none;
+        font-family: 'Klee One', cursive; font-size: 220px; color: #e0e0e0;
+        pointer-events: none; user-select: none;
     }
-    /* 十字リーダー */
-    .canvas-lines {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-    }
+    .canvas-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
     .line-v { position: absolute; left: 50%; top: 10%; bottom: 10%; width: 0; border-left: 1px dashed #ccc; }
     .line-h { position: absolute; top: 50%; left: 10%; right: 10%; height: 0; border-top: 1px dashed #ccc; }
-
-    canvas {
-        position: absolute; top: 0; left: 0;
-        z-index: 10;
-    }
+    canvas { position: absolute; top: 0; left: 0; z-index: 10; }
 
     /* コントロール */
-    .controls {
-        display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 10px; flex-wrap: wrap;
-    }
+    .controls { display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 5px; flex-wrap: wrap; }
     .btn {
-        padding: 10px 20px; border-radius: 30px; border: none;
-        font-weight: bold; font-family: 'Zen Maru Gothic', sans-serif;
-        cursor: pointer; font-size: 1em; display: flex; align-items: center; gap: 8px;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        padding: 8px 16px; border-radius: 30px; border: none; font-weight: bold;
+        cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 5px;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); font-family: 'Zen Maru Gothic', sans-serif;
     }
     .btn:active { transform: translateY(3px); box-shadow: none; }
     
     .btn-audio { background: #ff9800; color: white; box-shadow: 0 4px 0 #e65100; }
     .btn-clear { background: #f44336; color: white; box-shadow: 0 4px 0 #d32f2f; }
-    .btn-done { background: #4caf50; color: white; box-shadow: 0 4px 0 #388e3c; font-size: 1.2em; padding: 12px 40px; }
+    .btn-done { background: #4caf50; color: white; box-shadow: 0 4px 0 #388e3c; font-size: 1.1em; padding: 10px 30px; }
 
-    /* スマホ対応 */
     @media (max-width: 700px) {
         .modal-body { flex-direction: column; align-items: center; padding: 10px; }
-        .info-panel { width: 100%; max-width: 100%; order: 2; }
+        .info-panel { width: 100%; max-width: 100%; order: 2; flex-direction: row; flex-wrap: wrap; }
+        .info-box { flex: 1; min-width: 80px; }
         .practice-panel { width: 100%; order: 1; }
         .canvas-container { width: 280px; height: 280px; }
         .canvas-guide { font-size: 200px; }
-        .kanji-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
     }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html" class="logo"><i class="fa-solid fa-pen-nib"></i> 漢字・かきかた道場</a>
+    <a href="#" class="logo" onclick="location.reload()"><i class="fa-solid fa-pen-nib"></i> 漢字・かきかた道場</a>
     <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
 </header>
 
 <div class="container">
-    <div id="auth-status">認証中...</div>
     
-    <div style="text-align:center; margin-bottom:20px;">
-        <h2 style="color:var(--primary); margin-bottom:5px;">かんじを えらぼう</h2>
-        <p>1年生の かんじ 80こ</p>
+    <div id="level-select-view" class="fade-in">
+        <h2 style="text-align:center; color:var(--primary);">レベルを選んでね</h2>
+        <div class="level-grid">
+            <div class="level-card lv-n5" onclick="selectLevel('n5')">
+                <span class="level-badge">BASIC</span>
+                <div class="level-title">N5</div>
+                <div class="level-desc" id="count-n5">Loading...</div>
+            </div>
+            <div class="level-card lv-n4" onclick="selectLevel('n4')">
+                <span class="level-badge">ELEMENTARY</span>
+                <div class="level-title">N4</div>
+                <div class="level-desc" id="count-n4">Loading...</div>
+            </div>
+            <div class="level-card lv-n3" onclick="selectLevel('n3')">
+                <span class="level-badge">INTERMEDIATE</span>
+                <div class="level-title">N3</div>
+                <div class="level-desc" id="count-n3">Loading...</div>
+            </div>
+            <div class="level-card lv-locked">
+                <span class="level-badge"><i class="fa-solid fa-lock"></i></span>
+                <div class="level-title">N2</div>
+            </div>
+            <div class="level-card lv-locked">
+                <span class="level-badge"><i class="fa-solid fa-lock"></i></span>
+                <div class="level-title">N1</div>
+            </div>
+        </div>
     </div>
 
-    <div class="kanji-grid" id="kanji-grid">
+    <div id="kanji-list-view" class="hidden" style="width:100%;">
+        <div class="list-header">
+            <button class="back-btn" onclick="showLevelSelect()">
+                <i class="fa-solid fa-arrow-left"></i> もどる
+            </button>
+            <h2 id="list-title" style="margin:0; color:var(--primary);">N5</h2>
         </div>
+        <div class="kanji-grid" id="kanji-grid">
+            </div>
+    </div>
+
 </div>
 
 <div id="practice-modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="modal-title"><i class="fa-solid fa-paintbrush"></i> かきかた れんしゅう</div>
+            <div class="modal-title"><i class="fa-solid fa-paintbrush"></i> かきかた</div>
             <button class="close-btn" onclick="closeModal()"><i class="fa-solid fa-times"></i></button>
         </div>
         
         <div class="modal-body">
-            
             <div class="practice-panel">
-                <div class="canvas-container">
-                    <div class="canvas-lines">
-                        <div class="line-v"></div>
-                        <div class="line-h"></div>
-                    </div>
+                <div class="canvas-container" id="canvas-wrapper">
+                    <div class="canvas-lines"><div class="line-v"></div><div class="line-h"></div></div>
                     <div id="guide-char" class="canvas-guide"></div>
                     <canvas id="draw-canvas" width="300" height="300"></canvas>
                 </div>
-                
                 <div class="controls">
                     <button class="btn btn-audio" onclick="playAudio()"><i class="fa-solid fa-volume-high"></i> きく</button>
                     <button class="btn btn-clear" onclick="clearCanvas()"><i class="fa-solid fa-eraser"></i> けす</button>
@@ -252,11 +266,11 @@
 
             <div class="info-panel">
                 <div class="info-box">
-                    <div class="info-label">オン（音読み）</div>
+                    <div class="info-label">オン (On)</div>
                     <div id="info-on" class="info-text"></div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">くん（訓読み）</div>
+                    <div class="info-label">くん (Kun)</div>
                     <div id="info-kun" class="info-text"></div>
                 </div>
                 <div class="info-box">
@@ -264,7 +278,6 @@
                     <div id="info-mean" class="info-text"></div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -289,178 +302,164 @@
     const auth = getAuth(app);
     
     window.currentUserId = null;
-    const authStatusEl = document.getElementById('auth-status');
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.currentUserId = user.uid;
-            authStatusEl.textContent = "✅ ログイン中";
         } else {
             window.currentUserId = null;
-            authStatusEl.textContent = "❌ ゲストモード (ポイントはつきません)";
         }
     });
 
-    // ポイント加算
     window.addPoints = async function(points) {
         if (!window.currentUserId) return;
         try {
             const userRef = doc(db, "users", window.currentUserId);
             await updateDoc(userRef, { points: increment(points) });
-            console.log("Points added:", points);
         } catch (e) {
-            console.error("Error adding points:", e);
+            console.error(e);
         }
     }
 </script>
 
 <script>
-    const synth = window.speechSynthesis;
-    let voices = [];
-    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+    // --- 漢字データベース (Kanji Listと共通) ---
+    const kanjiDatabase = {
+        "n5": [
+            { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" }, { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
+            { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" }, { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
+            { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" }, { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
+            { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" }, { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
+            { "kanji": "九", "kun": "ここの", "on": "く", "meaning": "Nine" }, { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
+            { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" }, { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
+            { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "10 Thousand" }, { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen/Circle" },
+            { "kanji": "時", "kun": "とき", "on": "じ", "meaning": "Time" }, { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
+            { "kanji": "月", "kun": "つき", "on": "げつ", "meaning": "Month/Moon" }, { "kanji": "日", "kun": "ひ", "on": "にち", "meaning": "Day/Sun" },
+            { "kanji": "上", "kun": "うえ", "on": "じょう", "meaning": "Up" }, { "kanji": "下", "kun": "した", "on": "か", "meaning": "Down" },
+            { "kanji": "右", "kun": "みぎ", "on": "う", "meaning": "Right" }, { "kanji": "左", "kun": "ひだり", "on": "さ", "meaning": "Left" },
+            { "kanji": "中", "kun": "なか", "on": "ちゅう", "meaning": "Middle" }, { "kanji": "北", "kun": "きた", "on": "ほく", "meaning": "North" },
+            { "kanji": "南", "kun": "みなみ", "on": "なん", "meaning": "South" }, { "kanji": "東", "kun": "ひがし", "on": "とう", "meaning": "East" },
+            { "kanji": "西", "kun": "にし", "on": "せい", "meaning": "West" }, { "kanji": "人", "kun": "ひと", "on": "じん", "meaning": "Person" },
+            { "kanji": "今", "kun": "いま", "on": "こん", "meaning": "Now" }, { "kanji": "休", "kun": "やす", "on": "きゅう", "meaning": "Rest" },
+            { "kanji": "会", "kun": "あ", "on": "かい", "meaning": "Meet" }, { "kanji": "何", "kun": "なに", "on": "か", "meaning": "What" },
+            { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Previous" }, { "kanji": "入", "kun": "はい", "on": "にゅう", "meaning": "Enter" },
+            { "kanji": "出", "kun": "で", "on": "しゅつ", "meaning": "Exit" }, { "kanji": "分", "kun": "わ", "on": "ふん", "meaning": "Minute/Part" },
+            { "kanji": "前", "kun": "まえ", "on": "ぜん", "meaning": "Before" }, { "kanji": "午", "kun": "なし", "on": "ご", "meaning": "Noon" },
+            { "kanji": "半", "kun": "なか", "on": "はん", "meaning": "Half" }, { "kanji": "友", "kun": "とも", "on": "ゆう", "meaning": "Friend" },
+            { "kanji": "口", "kun": "くち", "on": "こう", "meaning": "Mouth" }, { "kanji": "古", "kun": "ふる", "on": "こ", "meaning": "Old" },
+            { "kanji": "名", "kun": "な", "on": "めい", "meaning": "Name" }, { "kanji": "国", "kun": "くに", "on": "こく", "meaning": "Country" },
+            { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Soil/Earth" }, { "kanji": "外", "kun": "そと", "on": "がい", "meaning": "Outside" },
+            { "kanji": "多", "kun": "おお", "on": "た", "meaning": "Many" }, { "kanji": "大", "kun": "おお", "on": "だい", "meaning": "Big" },
+            { "kanji": "天", "kun": "あま", "on": "てん", "meaning": "Heaven" }, { "kanji": "女", "kun": "おんな", "on": "じょ", "meaning": "Woman" },
+            { "kanji": "子", "kun": "こ", "on": "し", "meaning": "Child" }, { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study" },
+            { "kanji": "安", "kun": "やす", "on": "あん", "meaning": "Cheap/Safe" }, { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small" },
+            { "kanji": "少", "kun": "すく", "on": "しょう", "meaning": "Few" }, { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
+            { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" }, { "kanji": "店", "kun": "みせ", "on": "てん", "meaning": "Shop" },
+            { "kanji": "後", "kun": "あと", "on": "ご", "meaning": "After" }, { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
+            { "kanji": "新", "kun": "あたら", "on": "しん", "meaning": "New" }, { "kanji": "書", "kun": "か", "on": "しょ", "meaning": "Write" },
+            { "kanji": "木", "kun": "き", "on": "もく", "meaning": "Tree" }, { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book" },
+            { "kanji": "来", "kun": "く", "on": "らい", "meaning": "Come" }, { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
+            { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" }, { "kanji": "毎", "kun": "なし", "on": "まい", "meaning": "Every" },
+            { "kanji": "気", "kun": "なし", "on": "き", "meaning": "Spirit" }, { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
+            { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" }, { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
+            { "kanji": "生", "kun": "い", "on": "せい", "meaning": "Life" }, { "kanji": "男", "kun": "おとこ", "on": "だん", "meaning": "Man" },
+            { "kanji": "白", "kun": "しろ", "on": "はく", "meaning": "White" }, { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
+            { "kanji": "社", "kun": "やしろ", "on": "しゃ", "meaning": "Company" }, { "kanji": "空", "kun": "そら", "on": "くう", "meaning": "Sky" },
+            { "kanji": "立", "kun": "た", "on": "りつ", "meaning": "Stand" }, { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
+            { "kanji": "聞", "kun": "き", "on": "ぶん", "meaning": "Listen" }, { "kanji": "花", "kun": "はな", "on": "か", "meaning": "Flower" },
+            { "kanji": "行", "kun": "い", "on": "こう", "meaning": "Go" }, { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See" },
+            { "kanji": "言", "kun": "い", "on": "げん", "meaning": "Say" }, { "kanji": "話", "kun": "はなし", "on": "わ", "meaning": "Talk" },
+            { "kanji": "語", "kun": "かた", "on": "ご", "meaning": "Language" }, { "kanji": "読", "kun": "よ", "on": "どく", "meaning": "Read" },
+            { "kanji": "買", "kun": "か", "on": "ばい", "meaning": "Buy" }, { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot/Leg" },
+            { "kanji": "車", "kun": "くるま", "on": "しゃ", "meaning": "Car" }, { "kanji": "週", "kun": "なし", "on": "しゅう", "meaning": "Week" },
+            { "kanji": "道", "kun": "みち", "on": "どう", "meaning": "Road" }, { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold" },
+            { "kanji": "長", "kun": "なが", "on": "ちょう", "meaning": "Long" }, { "kanji": "間", "kun": "あいだ", "on": "かん", "meaning": "Between" },
+            { "kanji": "雨", "kun": "あめ", "on": "う", "meaning": "Rain" }, { "kanji": "電", "kun": "なし", "on": "でん", "meaning": "Electricity" },
+            { "kanji": "食", "kun": "た", "on": "しょく", "meaning": "Eat" }, { "kanji": "飲", "kun": "の", "on": "いん", "meaning": "Drink" },
+            { "kanji": "駅", "kun": "なし", "on": "えき", "meaning": "Station" }, { "kanji": "高", "kun": "たか", "on": "こう", "meaning": "High" },
+            { "kanji": "魚", "kun": "さかな", "on": "ぎょ", "meaning": "Fish" }
+        ],
+        "n4": [
+            "不", "世", "主", "乗", "事", "京", "仕", "代", "以", "低", "住", "体", "作", "使", "便", "借", "働", "元", "兄", "光",
+            "写", "冬", "切", "別", "力", "勉", "動", "区", "医", "去", "台", "合", "同", "味", "品", "員", "問", "回", "図", "地",
+            "堂", "場", "声", "売", "夏", "夕", "夜", "太", "好", "妹", "姉", "始", "字", "室", "家", "寒", "屋", "工", "市", "帰",
+            "広", "度", "建", "引", "弟", "弱", "強", "待", "心", "思", "急", "悪", "意", "所", "持", "教", "文", "料", "方", "旅",
+            "族", "早", "明", "映", "春", "昼", "暑", "暗", "曜", "有", "服", "朝", "村", "林", "森", "業", "楽", "歌", "止", "正",
+            "歩", "死", "民", "池", "注", "洋", "洗", "海", "漢", "牛", "物", "特", "犬", "理", "産", "用", "田", "町", "画", "界",
+            "病", "発", "県", "真", "着", "知", "短", "研", "私", "秋", "究", "答", "紙", "終", "習", "考", "者", "肉", "自", "色",
+            "英", "茶", "菜", "薬", "親", "計", "試", "説", "貸", "質", "赤", "走", "起", "転", "軽", "近", "送", "通", "進", "運",
+            "遠", "都", "重", "野", "銀", "門", "開", "院", "集", "青", "音", "頭", "題", "顔", "風", "飯", "館", "首", "験", "鳥", "黒"
+        ].map(c => ({ kanji: c, kun: "-", on: "-", meaning: "" })),
+        "n3": [
+            "与", "両", "予", "争", "互", "亡", "交", "他", "付", "件", "任", "伝", "似", "位", "余", "例", "供", "係", "信", "倒",
+            "候", "値", "偉", "側", "偶", "備", "優", "全", "共", "具", "内", "最", "冷", "処", "列", "初", "判", "利", "到", "制",
+            "刻", "割", "加", "助", "努", "労", "務", "勝", "勤", "化", "単", "危", "原", "参", "反", "収", "取", "受", "号", "向",
+            "君", "否", "吸", "吹", "告", "呼", "命", "和", "商", "喜", "因", "困", "園", "在", "報", "増", "変", "夢", "夫", "失",
+            "妻", "娘", "婚", "婦", "存", "宅", "守", "完", "官", "定", "実", "客", "害", "容", "宿", "寄", "富", "寝", "察", "対",
+            "局", "居", "差", "師", "席", "常", "平", "幸", "幾", "座", "庭", "式", "当", "形", "役", "彼", "徒", "得", "御", "必",
+            "忘", "忙", "念", "怒", "怖", "性", "恐", "恥", "息", "悲", "情", "想", "愛", "感", "慣", "成", "戦", "戻", "才", "打",
+            "払", "投", "折", "抜", "抱", "押", "招", "指", "捕", "掛", "探", "支", "放", "政", "敗", "散", "数", "断", "易", "昔",
+            "昨", "晩", "景", "晴", "暮", "曲", "更", "望", "期", "未", "末", "束", "杯", "果", "格", "構", "様", "権", "横", "機",
+            "欠", "次", "欲", "歯", "歳", "残", "段", "殺", "求", "決"
+        ].map(c => ({ kanji: c, kun: "-", on: "-", meaning: "" }))
+    };
 
-    // --- データ ---
-    const kanjiList = [
-        { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" },
-        { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
-        { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" },
-        { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
-        { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" },
-        { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
-        { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" },
-        { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
-        { "kanji": "九", "kun": "ここの", "on": "く・きゅう", "meaning": "Nine" },
-        { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
-        { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" },
-        { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
-        { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "Ten Thousand" },
-        { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen, Circle" },
-        { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
-        { "kanji": "月", "kun": "つき", "on": "げつ・がつ", "meaning": "Month, Moon" },
-        { "kanji": "日", "kun": "ひ・か", "on": "にち・じつ", "meaning": "Day, Sun" },
-        { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" },
-        { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
-        { "kanji": "木", "kun": "き", "on": "もく・ぼく", "meaning": "Tree, Wood" },
-        { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold, Money" },
-        { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Earth, Soil" },
-        { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
-        { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" },
-        { "kanji": "田", "kun": "た", "on": "でん", "meaning": "Rice field" },
-        { "kanji": "人", "kun": "ひと", "on": "じん・にん", "meaning": "Person" },
-        { "kanji": "大", "kun": "おお", "on": "だい・たい", "meaning": "Big, Large" },
-        { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small, Little" },
-        { "kanji": "上", "kun": "うえ・あ", "on": "じょう", "meaning": "Up, Above" },
-        { "kanji": "下", "kun": "した・さ", "on": "か・げ", "meaning": "Down, Below" },
-        { "kanji": "口", "kun": "くち", "on": "こう・く", "meaning": "Mouth" },
-        { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
-        { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
-        { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
-        { "kanji": "力", "kun": "ちから", "on": "りょく・りき", "meaning": "Power, Strength" },
-        { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
-        { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" },
-        { "kanji": "子", "kun": "こ", "on": "し・す", "meaning": "Child" },
-        { "kanji": "女", "kun": "おんな", "on": "じょ・にょ", "meaning": "Woman" },
-        { "kanji": "男", "kun": "おとこ", "on": "だん・なん", "meaning": "Man" },
-        { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Ahead, Previous" },
-        { "kanji": "生", "kun": "い・う・なま", "on": "せい・しょう", "meaning": "Life, Birth" },
-        { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study, Learning" },
-        { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
-        { "kanji": "文", "kun": "ふみ", "on": "ぶん・もん", "meaning": "Sentence, Writing" },
-        { "kanji": "字", "kun": "あざ", "on": "じ", "meaning": "Character, Letter" },
-        { "kanji": "語", "kun": "かた", "on": "ご", "meaning": "Word, Language" },
-        { "kanji": "前", "kun": "まえ", "on": "ぜん", "meaning": "Before, Front" },
-        { "kanji": "後", "kun": "のち・うし・あと", "on": "ご・こう", "meaning": "After, Back" },
-        { "kanji": "外", "kun": "そと・ほか", "on": "がい・げ", "meaning": "Outside" },
-        { "kanji": "右", "kun": "みぎ", "on": "う・ゆう", "meaning": "Right" },
-        { "kanji": "左", "kun": "ひだり", "on": "さ", "meaning": "Left" },
-        { "kanji": "入", "kun": "い・はい", "on": "にゅう・じゅ", "meaning": "Enter, Insert" },
-        { "kanji": "出", "kun": "で・だ", "on": "しゅつ・すい", "meaning": "Go out, Exit" },
-        { "kanji": "立", "kun": "た", "on": "りつ・りゅう", "meaning": "Stand" },
-        { "kanji": "休", "kun": "やす", "on": "きゅう", "meaning": "Rest, Day off" },
-        { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See, Look" },
-        { "kanji": "行", "kun": "い・ゆ", "on": "こう・ぎょう", "meaning": "Go, Travel" },
-        { "kanji": "来", "kun": "く・きた", "on": "らい", "meaning": "Come, Next" },
-        { "kanji": "気", "kun": "なし", "on": "き・け", "meaning": "Spirit, Air, Mood" },
-        { "kanji": "空", "kun": "そら・あ・から", "on": "くう", "meaning": "Sky, Empty" },
-        { "kanji": "天", "kun": "あめ・あま", "on": "てん", "meaning": "Heaven, Sky" },
-        { "kanji": "雨", "kun": "あめ・あま", "on": "う", "meaning": "Rain" },
-        { "kanji": "早", "kun": "はや", "on": "そう", "meaning": "Early" },
-        { "kanji": "草", "kun": "くさ", "on": "そう", "meaning": "Grass" },
-        { "kanji": "虫", "kun": "むし", "on": "ちゅう", "meaning": "Insect" },
-        { "kanji": "犬", "kun": "いぬ", "on": "けん", "meaning": "Dog" },
-        { "kanji": "竹", "kun": "たけ", "on": "ちく", "meaning": "Bamboo" },
-        { "kanji": "林", "kun": "はやし", "on": "りん", "meaning": "Woods" },
-        { "kanji": "森", "kun": "もり", "on": "しん", "meaning": "Forest" },
-        { "kanji": "石", "kun": "いし", "on": "せき", "meaning": "Stone" },
-        { "kanji": "王", "kun": "なし", "on": "おう", "meaning": "King" },
-        { "kanji": "玉", "kun": "たま", "on": "ぎょく", "meaning": "Ball, Jewel" },
-        { "kanji": "車", "kun": "くるま", "on": "しゃ", "meaning": "Car, Vehicle" },
-        { "kanji": "町", "kun": "まち", "on": "ちょう", "meaning": "Town, Village" },
-        { "kanji": "村", "kun": "むら", "on": "そん", "meaning": "Village" },
-        { "kanji": "音", "kun": "おと・ね", "on": "おん", "meaning": "Sound" },
-        { "kanji": "糸", "kun": "いと", "on": "し", "meaning": "Thread" },
-        { "kanji": "中", "kun": "なか", "on": "ちゅう", "meaning": "Middle, Inside" },
-        { "kanji": "北", "kun": "きた", "on": "ほく", "meaning": "North" },
-        { "kanji": "南", "kun": "みなみ", "on": "なん", "meaning": "South" },
-        { "kanji": "西", "kun": "にし", "on": "せい・さい", "meaning": "West" },
-        { "kanji": "東", "kun": "ひがし", "on": "とう", "meaning": "East" },
-        { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book, Origin" },
-        { "kanji": "名", "kun": "な", "on": "めい・みょう", "meaning": "Name" },
-        { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot, Leg" },
-        { "kanji": "赤", "kun": "あか", "on": "せき・しゃく", "meaning": "Red" },
-        { "kanji": "青", "kun": "あお", "on": "せい・しょう", "meaning": "Blue" },
-        { "kanji": "白", "kun": "しろ", "on": "はく", "meaning": "White" }
-    ];
-
+    // --- 変数 ---
+    const views = {
+        select: document.getElementById('level-select-view'),
+        list: document.getElementById('kanji-list-view')
+    };
+    const listTitle = document.getElementById('list-title');
     const grid = document.getElementById('kanji-grid');
     const modal = document.getElementById('practice-modal');
     const canvas = document.getElementById('draw-canvas');
     const ctx = canvas.getContext('2d');
     
+    const synth = window.speechSynthesis;
+    let voices = [];
+    if(synth) synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+
     let isDrawing = false;
     let currentKanji = null;
 
-    // --- 初期化 ---
-    function init() {
-        kanjiList.forEach((item) => {
+    // --- 初期表示: レベルの文字数 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('count-n5').textContent = kanjiDatabase['n5'].length + " Kanji";
+        document.getElementById('count-n4').textContent = kanjiDatabase['n4'].length + " Kanji";
+        document.getElementById('count-n3').textContent = kanjiDatabase['n3'].length + " Kanji";
+        setTimeout(() => { if(synth) voices = synth.getVoices(); }, 500);
+        setupCanvas();
+    });
+
+    // --- 画面切り替え ---
+    window.selectLevel = (level) => {
+        const data = kanjiDatabase[level];
+        // リスト表示
+        grid.innerHTML = '';
+        data.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
-            card.innerHTML = `
-                <div class="kanji-char">${item.kanji}</div>
-                <div class="kanji-meaning">${item.meaning}</div>
-            `;
+            card.innerHTML = `<div class="kanji-char">${item.kanji}</div>`;
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
-        setupCanvas();
-    }
 
-    // --- 音声再生 ---
-    window.playAudio = () => {
-        if (!currentKanji) return;
-        if (synth.speaking) synth.cancel();
+        // タイトル色設定
+        const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${level}`);
+        listTitle.textContent = `${level.toUpperCase()} 道場 (${data.length}字)`;
+        listTitle.style.color = colorVar;
 
-        const onText = currentKanji.on !== 'なし' ? currentKanji.on : '';
-        const kunText = currentKanji.kun !== 'なし' ? currentKanji.kun : '';
-        
-        // 読み上げテキスト: "漢字。音読み、〇〇。訓読み、〇〇。"
-        const utterText = `${currentKanji.kanji}。音読み、${onText}。訓読み、${kunText}`;
-        
-        const utterThis = new SpeechSynthesisUtterance(utterText);
-        utterThis.lang = 'ja-JP';
-        utterThis.rate = 0.9;
-        
-        // 女性声優先
-        const femaleKeywords = ['Google', 'Microsoft', 'Kyoko', 'O-Ren', 'Haruka', 'Ayumi', 'Female'];
-        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
-        let targetVoice = null;
-        for (const keyword of femaleKeywords) {
-            targetVoice = jpVoices.find(v => v.name.includes(keyword));
-            if (targetVoice) break;
-        }
-        if (targetVoice) utterThis.voice = targetVoice;
-        
-        synth.speak(utterThis);
+        // 遷移
+        views.select.classList.add('hidden');
+        views.list.classList.remove('hidden');
+        views.list.classList.add('fade-in');
+        window.scrollTo(0, 0);
+    };
+
+    window.showLevelSelect = () => {
+        views.list.classList.add('hidden');
+        views.select.classList.remove('hidden');
+        views.select.classList.add('fade-in');
     };
 
     // --- モーダル操作 ---
@@ -472,15 +471,36 @@
         document.getElementById('info-mean').textContent = item.meaning;
         document.getElementById('guide-char').textContent = item.kanji;
         
+        // 色をリセット
+        document.getElementById('canvas-wrapper').style.borderColor = listTitle.style.color || '#42a5f5';
+
         clearCanvas();
         modal.classList.add('active');
-        
-        // 自動再生はせず、ユーザーがボタンを押す形式にしています
     };
 
     window.closeModal = () => {
         modal.classList.remove('active');
         currentKanji = null;
+    };
+
+    // --- 音声再生 ---
+    window.playAudio = () => {
+        if (!currentKanji || !synth) return;
+        if (synth.speaking) synth.cancel();
+
+        let text = `${currentKanji.kanji}。`;
+        if (currentKanji.on !== '-') text += `おん、${currentKanji.on}。`;
+        if (currentKanji.kun !== '-') text += `くん、${currentKanji.kun}`;
+        
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 0.9;
+        
+        const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        let targetVoice = jpVoices.find(v => v.name.includes('Google') || v.name.includes('Kyoko'));
+        if (targetVoice) utterThis.voice = targetVoice;
+        
+        synth.speak(utterThis);
     };
 
     // --- キャンバスロジック ---
@@ -489,15 +509,8 @@
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDraw);
         canvas.addEventListener('mouseout', stopDraw);
-
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            startDraw(e.touches[0]);
-        }, { passive: false });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            draw(e.touches[0]);
-        }, { passive: false });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); }, { passive: false });
         canvas.addEventListener('touchend', stopDraw);
     }
 
@@ -508,8 +521,7 @@
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#333';
-        ctx.globalAlpha = 0.8;
-
+        ctx.globalAlpha = 0.9;
         ctx.beginPath();
         const x = (e.clientX - rect.left) * (canvas.width / rect.width);
         const y = (e.clientY - rect.top) * (canvas.height / rect.height);
@@ -535,10 +547,7 @@
     };
 
     window.finishPractice = () => {
-        // ★修正点：1ポイント加算
-        if (window.addPoints) {
-            window.addPoints(1);
-        }
+        if (window.addPoints) window.addPoints(1);
         
         const btn = document.querySelector('.btn-done');
         const originalText = btn.innerHTML;
@@ -553,8 +562,6 @@
             }, 500);
         }, 800);
     };
-
-    init();
 
 </script>
 </body>
