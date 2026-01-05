@@ -196,6 +196,7 @@ header {
   display: flex; align-items: center; gap: 8px; font-size: 0.9em;
   touch-action: manipulation;
   justify-content: center;
+  text-decoration: none; /* リンクの下線を消す */
 }
 .line-btn:active { transform: translateY(2px); opacity: 0.9; }
 
@@ -388,13 +389,14 @@ header {
 
   <div class="setting-row">
   <div>
-  <div style="font-weight:bold; font-size:0.95em;">LINE連携</div>
-  <div style="font-size:0.75em; color:#888;">ログインを便利にする</div>
+  <div style="font-weight:bold; font-size:0.95em;">公式LINE</div>
+  <div style="font-size:0.75em; color:#888;">最新情報・サポート</div>
   </div>
-  <button class="line-btn" onclick="linkLineAccount()">
-  <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 連携
-  </button>
+  <a href="https://lin.ee/bMkrO5fX" target="_blank" class="line-btn" style="color:white;">
+  <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 追加
+  </a>
   </div>
+
   <div style="margin-top:20px;">
   <button onclick="closeSettingsModal()" style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
   </div>
@@ -537,6 +539,7 @@ window.loginWithLine = async () => {
   }
 };
 
+// 【変更】この関数は設定画面からは呼ばれなくなりましたが、機能自体は残しています
 window.linkLineAccount = async () => {
   const user = auth.currentUser;
   if (!user) { alert("先にログインしてください。"); return; }
@@ -546,7 +549,6 @@ window.linkLineAccount = async () => {
     return;
   }
   
-  // スマホ対策：confirmを削除し、ボタンタップで即実行してポップアップブロックを回避
   try {
     await linkWithPopup(user, lineProvider);
     alert("LINE連携に成功しました！");
