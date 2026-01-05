@@ -24,6 +24,8 @@
             --c-n3: #f57c00;
         }
 
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: var(--bg-color);
@@ -31,55 +33,70 @@
             margin: 0; padding: 0;
             min-height: 100vh;
             display: flex; flex-direction: column;
+            align-items: center; /* 全体を中央寄せ */
             user-select: none;
             touch-action: pan-y;
         }
 
         header {
+            width: 100%;
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-            color: white; padding: 15px 20px;
+            color: white; padding: 10px 15px;
             box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
             position: sticky; top: 0; z-index: 100;
         }
         .header-container {
-            max-width: 800px; margin: 0 auto;
+            max-width: 600px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .header-container h1 { margin: 0; font-size: 1.4em; }
-        .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+        .header-container h1 { margin: 0; font-size: 1.1em; }
+        .home-link { 
+            color: white; text-decoration: none; font-weight: bold; 
+            background: rgba(255,255,255,0.2); padding: 4px 10px; 
+            border-radius: 20px; font-size: 0.8em;
+        }
 
         .container {
-            flex-grow: 1; padding: 20px;
-            width: 100%; max-width: 800px; margin: 0 auto;
+            flex-grow: 1; padding: 15px;
+            width: 100%; max-width: 600px; /* 全体の幅を少し小さく */
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- レベル選択画面 --- */
+        /* --- レベル選択画面 (修正: Flexboxで中央寄せ) --- */
         .level-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* PCは3列 */
-            gap: 20px; width: 100%; padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* 常に中央揃え */
+            gap: 15px; 
+            width: 100%; 
+            padding: 5px;
             animation: fadeIn 0.5s ease;
-        }
-        @media (max-width: 600px) {
-            .level-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } /* スマホは2列 */
         }
 
         .level-card {
-            background: white; border-radius: 20px; padding: 30px 15px;
+            /* スマホで2列になるように調整 */
+            width: calc(50% - 15px);
+            min-width: 130px;
+            max-width: 180px;
+            
+            background: white; border-radius: 15px; padding: 20px 10px;
             text-align: center; cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             transition: transform 0.2s;
-            border-bottom: 6px solid #ddd;
+            border-bottom: 5px solid #ddd;
         }
-        .level-card:active { transform: translateY(3px); border-bottom-width: 3px; }
+        .level-card:active { transform: translateY(3px); border-bottom-width: 2px; }
         
         .level-badge {
-            display: inline-block; padding: 5px 10px; border-radius: 15px;
-            color: white; font-weight: bold; margin-bottom: 10px; font-size: 0.8em;
+            display: inline-block; padding: 3px 8px; border-radius: 12px;
+            color: white; font-weight: bold; margin-bottom: 8px; font-size: 0.7em;
         }
-        .level-title { font-size: 2.5em; font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
-        .level-desc { font-size: 0.85em; color: #888; font-weight: bold; }
+        .level-title { 
+            font-size: 2em; /* サイズ縮小 */
+            font-weight: 900; line-height: 1; margin-bottom: 5px; 
+            font-family: 'Klee One', cursive; color: #444; 
+        }
+        .level-desc { font-size: 0.75em; color: #888; font-weight: bold; }
 
         .lv-n5 .level-badge { background-color: var(--c-n5); } .lv-n5 { border-bottom-color: var(--c-n5); }
         .lv-n4 .level-badge { background-color: var(--c-n4); } .lv-n4 { border-bottom-color: var(--c-n4); }
@@ -87,14 +104,16 @@
         .lv-locked { opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-bottom-color: #ccc; }
         .lv-locked .level-badge { background-color: #999; }
 
-        /* --- クイズ画面 --- */
+        /* --- クイズ画面 (修正: サイズ縮小と中央寄せ強化) --- */
         .quiz-card {
             background-color: var(--card-bg);
-            width: 100%; max-width: 600px;
-            padding: 30px; border-radius: 25px;
+            width: 100%; max-width: 420px; /* カードの幅を狭くする */
+            padding: 20px; /* パディングを減らす */
+            border-radius: 20px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            border: 4px solid white; text-align: center; margin-top: 10px;
-            display: none; /* 初期状態は非表示 */
+            border: 3px solid white; text-align: center; margin-top: 5px;
+            display: none;
+            margin-left: auto; margin-right: auto; /* 強制中央寄せ */
         }
         .quiz-card.active { display: block; animation: fadeIn 0.3s ease; }
 
@@ -103,76 +122,81 @@
             display: inline-flex;
             background: #e0e0e0;
             border-radius: 30px;
-            padding: 4px;
+            padding: 3px;
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            transform: scale(0.9); /* 少し小さく */
         }
         .switch-container input { display: none; }
         .switch-label {
-            padding: 8px 20px;
+            padding: 6px 15px;
             cursor: pointer;
             border-radius: 25px;
             font-weight: bold;
             color: #777;
             z-index: 2;
             transition: color 0.3s;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         .switch-bg {
             position: absolute;
-            top: 4px; bottom: 4px;
+            top: 3px; bottom: 3px;
             border-radius: 25px;
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: left 0.3s, width 0.3s;
             z-index: 1;
         }
-        /* スイッチの状態制御 */
-        #mode-kun:checked ~ .bg-indicator { left: 4px; width: 50%; }
+        #mode-kun:checked ~ .bg-indicator { left: 3px; width: 50%; }
         #mode-kun:checked ~ label[for="mode-kun"] { color: var(--primary); }
-        
         #mode-on:checked ~ .bg-indicator { left: 50%; width: 48%; }
         #mode-on:checked ~ label[for="mode-on"] { color: var(--primary); }
 
 
         .kanji-display {
-            font-size: 8rem; font-weight: 900; color: #333;
-            line-height: 1.2; margin: 10px 0 30px 0;
+            font-size: 5rem; /* 8remから縮小 */
+            font-weight: 900; color: #333;
+            line-height: 1.1; margin: 5px 0 20px 0;
             text-shadow: 2px 2px 0px #eee;
             background-color: #fafafa;
-            border-radius: 20px; padding: 20px;
+            border-radius: 15px; padding: 15px;
             border: 2px dashed #ddd; font-family: 'Klee One', cursive;
         }
 
-        .choices-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .choices-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
         
         .choice-btn {
-            background-color: #fff; border: 3px solid #e0e0e0; border-radius: 50px;
-            padding: 15px; font-size: 1.3em; font-weight: bold; color: var(--text-color);
+            background-color: #fff; border: 2px solid #e0e0e0; border-radius: 40px;
+            padding: 10px; /* 余白縮小 */
+            font-size: 1.1em; /* 文字サイズ縮小 */
+            font-weight: bold; color: var(--text-color);
             cursor: pointer; transition: all 0.2s; font-family: 'Zen Maru Gothic', sans-serif;
-            box-shadow: 0 4px 0 #ccc;
+            box-shadow: 0 3px 0 #ccc;
         }
-        .choice-btn:active { transform: translateY(4px); box-shadow: none; }
+        .choice-btn:active { transform: translateY(3px); box-shadow: none; }
         
-        .choice-btn.correct { background-color: var(--correct-color); color: white; border-color: var(--correct-color); box-shadow: 0 4px 0 #388e3c; }
-        .choice-btn.incorrect { background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); box-shadow: 0 4px 0 #d32f2f; }
+        .choice-btn.correct { background-color: var(--correct-color); color: white; border-color: var(--correct-color); box-shadow: 0 3px 0 #388e3c; }
+        .choice-btn.incorrect { background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); box-shadow: 0 3px 0 #d32f2f; }
         
-        #result-message { margin-top: 20px; font-size: 1.4em; font-weight: bold; min-height: 1.5em; }
+        #result-message { margin-top: 15px; font-size: 1.2em; font-weight: bold; min-height: 1.5em; }
 
-        .nav-buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .nav-buttons { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
         .nav-btn {
-            padding: 12px 25px; border-radius: 12px; border: none; font-weight: bold; font-size: 1em;
+            padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; font-size: 0.9em;
             cursor: pointer; color: white; text-decoration: none; display: inline-block;
         }
-        .btn-restart { background-color: #ffb74d; box-shadow: 0 4px 0 #f57c00; }
-        .btn-home { background-color: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
-        .btn-back { background-color: #fff; color: #555; border: 2px solid #eee; box-shadow: 0 4px 0 #ddd; }
-        .btn-restart:active, .btn-home:active, .btn-back:active { transform: translateY(4px); box-shadow: none; }
+        .btn-restart { background-color: #ffb74d; box-shadow: 0 3px 0 #f57c00; }
+        .btn-home { background-color: #90a4ae; box-shadow: 0 3px 0 #546e7a; }
+        .btn-back { background-color: #fff; color: #555; border: 2px solid #eee; box-shadow: 0 3px 0 #ddd; }
+        .btn-restart:active, .btn-home:active, .btn-back:active { transform: translateY(3px); box-shadow: none; }
 
-        #auth-status-kanji { font-size: 0.9em; color: var(--primary); margin-bottom: 15px; font-weight: bold; }
+        #auth-status-kanji { font-size: 0.8em; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
 
-        @media (max-width: 400px) { .kanji-display { font-size: 6rem; } }
+        @media (max-width: 400px) { 
+            .kanji-display { font-size: 4rem; padding: 10px; } 
+            .quiz-card { padding: 15px; }
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -188,13 +212,13 @@
     <div class="container">
         
         <div id="level-select-view">
-            <h2 style="text-align:center; color:var(--primary); margin-bottom:20px;">レベルをえらんでね</h2>
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:15px; font-size:1.2em;">レベルをえらんでね</h2>
             
             <div class="level-grid">
                 <div class="level-card lv-n5" onclick="startQuiz('n5')">
                     <span class="level-badge">BASIC</span>
                     <div class="level-title">N5</div>
-                    <div class="level-desc">はじめての かんじ</div>
+                    <div class="level-desc">はじめて</div>
                 </div>
                 <div class="level-card lv-n4" onclick="startQuiz('n4')">
                     <span class="level-badge">ELEMENTARY</span>
@@ -231,9 +255,9 @@
                     <label for="mode-on" class="switch-label">オンヨミ</label>
                 </div>
 
-                <div id="question-info" style="color:#666; font-weight:bold; margin-top:10px;">
+                <div id="question-info" style="color:#666; font-weight:bold; margin-top:5px; font-size:0.9em;">
                     <span id="level-label" style="background:#ddd; padding:2px 8px; border-radius:10px; font-size:0.8em; margin-right:5px;">N5</span>
-                    だい <span id="q-num" style="font-size:1.2em; color:var(--primary);">1</span> もん
+                    だい <span id="q-num" style="font-size:1.3em; color:var(--primary);">1</span> もん
                 </div>
 
                 <div id="kanji-display" class="kanji-display">?</div>
@@ -244,8 +268,8 @@
             </div>
 
             <div id="score-area" style="display: none;">
-                <h2 style="font-size:2em; color:var(--primary);">おつかれさま！</h2>
-                <div style="font-size: 5rem; font-weight:900; color:var(--correct-color); margin: 20px 0;">
+                <h2 style="font-size:1.5em; color:var(--primary);">おつかれさま！</h2>
+                <div style="font-size: 4rem; font-weight:900; color:var(--correct-color); margin: 15px 0;">
                     <span id="score-text">0</span><span style="font-size:0.4em; color:#333;">てん</span>
                 </div>
                 <div class="nav-buttons">
@@ -254,7 +278,7 @@
                 </div>
             </div>
             
-            <div class="nav-buttons" id="ingame-nav" style="margin-top:20px;">
+            <div class="nav-buttons" id="ingame-nav" style="margin-top:15px;">
                  <button onclick="backToLevelSelect()" class="nav-btn btn-back">やめる</button>
             </div>
 
