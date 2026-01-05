@@ -15,7 +15,7 @@
         --bg-color: #f0f4f8;
         --text-color: #333;
         
-        /* レベルカラー (リストと同じ) */
+        /* レベルカラー */
         --c-n5: #e57373; 
         --c-n4: #d32f2f; 
         --c-n3: #f57c00;
@@ -58,12 +58,28 @@
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- 1. レベル選択画面 --- */
+    /* --- 1. レベル選択画面 (修正箇所) --- */
     .level-grid {
         display: grid;
+        /* PCでは自動調整 */
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 20px; width: 100%; padding: 10px;
     }
+
+    /* ★スマホ対策：強制的に横2列にするCSS */
+    @media (max-width: 600px) {
+        .level-grid {
+            grid-template-columns: repeat(2, 1fr); /* 2列固定 */
+            gap: 15px;
+        }
+        .level-card {
+            padding: 20px 10px; /* スマホ用に余白調整 */
+        }
+        .level-title {
+            font-size: 2.5em; /* 少し文字サイズ調整 */
+        }
+    }
+
     .level-card {
         background: white; border-radius: 20px; padding: 30px 15px;
         text-align: center; cursor: pointer;
@@ -75,11 +91,14 @@
     .level-card:active { transform: translateY(3px); border-bottom-width: 3px; }
     
     .level-badge {
-        display: inline-block; padding: 5px 15px; border-radius: 15px;
+        display: inline-block; padding: 5px 10px; border-radius: 15px;
         color: white; font-weight: bold; margin-bottom: 10px;
-        font-size: 0.9em; letter-spacing: 1px;
+        font-size: 0.8em; letter-spacing: 1px;
     }
-    .level-title { font-size: 3em; font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
+    .level-title { font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
+    /* PCのデフォルトサイズ */
+    @media (min-width: 601px) { .level-title { font-size: 3em; } }
+
     .level-desc { font-size: 0.85em; color: #888; font-weight: bold; }
 
     .lv-n5 .level-badge { background-color: var(--c-n5); } .lv-n5 { border-bottom-color: var(--c-n5); }
@@ -323,7 +342,6 @@
 </script>
 
 <script>
-    // --- 漢字データベース ---
     const kanjiDatabase = {
         "n5": [
             { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" }, { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
