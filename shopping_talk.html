@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-    /* --- メインindex.htmlと共通のデザイン定義 --- */
+    /* --- デザイン設定 --- */
     :root {
         --primary: #5c7aff;
         --accent: #ffcc5c;
@@ -304,33 +304,40 @@ document.addEventListener('DOMContentLoaded', () => {
     synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     setTimeout(() => { voices = synth.getVoices(); }, 500);
 
-    // --- シナリオデータ ---
+    // --- シナリオデータ（アップデート版） ---
     const scenarios = {
         'konbini': {
             name: "コンビニ (Convenience Store)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。お弁当は温めますか？", en: "Welcome. Would you like your bento warmed up?" },
+                    clerk: { jp: "いらっしゃいませ。お支払いはどうなさいますか？", en: "How would you like to pay?" },
                     options: [
-                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true, fb: "丁寧な言い方です！ (Polite)" },
-                        { jp: "温めます。", en: "I will warm it.", correct: false, fb: "それだと自分が温めることになります。" },
-                        { jp: "いいえ、結構です。", en: "No, thank you.", correct: true, fb: "断る時はこれでOK！" }
+                        { jp: "現金でお願いします。", en: "Cash, please.", correct: true, fb: "基本の支払い方です。" },
+                        { jp: "カードで。", en: "By credit card.", correct: true, fb: "クレジットカードも使えます。" },
+                        { jp: "Suicaで。", en: "By Suica.", correct: true, fb: "交通系ICカードも便利です。" }
                     ]
                 },
                 {
-                    clerk: { jp: "ポイントカードはお持ちですか？", en: "Do you have a point card?" },
+                    clerk: { jp: "お弁当は温めますか？", en: "Would you like your bento warmed up?" },
                     options: [
-                        { jp: "はい、持っています。", en: "Yes, I have it.", correct: true, fb: "スムーズです！" },
-                        { jp: "カードです。", en: "It is a card.", correct: false, fb: "会話として少し不自然です。" },
-                        { jp: "大丈夫です（＝ないです）。", en: "No, I'm fine.", correct: true, fb: "「持っていません」の意味で使えます。" }
+                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true, fb: "Polite and good!" },
+                        { jp: "温めます。", en: "I will warm it.", correct: false, fb: "それだと自分が温めることになってしまいます。" },
+                        { jp: "いいえ、結構です。", en: "No, thank you.", correct: true, fb: "家で食べる時などは断りましょう。" }
                     ]
                 },
                 {
-                    clerk: { jp: "レジ袋はご利用ですか？", en: "Do you need a plastic bag?" },
+                    clerk: { jp: "お箸はお使いになりますか？", en: "Do you need chopsticks?" },
                     options: [
-                        { jp: "はい、一枚お願いします。", en: "Yes, one please.", correct: true, fb: "Good!" },
-                        { jp: "いりません。", en: "I don't need it.", correct: true, fb: "はっきり伝えるのは良いことです。" },
-                        { jp: "袋があります。", en: "There is a bag.", correct: false, fb: "「持っています(I have)」ならOKですが..." }
+                        { jp: "はい、一膳ください。", en: "Yes, one pair please.", correct: true, fb: "一膳（いちぜん）と言います。" },
+                        { jp: "スプーンをください。", en: "Spoon, please.", correct: true, fb: "必要なものを伝えましょう。" },
+                        { jp: "フォークとおしぼりをください。", en: "Fork and wet towel please.", correct: true, fb: "具体的で完璧です！" }
+                    ]
+                },
+                {
+                    clerk: { jp: "レシートはご利用ですか？", en: "Do you need a receipt?" },
+                    options: [
+                        { jp: "はい、ください。", en: "Yes, please.", correct: true, fb: "家計簿をつけるなら必要ですね。" },
+                        { jp: "大丈夫です（＝いりません）。", en: "I'm fine (No thanks).", correct: true, fb: "最近はもらわない人も多いです。" }
                     ]
                 }
             ]
@@ -339,19 +346,25 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "ハンバーガー (Burger Shop)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。店内でお召し上がりですか？", en: "Welcome. For here or to go?" },
+                    clerk: { jp: "いらっしゃいませ。ご注文をお伺いします。", en: "May I take your order?" },
                     options: [
-                        { jp: "はい、店内で。", en: "For here.", correct: true, fb: "お店で食べるならこれ！" },
-                        { jp: "持ち帰りで。", en: "To go.", correct: true, fb: "持って帰るならこれ！" },
-                        { jp: "食べます。", en: "I eat.", correct: false, fb: "どこで食べるか聞かれています。" }
+                        { jp: "ビックマックのセットを一つ。", en: "One Big Mac set.", correct: true, fb: "「セット」をつけると伝わりやすいです。" },
+                        { jp: "チーズバーガーを二つください。", en: "Two Cheeseburgers please.", correct: true, fb: "個数（ひとつ、ふたつ）も言えて完璧！" },
+                        { jp: "てりやきバーガー。", en: "Teriyaki burger.", correct: true, fb: "シンプルですが通じます。" }
                     ]
                 },
                 {
-                    clerk: { jp: "ご一緒にポテトはいかがですか？", en: "Would you like fries with that?" },
+                    clerk: { jp: "セットのお飲み物はいかがしますか？", en: "What would you like to drink with that?" },
                     options: [
-                        { jp: "お願いします。", en: "Please.", correct: true, fb: "セットにしましょう！" },
-                        { jp: "ポテトです。", en: "It is potato.", correct: false, fb: "不自然です。" },
-                        { jp: "いえ、大丈夫です。", en: "No, thanks.", correct: true, fb: "いらない時は丁寧に断りましょう。" }
+                        { jp: "コーラで。", en: "Coke.", correct: true, fb: "定番ですね！" },
+                        { jp: "ホットコーヒーで。", en: "Hot coffee.", correct: true, fb: "温かい飲み物もOKです。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "サイズはいかがなさいますか？", en: "Which size would you like?" },
+                    options: [
+                        { jp: "Mサイズで。", en: "Medium size.", correct: true, fb: "Good!" },
+                        { jp: "大きくしてください（Lサイズ）。", en: "Large size.", correct: true, fb: "Lサイズと言っても通じます。" }
                     ]
                 }
             ]
@@ -360,29 +373,56 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "カフェ (Cafe)",
             steps: [
                 {
-                    clerk: { jp: "ご注文をどうぞ。", en: "May I take your order?" },
+                    clerk: { jp: "こんにちは。ご注文をどうぞ。", en: "Hello. Order please." },
                     options: [
-                        { jp: "ホットコーヒーをください。", en: "Hot coffee please.", correct: true, fb: "Good!" },
-                        { jp: "コーヒーがあります。", en: "There is coffee.", correct: false, fb: "注文になっていません。" }
+                        { jp: "アイスコーヒーを一つください。", en: "One Iced Coffee please.", correct: true, fb: "一番よく使う注文です。" },
+                        { jp: "ホットのカフェラテをお願いします。", en: "Hot Cafe Latte please.", correct: true, fb: "ホットかアイスかも伝えましょう。" },
+                        { jp: "抹茶ラテはありますか？", en: "Do you have Matcha Latte?", correct: true, fb: "あるか聞くのも良い練習です。" }
                     ]
                 },
                 {
-                    clerk: { jp: "サイズはどうなさいますか？", en: "Which size would you like?" },
+                    clerk: { jp: "店内をご利用ですか？", en: "For here?" },
                     options: [
-                        { jp: "Mサイズでお願いします。", en: "Medium, please.", correct: true, fb: "わかりやすいです！" },
-                        { jp: "大きいです。", en: "It is big.", correct: false, fb: "Lサイズ(Large)のことかな？" }
+                        { jp: "はい、店内で。", en: "For here.", correct: true, fb: "お店で飲むときはこれ！" },
+                        { jp: "持ち帰りで（テイクアウトで）。", en: "To go (Take out).", correct: true, fb: "英語のTake outも通じます。" }
                     ]
                 }
             ]
         },
         'restaurant': {
-            name: "レストラン (Restaurant)",
+            name: "レストラン・居酒屋 (Restaurant/Izakaya)",
             steps: [
                 {
-                    clerk: { jp: "何名様ですか？", en: "How many people?" },
+                    clerk: { jp: "いらっしゃいませ。何名様ですか？", en: "Welcome. How many people?" },
                     options: [
-                        { jp: "二人です。", en: "Two.", correct: true, fb: "人数を言えましたね。" },
-                        { jp: "二つです。", en: "Two things.", correct: false, fb: "人の数え方は「ひとり、ふたり」です。" }
+                        { jp: "ひとりです。", en: "One person.", correct: true, fb: "ひとり（1名）" },
+                        { jp: "ふたりです。", en: "Two people.", correct: true, fb: "ふたり（2名）" },
+                        { jp: "さんにんです。", en: "Three people.", correct: true, fb: "さんにん（3名）" },
+                        { jp: "ひとつです。", en: "One thing.", correct: false, fb: "それは「モノ」を数える時です。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "（店員を呼んでください）", en: "(Please call the staff)" },
+                    options: [
+                        { jp: "すみませーん！", en: "Excuse me!", correct: true, fb: "日本で店員を呼ぶ時の定番です。" },
+                        { jp: "こんにちは！", en: "Hello!", correct: false, fb: "店員を呼ぶときはあまり使いません。" },
+                        { jp: "おーい！", en: "Hey!", correct: false, fb: "失礼（Rude）なので使わないでください。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "はい、ご注文をお伺いします。", en: "Yes, may I take your order?" },
+                    options: [
+                        { jp: "唐揚げとビールをください。", en: "Fried chicken and Beer.", correct: true, fb: "居酒屋の定番！" },
+                        { jp: "とりあえず枝豆で。", en: "Edamame for now.", correct: true, fb: "「とりあえず」は便利な言葉です。" },
+                        { jp: "メニューをください。", en: "Menu please.", correct: true, fb: "まだ決まっていない時はこれ。" }
+                    ]
+                },
+                {
+                    clerk: { jp: "他にご注文はありますか？", en: "Anything else?" },
+                    options: [
+                        { jp: "取り皿を3枚ください。", en: "3 small plates please.", correct: true, fb: "みんなでシェアする時に使います。" },
+                        { jp: "お水をください。", en: "Water please.", correct: true, fb: "無料（Free）でもらえます。" },
+                        { jp: "お会計をお願いします。", en: "Check please.", correct: true, fb: "帰る時はこう言いましょう。" }
                     ]
                 }
             ]
@@ -398,6 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        window.scrollTo(0,0);
     };
 
     // --- 音声再生 ---
