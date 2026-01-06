@@ -539,7 +539,6 @@ window.loginWithLine = async () => {
   }
 };
 
-// 【変更】この関数は設定画面からは呼ばれなくなりましたが、機能自体は残しています
 window.linkLineAccount = async () => {
   const user = auth.currentUser;
   if (!user) { alert("先にログインしてください。"); return; }
@@ -895,6 +894,11 @@ gameGrid.appendChild(a);
 gameGrid.classList.remove('fade-in');
 void gameGrid.offsetWidth;
 gameGrid.classList.add('fade-in');
+
+// スクロール処理の追加 (ここが変更点)
+const sectionHeader = document.getElementById('game-section-title').closest('.section-header');
+const y = sectionHeader.getBoundingClientRect().top + window.scrollY - 80; // -80はヘッダー分のオフセット
+window.scrollTo({top: y, behavior: 'smooth'});
 }
 
 window.setLanguage = (lang) => {
