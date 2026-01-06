@@ -24,7 +24,9 @@
         font-family: 'Zen Maru Gothic', sans-serif;
         background-color: var(--bg-color);
         color: var(--text-color);
-        margin: 0; padding: 0; padding-bottom: 50px;
+        margin: 0; padding: 0; 
+        /* 固定ボタンのために下部余白を確保 */
+        padding-bottom: 100px;
         min-height: 100vh;
         display: flex; flex-direction: column;
     }
@@ -112,6 +114,7 @@
     .sim-header {
         text-align: center; margin-bottom: 20px;
         background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px;
+        position: relative;
     }
     
     /* 店員エリア */
@@ -169,10 +172,29 @@
         background: var(--primary); color: white; border: none;
         padding: 12px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1em;
         cursor: pointer; box-shadow: 0 4px 0 #3949ab; width: 100%; max-width: 300px;
-        margin: 10px auto; display: block; text-align: center;
+        display: block; text-align: center;
+        margin: 0 auto;
     }
     .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    
     .btn-secondary { background: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
+    .btn-small { padding: 5px 15px; font-size: 0.9em; width: auto; display: inline-block; margin: 0; }
+
+    /* --- 固定フッター (Startボタン用) --- */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        text-align: center; z-index: 900;
+        display: none; /* デフォルト非表示、JSで制御 */
+    }
+    /* 練習画面でのみ表示するためのクラス */
+    #practice-screen.active ~ .fixed-footer-practice { display: block; }
+    
+    /* 上部のボタンコンテナ */
+    .top-controls {
+        display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;
+    }
 
 </style>
 </head>
@@ -210,24 +232,28 @@
 
     <div id="practice-screen" class="screen">
         <div class="sim-header">
-            <h2 id="practice-title" style="margin:0; color:var(--primary);"></h2>
-            <p style="margin:5px 0 0; font-size:0.9em; color:#777;">会話を練習しましょう！この中から一つがクイズに出ます。</p>
+            <div class="top-controls">
+                <button class="action-btn btn-secondary btn-small" onclick="showScreen('menu-screen')">
+                    <i class="fa-solid fa-arrow-left"></i> もどる
+                </button>
+            </div>
+            <h2 id="practice-title" style="margin:5px 0; color:var(--primary);"></h2>
+            <p style="margin:0; font-size:0.9em; color:#777;">会話を練習しましょう！この中から一つがクイズに出ます。</p>
         </div>
 
         <div id="practice-list" class="practice-list">
             </div>
-
-        <button class="action-btn" onclick="startSimulation()">
-            <i class="fa-solid fa-microphone"></i> スピーキングテスト！
-        </button>
-        <button class="action-btn btn-secondary" onclick="showScreen('menu-screen')" style="margin-top:10px;">
-            もどる
-        </button>
-    </div>
+        
+        </div>
 
     <div id="sim-screen" class="screen">
         <div class="sim-header">
-            Step <span id="step-count">1</span> / <span id="total-step">3</span>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                 <span style="font-weight:bold;">Step <span id="step-count">1</span> / <span id="total-step">3</span></span>
+                 <button class="action-btn btn-secondary btn-small" onclick="showScreen('practice-screen')">
+                    <i class="fa-solid fa-book"></i> 練習にもどる
+                 </button>
+            </div>
         </div>
 
         <div class="clerk-area">
@@ -275,6 +301,12 @@
         <button class="action-btn" onclick="location.reload()">メニューに戻る</button>
     </div>
 
+</div>
+
+<div id="fixed-footer-practice" class="fixed-footer">
+    <button class="action-btn" onclick="startSimulation()">
+        <i class="fa-solid fa-microphone"></i> スピーキングテスト！
+    </button>
 </div>
 
 <script type="module">
@@ -413,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     options: [
                         { jp: "ビックマックのセットを一つ。", en: "One Big Mac set.", correct: true },
                         { jp: "チーズバーガーを二つください。", en: "Two Cheeseburgers please.", correct: true },
-                        { jp: "てりやきバーガー。", en: "Teriyaki burger.", correct: true }
+                        { jp: "てりやきバーガーを単品で。", en: "Teriyaki burger, a la carte.", correct: true }
                     ]
                 },
                 {
@@ -494,9 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let stepIndex = 0;
     let currentTargetPhrase = null;
 
-    // --- 【修正版】文字列の正規化と類似度計算 ---
-    
-    // アラビア数字や漢字の数詞を統一する関数
+    // --- 文字列の正規化と類似度計算 ---
     function normalizeText(text) {
         if(!text) return "";
         let t = text;
@@ -517,41 +547,28 @@ document.addEventListener('DOMContentLoaded', () => {
         t = t.replace(/唐揚/g, "唐揚げ");
 
         // --- 数詞の統一 ---
-        // 特殊な読み方（人）を数字に変換
-        // 「ふたり」「二人」→「2人」
         t = t.replace(/ふたり|二人/g, "2人");
-        // 「ひとり」「一人」→「1人」
         t = t.replace(/ひとり|一人/g, "1人");
-        // 「さんにん」「三人」→「3人」
         t = t.replace(/さんにん|三人/g, "3人");
-        
-        // 特殊な読み方（物）を数字に変換
-        // 「ひとつ」「一つ」→「1つ」
         t = t.replace(/ひとつ|一つ/g, "1つ");
-        // 「ふたつ」「二つ」→「2つ」
         t = t.replace(/ふたつ|二つ/g, "2つ");
-        // 「みっつ」「三つ」→「3つ」
         t = t.replace(/みっつ|三つ/g, "3つ");
 
-        // 一般的な漢数字をアラビア数字に変換
         t = t.replace(/一/g, "1");
         t = t.replace(/二/g, "2");
         t = t.replace(/三/g, "3");
         t = t.replace(/四/g, "4");
         t = t.replace(/五/g, "5");
         
-        // 全角数字を半角に
         t = t.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
 
         return t;
     }
 
     function getSimilarity(s1, s2) {
-        // 正規化してから比較
         s1 = normalizeText(s1);
         s2 = normalizeText(s2);
 
-        // レーベンシュタイン距離計算
         const len1 = s1.length;
         const len2 = s2.length;
         const matrix = [];
@@ -580,6 +597,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
+        
+        // フッター制御
+        const footer = document.getElementById('fixed-footer-practice');
+        if(id === 'practice-screen') {
+            footer.style.display = 'block';
+        } else {
+            footer.style.display = 'none';
+        }
     };
 
     window.speak = (text) => {
