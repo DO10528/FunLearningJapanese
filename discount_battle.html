@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>割引計算バトル - Discount Battle</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+    /* --- 共通設定 (メインコード準拠) --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --sticker-red: #d32f2f; /* 半額シールなどの赤 */
+        --sticker-yellow: #fdd835;
+        --card-bg: #ffffff;
+        --display-border: #1565c0; /* 濃い青 */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+        display: flex; flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    
+    /* 画面コンテナ */
+    .screen { display: none; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+    }
+
+    /* --- 1. 学習ページ (Practice) --- */
+    .learning-card {
+        background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+    }
+    .learning-title { font-weight: 900; font-size: 1.2em; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .sticker-example {
+        display: inline-block; background: var(--sticker-red); color: white;
+        padding: 5px 10px; border-radius: 50%; font-weight: 900; transform: rotate(-10deg);
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2); border: 2px solid white;
+    }
+    .sticker-yellow { background: var(--sticker-yellow); color: #d32f2f; }
+    
+    .example-list {
+        background:#f9f9f9; padding:15px; border-radius:10px; 
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .example-item {
+        display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 5px; font-weight: bold;
+    }
+    .example-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* --- 2. レベル選択 (Level Select) --- */
+    .level-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
+    }
+    .level-btn {
+        background: white; border-radius: 20px; padding: 20px; text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 3px solid transparent;
+        cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .level-btn:active { transform: scale(0.95); }
+    .level-icon { font-size: 2.5em; margin-bottom: 10px; display: block; }
+    .level-badge {
+        position: absolute; top: 0; right: 0; background: var(--accent);
+        color: #d35400; font-size: 0.7em; padding: 3px 10px; border-radius: 0 0 0 10px; font-weight: bold;
+    }
+
+    /* --- 3. ゲーム画面 (3D Product Card) --- */
+    .game-area {
+        display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
+    }
+    
+    /* 商品カード (3D表現) */
+    .product-card-container {
+        perspective: 1000px; width: 100%; max-width: 300px; margin: 20px auto;
+    }
+    .product-card {
+        background: white; border-radius: 20px; padding: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+        position: relative; text-align: center;
+        transform-style: preserve-3d;
+        transform: rotateX(5deg); /* 少し上向き */
+        border: 1px solid #eee;
+    }
+    .product-img { font-size: 4em; margin-bottom: 10px; display: block; text-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+    .product-name { font-weight: bold; font-size: 1.2em; color: #555; margin-bottom: 5px; }
+    
+    /* 値札 */
+    .price-tag {
+        font-size: 1.5em; font-weight: 900; color: #333;
+        text-decoration: line-through; decoration-thickness: 3px; text-decoration-color: #aaa;
+    }
+
+    /* 割引シール (リアルな表現) */
+    .discount-sticker {
+        position: absolute; bottom: 10px; right: -10px;
+        width: 90px; height: 90px;
+        background: radial-gradient(circle at 30% 30%, #ff5252, #d32f2f);
+        color: white; border-radius: 50%;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        font-weight: 900; box-shadow: 2px 5px 10px rgba(0,0,0,0.3);
+        border: 3px solid white;
+        transform: rotate(-15deg) translateZ(20px); /* 浮き上がらせる */
+        z-index: 10;
+        animation: stickOn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes stickOn { from { transform: rotate(-15deg) scale(2); opacity: 0; } to { transform: rotate(-15deg) scale(1); opacity: 1; } }
+    
+    .sticker-text-main { font-size: 1.6em; line-height: 1; text-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+    .sticker-text-sub { font-size: 0.7em; }
+
+    /* 電卓キーパッド (デザイン修正：白抜き・青枠・中央寄せ) */
+    .calc-display {
+        background: #fff; /* 白抜き */
+        color: #333; /* 文字は黒 */
+        border: 3px solid var(--display-border); /* 濃いめの青枠 */
+        font-family: 'Courier New', monospace;
+        font-size: 2em; padding: 10px 20px; border-radius: 10px; 
+        width: 100%; max-width: 320px;
+        text-align: right; margin: 0 auto 20px auto; /* 中央寄せ */
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        height: 60px; display: flex; align-items: center; justify-content: flex-end;
+    }
+    
+    .numpad {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        width: 100%; max-width: 320px; margin: 0 auto;
+    }
+    .num-btn {
+        background: white; border: none; padding: 15px; border-radius: 15px;
+        font-size: 1.5em; font-weight: bold; color: #555;
+        box-shadow: 0 4px 0 #ddd; cursor: pointer;
+        touch-action: manipulation;
+    }
+    .num-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #ddd; }
+    .btn-clear { background: #ef5350; color: white; box-shadow: 0 4px 0 #c62828; }
+    .btn-enter { background: var(--primary); color: white; box-shadow: 0 4px 0 #3949ab; grid-column: span 3; }
+
+    /* プログレスバー */
+    .progress-container { width: 100%; background: #eee; height: 10px; border-radius: 5px; margin-bottom: 10px; }
+    .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; border-radius: 5px; }
+
+    /* 固定フッター (スタートボタン) */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 200;
+    }
+    .btn-start {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; font-size: 1.2em;
+        width: 100%; max-width: 300px; cursor: pointer; box-shadow: 0 4px 0 #3949ab;
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+    /* 結果画面 */
+    .result-score { font-size: 3em; color: var(--primary); font-weight: 900; }
+    .result-msg { font-size: 1.2em; margin-bottom: 20px; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo"><i class="fa-solid fa-calculator"></i> 割引計算バトル</a>
+    <button class="btn-back-nav" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> もどる</button>
+</header>
+
+<div id="screen-practice" class="screen active">
+    <div style="text-align:center; margin-bottom:20px;">
+        <h2><i class="fa-solid fa-book-open"></i> ルールをおぼえよう</h2>
+        <p>日本のスーパーやお店で見かける「割引（わりびき）」の計算方法です。</p>
+    </div>
+
+    <div class="learning-card">
+        <div class="learning-title">
+            <span class="sticker-example">半額</span> = 50% OFF
+        </div>
+        <p>値段が半分になります。「÷2」をします。</p>
+        <div class="example-list">
+            <div class="example-item"><span>200円</span> <span>→ 100円</span></div>
+            <div class="example-item"><span>500円</span> <span>→ 250円</span></div>
+            <div class="example-item"><span>1200円</span> <span>→ 600円</span></div>
+        </div>
+    </div>
+
+    <div class="learning-card">
+        <div class="learning-title">
+            <span class="sticker-example sticker-yellow">20%引</span> = 20% OFF
+        </div>
+        <p>値段の80%になります。「×0.8」をします。</p>
+        <p style="font-size:0.9em; color:#777;">ヒント: 10% (1割) を計算して、それを引くと簡単です。</p>
+        <div class="example-list">
+            <div class="example-item"><span>1000円</span> <span>→ 800円</span></div>
+            <div class="example-item"><span>500円</span> <span>→ 400円</span></div>
+            <div class="example-item"><span>100円</span> <span>→ 80円</span></div>
+        </div>
+    </div>
+
+    <div class="learning-card">
+        <div class="learning-title">
+            <span class="sticker-example sticker-yellow">3割引</span> = 30% OFF
+        </div>
+        <p>「割 (Wari)」は 10% のことです。</p>
+        <ul style="font-weight:bold; font-size:0.9em; margin-bottom:10px;">
+            <li>1割 (ichi-wari) = 10%</li>
+            <li>3割 (san-wari) = 30%</li>
+        </ul>
+        <div class="example-list">
+            <div class="example-item"><span>100円</span> <span>→ 70円</span></div>
+            <div class="example-item"><span>2000円</span> <span>→ 1400円</span></div>
+            <div class="example-item"><span>500円</span> <span>→ 350円</span></div>
+        </div>
+    </div>
+    
+    <div style="height:60px;"></div>
+</div>
+
+<div id="footer-start" class="fixed-footer">
+    <button class="btn-start" onclick="showScreen('screen-level')">
+        ゲームスタート！ <i class="fa-solid fa-gamepad"></i>
+    </button>
+</div>
+
+
+<div id="screen-level" class="screen">
+    <h2 style="text-align:center;">レベルを選んでね</h2>
+    <div class="level-grid">
+        <div class="level-btn" onclick="startGame(1)" style="border-bottom: 4px solid #4caf50;">
+            <span class="level-badge" style="background:#4caf50; color:white;">EASY</span>
+            <i class="fa-solid fa-tag level-icon" style="color:#4caf50;"></i>
+            <h3>半額ハンター</h3>
+            <p style="font-size:0.8em; color:#777;">「半額」の問題だけが出ます。</p>
+        </div>
+        <div class="level-btn" onclick="startGame(2)" style="border-bottom: 4px solid #ff9800;">
+            <span class="level-badge" style="background:#ff9800; color:white;">NORMAL</span>
+            <i class="fa-solid fa-percent level-icon" style="color:#ff9800;"></i>
+            <h3>パーセント計算</h3>
+            <p style="font-size:0.8em; color:#777;">10%, 20% OFFなどの問題。</p>
+        </div>
+        <div class="level-btn" onclick="startGame(3)" style="border-bottom: 4px solid #f44336;">
+            <span class="level-badge" style="background:#f44336; color:white;">HARD</span>
+            <i class="fa-solid fa-calculator level-icon" style="color:#f44336;"></i>
+            <h3>「割」マスター</h3>
+            <p style="font-size:0.8em; color:#777;">「2割引き」「半額」などが混ざります。</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="screen-game" class="screen">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold;">
+        <span>Lv.<span id="current-level-display">1</span></span>
+        <span>Q <span id="q-current">1</span> / 10</span>
+    </div>
+    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+
+    <div class="product-card-container">
+        <div class="product-card">
+            <span id="product-icon" class="product-img">🍱</span>
+            <div id="product-name" class="product-name">特製お弁当</div>
+            <div class="price-tag"><span id="original-price">1000</span>円</div>
+            
+            <div class="discount-sticker" id="sticker-el">
+                <div class="sticker-text-main" id="sticker-main">半額</div>
+                <div class="sticker-text-sub" id="sticker-sub"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin-bottom:10px; font-weight:bold; color:#555;">いくらになりますか？</div>
+
+    <div class="calc-display" id="user-input"></div>
+
+    <div class="numpad">
+        <button class="num-btn" onclick="inputNum(7)">7</button>
+        <button class="num-btn" onclick="inputNum(8)">8</button>
+        <button class="num-btn" onclick="inputNum(9)">9</button>
+        <button class="num-btn" onclick="inputNum(4)">4</button>
+        <button class="num-btn" onclick="inputNum(5)">5</button>
+        <button class="num-btn" onclick="inputNum(6)">6</button>
+        <button class="num-btn" onclick="inputNum(1)">1</button>
+        <button class="num-btn" onclick="inputNum(2)">2</button>
+        <button class="num-btn" onclick="inputNum(3)">3</button>
+        <button class="num-btn btn-clear" onclick="clearInput()">C</button>
+        <button class="num-btn" onclick="inputNum(0)">0</button>
+        <button class="num-btn btn-clear" onclick="backspace()"><i class="fa-solid fa-delete-left"></i></button>
+        
+        <button class="num-btn btn-enter" onclick="checkAnswer()">決定 (Enter)</button>
+    </div>
+</div>
+
+
+<div id="screen-result" class="screen" style="text-align:center; padding-top:40px;">
+    <div id="result-icon" style="font-size:5em; margin-bottom:20px;">🎉</div>
+    <div class="result-score"><span id="final-score">0</span>点</div>
+    <p class="result-msg" id="final-msg">素晴らしい！</p>
+    
+    <button class="btn-start" onclick="showScreen('screen-level')">
+        もう一度遊ぶ
+    </button>
+    <br><br>
+    <button class="btn-back-nav" style="background:#999; border:none;" onclick="showScreen('screen-practice')">
+        練習に戻る
+    </button>
+</div>
+
+
+<script>
+    // --- ゲームデータ ---
+    const products = [
+        { name: "お弁当 (Bento)", icon: "🍱", prices: [400, 500, 600, 800, 1000] },
+        { name: "お寿司 (Sushi)", icon: "🍣", prices: [800, 1000, 1200, 1500, 2000] },
+        { name: "お肉 (Meat)", icon: "🥩", prices: [1000, 1500, 2000, 3000] },
+        { name: "パン (Bread)", icon: "🍞", prices: [100, 150, 200, 300] },
+        { name: "おにぎり (Onigiri)", icon: "🍙", prices: [100, 120, 150, 200] },
+        { name: "ケーキ (Cake)", icon: "🍰", prices: [300, 400, 500, 600] },
+        { name: "唐揚げ (Fried Chicken)", icon: "🍗", prices: [300, 400, 500] },
+        { name: "刺身 (Sashimi)", icon: "🐟", prices: [500, 700, 1000, 1200] }
+    ];
+
+    let currentLevel = 1;
+    let questionCount = 0;
+    let score = 0;
+    let correctPrice = 0;
+    let currentInput = "";
+    let isProcessing = false; // 連打防止用
+
+    // --- 画面遷移 ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        
+        // フッター制御
+        const footer = document.getElementById('footer-start');
+        if(id === 'screen-practice') {
+            footer.style.display = 'block';
+        } else {
+            footer.style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function goBack() {
+        const activeId = document.querySelector('.screen.active').id;
+        if (activeId === 'screen-level') showScreen('screen-practice');
+        else if (activeId === 'screen-game') {
+            if(confirm("ゲームをやめて戻りますか？")) showScreen('screen-level');
+        }
+        else if (activeId === 'screen-result') showScreen('screen-level');
+        else window.location.href = 'index.html'; // メインメニューへ
+    }
+
+    // --- ゲームロジック ---
+    function startGame(level) {
+        currentLevel = level;
+        questionCount = 0;
+        score = 0;
+        isProcessing = false;
+        document.getElementById('current-level-display').innerText = level;
+        showScreen('screen-game');
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (questionCount >= 10) {
+            endGame();
+            return;
+        }
+
+        questionCount++;
+        isProcessing = false; // 入力ロック解除
+        document.getElementById('q-current').innerText = questionCount;
+        document.getElementById('progress-bar').style.width = `${(questionCount-1)*10}%`;
+        clearInput();
+
+        // 1. 商品決定
+        const prod = products[Math.floor(Math.random() * products.length)];
+        const basePrice = prod.prices[Math.floor(Math.random() * prod.prices.length)];
+
+        // 2. 割引決定 (レベル別)
+        let discountType = "";
+        let discountValue = 0; // %単位
+        let stickerMain = "";
+        let stickerSub = "";
+        
+        if (currentLevel === 1) {
+            // Level 1: 半額のみ (たまに簡単な10%など)
+            if(Math.random() < 0.8) {
+                discountType = "hangaku";
+                stickerMain = "半額";
+                stickerSub = "";
+                discountValue = 50;
+            } else {
+                discountType = "percent";
+                discountValue = 10;
+                stickerMain = "10%"; stickerSub = "OFF";
+            }
+        } else if (currentLevel === 2) {
+            // Level 2: 10%, 20%, 30%, 50%
+            const opts = [10, 20, 30, 50];
+            discountValue = opts[Math.floor(Math.random() * opts.length)];
+            stickerMain = discountValue + "%"; stickerSub = "OFF";
+            
+            // 【修正箇所】カッコ {} を追加しました
+            if(discountValue === 50 && Math.random() < 0.3) {
+                stickerMain = "半額"; 
+                stickerSub = "";
+            }
+        } else {
+            // Level 3: 割引きも含む
+            const mode = Math.random();
+            if (mode < 0.4) {
+                // 割
+                const wari = Math.floor(Math.random() * 4) + 1; // 1~4割
+                discountValue = wari * 10;
+                stickerMain = wari + "割"; stickerSub = "引";
+            } else if (mode < 0.7) {
+                // 半額
+                discountValue = 50;
+                stickerMain = "半額";
+                stickerSub = "";
+            } else {
+                // %
+                const opts = [5, 10, 15, 20, 25, 30, 40];
+                discountValue = opts[Math.floor(Math.random() * opts.length)];
+                stickerMain = discountValue + "%"; stickerSub = "引";
+            }
+        }
+
+        // 正解計算
+        correctPrice = Math.floor(basePrice * (100 - discountValue) / 100);
+
+        // 表示更新
+        document.getElementById('product-icon').innerText = prod.icon;
+        document.getElementById('product-name').innerText = prod.name;
+        document.getElementById('original-price').innerText = basePrice;
+        
+        const stickerEl = document.getElementById('sticker-el');
+        const mainEl = document.getElementById('sticker-main');
+        const subEl = document.getElementById('sticker-sub');
+
+        mainEl.innerText = stickerMain;
+        subEl.innerText = stickerSub;
+
+        // シールの色変え
+        stickerEl.classList.remove('sticker-yellow');
+        if (discountValue !== 50) { 
+            if (Math.random() > 0.5) stickerEl.style.background = "radial-gradient(circle at 30% 30%, #fdd835, #fbc02d)";
+            else stickerEl.style.background = "radial-gradient(circle at 30% 30%, #ff5252, #d32f2f)";
+            
+            if (stickerEl.style.background.includes('fdd835')) stickerEl.style.color = "#d32f2f";
+            else stickerEl.style.color = "white";
+        } else {
+            stickerEl.style.background = "radial-gradient(circle at 30% 30%, #ff5252, #d32f2f)";
+            stickerEl.style.color = "white";
+        }
+        
+        // アニメーションリセット
+        stickerEl.style.animation = 'none';
+        stickerEl.offsetHeight; 
+        stickerEl.style.animation = 'stickOn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    }
+
+    // --- 入力処理 ---
+    function inputNum(n) {
+        if (isProcessing) return; // 処理中は入力不可
+        if (currentInput.length >= 6) return;
+        currentInput += n;
+        updateDisplay();
+    }
+    function clearInput() {
+        if (isProcessing) return;
+        currentInput = "";
+        updateDisplay();
+    }
+    function backspace() {
+        if (isProcessing) return;
+        currentInput = currentInput.slice(0, -1);
+        updateDisplay();
+    }
+    function updateDisplay() {
+        const display = document.getElementById('user-input');
+        display.innerText = currentInput;
+    }
+
+    function checkAnswer() {
+        if (isProcessing) return; // 連打防止
+        if (currentInput === "") return;
+        
+        isProcessing = true; // ロック開始
+        const userVal = parseInt(currentInput);
+
+        if (userVal === correctPrice) {
+            score += 10;
+            showFeedback(true);
+        } else {
+            showFeedback(false);
+        }
+    }
+
+    function showFeedback(isCorrect) {
+        const display = document.getElementById('user-input');
+        
+        if (isCorrect) {
+            display.style.color = "#00e676";
+            display.innerText = "⭕ " + currentInput;
+            setTimeout(() => {
+                display.style.color = "";
+                nextQuestion();
+            }, 800);
+        } else {
+            display.style.color = "#ff1744";
+            // 間違いの時は、わかりやすく正解を表示
+            display.innerText = "❌ " + correctPrice; 
+            setTimeout(() => {
+                display.style.color = "";
+                nextQuestion();
+            }, 1500);
+        }
+    }
+
+    function endGame() {
+        showScreen('screen-result');
+        document.getElementById('final-score').innerText = score;
+        const msg = document.getElementById('final-msg');
+        const icon = document.getElementById('result-icon');
+        
+        if (score === 100) {
+            msg.innerText = "パーフェクト！買い物マスターです！";
+            icon.innerText = "🏆";
+        } else if (score >= 80) {
+            msg.innerText = "すごい！ほとんど正解です。";
+            icon.innerText = "😎";
+        } else if (score >= 50) {
+            msg.innerText = "あと少し！練習しましょう。";
+            icon.innerText = "👍";
+        } else {
+            msg.innerText = "もう一度チャレンジしよう！";
+            icon.innerText = "💪";
+        }
+    }
+
+</script>
