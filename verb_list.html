@@ -11,6 +11,7 @@
     /* --- 共通設定 --- */
     :root {
         --primary: #00bcd4;
+        --accent: #ff4081;
         --bg-color: #f0f8ff;
         --text-color: #333;
         
@@ -54,49 +55,55 @@
         text-align: center; margin-bottom: 20px;
     }
     .page-title { font-size: 1.8em; color: var(--primary); margin: 0; font-weight: 900; }
-    .page-desc { color: #666; margin-top: 10px; font-size: 0.95em; }
+    .page-desc { color: #666; margin-top: 5px; font-size: 0.9em; }
 
-    /* --- ★切り替えタブボタン --- */
-    .tab-container {
+    /* --- ★横スクロール対応タブ --- */
+    .tab-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 10px; /* スクロールバーの干渉を防ぐ */
+        margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
         display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 30px;
+        justify-content: flex-start; /* 左詰めスタート */
+        gap: 10px;
     }
+    /* PCなど幅があるときは中央寄せ */
+    @media (min-width: 700px) {
+        .tab-scroll-container { justify-content: center; }
+    }
+
     .tab-btn {
         background: white;
         border: 2px solid var(--primary);
         color: var(--primary);
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-size: 1.2em;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 1em;
         font-weight: 900;
         cursor: pointer;
         transition: all 0.2s;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-        min-width: 140px;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        flex-shrink: 0; /* 縮まないようにする */
     }
-    .tab-btn:active { transform: translateY(3px); box-shadow: none; }
+    .tab-btn:active { transform: translateY(2px); box-shadow: none; }
     
-    /* アクティブなタブのデザイン */
     .tab-btn.active {
         background: var(--primary);
         color: white;
         box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4);
         transform: scale(1.05);
+        border-color: var(--primary);
     }
 
-    /* --- リスト表示エリア (切り替え用) --- */
-    .view-section {
-        display: none; /* 初期状態は非表示 */
-        animation: fadeIn 0.3s;
-    }
-    .view-section.active {
-        display: block;
+    /* --- リスト表示エリア --- */
+    /* 切り替え時にフェードインさせる */
+    .groups-wrapper {
+        animation: fadeIn 0.4s ease-out;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 
     /* --- グループカラムレイアウト --- */
     .groups-container {
@@ -107,12 +114,7 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; border-top: 5px solid;
     }
     .group-header-bar {
-        padding: 15px; text-align: center; font-size: 1.4em; font-weight: 900; background: #fafafa; border-bottom: 1px solid #eee; margin-bottom: 15px;
-    }
-    .type-tag {
-        display: inline-block; padding: 5px 20px; border-radius: 15px; color: white; font-weight: bold;
-        font-family: 'Klee One', cursive; font-size: 1.1em; margin: 10px auto; text-align: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 12px; text-align: center; font-size: 1.2em; font-weight: 900; background: #fafafa; border-bottom: 1px solid #eee; margin-bottom: 10px;
     }
     .verb-list-area { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
 
@@ -120,27 +122,38 @@
     .verb-card {
         background: white; border-radius: 12px; padding: 10px 15px;
         display: flex; align-items: center; justify-content: space-between;
-        cursor: pointer; border: 2px solid #f0f0f0; transition: all 0.1s;
+        cursor: pointer; border: 2px solid #f5f5f5; transition: all 0.1s;
     }
     .verb-card:active { transform: scale(0.98); background: #f9f9f9; }
     .verb-card:hover { border-color: #ddd; }
-    .verb-info { display: flex; align-items: center; gap: 15px; }
+    .verb-info { display: flex; align-items: center; gap: 12px; width: 100%; }
     .verb-icon { 
-        font-size: 1.5em; width: 40px; height: 40px; 
+        font-size: 1.4em; width: 36px; height: 36px; 
         display: flex; justify-content: center; align-items: center;
-        background: #eef; border-radius: 50%; color: #555;
+        background: #eef; border-radius: 50%; color: #555; flex-shrink: 0;
     }
     .verb-text-box { text-align: left; }
-    .verb-jp { font-family: 'Klee One', cursive; font-size: 1.2em; font-weight: 800; color: #333; }
-    .verb-en { font-size: 0.8em; color: #888; }
+    .verb-jp { font-family: 'Klee One', cursive; font-size: 1.15em; font-weight: 800; color: #333; line-height: 1.2; }
+    .verb-en { font-size: 0.75em; color: #888; margin-top: 2px; }
+    
     .check-btn {
-        color: #ddd; font-size: 1.2em; width: 30px; height: 30px;
+        color: #ddd; font-size: 1.2em; width: 34px; height: 34px;
         display: flex; justify-content: center; align-items: center;
         border-radius: 50%; border: 2px solid #eee; transition: all 0.2s;
+        margin-left: 10px; flex-shrink: 0;
     }
     .verb-card.learned .check-btn { background: #4caf50; border-color: #4caf50; color: white; }
-    .verb-card.learned { opacity: 0.6; }
-    .divider { height: 2px; background: #eee; margin: 15px 20px; border-radius: 2px; }
+    .verb-card.learned .verb-jp, .verb-card.learned .verb-icon { opacity: 0.5; }
+
+    /* Divider */
+    .divider-label {
+        font-size: 0.8em; color: #999; text-align: center; margin: 15px 0 5px; font-weight: bold; position: relative;
+    }
+    .divider-label::before, .divider-label::after {
+        content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: #eee;
+    }
+    .divider-label::before { left: 10px; }
+    .divider-label::after { right: 10px; }
 
     /* フッター */
     .footer-area { text-align: center; margin-top: 40px; padding-bottom: 40px; width: 100%; }
@@ -154,7 +167,6 @@
     @media (max-width: 700px) {
         .groups-container { flex-direction: column; }
         .group-column { width: 100%; }
-        .tab-btn { padding: 10px 20px; font-size: 1em; }
     }
 </style>
 </head>
@@ -169,65 +181,45 @@
 
     <div class="page-header">
         <h1 class="page-title"><i class="fa-solid fa-book"></i> どうし リスト</h1>
-        <p class="page-desc">「ます形」と「て形」を きりかえて みてみよう！</p>
+        <p class="page-desc" id="form-desc">ボタンをおして 形（かたち）を かえよう！</p>
     </div>
 
-    <div class="tab-container">
-        <button class="tab-btn active" onclick="switchTab('masu')">
-            <i class="fa-solid fa-square-check"></i> ます形
+    <div class="tab-scroll-container">
+        <button class="tab-btn active" onclick="setForm('masu')">
+            <i class="fa-solid fa-square-check"></i> ます
         </button>
-        <button class="tab-btn" onclick="switchTab('te')">
+        <button class="tab-btn" onclick="setForm('mashita')">
+            <i class="fa-solid fa-clock-rotate-left"></i> ました
+        </button>
+        <button class="tab-btn" onclick="setForm('te')">
             <i class="fa-solid fa-share-nodes"></i> て形
         </button>
+        <button class="tab-btn" onclick="setForm('jisho')">
+            <i class="fa-solid fa-book"></i> 辞書形
+        </button>
+        <button class="tab-btn" onclick="setForm('nai')">
+            <i class="fa-solid fa-xmark"></i> ない形
+        </button>
+        <button class="tab-btn" onclick="setForm('ta')">
+            <i class="fa-solid fa-flag"></i> た形
+        </button>
     </div>
 
-    <div id="view-masu" class="view-section active">
+    <div id="list-container" class="groups-wrapper">
         <div class="groups-container">
             <div class="group-column" style="border-top-color: var(--grp1-color);">
                 <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
-                <div class="type-tag" style="background: var(--grp1-color);">i-masu</div>
-                <div class="verb-list-area" id="masu-grp1"></div>
+                <div class="verb-list-area" id="list-grp1"></div>
             </div>
             <div class="group-column" style="border-top-color: var(--grp2-color);">
                 <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
-                <div class="type-tag" style="background: var(--grp2-color);">e-masu</div>
-                <div class="verb-list-area" id="masu-grp2-e"></div>
-                <div class="divider"></div>
-                <div class="type-tag" style="background: var(--grp2-color);">i-masu (Exception)</div>
-                <div class="verb-list-area" id="masu-grp2-i"></div>
+                <div class="verb-list-area" id="list-grp2-e"></div>
+                <div class="divider-label">Exception (Imasu)</div>
+                <div class="verb-list-area" id="list-grp2-i"></div>
             </div>
             <div class="group-column" style="border-top-color: var(--grp3-color);">
                 <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
-                <div class="type-tag" style="background: var(--grp3-color);">shimasu</div>
-                <div class="verb-list-area" id="masu-grp3-s"></div>
-                <div class="divider"></div>
-                <div class="type-tag" style="background: var(--grp3-color);">kimasu</div>
-                <div class="verb-list-area" id="masu-grp3-k"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-te" class="view-section">
-        <div class="groups-container">
-            <div class="group-column" style="border-top-color: var(--grp1-color);">
-                <div class="group-header-bar" style="color: var(--grp1-color);">Group I</div>
-                <div class="type-tag" style="background: var(--grp1-color);">Group 1</div>
-                <div class="verb-list-area" id="te-grp1"></div>
-            </div>
-            <div class="group-column" style="border-top-color: var(--grp2-color);">
-                <div class="group-header-bar" style="color: var(--grp2-color);">Group II</div>
-                <div class="type-tag" style="background: var(--grp2-color);">Group 2</div>
-                <div class="verb-list-area" id="te-grp2-e"></div>
-                <div class="divider"></div>
-                <div class="type-tag" style="background: var(--grp2-color);">Exception</div>
-                <div class="verb-list-area" id="te-grp2-i"></div>
-            </div>
-            <div class="group-column" style="border-top-color: var(--grp3-color);">
-                <div class="group-header-bar" style="color: var(--grp3-color);">Group III</div>
-                <div class="type-tag" style="background: var(--grp3-color);">Irregular</div>
-                <div class="verb-list-area" id="te-grp3-s"></div>
-                <div class="divider"></div>
-                <div class="verb-list-area" id="te-grp3-k"></div>
+                <div class="verb-list-area" id="list-grp3"></div>
             </div>
         </div>
     </div>
@@ -239,174 +231,160 @@
 </div>
 
 <script>
-    // --- ます形データ (追加済み) ---
-    const masuVerbs = {
-        grp1: [
-            { jp: "かきます", en: "Write", icon: "fa-solid fa-pen" },
-            { jp: "ききます", en: "Listen", icon: "fa-solid fa-headphones" },
-            { jp: "いきます", en: "Go", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "およぎます", en: "Swim", icon: "fa-solid fa-person-swimming" },
-            { jp: "のみます", en: "Drink", icon: "fa-solid fa-glass-water" },
-            { jp: "よみます", en: "Read", icon: "fa-solid fa-book-open" },
-            { jp: "やすみます", en: "Rest", icon: "fa-solid fa-bed" },
-            { jp: "あそびます", en: "Play", icon: "fa-solid fa-gamepad" },
-            { jp: "かいます", en: "Buy", icon: "fa-solid fa-cart-shopping" },
-            { jp: "あいます", en: "Meet", icon: "fa-solid fa-handshake" },
-            { jp: "まちます", en: "Wait", icon: "fa-solid fa-clock" },
-            { jp: "もちます", en: "Hold", icon: "fa-solid fa-bag-shopping" },
-            { jp: "とります", en: "Take photo", icon: "fa-solid fa-camera" },
-            { jp: "かえります", en: "Return", icon: "fa-solid fa-house" },
-            { jp: "わかります", en: "Understand", icon: "fa-regular fa-lightbulb" },
-            { jp: "はなします", en: "Talk", icon: "fa-solid fa-comments" },
-            // Added
-            { jp: "うります", en: "Sell", icon: "fa-solid fa-hand-holding-dollar" },
-            { jp: "つかいます", en: "Use", icon: "fa-solid fa-hand-pointer" },
-            { jp: "ならいます", en: "Learn", icon: "fa-solid fa-book-reader" },
-            { jp: "たちます", en: "Stand", icon: "fa-solid fa-person" },
-            { jp: "すわります", en: "Sit", icon: "fa-solid fa-chair" },
-            { jp: "いそぎます", en: "Hurry", icon: "fa-solid fa-person-running" },
-            { jp: "はたらきます", en: "Work", icon: "fa-solid fa-briefcase" },
-            { jp: "かします", en: "Lend", icon: "fa-solid fa-hand-holding-heart" },
-            { jp: "あるきます", en: "Walk", icon: "fa-solid fa-person-walking" },
-            { jp: "のります", en: "Ride", icon: "fa-solid fa-train-subway" }
-        ],
-        grp2_e: [
-            { jp: "ねます", en: "Sleep", icon: "fa-solid fa-moon" },
-            { jp: "たべます", en: "Eat", icon: "fa-solid fa-utensils" },
-            { jp: "あげます", en: "Give", icon: "fa-solid fa-gift" },
-            { jp: "あけます", en: "Open", icon: "fa-solid fa-door-open" },
-            { jp: "みせます", en: "Show", icon: "fa-solid fa-eye" },
-            { jp: "おしえます", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
-            { jp: "はじめます", en: "Start", icon: "fa-solid fa-play" },
-            // Added
-            { jp: "しめます", en: "Close", icon: "fa-solid fa-door-closed" },
-            { jp: "つけます", en: "Turn on", icon: "fa-solid fa-power-off" },
-            { jp: "わすれます", en: "Forget", icon: "fa-solid fa-circle-question" },
-            { jp: "でます", en: "Exit/Leave", icon: "fa-solid fa-arrow-right-from-bracket" },
-            { jp: "おぼえます", en: "Remember", icon: "fa-solid fa-brain" },
-            { jp: "とめます", en: "Stop", icon: "fa-solid fa-hand" },
-            { jp: "すてます", en: "Throw away", icon: "fa-solid fa-trash" },
-            { jp: "かんがえます", en: "Think", icon: "fa-solid fa-cloud" }
-        ],
-        grp2_i: [
-            { jp: "みます", en: "Watch/See", icon: "fa-solid fa-tv" },
-            { jp: "います", en: "Exist (Living)", icon: "fa-solid fa-person" },
-            { jp: "おきます", en: "Wake up", icon: "fa-solid fa-sun" },
-            { jp: "かります", en: "Borrow", icon: "fa-solid fa-hand-holding" },
-            { jp: "あびます", en: "Shower", icon: "fa-solid fa-shower" },
-            { jp: "できます", en: "Can do", icon: "fa-solid fa-thumbs-up" },
-            // Added
-            { jp: "おります", en: "Get off", icon: "fa-solid fa-person-walking-luggage" },
-            { jp: "きます", en: "Wear", icon: "fa-solid fa-shirt" }
-        ],
-        grp3_s: [
-            { jp: "べんきょう\nします", en: "Study", icon: "fa-solid fa-graduation-cap" },
-            { jp: "かいもの\nします", en: "Shop", icon: "fa-solid fa-basket-shopping" },
-            { jp: "さんぽ\nします", en: "Walk", icon: "fa-solid fa-tree" },
-            { jp: "コピー\nします", en: "Copy", icon: "fa-solid fa-copy" },
-            // Added
-            { jp: "けっこん\nします", en: "Marry", icon: "fa-solid fa-ring" },
-            { jp: "そうじ\nします", en: "Clean", icon: "fa-solid fa-broom" },
-            { jp: "せんたく\nします", en: "Laundry", icon: "fa-solid fa-shirt" },
-            { jp: "りょうり\nします", en: "Cook", icon: "fa-solid fa-kitchen-set" },
-            { jp: "うんてん\nします", en: "Drive", icon: "fa-solid fa-car" },
-            { jp: "でんわ\nします", en: "Call", icon: "fa-solid fa-phone" },
-            { jp: "しんぱい\nします", en: "Worry", icon: "fa-solid fa-face-frown" },
-            { jp: "ざんぎょう\nします", en: "Overtime", icon: "fa-solid fa-business-time" },
-            { jp: "しょくじ\nします", en: "Meal", icon: "fa-solid fa-bowl-rice" }
-        ],
-        grp3_k: [
-            { jp: "きます", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "もって\nきます", en: "Bring", icon: "fa-solid fa-box-open" },
-            // Added
-            { jp: "つれて\nきます", en: "Bring (person)", icon: "fa-solid fa-people-arrows" }
-        ]
-    };
+    // --- マスター動詞データ (全ての活用形を持つ) ---
+    // Grp1: 五段, Grp2: 一段, Grp3: 変格
+    // subGroup: 'e' (e-masu), 'i' (i-masu exception), 's' (shimasu), 'k' (kimasu)
 
-    // --- て形データ (変換済み・追加済み) ---
-    const teVerbs = {
-        grp1: [
-            { jp: "かいて", en: "Write", icon: "fa-solid fa-pen" },
-            { jp: "きいて", en: "Listen", icon: "fa-solid fa-headphones" },
-            { jp: "いって", en: "Go", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "およいで", en: "Swim", icon: "fa-solid fa-person-swimming" },
-            { jp: "のんで", en: "Drink", icon: "fa-solid fa-glass-water" },
-            { jp: "よんで", en: "Read", icon: "fa-solid fa-book-open" },
-            { jp: "やすんで", en: "Rest", icon: "fa-solid fa-bed" },
-            { jp: "あそんで", en: "Play", icon: "fa-solid fa-gamepad" },
-            { jp: "かって", en: "Buy", icon: "fa-solid fa-cart-shopping" },
-            { jp: "あって", en: "Meet", icon: "fa-solid fa-handshake" },
-            { jp: "まって", en: "Wait", icon: "fa-solid fa-clock" },
-            { jp: "もって", en: "Hold", icon: "fa-solid fa-bag-shopping" },
-            { jp: "とって", en: "Take photo", icon: "fa-solid fa-camera" },
-            { jp: "かえって", en: "Return", icon: "fa-solid fa-house" },
-            { jp: "わかって", en: "Understand", icon: "fa-regular fa-lightbulb" },
-            { jp: "はなして", en: "Talk", icon: "fa-solid fa-comments" },
-            // Added
-            { jp: "うって", en: "Sell", icon: "fa-solid fa-hand-holding-dollar" },
-            { jp: "つかって", en: "Use", icon: "fa-solid fa-hand-pointer" },
-            { jp: "ならって", en: "Learn", icon: "fa-solid fa-book-reader" },
-            { jp: "たって", en: "Stand", icon: "fa-solid fa-person" },
-            { jp: "すわって", en: "Sit", icon: "fa-solid fa-chair" },
-            { jp: "いそいで", en: "Hurry", icon: "fa-solid fa-person-running" },
-            { jp: "はたらいて", en: "Work", icon: "fa-solid fa-briefcase" },
-            { jp: "かして", en: "Lend", icon: "fa-solid fa-hand-holding-heart" },
-            { jp: "あるいて", en: "Walk", icon: "fa-solid fa-person-walking" },
-            { jp: "のって", en: "Ride", icon: "fa-solid fa-train-subway" }
-        ],
-        grp2_e: [
-            { jp: "ねて", en: "Sleep", icon: "fa-solid fa-moon" },
-            { jp: "たべて", en: "Eat", icon: "fa-solid fa-utensils" },
-            { jp: "あげて", en: "Give", icon: "fa-solid fa-gift" },
-            { jp: "あけて", en: "Open", icon: "fa-solid fa-door-open" },
-            { jp: "みせて", en: "Show", icon: "fa-solid fa-eye" },
-            { jp: "おしえて", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
-            { jp: "はじめて", en: "Start", icon: "fa-solid fa-play" },
-            // Added
-            { jp: "しめて", en: "Close", icon: "fa-solid fa-door-closed" },
-            { jp: "つけて", en: "Turn on", icon: "fa-solid fa-power-off" },
-            { jp: "わすれて", en: "Forget", icon: "fa-solid fa-circle-question" },
-            { jp: "でて", en: "Exit/Leave", icon: "fa-solid fa-arrow-right-from-bracket" },
-            { jp: "おぼえて", en: "Remember", icon: "fa-solid fa-brain" },
-            { jp: "とめて", en: "Stop", icon: "fa-solid fa-hand" },
-            { jp: "すてて", en: "Throw away", icon: "fa-solid fa-trash" },
-            { jp: "かんがえて", en: "Think", icon: "fa-solid fa-cloud" }
-        ],
-        grp2_i: [
-            { jp: "みて", en: "Watch/See", icon: "fa-solid fa-tv" },
-            { jp: "いて", en: "Exist (Living)", icon: "fa-solid fa-person" },
-            { jp: "おきて", en: "Wake up", icon: "fa-solid fa-sun" },
-            { jp: "かりて", en: "Borrow", icon: "fa-solid fa-hand-holding" },
-            { jp: "あびて", en: "Shower", icon: "fa-solid fa-shower" },
-            { jp: "できて", en: "Can do", icon: "fa-solid fa-thumbs-up" },
-            // Added
-            { jp: "おりて", en: "Get off", icon: "fa-solid fa-person-walking-luggage" },
-            { jp: "きて", en: "Wear", icon: "fa-solid fa-shirt" }
-        ],
-        grp3_s: [
-            { jp: "べんきょう\nして", en: "Study", icon: "fa-solid fa-graduation-cap" },
-            { jp: "かいもの\nして", en: "Shop", icon: "fa-solid fa-basket-shopping" },
-            { jp: "さんぽ\nして", en: "Walk", icon: "fa-solid fa-tree" },
-            { jp: "コピー\nして", en: "Copy", icon: "fa-solid fa-copy" },
-            // Added
-            { jp: "けっこん\nして", en: "Marry", icon: "fa-solid fa-ring" },
-            { jp: "そうじ\nして", en: "Clean", icon: "fa-solid fa-broom" },
-            { jp: "せんたく\nして", en: "Laundry", icon: "fa-solid fa-shirt" },
-            { jp: "りょうり\nして", en: "Cook", icon: "fa-solid fa-kitchen-set" },
-            { jp: "うんてん\nして", en: "Drive", icon: "fa-solid fa-car" },
-            { jp: "でんわ\nして", en: "Call", icon: "fa-solid fa-phone" },
-            { jp: "しんぱい\nして", en: "Worry", icon: "fa-solid fa-face-frown" },
-            { jp: "ざんぎょう\nして", en: "Overtime", icon: "fa-solid fa-business-time" },
-            { jp: "しょくじ\nして", en: "Meal", icon: "fa-solid fa-bowl-rice" }
-        ],
-        grp3_k: [
-            { jp: "きて", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "もって\nきて", en: "Bring", icon: "fa-solid fa-box-open" },
-            // Added
-            { jp: "つれて\nきて", en: "Bring (person)", icon: "fa-solid fa-people-arrows" }
-        ]
-    };
+    const masterVerbs = [
+        // --- Group I (u-verbs) ---
+        { grp: 1, en: "Write", icon: "fa-solid fa-pen", 
+          masu: "かきます", mashita: "かきました", te: "かいて", jisho: "かく", nai: "かかない", ta: "かいた" },
+        { grp: 1, en: "Listen", icon: "fa-solid fa-headphones", 
+          masu: "ききます", mashita: "ききました", te: "きいて", jisho: "きく", nai: "きかない", ta: "きいた" },
+        { grp: 1, en: "Go", icon: "fa-solid fa-person-walking-arrow-right", 
+          masu: "いきます", mashita: "いきました", te: "いって", jisho: "いく", nai: "いかない", ta: "いった" },
+        { grp: 1, en: "Swim", icon: "fa-solid fa-person-swimming", 
+          masu: "およぎます", mashita: "およぎました", te: "およいで", jisho: "およぐ", nai: "およがない", ta: "およいだ" },
+        { grp: 1, en: "Drink", icon: "fa-solid fa-glass-water", 
+          masu: "のみます", mashita: "のみました", te: "のんで", jisho: "のむ", nai: "のまない", ta: "のんだ" },
+        { grp: 1, en: "Read", icon: "fa-solid fa-book-open", 
+          masu: "よみます", mashita: "よみました", te: "よんで", jisho: "よむ", nai: "よまない", ta: "よんだ" },
+        { grp: 1, en: "Rest", icon: "fa-solid fa-bed", 
+          masu: "やすみます", mashita: "やすみました", te: "やすんで", jisho: "やすむ", nai: "やすまない", ta: "やすんだ" },
+        { grp: 1, en: "Play", icon: "fa-solid fa-gamepad", 
+          masu: "あそびます", mashita: "あそびました", te: "あそんで", jisho: "あそぶ", nai: "あそばない", ta: "あそんだ" },
+        { grp: 1, en: "Buy", icon: "fa-solid fa-cart-shopping", 
+          masu: "かいます", mashita: "かいました", te: "かって", jisho: "かう", nai: "かわない", ta: "かった" },
+        { grp: 1, en: "Meet", icon: "fa-solid fa-handshake", 
+          masu: "あいます", mashita: "あいました", te: "あって", jisho: "あう", nai: "あわない", ta: "あった" },
+        { grp: 1, en: "Wait", icon: "fa-solid fa-clock", 
+          masu: "まちます", mashita: "まちました", te: "まって", jisho: "まつ", nai: "またない", ta: "まった" },
+        { grp: 1, en: "Hold", icon: "fa-solid fa-bag-shopping", 
+          masu: "もちます", mashita: "もちました", te: "もって", jisho: "もつ", nai: "もたない", ta: "もった" },
+        { grp: 1, en: "Take (photo)", icon: "fa-solid fa-camera", 
+          masu: "とります", mashita: "とりました", te: "とって", jisho: "とる", nai: "とらない", ta: "とった" },
+        { grp: 1, en: "Return", icon: "fa-solid fa-house", 
+          masu: "かえります", mashita: "かえりました", te: "かえって", jisho: "かえる", nai: "かえらない", ta: "かえった" },
+        { grp: 1, en: "Understand", icon: "fa-regular fa-lightbulb", 
+          masu: "わかります", mashita: "わかりました", te: "わかって", jisho: "わかる", nai: "わからない", ta: "わかった" },
+        { grp: 1, en: "Talk", icon: "fa-solid fa-comments", 
+          masu: "はなします", mashita: "はなしました", te: "はなして", jisho: "はなす", nai: "はなさない", ta: "はなした" },
+        { grp: 1, en: "Sell", icon: "fa-solid fa-hand-holding-dollar", 
+          masu: "うります", mashita: "うりました", te: "うって", jisho: "うる", nai: "うらない", ta: "うった" },
+        { grp: 1, en: "Use", icon: "fa-solid fa-hand-pointer", 
+          masu: "つかいます", mashita: "つかいました", te: "つかって", jisho: "つかう", nai: "つかわない", ta: "つかった" },
+        { grp: 1, en: "Learn", icon: "fa-solid fa-book-reader", 
+          masu: "ならいます", mashita: "ならいました", te: "ならって", jisho: "ならう", nai: "ならわない", ta: "ならった" },
+        { grp: 1, en: "Stand", icon: "fa-solid fa-person", 
+          masu: "たちます", mashita: "たちました", te: "たって", jisho: "たつ", nai: "たたない", ta: "たった" },
+        { grp: 1, en: "Sit", icon: "fa-solid fa-chair", 
+          masu: "すわります", mashita: "すわりました", te: "すわって", jisho: "すわる", nai: "すわらない", ta: "すわった" },
+        { grp: 1, en: "Hurry", icon: "fa-solid fa-person-running", 
+          masu: "いそぎます", mashita: "いそぎました", te: "いそいで", jisho: "いそぐ", nai: "いそがない", ta: "いそいだ" },
+        { grp: 1, en: "Work", icon: "fa-solid fa-briefcase", 
+          masu: "はたらきます", mashita: "はたらきました", te: "はたらいて", jisho: "はたらく", nai: "はたらかない", ta: "はたらいた" },
+        { grp: 1, en: "Lend", icon: "fa-solid fa-hand-holding-heart", 
+          masu: "かします", mashita: "かしました", te: "かして", jisho: "かす", nai: "かさない", ta: "かした" },
+        { grp: 1, en: "Walk", icon: "fa-solid fa-person-walking", 
+          masu: "あるきます", mashita: "あるきました", te: "あるいて", jisho: "あるく", nai: "あるかない", ta: "あるいた" },
+        { grp: 1, en: "Ride", icon: "fa-solid fa-train-subway", 
+          masu: "のります", mashita: "のりました", te: "のって", jisho: "のる", nai: "のらない", ta: "のった" },
 
+        // --- Group II (ru-verbs) ---
+        { grp: 2, sub: 'e', en: "Sleep", icon: "fa-solid fa-moon", 
+          masu: "ねます", mashita: "ねました", te: "ねて", jisho: "ねる", nai: "ねない", ta: "ねた" },
+        { grp: 2, sub: 'e', en: "Eat", icon: "fa-solid fa-utensils", 
+          masu: "たべます", mashita: "たべました", te: "たべて", jisho: "たべる", nai: "たべない", ta: "たべた" },
+        { grp: 2, sub: 'e', en: "Give", icon: "fa-solid fa-gift", 
+          masu: "あげます", mashita: "あげました", te: "あげて", jisho: "あげる", nai: "あげない", ta: "あげた" },
+        { grp: 2, sub: 'e', en: "Open", icon: "fa-solid fa-door-open", 
+          masu: "あけます", mashita: "あけました", te: "あけて", jisho: "あける", nai: "あけない", ta: "あけた" },
+        { grp: 2, sub: 'e', en: "Show", icon: "fa-solid fa-eye", 
+          masu: "みせます", mashita: "みせました", te: "みせて", jisho: "みせる", nai: "みせない", ta: "みせた" },
+        { grp: 2, sub: 'e', en: "Teach", icon: "fa-solid fa-chalkboard-user", 
+          masu: "おしえます", mashita: "おしえました", te: "おしえて", jisho: "おしえる", nai: "おしえない", ta: "おしえた" },
+        { grp: 2, sub: 'e', en: "Start", icon: "fa-solid fa-play", 
+          masu: "はじめます", mashita: "はじめました", te: "はじめて", jisho: "はじめる", nai: "はじめない", ta: "はじめた" },
+        { grp: 2, sub: 'e', en: "Close", icon: "fa-solid fa-door-closed", 
+          masu: "しめます", mashita: "しめました", te: "しめて", jisho: "しめる", nai: "しめない", ta: "しめた" },
+        { grp: 2, sub: 'e', en: "Turn on", icon: "fa-solid fa-power-off", 
+          masu: "つけます", mashita: "つけました", te: "つけて", jisho: "つける", nai: "つけない", ta: "つけた" },
+        { grp: 2, sub: 'e', en: "Forget", icon: "fa-solid fa-circle-question", 
+          masu: "わすれます", mashita: "わすれました", te: "わすれて", jisho: "わすれる", nai: "わすれない", ta: "わすれた" },
+        { grp: 2, sub: 'e', en: "Exit/Leave", icon: "fa-solid fa-arrow-right-from-bracket", 
+          masu: "でます", mashita: "でました", te: "でて", jisho: "でる", nai: "でない", ta: "でた" },
+        { grp: 2, sub: 'e', en: "Remember", icon: "fa-solid fa-brain", 
+          masu: "おぼえます", mashita: "おぼえました", te: "おぼえて", jisho: "おぼえる", nai: "おぼえない", ta: "おぼえた" },
+        { grp: 2, sub: 'e', en: "Stop", icon: "fa-solid fa-hand", 
+          masu: "とめます", mashita: "とめました", te: "とめて", jisho: "とめる", nai: "とめない", ta: "とめた" },
+        { grp: 2, sub: 'e', en: "Throw away", icon: "fa-solid fa-trash", 
+          masu: "すてます", mashita: "すてました", te: "すてて", jisho: "すてる", nai: "すてない", ta: "すてた" },
+        { grp: 2, sub: 'e', en: "Think", icon: "fa-solid fa-cloud", 
+          masu: "かんがえます", mashita: "かんがえました", te: "かんがえて", jisho: "かんがえる", nai: "かんがえない", ta: "かんがえた" },
+
+        // --- Group II (i-masu exceptions) ---
+        { grp: 2, sub: 'i', en: "Watch/See", icon: "fa-solid fa-tv", 
+          masu: "みます", mashita: "みました", te: "みて", jisho: "みる", nai: "みない", ta: "みた" },
+        { grp: 2, sub: 'i', en: "Exist (Living)", icon: "fa-solid fa-person", 
+          masu: "います", mashita: "いました", te: "いて", jisho: "いる", nai: "いない", ta: "いた" },
+        { grp: 2, sub: 'i', en: "Wake up", icon: "fa-solid fa-sun", 
+          masu: "おきます", mashita: "おきました", te: "おきて", jisho: "おきる", nai: "おきない", ta: "おきた" },
+        { grp: 2, sub: 'i', en: "Borrow", icon: "fa-solid fa-hand-holding", 
+          masu: "かります", mashita: "かりました", te: "かりて", jisho: "かりる", nai: "かりない", ta: "かりた" },
+        { grp: 2, sub: 'i', en: "Shower", icon: "fa-solid fa-shower", 
+          masu: "あびます", mashita: "あびました", te: "あびて", jisho: "あびる", nai: "あびない", ta: "あびた" },
+        { grp: 2, sub: 'i', en: "Can do", icon: "fa-solid fa-thumbs-up", 
+          masu: "できます", mashita: "できました", te: "できて", jisho: "できる", nai: "できない", ta: "できた" },
+        { grp: 2, sub: 'i', en: "Get off", icon: "fa-solid fa-person-walking-luggage", 
+          masu: "おります", mashita: "おりました", te: "おりて", jisho: "おりる", nai: "おりない", ta: "おりた" },
+        { grp: 2, sub: 'i', en: "Wear", icon: "fa-solid fa-shirt", 
+          masu: "きます", mashita: "きました", te: "きて", jisho: "きる", nai: "きない", ta: "きた" },
+
+        // --- Group III (Irregular) ---
+        { grp: 3, en: "Do", icon: "fa-solid fa-check", 
+          masu: "します", mashita: "しました", te: "して", jisho: "する", nai: "しない", ta: "した" },
+        { grp: 3, en: "Come", icon: "fa-solid fa-person-walking-arrow-right", 
+          masu: "きます", mashita: "きました", te: "きて", jisho: "くる", nai: "こない", ta: "きた" },
+        
+        { grp: 3, en: "Study", icon: "fa-solid fa-graduation-cap", 
+          masu: "べんきょう\nします", mashita: "べんきょう\nしました", te: "べんきょう\nして", jisho: "べんきょう\nする", nai: "べんきょう\nしない", ta: "べんきょう\nした" },
+        { grp: 3, en: "Shop", icon: "fa-solid fa-basket-shopping", 
+          masu: "かいもの\nします", mashita: "かいもの\nしました", te: "かいもの\nして", jisho: "かいもの\nする", nai: "かいもの\nしない", ta: "かいもの\nした" },
+        { grp: 3, en: "Walk", icon: "fa-solid fa-tree", 
+          masu: "さんぽ\nします", mashita: "さんぽ\nしました", te: "さんぽ\nして", jisho: "さんぽ\nする", nai: "さんぽ\nしない", ta: "さんぽ\nした" },
+        { grp: 3, en: "Copy", icon: "fa-solid fa-copy", 
+          masu: "コピー\nします", mashita: "コピー\nしました", te: "コピー\nして", jisho: "コピー\nする", nai: "コピー\nしない", ta: "コピー\nした" },
+        { grp: 3, en: "Marry", icon: "fa-solid fa-ring", 
+          masu: "けっこん\nします", mashita: "けっこん\nしました", te: "けっこん\nして", jisho: "けっこん\nする", nai: "けっこん\nしない", ta: "けっこん\nした" },
+        { grp: 3, en: "Clean", icon: "fa-solid fa-broom", 
+          masu: "そうじ\nします", mashita: "そうじ\nしました", te: "そうじ\nして", jisho: "そうじ\nする", nai: "そうじ\nしない", ta: "そうじ\nした" },
+        { grp: 3, en: "Laundry", icon: "fa-solid fa-shirt", 
+          masu: "せんたく\nします", mashita: "せんたく\nしました", te: "せんたく\nして", jisho: "せんたく\nする", nai: "せんたく\nしない", ta: "せんたく\nした" },
+        { grp: 3, en: "Cook", icon: "fa-solid fa-kitchen-set", 
+          masu: "りょうり\nします", mashita: "りょうり\nしました", te: "りょうり\nして", jisho: "りょうり\nする", nai: "りょうり\nしない", ta: "りょうり\nした" },
+        { grp: 3, en: "Drive", icon: "fa-solid fa-car", 
+          masu: "うんてん\nします", mashita: "うんてん\nしました", te: "うんてん\nして", jisho: "うんてん\nする", nai: "うんてん\nしない", ta: "うんてん\nした" },
+        { grp: 3, en: "Call", icon: "fa-solid fa-phone", 
+          masu: "でんわ\nします", mashita: "でんわ\nしました", te: "でんわ\nして", jisho: "でんわ\nする", nai: "でんわ\nしない", ta: "でんわ\nした" },
+        { grp: 3, en: "Worry", icon: "fa-solid fa-face-frown", 
+          masu: "しんぱい\nします", mashita: "しんぱい\nしました", te: "しんぱい\nして", jisho: "しんぱい\nする", nai: "しんぱい\nしない", ta: "しんぱい\nした" },
+        { grp: 3, en: "Overtime", icon: "fa-solid fa-business-time", 
+          masu: "ざんぎょう\nします", mashita: "ざんぎょう\nしました", te: "ざんぎょう\nして", jisho: "ざんぎょう\nする", nai: "ざんぎょう\nしない", ta: "ざんぎょう\nした" },
+        { grp: 3, en: "Meal", icon: "fa-solid fa-bowl-rice", 
+          masu: "しょくじ\nします", mashita: "しょくじ\nしました", te: "しょくじ\nして", jisho: "しょくじ\nする", nai: "しょくじ\nしない", ta: "しょくじ\nした" },
+        { grp: 3, en: "Bring", icon: "fa-solid fa-box-open", 
+          masu: "もって\nきます", mashita: "もって\nきました", te: "もって\nきて", jisho: "もって\nくる", nai: "もって\nこない", ta: "もって\nきた" },
+        { grp: 3, en: "Bring (person)", icon: "fa-solid fa-people-arrows", 
+          masu: "つれて\nきます", mashita: "つれて\nきました", te: "つれて\nきて", jisho: "つれて\nくる", nai: "つれて\nこない", ta: "つれて\nきた" }
+    ];
+
+    // 全ての動詞にIDと学習状態を付与
+    masterVerbs.forEach((v, idx) => {
+        v.id = idx;
+        v.learned = false;
+    });
+
+    let currentForm = 'masu';
     const synth = window.speechSynthesis;
 
     function speak(text) {
@@ -420,69 +398,92 @@
         synth.speak(utterThis);
     }
 
+    // --- 表示ロジック ---
+    window.setForm = (form) => {
+        currentForm = form;
+        
+        // タブのアクティブ化
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        // 押されたボタンをactiveに（eventから取得できない場合もあるのでループで処理）
+        // 簡易的にHTMLのonclickで指定した関数引数とマッチするボタンを探す
+        const buttons = document.querySelectorAll('.tab-btn');
+        if(form === 'masu') buttons[0].classList.add('active');
+        else if(form === 'mashita') buttons[1].classList.add('active');
+        else if(form === 'te') buttons[2].classList.add('active');
+        else if(form === 'jisho') buttons[3].classList.add('active');
+        else if(form === 'nai') buttons[4].classList.add('active');
+        else if(form === 'ta') buttons[5].classList.add('active');
+
+        // コンテナの再描画 (アニメーション用クラス付与)
+        const wrapper = document.getElementById('list-container');
+        wrapper.classList.remove('groups-wrapper');
+        void wrapper.offsetWidth; // trigger reflow
+        wrapper.classList.add('groups-wrapper');
+
+        renderAllGroups();
+    };
+
+    function renderAllGroups() {
+        const grp1 = masterVerbs.filter(v => v.grp === 1);
+        const grp2e = masterVerbs.filter(v => v.grp === 2 && v.sub === 'e');
+        const grp2i = masterVerbs.filter(v => v.grp === 2 && v.sub === 'i');
+        const grp3 = masterVerbs.filter(v => v.grp === 3);
+
+        renderList('list-grp1', grp1);
+        renderList('list-grp2-e', grp2e);
+        renderList('list-grp2-i', grp2i);
+        renderList('list-grp3', grp3);
+    }
+
     function renderList(containerId, data) {
         const container = document.getElementById(containerId);
-        // 切り替え時に中身が重複しないようクリア
         container.innerHTML = '';
         
         data.forEach((item) => {
             const card = document.createElement('div');
-            card.className = 'verb-card';
+            card.className = `verb-card ${item.learned ? 'learned' : ''}`;
+            
+            // 現在のフォームのテキストを取得
+            const displayText = item[currentForm];
+
             card.innerHTML = `
                 <div class="verb-info">
                     <div class="verb-icon"><i class="${item.icon}"></i></div>
                     <div class="verb-text-box">
-                        <div class="verb-jp">${item.jp.replace('\n', '<br>')}</div>
+                        <div class="verb-jp">${displayText.replace('\n', '<br>')}</div>
                         <div class="verb-en">${item.en}</div>
                     </div>
                 </div>
-                <div class="check-btn"><i class="fa-solid fa-check"></i></div>
+                <div class="check-btn" data-id="${item.id}">
+                    <i class="fa-solid fa-check"></i>
+                </div>
             `;
 
+            // クリックイベント
             card.onclick = (e) => {
+                // チェックボタンが押された場合
                 if (e.target.closest('.check-btn')) {
                     e.stopPropagation();
-                    card.classList.toggle('learned');
+                    toggleLearned(item.id);
                     return;
                 }
-                speak(item.jp);
+                // カード本体なら読み上げ
+                speak(displayText);
             };
             container.appendChild(card);
         });
     }
 
-    // タブ切り替え機能
-    window.switchTab = (tab) => {
-        const btns = document.querySelectorAll('.tab-btn');
-        const views = document.querySelectorAll('.view-section');
-        
-        btns.forEach(b => b.classList.remove('active'));
-        views.forEach(v => v.classList.remove('active'));
-        
-        if (tab === 'masu') {
-            btns[0].classList.add('active');
-            document.getElementById('view-masu').classList.add('active');
-        } else {
-            btns[1].classList.add('active');
-            document.getElementById('view-te').classList.add('active');
+    function toggleLearned(id) {
+        const target = masterVerbs.find(v => v.id === id);
+        if(target) {
+            target.learned = !target.learned;
+            renderAllGroups(); // 全再描画して状態を反映
         }
-    };
+    }
 
     window.onload = () => {
-        // ます形レンダリング
-        renderList('masu-grp1', masuVerbs.grp1);
-        renderList('masu-grp2-e', masuVerbs.grp2_e);
-        renderList('masu-grp2-i', masuVerbs.grp2_i);
-        renderList('masu-grp3-s', masuVerbs.grp3_s);
-        renderList('masu-grp3-k', masuVerbs.grp3_k);
-
-        // て形レンダリング
-        renderList('te-grp1', teVerbs.grp1);
-        renderList('te-grp2-e', teVerbs.grp2_e);
-        renderList('te-grp2-i', teVerbs.grp2_i);
-        renderList('te-grp3-s', teVerbs.grp3_s);
-        renderList('te-grp3-k', teVerbs.grp3_k);
-        
+        setForm('masu'); // 初期表示
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = () => {};
         }
