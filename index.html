@@ -735,7 +735,7 @@ group_kiso: "基礎・単語", group_learning: "学習メニュー", group_fun_g
 btn_kiso: "ひらがなカタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
 cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
 cat_clock: "とけい", cat_date_time: "日付・時間",
-cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう", cat_practice: "じっせん",
+cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう", cat_practice: "じっせん", cat_manga: "マンガ",
 btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
 btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
 btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", btn_k_pair: "ひらカタあわせ",
@@ -748,7 +748,7 @@ btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", bt
 btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか", 
 btn_teimasu: "V-ています", btn_temoii: "V-てもいいですか", btn_kata: "V-方",
 btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_sentencepuzzle: "ぶんづくり",
-btn_shoptalk: "お買い物トーク", btn_discount: "割引計算バトル", btn_sign: "看板サバイバル", btn_bustalk: "お仕事トーク", btn_sengoku: "戦国・日本語伝",
+btn_shoptalk: "お買い物トーク", btn_discount: "割引計算バトル", btn_sign: "看板サバイバル", btn_bustalk: "お仕事トーク", btn_sengoku: "戦国・日本語伝", btn_manga_sound: "オノマトペ",
 modal_login: "ログイン", modal_signup: "新規登録",
 ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
 btn_exec: "実行", btn_cancel: "キャンセル",
@@ -766,7 +766,7 @@ group_kiso: "Basics", group_learning: "Learning Menu", group_fun_games: "Games",
 btn_kiso: "Kana Basics", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adj List", btn_verb_list: "Verb List", btn_kanji_list: "Kanji List",
 cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
 cat_clock: "Clock", cat_date_time: "Date & Time",
-cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence", cat_practice: "Practice",
+cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Sentence", cat_practice: "Practice", cat_manga: "Manga",
 btn_h_write: "Writing Practice", btn_h_sound: "Sound Quiz", btn_h_match: "Hiragana Match",
 btn_h_vocab: "Hiragana Vocab", btn_h_reorder: "Reordering", btn_h_meteor: "Meteor Quiz",
 btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Katakana Match", btn_k_pair: "Hira/Kata Pair",
@@ -779,7 +779,7 @@ btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing
 btn_tekudasai: "V-te Kudasai", btn_tekudasaimasenka: "V-te Kudasaimasenka", btn_mashouka: "V-mashouka",
 btn_teimasu: "V-te Imasu", btn_temoii: "May I...?", btn_kata: "How to V (V-kata)",
 btn_partsort: "Particle Sorter", btn_partquiz: "Particle Master", btn_sentencepuzzle: "Sentence Builder",
-btn_shoptalk: "Shopping Talk", btn_discount: "Discount Battle", btn_sign: "Sign Reader", btn_bustalk: "Business Talk", btn_sengoku: "Sengoku RPG",
+btn_shoptalk: "Shopping Talk", btn_discount: "Discount Battle", btn_sign: "Sign Reader", btn_bustalk: "Business Talk", btn_sengoku: "Sengoku RPG", btn_manga_sound: "Manga Sound",
 modal_login: "Login", modal_signup: "Sign Up",
 ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
 btn_exec: "Submit", btn_cancel: "Cancel",
@@ -856,6 +856,9 @@ const gameStructure = [
 { url: "discount_battle.html", titleKey: "btn_discount", icon: "fa-solid fa-tag" },
 { url: "sign_survival.html", titleKey: "btn_sign", icon: "fa-solid fa-person-walking-luggage" },
 { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
+]},
+{ id: "manga", icon: "fa-solid fa-book-journal-whills", color: "#00897B", titleKey: "cat_manga", games: [
+{ url: "manga_sound.html", titleKey: "btn_manga_sound", icon: "fa-solid fa-comment-dots" }
 ]}
 ];
 
