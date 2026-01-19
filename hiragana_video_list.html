@@ -1,102 +1,242 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ひらがな練習 動画リスト</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .container {
-            max-width: 700px;
-        }
-        .video-list-container {
-            margin-top: 20px;
-        }
-        .video-link {
-            display: block;
-            background-color: #fff;
-            border: 2px solid #5c7aff;
-            color: #333;
-            padding: 20px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 1.3em;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        .video-link:hover {
-            background-color: #f0f8ff;
-        }
-        .video-link.disabled {
-            background-color: #f4f4f4;
-            border-color: #ddd;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ひらがな動画練習 - Fun Learning Japanese</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0BX3DD42C1');
+</script>
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0BX3DD42C1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+<style>
+    /* --- メインページ共通スタイル --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 80px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { 
+        font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white;
+    }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+        text-decoration: none; display: flex; align-items: center; gap: 5px;
+    }
+    .btn-back-nav:hover { background: rgba(255,255,255,0.3); }
+
+    /* ヒーローセクション */
+    .hero-section {
+        background: white; text-align: center; padding: 25px 20px;
+        width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.5em; display: flex; justify-content: center; align-items: center; gap: 10px; }
+
+    /* --- 動画リストグリッド --- */
+    .container {
+        max-width: 1000px; margin: 0 auto; padding: 0 20px;
+    }
+
+    .video-grid {
+        display: grid;
+        gap: 15px;
+    }
+
+    /* カードスタイル */
+    .video-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 15px;
+        text-decoration: none;
+        color: var(--text-color);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border: 2px solid transparent;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+
+    .video-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(92, 122, 255, 0.15);
+        border-color: var(--primary);
+    }
+
+    .video-icon {
+        color: var(--primary);
+        background: #e0e7ff;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        flex-shrink: 0;
+    }
+    .video-icon i { font-size: 1.2em; } /* アイコンサイズ小さめ */
+
+    .video-info {
+        display: flex; flex-direction: column;
+    }
+    .video-title { font-weight: 900; font-size: 1.1em; line-height: 1.2; }
+    .video-sub { font-size: 0.8em; color: #777; margin-top: 3px; }
+
+    /* --- レスポンシブレイアウト --- */
     
-      gtag('config', 'G-0BX3DD42C1');
-    </script>
-    </head>
+    /* PC・タブレット (横並び 5列) */
+    @media (min-width: 768px) {
+        .video-grid {
+            grid-template-columns: repeat(5, 1fr); /* 5つ並び */
+        }
+        .video-card {
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            height: 140px;
+            gap: 10px;
+        }
+        .video-info { align-items: center; }
+    }
+
+    /* スマホ (縦並び 1列) */
+    @media (max-width: 767px) {
+        .video-grid {
+            grid-template-columns: 1fr; /* 1つ並び */
+        }
+        .video-card {
+            flex-direction: row;
+            justify-content: flex-start;
+            text-align: left;
+            padding: 15px 20px;
+            gap: 15px;
+        }
+    }
+
+</style>
+</head>
 <body>
 
-    <h1>🎥 ひらがな練習 動画リスト</h1>
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="btn-back-nav"><i class="fa-solid fa-house"></i> ホーム</a>
+    </header>
+
+    <div class="hero-section">
+        <h1><i class="fa-solid fa-clapperboard"></i> ひらがな動画</h1>
+        <p style="color:#666; font-size:0.9em; margin-top:5px;">発音と書き順を見て覚えよう！</p>
+    </div>
 
     <div class="container">
-        
-        <div class="video-list-container">
+        <div class="video-grid">
             
-            <a href="video_player.html?video=assets/videos/a-i-u-e-o.mp4&amp;title=あ行 あいうえお" class="video-link">
-                ▶ あ行 (あいうえお)
+            <a href="video_player.html?video=assets/videos/a-i-u-e-o.mp4&title=あ行 あいうえお" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">あ行</span>
+                    <span class="video-sub">あいうえお</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/ka-ki-ku-ke-ko.mp4&amp;title=か行 かきくけこ" class="video-link">
-                ▶ か行 (かきくけこ)
+            <a href="video_player.html?video=assets/videos/ka-ki-ku-ke-ko.mp4&title=か行 かきくけこ" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">か行</span>
+                    <span class="video-sub">かきくけこ</span>
+                </div>
             </a>
             
-            <a href="video_player.html?video=assets/videos/sa-shi-su-se-so.mp4&amp;title=さ行 さしすせそ" class="video-link">
-                ▶ さ行 (さしすせそ)
+            <a href="video_player.html?video=assets/videos/sa-shi-su-se-so.mp4&title=さ行 さしすせそ" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">さ行</span>
+                    <span class="video-sub">さしすせそ</span>
+                </div>
             </a>
             
-            <a href="video_player.html?video=assets/videos/ta-chi-tsu-te-to.mp4&amp;title=た行 たちつてと" class="video-link">
-                ▶ た行 (たちつてと)
+            <a href="video_player.html?video=assets/videos/ta-chi-tsu-te-to.mp4&title=た行 たちつてと" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">た行</span>
+                    <span class="video-sub">たちつてと</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/na-ni-nu-ne-no.mp4&amp;title=な行 なにぬねの" class="video-link">
-                ▶ な行 (なにぬねの)
+            <a href="video_player.html?video=assets/videos/na-ni-nu-ne-no.mp4&title=な行 なにぬねの" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">な行</span>
+                    <span class="video-sub">なにぬねの</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/ha-hi-fu-he-ho.mp4&amp;title=は行 はひふへほ" class="video-link">
-                ▶ は行 (はひふへほ)
+            <a href="video_player.html?video=assets/videos/ha-hi-fu-he-ho.mp4&title=は行 はひふへほ" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">は行</span>
+                    <span class="video-sub">はひふへほ</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/ma-mi-mu-me-mo.mp4&amp;title=ま行 まみむめも" class="video-link">
-                ▶ ま行 (まみむめも)
+            <a href="video_player.html?video=assets/videos/ma-mi-mu-me-mo.mp4&title=ま行 まみむめも" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">ま行</span>
+                    <span class="video-sub">まみむめも</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/ya-yu-yo.mp4&amp;title=や行 やゆよ" class="video-link">
-                ▶ や行 (やゆよ)
+            <a href="video_player.html?video=assets/videos/ya-yu-yo.mp4&title=や行 やゆよ" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">や行</span>
+                    <span class="video-sub">やゆよ</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/ra-ri-ru-re-ro.mp4&amp;title=ら行 らりるれろ" class="video-link">
-                ▶ ら行 (らりるれろ)
+            <a href="video_player.html?video=assets/videos/ra-ri-ru-re-ro.mp4&title=ら行 らりるれろ" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">ら行</span>
+                    <span class="video-sub">らりるれろ</span>
+                </div>
             </a>
 
-            <a href="video_player.html?video=assets/videos/wa-o-n.mp4&amp;title=わ行 わをん" class="video-link">
-                ▶ わ行 (わをん)
+            <a href="video_player.html?video=assets/videos/wa-o-n.mp4&title=わ行 わをん" class="video-card">
+                <div class="video-icon"><i class="fa-solid fa-play"></i></div>
+                <div class="video-info">
+                    <span class="video-title">わ行</span>
+                    <span class="video-sub">わをん</span>
+                </div>
             </a>
 
-        </div>
-
-        <div class="navigation-buttons" style="margin-top: 30px; text-align: center;">
-            <button onclick="window.location.href='index.html'">ホームにもどる</button>
         </div>
     </div>
 
