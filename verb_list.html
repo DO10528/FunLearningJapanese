@@ -98,7 +98,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 
-    /* --- グループカラムレイアウト (前回と同じ) --- */
+    /* --- グループカラムレイアウト --- */
     .groups-container {
         display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start;
     }
@@ -193,7 +193,7 @@
                 <div class="type-tag" style="background: var(--grp2-color);">e-masu</div>
                 <div class="verb-list-area" id="masu-grp2-e"></div>
                 <div class="divider"></div>
-                <div class="type-tag" style="background: var(--grp2-color);">i-masu</div>
+                <div class="type-tag" style="background: var(--grp2-color);">i-masu (Exception)</div>
                 <div class="verb-list-area" id="masu-grp2-i"></div>
             </div>
             <div class="group-column" style="border-top-color: var(--grp3-color);">
@@ -239,7 +239,7 @@
 </div>
 
 <script>
-    // --- ます形データ ---
+    // --- ます形データ (追加済み) ---
     const masuVerbs = {
         grp1: [
             { jp: "かきます", en: "Write", icon: "fa-solid fa-pen" },
@@ -257,7 +257,18 @@
             { jp: "とります", en: "Take photo", icon: "fa-solid fa-camera" },
             { jp: "かえります", en: "Return", icon: "fa-solid fa-house" },
             { jp: "わかります", en: "Understand", icon: "fa-regular fa-lightbulb" },
-            { jp: "はなします", en: "Talk", icon: "fa-solid fa-comments" }
+            { jp: "はなします", en: "Talk", icon: "fa-solid fa-comments" },
+            // Added
+            { jp: "うります", en: "Sell", icon: "fa-solid fa-hand-holding-dollar" },
+            { jp: "つかいます", en: "Use", icon: "fa-solid fa-hand-pointer" },
+            { jp: "ならいます", en: "Learn", icon: "fa-solid fa-book-reader" },
+            { jp: "たちます", en: "Stand", icon: "fa-solid fa-person" },
+            { jp: "すわります", en: "Sit", icon: "fa-solid fa-chair" },
+            { jp: "いそぎます", en: "Hurry", icon: "fa-solid fa-person-running" },
+            { jp: "はたらきます", en: "Work", icon: "fa-solid fa-briefcase" },
+            { jp: "かします", en: "Lend", icon: "fa-solid fa-hand-holding-heart" },
+            { jp: "あるきます", en: "Walk", icon: "fa-solid fa-person-walking" },
+            { jp: "のります", en: "Ride", icon: "fa-solid fa-train-subway" }
         ],
         grp2_e: [
             { jp: "ねます", en: "Sleep", icon: "fa-solid fa-moon" },
@@ -266,7 +277,16 @@
             { jp: "あけます", en: "Open", icon: "fa-solid fa-door-open" },
             { jp: "みせます", en: "Show", icon: "fa-solid fa-eye" },
             { jp: "おしえます", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
-            { jp: "はじめます", en: "Start", icon: "fa-solid fa-play" }
+            { jp: "はじめます", en: "Start", icon: "fa-solid fa-play" },
+            // Added
+            { jp: "しめます", en: "Close", icon: "fa-solid fa-door-closed" },
+            { jp: "つけます", en: "Turn on", icon: "fa-solid fa-power-off" },
+            { jp: "わすれます", en: "Forget", icon: "fa-solid fa-circle-question" },
+            { jp: "でます", en: "Exit/Leave", icon: "fa-solid fa-arrow-right-from-bracket" },
+            { jp: "おぼえます", en: "Remember", icon: "fa-solid fa-brain" },
+            { jp: "とめます", en: "Stop", icon: "fa-solid fa-hand" },
+            { jp: "すてます", en: "Throw away", icon: "fa-solid fa-trash" },
+            { jp: "かんがえます", en: "Think", icon: "fa-solid fa-cloud" }
         ],
         grp2_i: [
             { jp: "みます", en: "Watch/See", icon: "fa-solid fa-tv" },
@@ -274,21 +294,36 @@
             { jp: "おきます", en: "Wake up", icon: "fa-solid fa-sun" },
             { jp: "かります", en: "Borrow", icon: "fa-solid fa-hand-holding" },
             { jp: "あびます", en: "Shower", icon: "fa-solid fa-shower" },
-            { jp: "できます", en: "Can do", icon: "fa-solid fa-thumbs-up" }
+            { jp: "できます", en: "Can do", icon: "fa-solid fa-thumbs-up" },
+            // Added
+            { jp: "おります", en: "Get off", icon: "fa-solid fa-person-walking-luggage" },
+            { jp: "きます", en: "Wear", icon: "fa-solid fa-shirt" }
         ],
         grp3_s: [
             { jp: "べんきょう\nします", en: "Study", icon: "fa-solid fa-graduation-cap" },
             { jp: "かいもの\nします", en: "Shop", icon: "fa-solid fa-basket-shopping" },
             { jp: "さんぽ\nします", en: "Walk", icon: "fa-solid fa-tree" },
-            { jp: "コピー\nします", en: "Copy", icon: "fa-solid fa-copy" }
+            { jp: "コピー\nします", en: "Copy", icon: "fa-solid fa-copy" },
+            // Added
+            { jp: "けっこん\nします", en: "Marry", icon: "fa-solid fa-ring" },
+            { jp: "そうじ\nします", en: "Clean", icon: "fa-solid fa-broom" },
+            { jp: "せんたく\nします", en: "Laundry", icon: "fa-solid fa-shirt" },
+            { jp: "りょうり\nします", en: "Cook", icon: "fa-solid fa-kitchen-set" },
+            { jp: "うんてん\nします", en: "Drive", icon: "fa-solid fa-car" },
+            { jp: "でんわ\nします", en: "Call", icon: "fa-solid fa-phone" },
+            { jp: "しんぱい\nします", en: "Worry", icon: "fa-solid fa-face-frown" },
+            { jp: "ざんぎょう\nします", en: "Overtime", icon: "fa-solid fa-business-time" },
+            { jp: "しょくじ\nします", en: "Meal", icon: "fa-solid fa-bowl-rice" }
         ],
         grp3_k: [
             { jp: "きます", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "もって\nきます", en: "Bring", icon: "fa-solid fa-box-open" }
+            { jp: "もって\nきます", en: "Bring", icon: "fa-solid fa-box-open" },
+            // Added
+            { jp: "つれて\nきます", en: "Bring (person)", icon: "fa-solid fa-people-arrows" }
         ]
     };
 
-    // --- て形データ (変換済み) ---
+    // --- て形データ (変換済み・追加済み) ---
     const teVerbs = {
         grp1: [
             { jp: "かいて", en: "Write", icon: "fa-solid fa-pen" },
@@ -306,7 +341,18 @@
             { jp: "とって", en: "Take photo", icon: "fa-solid fa-camera" },
             { jp: "かえって", en: "Return", icon: "fa-solid fa-house" },
             { jp: "わかって", en: "Understand", icon: "fa-regular fa-lightbulb" },
-            { jp: "はなして", en: "Talk", icon: "fa-solid fa-comments" }
+            { jp: "はなして", en: "Talk", icon: "fa-solid fa-comments" },
+            // Added
+            { jp: "うって", en: "Sell", icon: "fa-solid fa-hand-holding-dollar" },
+            { jp: "つかって", en: "Use", icon: "fa-solid fa-hand-pointer" },
+            { jp: "ならって", en: "Learn", icon: "fa-solid fa-book-reader" },
+            { jp: "たって", en: "Stand", icon: "fa-solid fa-person" },
+            { jp: "すわって", en: "Sit", icon: "fa-solid fa-chair" },
+            { jp: "いそいで", en: "Hurry", icon: "fa-solid fa-person-running" },
+            { jp: "はたらいて", en: "Work", icon: "fa-solid fa-briefcase" },
+            { jp: "かして", en: "Lend", icon: "fa-solid fa-hand-holding-heart" },
+            { jp: "あるいて", en: "Walk", icon: "fa-solid fa-person-walking" },
+            { jp: "のって", en: "Ride", icon: "fa-solid fa-train-subway" }
         ],
         grp2_e: [
             { jp: "ねて", en: "Sleep", icon: "fa-solid fa-moon" },
@@ -315,7 +361,16 @@
             { jp: "あけて", en: "Open", icon: "fa-solid fa-door-open" },
             { jp: "みせて", en: "Show", icon: "fa-solid fa-eye" },
             { jp: "おしえて", en: "Teach", icon: "fa-solid fa-chalkboard-user" },
-            { jp: "はじめて", en: "Start", icon: "fa-solid fa-play" }
+            { jp: "はじめて", en: "Start", icon: "fa-solid fa-play" },
+            // Added
+            { jp: "しめて", en: "Close", icon: "fa-solid fa-door-closed" },
+            { jp: "つけて", en: "Turn on", icon: "fa-solid fa-power-off" },
+            { jp: "わすれて", en: "Forget", icon: "fa-solid fa-circle-question" },
+            { jp: "でて", en: "Exit/Leave", icon: "fa-solid fa-arrow-right-from-bracket" },
+            { jp: "おぼえて", en: "Remember", icon: "fa-solid fa-brain" },
+            { jp: "とめて", en: "Stop", icon: "fa-solid fa-hand" },
+            { jp: "すてて", en: "Throw away", icon: "fa-solid fa-trash" },
+            { jp: "かんがえて", en: "Think", icon: "fa-solid fa-cloud" }
         ],
         grp2_i: [
             { jp: "みて", en: "Watch/See", icon: "fa-solid fa-tv" },
@@ -323,17 +378,32 @@
             { jp: "おきて", en: "Wake up", icon: "fa-solid fa-sun" },
             { jp: "かりて", en: "Borrow", icon: "fa-solid fa-hand-holding" },
             { jp: "あびて", en: "Shower", icon: "fa-solid fa-shower" },
-            { jp: "できて", en: "Can do", icon: "fa-solid fa-thumbs-up" }
+            { jp: "できて", en: "Can do", icon: "fa-solid fa-thumbs-up" },
+            // Added
+            { jp: "おりて", en: "Get off", icon: "fa-solid fa-person-walking-luggage" },
+            { jp: "きて", en: "Wear", icon: "fa-solid fa-shirt" }
         ],
         grp3_s: [
             { jp: "べんきょう\nして", en: "Study", icon: "fa-solid fa-graduation-cap" },
             { jp: "かいもの\nして", en: "Shop", icon: "fa-solid fa-basket-shopping" },
             { jp: "さんぽ\nして", en: "Walk", icon: "fa-solid fa-tree" },
-            { jp: "コピー\nして", en: "Copy", icon: "fa-solid fa-copy" }
+            { jp: "コピー\nして", en: "Copy", icon: "fa-solid fa-copy" },
+            // Added
+            { jp: "けっこん\nして", en: "Marry", icon: "fa-solid fa-ring" },
+            { jp: "そうじ\nして", en: "Clean", icon: "fa-solid fa-broom" },
+            { jp: "せんたく\nして", en: "Laundry", icon: "fa-solid fa-shirt" },
+            { jp: "りょうり\nして", en: "Cook", icon: "fa-solid fa-kitchen-set" },
+            { jp: "うんてん\nして", en: "Drive", icon: "fa-solid fa-car" },
+            { jp: "でんわ\nして", en: "Call", icon: "fa-solid fa-phone" },
+            { jp: "しんぱい\nして", en: "Worry", icon: "fa-solid fa-face-frown" },
+            { jp: "ざんぎょう\nして", en: "Overtime", icon: "fa-solid fa-business-time" },
+            { jp: "しょくじ\nして", en: "Meal", icon: "fa-solid fa-bowl-rice" }
         ],
         grp3_k: [
             { jp: "きて", en: "Come", icon: "fa-solid fa-person-walking-arrow-right" },
-            { jp: "もって\nきて", en: "Bring", icon: "fa-solid fa-box-open" }
+            { jp: "もって\nきて", en: "Bring", icon: "fa-solid fa-box-open" },
+            // Added
+            { jp: "つれて\nきて", en: "Bring (person)", icon: "fa-solid fa-people-arrows" }
         ]
     };
 
