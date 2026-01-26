@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>たからさがしワークシート</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+    /* --- 印刷設定 --- */
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        background: #eee;
+        font-family: 'Zen Maru Gothic', sans-serif;
+    }
+
+    /* --- A4シートの共通スタイル --- */
+    .sheet {
+        width: 210mm;
+        height: 296mm;
+        background: white;
+        margin: 20px auto;
+        padding: 15mm;
+        box-sizing: border-box;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media print {
+        body { background: white; }
+        .sheet {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 10mm;
+            box-shadow: none;
+            page-break-after: always;
+        }
+    }
+
+    /* --- 表紙 (Cover) --- */
+    .cover-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 5px dashed #5c7aff;
+        border-radius: 20px;
+    }
+    .main-title {
+        font-size: 60px;
+        font-weight: 900;
+        color: #5c7aff;
+        margin-bottom: 20px;
+        letter-spacing: 5px;
+    }
+    .sub-title {
+        font-size: 24px;
+        color: #666;
+        margin-bottom: 100px;
+    }
+    .name-box {
+        width: 80%;
+        border-bottom: 3px solid #333;
+        padding: 10px;
+        text-align: left;
+        font-size: 30px;
+        margin-top: 50px;
+    }
+    .name-label {
+        font-size: 20px;
+        color: #555;
+    }
+
+    /* --- 問題ページ (Topic Page) --- */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #ccc;
+        padding-bottom: 10px;
+    }
+    .topic-title {
+        font-size: 32px;
+        font-weight: 900;
+        padding: 5px 20px;
+        border-radius: 15px;
+        color: white;
+    }
+    .page-number {
+        font-size: 18px;
+        color: #888;
+    }
+
+    /* 2x2 グリッド */
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 20px;
+        flex: 1;
+    }
+
+    .card {
+        border-radius: 20px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    /* 名前記入欄 */
+    .word-section {
+        height: 60px;
+        display: flex;
+        align-items: center; /* 垂直中央揃え */
+        margin-bottom: 10px;
+    }
+    .name-label-text {
+        font-size: 18px;
+        color: #555;
+        font-weight: bold;
+        margin-right: 10px;
+        white-space: nowrap; /* 改行しない */
+    }
+    .write-line {
+        flex: 1; /* 残りの幅いっぱい */
+        height: 40px;
+        border-bottom: 2px solid #333; /* 下線 */
+    }
+
+    /* 絵を描く欄 */
+    .draw-section {
+        flex: 1;
+        border: 2px dashed #ddd; /* 絵を描くところは破線で優しく */
+        border-radius: 15px;
+        background: #fdfdfd;
+        position: relative;
+    }
+    .draw-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 14px;
+        color: #aaa;
+        font-weight: bold;
+    }
+
+</style>
+</head>
+<body>
+
+    <div id="worksheet-container"></div>
+
+<script>
+    // --- データ定義 ---
+    const GAME_DATA = {
+        stationery: {
+            title: 'ぶんぼうぐ',
+            color: '#ffd54f', // 黄色
+            words: new Array(10).fill({}) // アイテム数は10個（中身は空でOK）
+        },
+        food: {
+            title: 'たべもの',
+            color: '#ffab91', // オレンジ
+            words: new Array(10).fill({})
+        },
+        clothing: {
+            title: 'おようふく',
+            color: '#81d4fa', // 水色
+            words: new Array(10).fill({})
+        },
+        toys: {
+            title: 'おもちゃ',
+            color: '#a5d6a7', // 緑
+            words: new Array(10).fill({})
+        },
+        room: {
+            title: 'おへや',
+            color: '#ce93d8', // 紫
+            words: new Array(10).fill({})
+        },
+        kitchen: {
+            title: 'キッチン',
+            color: '#ffcc80', // 薄オレンジ
+            words: new Array(10).fill({})
+        },
+        bathroom: {
+            title: 'おふろ',
+            color: '#80deea', // シアン
+            words: new Array(10).fill({})
+        },
+        electronics: {
+            title: 'かでん',
+            color: '#b0bec5', // グレー
+            words: new Array(10).fill({})
+        },
+        colors: {
+            title: 'いろ',
+            color: '#f48fb1', // ピンク
+            words: new Array(10).fill({})
+        },
+        body: {
+            title: 'からだ',
+            color: '#ffccbc', // 肌色
+            words: new Array(10).fill({})
+        }
+    };
+
+    const container = document.getElementById('worksheet-container');
+
+    // -------------------------------------------
+    // 1. 表紙の生成
+    // -------------------------------------------
+    const coverSheet = document.createElement('div');
+    coverSheet.className = 'sheet';
+    coverSheet.innerHTML = `
+        <div class="cover-container">
+            <div class="main-title">たからさがし</div>
+            <div class="sub-title">おうちにあるものを さがして えをかこう！</div>
+            <div class="name-box">
+                <span class="name-label">なまえ：</span>
+            </div>
+        </div>
+    `;
+    container.appendChild(coverSheet);
+
+    // -------------------------------------------
+    // 2. トピックページの生成
+    // -------------------------------------------
+    Object.keys(GAME_DATA).forEach(key => {
+        const topic = GAME_DATA[key];
+        const words = topic.words;
+        const itemsPerPage = 4; // 1ページ4問
+        
+        for (let i = 0; i < words.length; i += itemsPerPage) {
+            
+            // ページ作成
+            const sheet = document.createElement('div');
+            sheet.className = 'sheet';
+
+            // ヘッダー
+            const header = document.createElement('div');
+            header.className = 'header';
+            header.style.borderColor = topic.color;
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'topic-title';
+            titleDiv.textContent = topic.title;
+            titleDiv.style.backgroundColor = topic.color;
+
+            const pageNum = document.createElement('div');
+            pageNum.className = 'page-number';
+            const currentPage = Math.floor(i / itemsPerPage) + 1;
+            const totalPages = Math.ceil(words.length / itemsPerPage);
+            pageNum.textContent = `${currentPage} / ${totalPages}`;
+
+            header.appendChild(titleDiv);
+            header.appendChild(pageNum);
+            sheet.appendChild(header);
+
+            // グリッド作成
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            // 4つのカードを作成
+            for (let j = 0; j < itemsPerPage; j++) {
+                if (i + j >= words.length) break; // アイテム数を超えたら終了
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                // ★修正点: 枠線をトピックの色に変更（太め）
+                card.style.border = `4px solid ${topic.color}`;
+
+                // ★修正点: 単語名を削除し、「（なまえ）」ラベルと記入線を表示
+                const wordSection = document.createElement('div');
+                wordSection.className = 'word-section';
+                wordSection.innerHTML = `
+                    <div class="name-label-text">（なまえ）</div>
+                    <div class="write-line" style="border-color: ${topic.color}"></div>
+                `;
+
+                // 絵を描く欄
+                const drawSection = document.createElement('div');
+                drawSection.className = 'draw-section';
+                drawSection.innerHTML = `<span class="draw-label">えをかこう</span>`;
+
+                card.appendChild(wordSection);
+                card.appendChild(drawSection);
+                grid.appendChild(card);
+            }
+
+            // レイアウト崩れ防止の空白埋め
+            while (grid.children.length < 4) {
+                const emptyCard = document.createElement('div');
+                emptyCard.style.visibility = 'hidden'; 
+                grid.appendChild(emptyCard);
+            }
+
+            sheet.appendChild(grid);
+            container.appendChild(sheet);
+        }
+    });
+
+</script>
+</body>
+</html>
