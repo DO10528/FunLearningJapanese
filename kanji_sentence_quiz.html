@@ -126,7 +126,6 @@
     }
     .sentence-box { font-size: 1.4em; line-height: 1.8; font-weight: bold; color: #444; text-align: left; }
     
-    /* 会話のコンテキスト用スタイル */
     .context-line { color: #888; font-size: 0.9em; margin-bottom: 10px; border-left: 3px solid #ddd; padding-left: 10px; }
     .current-line { color: #333; font-weight: 900; }
 
@@ -287,47 +286,90 @@
         { pre: "<ruby>右<rt>みぎ</rt></ruby>の", reading: "あし", target: "足", post: "が<ruby>痛<rt>いた</rt></ruby>いです。", wrong1: "口", wrong2: "走", en: "My right leg hurts." }
     ];
 
-    // Lv2: A-B会話セット (グループ化)
-    // 1つの配列の中に「会話の流れ」順に問題を入れる
+    // Lv2: A-B会話セット (グループ化) - 10セット作成
     const level2Groups = [
-        [ // Conversation 1 (Lunch)
-            { pre: "おなかが <ruby>空<rt>す</rt></ruby>きましたね。<ruby>何<rt>なに</rt></ruby>", reading: "じ", target: "時", post: "ですか。", wrong1: "分", wrong2: "寺", en: "I'm hungry. What time is it?", role: "A" },
-            { pre: "12時です。<ruby>昼<rt>ひる</rt></ruby>ご<ruby>飯<rt>はん</rt></ruby>を", reading: "た", target: "食", post: "べましょう。", wrong1: "飲", wrong2: "見", en: "It's 12 o'clock. Let's eat lunch.", role: "B", prev: "A: おなかが すきましたね。何時ですか。" }
+        [ // 1. Lunch
+            { pre: "<ruby>昼<rt>ひる</rt></ruby>ご<ruby>飯<rt>はん</rt></ruby>は <ruby>何<rt>なん</rt></ruby>", reading: "じ", target: "時", post: "ですか。", wrong1: "分", wrong2: "寺", en: "What time is lunch?", role: "A" },
+            { pre: "12時です。<ruby>一緒<rt>いっしょ</rt></ruby>に", reading: "た", target: "食", post: "べましょう。", wrong1: "飲", wrong2: "見", en: "It's 12. Let's eat together.", role: "B", prev: "A: 昼ご飯は 何時ですか。" }
         ],
-        [ // Conversation 2 (Weather)
-            { pre: "今日は", reading: "てん", target: "天", post: "<ruby>気<rt>き</rt></ruby>が いいですね。", wrong1: "大", wrong2: "夫", en: "The weather is nice today.", role: "A" },
-            { pre: "そうですね。<ruby>外<rt>そと</rt></ruby>に", reading: "い", target: "行", post: "きましょう。", wrong1: "休", wrong2: "来", en: "That's right. Let's go outside.", role: "B", prev: "A: 今日は 天気が いいですね。" }
+        [ // 2. Weather
+            { pre: "今日は <ruby>天<rt>てん</rt></ruby>", reading: "き", target: "気", post: "が <ruby>悪<rt>わる</rt></ruby>いですね。", wrong1: "汽", wrong2: "木", en: "The weather is bad today.", role: "A" },
+            { pre: "そうですね。", reading: "あめ", target: "雨", post: "が <ruby>降<rt>ふ</rt></ruby>りますよ。", wrong1: "雪", wrong2: "雲", en: "That's right. It's going to rain.", role: "B", prev: "A: 今日は 天気が 悪いですね。" }
         ],
-        [ // Conversation 3 (Name)
-            { pre: "あなたの", reading: "な", target: "名", post: "<ruby>前<rt>まえ</rt></ruby>は 何ですか。", wrong1: "夕", wrong2: "多", en: "What is your name?", role: "A" },
-            { pre: "<ruby>田<rt>た</rt></ruby>", reading: "なか", target: "中", post: "です。よろしくお<ruby>願<rt>ねが</rt></ruby>いします。", wrong1: "口", wrong2: "日", en: "I am Tanaka. Nice to meet you.", role: "B", prev: "A: あなたの 名前は 何ですか。" }
+        [ // 3. Intro
+            { pre: "お", reading: "な", target: "名", post: "<ruby>前<rt>まえ</rt></ruby>は <ruby>何<rt>なん</rt></ruby>ですか。", wrong1: "夕", wrong2: "多", en: "What is your name?", role: "A" },
+            { pre: "<ruby>田中<rt>たなか</rt></ruby>です。大", reading: "がく", target: "学", post: "<ruby>生<rt>せい</rt></ruby>です。", wrong1: "字", wrong2: "安", en: "I am Tanaka. I'm a university student.", role: "B", prev: "A: お名前は 何ですか。" }
         ],
-        [ // Conversation 4 (Book)
-            { pre: "この <ruby>本<rt>ほん</rt></ruby>は", reading: "なん", target: "何", post: "ですか。", wrong1: "伺", wrong2: "同", en: "What is this book?", role: "A" },
-            { pre: "それは <ruby>日本<rt>にほん</rt></ruby>の", reading: "くるま", target: "車", post: "の <ruby>本<rt>ほん</rt></ruby>です。", wrong1: "東", wrong2: "連", en: "That is a book about Japanese cars.", role: "B", prev: "A: この 本は 何ですか。" }
+        [ // 4. Shopping
+            { pre: "この <ruby>本<rt>ほん</rt></ruby>は いくらですか。", reading: "えん", target: "円", post: "", wrong1: "月", wrong2: "口", en: "(Actually target is in prev sentence context implied, fixing structure: This book, how much?) -> Context fix: 'This book is 500 yen.'", 
+              // Re-structuring for N5 fit
+              pre: "この <ruby>本<rt>ほん</rt></ruby>は 500", reading: "えん", target: "円", post: "です。", wrong1: "口", wrong2: "目", en: "This book is 500 yen.", role: "A" },
+            { pre: "<ruby>安<rt>やす</rt></ruby>いですね。それを", reading: "か", target: "買", post: "います。", wrong1: "貝", wrong2: "見", en: "That's cheap. I'll buy it.", role: "B", prev: "A: この 本は 500円です。" }
         ],
-        [ // Conversation 5 (Sick)
-            { pre: "<ruby>顔色<rt>かおいろ</rt></ruby>が", reading: "わる", target: "悪", post: "いですね。", wrong1: "亜", wrong2: "西", en: "You look pale.", role: "A" },
-            { pre: "はい、今日は <ruby>会社<rt>かいしゃ</rt></ruby>を", reading: "やす", target: "休", post: "みます。", wrong1: "体", wrong2: "来", en: "Yes, I will take a day off today.", role: "B", prev: "A: 顔色が 悪いですね。" }
+        [ // 5. Directions
+            { pre: "すみません。<ruby>東京<rt>とうきょう</rt></ruby>", reading: "えき", target: "駅", post: "は どこですか。", wrong1: "訳", wrong2: "馬", en: "Excuse me. Where is Tokyo Station?", role: "A" },
+            { pre: "あちらです。この", reading: "みち", target: "道", post: "を まっすぐです。", wrong1: "通", wrong2: "週", en: "It's over there. Go straight on this road.", role: "B", prev: "A: すみません。東京駅は どこですか。" }
+        ],
+        [ // 6. Sickness
+            { pre: "お<ruby>腹<rt>なか</rt></ruby>が <ruby>痛<rt>いた</rt></ruby>いです。<ruby>元気<rt>げんき</rt></ruby>が", reading: "な", target: "無", post: "いです。(※N5外ですが)", // Adjusting to N5 target
+              pre: "どうしましたか。<ruby>元気<rt>げんき</rt></ruby>が", reading: "な", target: "無", post: "いですね。(No good target)",
+              // Retry
+              pre: "<ruby>顔色<rt>かおいろ</rt></ruby>が <ruby>悪<rt>わる</rt></ruby>いですね。", reading: "だい", target: "大", post: "<ruby>丈<rt>じょう</rt></ruby><ruby>夫<rt>ぶ</rt></ruby>ですか。", wrong1: "太", wrong2: "犬", en: "You look pale. Are you okay?", role: "A" },
+            { pre: "いいえ。<ruby>今日<rt>きょう</rt></ruby>は", reading: "やす", target: "休", post: "みます。", wrong1: "体", wrong2: "来", en: "No. I will rest today.", role: "B", prev: "A: 顔色が 悪いですね。大丈夫ですか。" }
+        ],
+        [ // 7. Phone/Contact
+            { pre: "<ruby>電話<rt>でんわ</rt></ruby>で", reading: "はな", target: "話", post: "しませんか。", wrong1: "語", wrong2: "読", en: "Shall we talk on the phone?", role: "A" },
+            { pre: "いいですね。<ruby>後<rt>あと</rt></ruby>で", reading: "でん", target: "電", post: "<ruby>話<rt>わ</rt></ruby>します。", wrong1: "雷", wrong2: "雪", en: "Sounds good. I'll call you later.", role: "B", prev: "A: 電話で 話しませんか。" }
+        ],
+        [ // 8. Weekend
+            { pre: "<ruby>来<rt>らい</rt></ruby>", reading: "しゅう", target: "週", post: "、<ruby>暇<rt>ひま</rt></ruby>ですか。", wrong1: "周", wrong2: "道", en: "Are you free next week?", role: "A" },
+            { pre: "はい。<ruby>一緒<rt>いっしょ</rt></ruby>に", reading: "あ", target: "会", post: "いましょう。", wrong1: "合", wrong2: "今", en: "Yes. Let's meet.", role: "B", prev: "A: 来週、暇ですか。" }
+        ],
+        [ // 9. Hobby
+            { pre: "いつも どんな", reading: "おん", target: "音", post: "<ruby>楽<rt>がく</rt></ruby>を <ruby>聞<rt>き</rt></ruby>きますか。", wrong1: "白", wrong2: "日", en: "What music do you usually listen to?", role: "A" },
+            { pre: "ラジオを よく", reading: "き", target: "聞", post: "きます。", wrong1: "間", wrong2: "耳", en: "I often listen to the radio.", role: "B", prev: "A: いつも どんな 音楽を 聞きますか。" }
+        ],
+        [ // 10. Travel
+            { pre: "<ruby>休<rt>やす</rt></ruby>みの<ruby>日<rt>ひ</rt></ruby>に", reading: "くるま", target: "車", post: "で <ruby>出<rt>で</rt></ruby>かけました。", wrong1: "東", wrong2: "庫", en: "I went out by car on my day off.", role: "A" },
+            { pre: "いいですね。きれいな", reading: "やま", target: "山", post: "を <ruby>見<rt>み</rt></ruby>ましたか。", wrong1: "出", wrong2: "川", en: "Nice. Did you see beautiful mountains?", role: "B", prev: "A: 休みの日に 車で 出かけました。" }
         ]
     ];
 
-    // Lv3: A-B-C会話セット (グループ化)
+    // Lv3: A-B-C会話セット (グループ化) - 6セット作成
     const level3Groups = [
-        [ // Conversation 1 (Mountain)
-            { pre: "私は <ruby>日本<rt>にほん</rt></ruby>の", reading: "やま", target: "山", post: "が <ruby>好<rt>す</rt></ruby>きです。", wrong1: "出", wrong2: "川", en: "I like Japanese mountains.", role: "A" },
-            { pre: "<ruby>日曜日<rt>にちようび</rt></ruby>に <ruby>父<rt>ちち</rt></ruby>と", reading: "い", target: "行", post: "きました。", wrong1: "休", wrong2: "来", en: "I went with my father on Sunday.", role: "B", prev: "A: 私は 日本の 山が 好きです。" },
-            { pre: "たくさん <ruby>歩<rt>ある</rt></ruby>きました。とても", reading: "たの", target: "楽", post: "しかったです。", wrong1: "薬", wrong2: "東", en: "We walked a lot. It was very fun.", role: "C", prev: "A: 私は 日本の 山が 好きです。<br>B: 日曜日に 父と 行きました。" }
+        [ // 1. Restaurant
+            { pre: "<ruby>昼<rt>ひる</rt></ruby>ご<ruby>飯<rt>はん</rt></ruby>は", reading: "なに", target: "何", post: "を <ruby>食<rt>た</rt></ruby>べますか。", wrong1: "伺", wrong2: "同", en: "What will you eat for lunch?", role: "A" },
+            { pre: "私は", reading: "さかな", target: "魚", post: "を <ruby>食<rt>た</rt></ruby>べます。", wrong1: "角", wrong2: "牛", en: "I will eat fish.", role: "B", prev: "A: 昼ご飯は 何を 食べますか。" },
+            { pre: "私は", reading: "みず", target: "水", post: "と パンを ください。", wrong1: "氷", wrong2: "木", en: "Water and bread for me, please.", role: "C", prev: "A: 昼ご飯は 何を 食べますか。<br>B: 私は 魚を 食べます。" }
         ],
-        [ // Conversation 2 (Cooking)
-            { pre: "私の", reading: "はは", target: "母", post: "は <ruby>料理<rt>りょうり</rt></ruby>が <ruby>上手<rt>じょうず</rt></ruby>です。", wrong1: "毎", wrong2: "海", en: "My mother is good at cooking.", role: "A" },
-            { pre: "<ruby>毎日<rt>まいにち</rt></ruby> おいしい ご<ruby>飯<rt>はん</rt></ruby>を", reading: "つく", target: "作", post: "ります。", wrong1: "昨", wrong2: "休", en: "She makes delicious meals every day.", role: "B", prev: "A: 私の 母は 料理が 上手です。" },
-            { pre: "私は いつも たくさん", reading: "た", target: "食", post: "べます。", wrong1: "飲", wrong2: "良", en: "I always eat a lot.", role: "C", prev: "A: 私の 母は 料理が 上手です。<br>B: 毎日 おいしい ご飯を 作ります。" }
+        [ // 2. Trip
+            { pre: "<ruby>先週<rt>せんしゅう</rt></ruby>、<ruby>京都<rt>きょうと</rt></ruby>へ", reading: "い", target: "行", post: "きました。", wrong1: "休", wrong2: "来", en: "I went to Kyoto last week.", role: "A" },
+            { pre: "いいですね。そこで", reading: "なに", target: "何", post: "を しましたか。", wrong1: "伺", wrong2: "可", en: "Nice. What did you do there?", role: "B", prev: "A: 先週、京都へ 行きました。" },
+            { pre: "<ruby>古<rt>ふる</rt></ruby>い お<ruby>寺<rt>てら</rt></ruby>を", reading: "み", target: "見", post: "ました。", wrong1: "貝", wrong2: "目", en: "We saw old temples.", role: "C", prev: "A: 先週、京都へ 行きました。<br>B: いいですね。そこで 何を しましたか。" }
         ],
-        [ // Conversation 3 (Train)
-            { pre: "きのう <ruby>友<rt>とも</rt></ruby>だちに", reading: "あ", target: "会", post: "いました。", wrong1: "今", wrong2: "合", en: "I met a friend yesterday.", role: "A" },
-            { pre: "私たちは <ruby>電車<rt>でんしゃ</rt></ruby>で", reading: "えき", target: "駅", post: "まで <ruby>行<rt>い</rt></ruby>きました。", wrong1: "馬", wrong2: "験", en: "We went to the station by train.", role: "B", prev: "A: きのう 友だちに 会いました。" },
-            { pre: "そこで <ruby>新<rt>あたら</rt></ruby>しい", reading: "みせ", target: "店", post: "を <ruby>見<rt>み</rt></ruby>ました。", wrong1: "庄", wrong2: "庫", en: "We saw a new shop there.", role: "C", prev: "A: きのう 友だちに 会いました。<br>B: 私たちは 電車で 駅まで 行きました。" }
+        [ // 3. School
+            { pre: "<ruby>日本語<rt>にほんご</rt></ruby>の 勉<ruby>強<rt>きょう</rt></ruby>は どうですか。", reading: "ご", target: "語", post: "", wrong1: "話", wrong2: "読", // context fix
+              pre: "日本", reading: "ご", target: "語", post: "の 勉<ruby>強<rt>きょう</rt></ruby>は どうですか。", wrong1: "話", wrong2: "読", en: "How is your Japanese study?", role: "A" },
+            { pre: "<ruby>難<rt>むずか</rt></ruby>しいです。<ruby>本<rt>ほん</rt></ruby>を たくさん", reading: "よ", target: "読", post: "みます。", wrong1: "語", wrong2: "言", en: "It's difficult. I read many books.", role: "B", prev: "A: 日本語の 勉強は どうですか。" },
+            { pre: "私は <ruby>先生<rt>せんせい</rt></ruby>と たくさん", reading: "はな", target: "話", post: "します。", wrong1: "語", wrong2: "計", en: "I talk a lot with the teacher.", role: "C", prev: "A: 日本語の 勉強は どうですか。<br>B: 難しいです。本を たくさん 読みます。" }
+        ],
+        [ // 4. Family
+            { pre: "ご<ruby>家族<rt>かぞく</rt></ruby>は", reading: "なん", target: "何", post: "<ruby>人<rt>にん</rt></ruby>ですか。", wrong1: "伺", wrong2: "可", en: "How many people are in your family?", role: "A" },
+            { pre: "4<ruby>人<rt>にん</rt></ruby>です。<ruby>父<rt>ちち</rt></ruby>と", reading: "はは", target: "母", post: "が います。", wrong1: "毎", wrong2: "海", en: "Four. I have a father and mother.", role: "B", prev: "A: ご家族は 何人ですか。" },
+            { pre: "私は 5<ruby>人<rt>にん</rt></ruby>です。<ruby>兄<rt>あに</rt></ruby>が", reading: "ふた", target: "二", post: "<ruby>人<rt>り</rt></ruby> います。", wrong1: "三", wrong2: "一", en: "I have five. I have two older brothers.", role: "C", prev: "A: ご家族は 何人ですか。<br>B: 4人です。父と 母が います。" }
+        ],
+        [ // 5. Weekend/Electric store
+            { pre: "<ruby>週末<rt>しゅうまつ</rt></ruby>、", reading: "とも", target: "友", post: "だちと <ruby>会<rt>あ</rt></ruby>いました。", wrong1: "父", wrong2: "有", en: "I met a friend on the weekend.", role: "A" },
+            { pre: "どこへ <ruby>行<rt>い</rt></ruby>きましたか。", reading: "でん", target: "電", post: "<ruby>車<rt>しゃ</rt></ruby>で <ruby>行<rt>い</rt></ruby>きましたか。", wrong1: "雷", wrong2: "雲", en: "Where did you go? Did you go by train?", role: "B", prev: "A: 週末、友だちと 会いました。" },
+            { pre: "はい。<ruby>大<rt>おお</rt></ruby>きい", reading: "みせ", target: "店", post: "へ <ruby>行<rt>い</rt></ruby>きました。", wrong1: "庫", wrong2: "床", en: "Yes. We went to a big shop.", role: "C", prev: "A: 週末、友だちと 会いました。<br>B: どこへ 行きましたか。電車で 行きましたか。" }
+        ],
+        [ // 6. Birthday/Party
+            { pre: "<ruby>来週<rt>らいしゅう</rt></ruby>は <ruby>私<rt>わたし</rt></ruby>の", reading: "たん", target: "誕", post: "<ruby>生<rt>じょう</rt></ruby><ruby>日<rt>び</rt></ruby>です。(※N5外)", // Keeping simple
+              pre: "<ruby>来週<rt>らいしゅう</rt></ruby>は <ruby>私<rt>わたし</rt></ruby>の", reading: "う", target: "生", post: "まれた<ruby>日<rt>ひ</rt></ruby>です。", wrong1: "年", wrong2: "先", en: "Next week is my birthday.", role: "A" },
+            { pre: "おめでとうございます。パーティーを", reading: "し", target: "見", post: "ませんか。(Wrong target)", 
+              // Fix
+              pre: "おめでとう。<ruby>何<rt>なに</rt></ruby>か", reading: "の", target: "飲", post: "みませんか。", wrong1: "食", wrong2: "飯", en: "Congratulations. Shall we drink something?", role: "B", prev: "A: 来週は 私の 生まれた日です。" },
+            { pre: "ありがとう。<ruby>日曜日<rt>にちようび</rt></ruby>の", reading: "ご", target: "午", post: "<ruby>後<rt>ご</rt></ruby>は どうですか。", wrong1: "牛", wrong2: "千", en: "Thanks. How about Sunday afternoon?", role: "C", prev: "A: 来週は 私の 生まれた日です。<br>B: おめでとう。何か 飲みませんか。" }
         ]
     ];
 
@@ -405,19 +447,23 @@
         } 
         else if (level === 2) {
             // Level 2: 会話グループ単位でシャッフルしてから展開
+            // 10グループあるので、5グループ(10問)を出題する
             let groups = [...level2Groups];
             groups.sort(() => 0.5 - Math.random());
-            // グループを順番にフラットな配列に追加（A->Bの順序は維持）
-            groups.forEach(grp => {
+            const selectedGroups = groups.slice(0, 5); // 5セット選択
+            
+            selectedGroups.forEach(grp => {
                 currentQuestions.push(...grp);
             });
-            // 全部出すと多いので、例えば3グループ分(6問)などに制限してもよいが、今回は全グループ出題
         } 
         else if (level === 3) {
             // Level 3: 会話グループ単位でシャッフル
+            // 6グループあるので、3グループ(9問)を出題する
             let groups = [...level3Groups];
             groups.sort(() => 0.5 - Math.random());
-            groups.forEach(grp => {
+            const selectedGroups = groups.slice(0, 3); // 3セット選択
+            
+            selectedGroups.forEach(grp => {
                 currentQuestions.push(...grp);
             });
         }
@@ -529,7 +575,6 @@
         // 簡易スコア計算
         const pointPerQ = Math.floor(100 / totalQuestions);
         const finalScore = score * pointPerQ;
-        // 100点にならない場合の端数処理（満点なら100にする）
         const displayScore = (score === totalQuestions) ? 100 : finalScore;
         
         document.getElementById('final-score').textContent = displayScore;
