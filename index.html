@@ -742,7 +742,7 @@ btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: 
 btn_shiri1: "しりとり1", btn_shiri2: "しりとり2", btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
 btn_imasu: "います<br>あります", btn_money: "お金の学習", btn_transport: "こうつう",
 btn_clock1: "とけい1", btn_clock2: "とけい2", btn_datetime_practice: "日付・練習",
-btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ",
+btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ", btn_kanji_sentence: "漢字・文章クイズ",
 btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？", btn_kei_neg: "ひていけい (～くない)",
 btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
 btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか", 
@@ -773,7 +773,7 @@ btn_k_write: "Writing Practice", btn_k_sound: "Sound Quiz", btn_k_match: "Kataka
 btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2", btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings Quiz",
 btn_imasu: "Imasu<br>Arimasu", btn_money: "Money Learning", btn_transport: "Transport",
 btn_clock1: "Clock 1", btn_clock2: "Clock 2", btn_datetime_practice: "Date Practice",
-btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz",
+btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz", btn_kanji_sentence: "Kanji Sentence Quiz",
 btn_kei1: "Adjective Quiz 1", btn_kei_match: "Which one?", btn_kei_neg: "Negative Form",
 btn_verbgame: "Verb Game", btn_verbmasu: "-masu Typing", btn_verbte: "-te Typing", 
 btn_tekudasai: "V-te Kudasai", btn_tekudasaimasenka: "V-te Kudasaimasenka", btn_mashouka: "V-mashouka",
@@ -829,6 +829,7 @@ const gameStructure = [
 { id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
 { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
 { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
+{ url: "kanji_sentence_quiz.html", titleKey: "btn_kanji_sentence", icon: "fa-solid fa-pen-to-square" }
 ]},
 { id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
 { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
@@ -903,7 +904,7 @@ gameGrid.classList.remove('fade-in');
 void gameGrid.offsetWidth;
 gameGrid.classList.add('fade-in');
 
-// スクロール処理の追加 (ここが変更点)
+// スクロール処理の追加
 const sectionHeader = document.getElementById('game-section-title').closest('.section-header');
 const y = sectionHeader.getBoundingClientRect().top + window.scrollY - 80; // -80はヘッダー分のオフセット
 window.scrollTo({top: y, behavior: 'smooth'});
