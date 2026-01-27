@@ -283,7 +283,7 @@ header {
 
 <header>
 <div class="logo">
-  <i class="fa-solid fa-shapes"></i> FunLearnJP <span style="font-size:0.6em; margin-left:5px;">(Ver 2.0)</span>
+  <i class="fa-solid fa-shapes"></i> FunLearnJP <span style="font-size:0.6em; margin-left:5px;">(Ver 2.1)</span>
 </div>
 <div class="header-right">
   <button class="settings-trigger" onclick="openSettingsModal()">
@@ -366,7 +366,7 @@ header {
 <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
 </div>
 <div class="grid-container">
-<a href="culture_map.html" class="game-card" style="border-color:#b71c1c;">
+<a href="culture_map.html" id="static-sengoku-btn" class="game-card" style="border-color:#b71c1c;">
   <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
   <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
 </a>
@@ -679,12 +679,36 @@ const checkMonthlyReset = async (user) => {
   }
 };
 
+// ★ここが更新：静的カード(下部の戦国ボタン)のロック制御も行う
+window.updateStaticCards = (isPremium) => {
+    const staticSengoku = document.getElementById('static-sengoku-btn');
+    if (staticSengoku) {
+        if (!isPremium) {
+            staticSengoku.classList.add('locked');
+            staticSengoku.href = "javascript:void(0)";
+            staticSengoku.onclick = (e) => { 
+                e.preventDefault(); 
+                window.openPremiumModal(); 
+            };
+            // 鍵マークなどを追加(既存スタイルでOK)
+        } else {
+            staticSengoku.classList.remove('locked');
+            staticSengoku.href = "culture_map.html";
+            staticSengoku.onclick = null;
+        }
+    }
+};
+
 window.updateUI = function(userState) {
   const dash = document.getElementById('user-dashboard');
   const welcome = document.getElementById('guest-welcome');
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+  
   if (userState === 'guest') {
-    window.isUserPremium = false; // ゲストは無料扱い
+    window.isUserPremium = false; // ゲストは無料
+    // ★静的カード更新
+    window.updateStaticCards(false);
+
     welcome.classList.add('hidden');
     dash.classList.remove('hidden');
     document.getElementById('user-name').textContent = 'ゲスト';
@@ -699,9 +723,11 @@ window.updateUI = function(userState) {
     currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        // ★プレミアム状態を取得しグローバル変数にセット
         window.isUserPremium = data.isPremium || false;
         
+        // ★静的カード更新(ログインユーザーのステータスに合わせて)
+        window.updateStaticCards(window.isUserPremium);
+
         document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
         document.getElementById('streak-val').textContent = data.streak || 0;
         document.getElementById('point-val').textContent = data.points || 0;
@@ -713,6 +739,9 @@ window.updateUI = function(userState) {
     });
   } else {
     window.isUserPremium = false; // 未ログイン
+    // ★静的カード更新(未ログイン時もロック)
+    window.updateStaticCards(false);
+
     welcome.classList.remove('hidden');
     dash.classList.add('hidden');
   }
@@ -990,6 +1019,8 @@ window.renderGameCategories();
 
 // ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
 window.setLanguage('ja');
+// ★初期ロード時にも静的カードをロックする
+window.updateStaticCards(false);
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('mode') === 'ranking') {
