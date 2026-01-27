@@ -378,7 +378,6 @@
     let currentUser = null;
     let playerName = "ゲスト";
 
-    // ★修正: 無料版アイコンに変更 (fa-flower等は有料版のため表示されません)
     const WARLORDS = [
         { id: 1, name: "織田 信長", title: "たべもの", castle: "岐阜城", x: 150, y: 650, crest: "fa-fan" },
         { id: 2, name: "豊臣 秀吉", title: "あいさつ", castle: "大阪城", x: 450, y: 450, crest: "fa-sun" },
@@ -428,35 +427,54 @@
         localStorage.setItem('culture_lang', lang);
     };
 
-    // ★修正: 読み込み直後に一度描画を実行する (Firebaseの読み込みを待たない)
     function init() {
+        // セキュリティのため、初期ロード時は仮の描画をするが
+        // 実際はonAuthStateChangedで弾かれるので一瞬映る程度
         const saved = sessionStorage.getItem('sengoku_save_v2');
         if (saved) userState = JSON.parse(saved);
         
-        renderWorldMap(); // まず初期状態で描画
+        renderWorldMap();
         updateAvatar();
         document.getElementById('money-display').innerText = userState.money || 0;
     }
     
-    // 起動時に即時実行
     init();
 
+    // ▼▼▼ ここが重要な追加・変更箇所です（セキュリティガード） ▼▼▼
     onAuthStateChanged(auth, async (user) => {
-        currentUser = user;
-        if (user) {
-            playerName = user.displayName || "ゲスト";
-            try {
-                const snap = await getDoc(doc(db, "users", user.uid, "progress", "sengoku_rpg_v2"));
-                if (snap.exists()) {
-                    userState = snap.data();
-                    // データロード後にもう一度再描画
-                    renderWorldMap();
-                    updateAvatar();
-                    document.getElementById('money-display').innerText = userState.money || 0;
-                }
-            } catch(e) { console.error(e); }
+        if (!user) {
+            // 1. ログインしていない（ゲスト）なら即退場
+            alert("このゲームはプレミアム会員限定です。\nログインしてください。");
+            window.location.href = "index.html"; 
+            return;
         }
+
+        // 2. ユーザーがいたら、プレミアム会員かどうかチェック
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists() || !userDocSnap.data().isPremium) {
+            // プレミアムじゃないなら退場
+            alert("このゲームはプレミアム会員限定です。\nメニューに戻ります。");
+            window.location.href = "index.html";
+            return;
+        }
+
+        // 3. ここまで来れたら「合格」なのでゲームデータをロード
+        currentUser = user;
+        playerName = user.displayName || "ユーザー";
+        
+        try {
+            const snap = await getDoc(doc(db, "users", user.uid, "progress", "sengoku_rpg_v2"));
+            if (snap.exists()) {
+                userState = snap.data();
+                renderWorldMap();
+                updateAvatar();
+                document.getElementById('money-display').innerText = userState.money || 0;
+            }
+        } catch(e) { console.error(e); }
     });
+    // ▲▲▲ セキュリティガードここまで ▲▲▲
 
     function renderWorldMap() {
         currentView = 'world';
@@ -499,7 +517,6 @@
 
         const currentLord = WARLORDS[userState.level - 1];
         if (currentLord) {
-            // ★修正: 最初はアニメーションなしで即移動
             setTimeout(() => moveAvatarTo(currentLord.x, currentLord.y, false), 100);
         }
     }
