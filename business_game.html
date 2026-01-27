@@ -282,7 +282,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -302,15 +302,35 @@
     window.currentUserId = null;
     const authStatusEl = document.getElementById('auth-status');
     
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.currentUserId = user.uid;
-            authStatusEl.textContent = `✅ ログイン中`;
-        } else {
-            window.currentUserId = null;
-            authStatusEl.textContent = '❌ ゲストモード';
+    // ▼▼▼ セキュリティガード (お支払い誘導付き) ▼▼▼
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // 1. ログインしていない（ゲスト）
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
+            window.location.href = "index.html"; 
+            return;
         }
+
+        // 2. ユーザーがいたら、プレミアム会員かどうかチェック
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists() || !userDocSnap.data().isPremium) {
+            // プレミアムじゃないなら
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
+            window.location.href = "index.html";
+            return;
+        }
+
+        // 3. 合格（ログイン＆プレミアム）
+        window.currentUserId = user.uid;
+        authStatusEl.textContent = `✅ ログイン中 (${user.displayName || 'User'})`;
     });
+    // ▲▲▲ セキュリティガードここまで ▲▲▲
 
     window.addPoints = async function(points) { 
         if (!window.currentUserId) return;
@@ -643,6 +663,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('final-score').textContent = score;
         window.showScreen('result-screen');
     }
+
+    // ★追加: どこからでも課金画面を呼び出せるようにする
+    window.openPremiumModal = () => {
+        if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+            window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+        }
+    };
 
 });
 </script>
