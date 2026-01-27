@@ -283,7 +283,7 @@ header {
 
 <header>
 <div class="logo">
-  <i class="fa-solid fa-shapes"></i> FunLearnJP <span style="font-size:0.6em; margin-left:5px;">(Ver 2.1)</span>
+  <i class="fa-solid fa-shapes"></i> FunLearnJP <span style="font-size:0.6em; margin-left:5px;">(Ver 2.2)</span>
 </div>
 <div class="header-right">
   <button class="settings-trigger" onclick="openSettingsModal()">
@@ -679,7 +679,6 @@ const checkMonthlyReset = async (user) => {
   }
 };
 
-// ★ここが更新：静的カード(下部の戦国ボタン)のロック制御も行う
 window.updateStaticCards = (isPremium) => {
     const staticSengoku = document.getElementById('static-sengoku-btn');
     if (staticSengoku) {
@@ -690,7 +689,6 @@ window.updateStaticCards = (isPremium) => {
                 e.preventDefault(); 
                 window.openPremiumModal(); 
             };
-            // 鍵マークなどを追加(既存スタイルでOK)
         } else {
             staticSengoku.classList.remove('locked');
             staticSengoku.href = "culture_map.html";
@@ -706,7 +704,6 @@ window.updateUI = function(userState) {
   
   if (userState === 'guest') {
     window.isUserPremium = false; // ゲストは無料
-    // ★静的カード更新
     window.updateStaticCards(false);
 
     welcome.classList.add('hidden');
@@ -725,7 +722,6 @@ window.updateUI = function(userState) {
         const data = doc.data();
         window.isUserPremium = data.isPremium || false;
         
-        // ★静的カード更新(ログインユーザーのステータスに合わせて)
         window.updateStaticCards(window.isUserPremium);
 
         document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
@@ -739,7 +735,6 @@ window.updateUI = function(userState) {
     });
   } else {
     window.isUserPremium = false; // 未ログイン
-    // ★静的カード更新(未ログイン時もロック)
     window.updateStaticCards(false);
 
     welcome.classList.remove('hidden');
@@ -970,9 +965,13 @@ function renderGameList(category) {
     window.scrollTo({top: y, behavior: 'smooth'});
 }
 
-// 課金誘導モーダル（簡易版）
+// ▼▼▼ Stripe決済ページへの誘導に変更しました ▼▼▼
 window.openPremiumModal = () => {
-    alert("このゲームはプレミアム会員限定です！\n\n(※開発中: ここに支払いページへのリンクなどが入ります)");
+    // ユーザーに確認してから飛ばす
+    if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+        // Stripeの支払いページを新しいタブで開く
+        window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+    }
 };
 
 window.setLanguage = (lang) => {
