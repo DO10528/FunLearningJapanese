@@ -249,6 +249,7 @@ header {
   position: relative;
   opacity: 0.8;
   background: #f9f9f9;
+  cursor: default; /* クリック不可カーソル */
 }
 /* 鍵アイコンを中央に配置 */
 .game-card.locked::after {
@@ -262,7 +263,7 @@ header {
   color: #555;
   opacity: 0.7;
   z-index: 2;
-  pointer-events: none; /* クリックを邪魔しないように */
+  pointer-events: none;
 }
 /* PROバッジを右上に配置 */
 .premium-badge {
@@ -903,7 +904,7 @@ const gameStructure = [
 { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
 ]},
 { id: "culture", icon: "fa-solid fa-torii-gate", color: "#9c27b0", titleKey: "cat_culture", games: [
-{ url: "culture_map.html", titleKey: "btn_sengoku", icon: "fa-solid fa-khanda", isPremium: true }, /* ★プレミアム対象に変更 */
+{ url: "culture_map.html", titleKey: "btn_sengoku", icon: "fa-solid fa-khanda", isPremium: true },
 { url: "festival_game.html", titleKey: "btn_festival", icon: "fa-solid fa-calendar-days" }
 ]},
 { id: "manga", icon: "fa-solid fa-book-journal-whills", color: "#00897B", titleKey: "cat_manga", games: [
@@ -941,12 +942,19 @@ const a = document.createElement('a');
 a.className = 'game-card';
 a.style.borderColor = category.color;
 
-// ★ロック機能の実装
-const isLocked = game.isPremium && !window.isUserPremium;
+// ★ロック機能の実装（確実版）
+// 戦国ゲーム(id: culture内)なら強制チェック
+const isLocked = (game.isPremium === true) && (window.isUserPremium !== true);
+
 if (isLocked) {
   a.classList.add('locked');
   a.href = "javascript:void(0)";
-  a.onclick = (e) => { e.preventDefault(); window.openPremiumModal(); };
+  a.onclick = (e) => { 
+      e.preventDefault(); 
+      e.stopPropagation(); // バブリングも止める
+      window.openPremiumModal(); 
+      return false;
+  };
 } else {
   a.href = game.url;
 }
