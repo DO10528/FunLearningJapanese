@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-        /* --- Common Settings (V2 Design) --- */
+        /* --- Common Settings --- */
         :root {
             --primary: #5c7aff;
             --accent: #ffcc5c;
@@ -27,9 +27,10 @@
             display: flex;
             flex-direction: column;
             touch-action: manipulation;
+            user-select: none;
         }
 
-        /* --- Header (V2 Unified Design) --- */
+        /* --- Header --- */
         header {
             background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
             color: white;
@@ -90,280 +91,160 @@
             100% { transform: scale(1.0); opacity: 1; }
         }
 
-        .dv-screen {
-            display: none; 
-        }
-        .dv-screen.active {
-            display: block; 
-        }
+        .dv-screen { display: none; }
+        .dv-screen.active { display: block; }
 
-        h1, h2 {
-            text-align: center;
-            color: var(--primary);
-        }
+        h1, h2 { text-align: center; color: var(--primary); }
         h1 { font-size: 2.2em; margin-bottom: 20px; }
         h2 { font-size: 1.8em; margin-bottom: 20px; }
         p { text-align: center; font-size: 1.1em; color: #666; }
 
-        /* --- Button Common (V2 3D Style) --- */
+        /* --- Icons & Animations --- */
+        .game-icon {
+            font-size: 5em;
+            color: var(--text-color);
+            transition: transform 0.3s;
+        }
+        /* CSS Animations for Verbs */
+        @keyframes eatAnim { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(10deg); } }
+        @keyframes drinkAnim { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-20deg); } }
+        @keyframes sleepAnim { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes walkAnim { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-5deg); } 75% { transform: translateX(5px) rotate(5deg); } }
+        @keyframes listenAnim { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .anim-eat { animation: eatAnim 1s infinite ease-in-out; }
+        .anim-drink { animation: drinkAnim 1.5s infinite ease-in-out; }
+        .anim-sleep { animation: sleepAnim 3s infinite ease-in-out; }
+        .anim-walk { animation: walkAnim 1s infinite linear; }
+        .anim-listen { animation: listenAnim 0.8s infinite ease-in-out; }
+
+
+        /* --- Buttons --- */
         .dv-button {
-            display: block;
-            width: 90%;
-            margin: 15px auto;
-            padding: 20px; 
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #fff;
-            border: none; 
-            border-radius: 15px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.15); 
-            transition: all 0.1s ease-out;
-            position: relative; 
-            top: 0;
+            display: block; width: 90%; margin: 15px auto; padding: 20px; 
+            font-size: 1.5em; font-weight: 700; color: #fff; border: none; 
+            border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.15); 
+            transition: all 0.1s ease-out; position: relative; top: 0;
             text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
         }
-        
-        .dv-button:active {
-            top: 4px; 
-            box-shadow: 0 2px 0 rgba(0,0,0,0.15); 
-        }
+        .dv-button:active { top: 4px; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
 
-        /* --- Menu Button Colors --- */
-        #dv-menu-game1 {
-            background-color: #66bb6a; /* Green */
-            box-shadow: 0 6px 0 #388e3c;
-        }
+        #dv-menu-game1 { background-color: #66bb6a; box-shadow: 0 6px 0 #388e3c; }
         #dv-menu-game1:active { box-shadow: 0 2px 0 #388e3c; }
-
-        #dv-menu-game2 {
-            background-color: #ffa726; /* Orange */
-            box-shadow: 0 6px 0 #f57c00;
-        }
+        #dv-menu-game2 { background-color: #ffa726; box-shadow: 0 6px 0 #f57c00; }
         #dv-menu-game2:active { box-shadow: 0 2px 0 #f57c00; }
-
-        #dv-menu-game3 {
-            background-color: #4fc3f7; /* Light Blue */
-            box-shadow: 0 6px 0 #0288d1;
-        }
+        #dv-menu-game3 { background-color: #4fc3f7; box-shadow: 0 6px 0 #0288d1; }
         #dv-menu-game3:active { box-shadow: 0 2px 0 #0288d1; }
 
-
-        /* --- Secondary Buttons --- */
         .dv-button-secondary {
-             background-color: #90a4ae;
-             box-shadow: 0 4px 0 #546e7a;
-             font-size: 1.1em;
-             padding: 10px 15px;
-             width: 180px;
-             margin-top: 25px;
-             border-radius: 10px;
-             display: inline-flex;
-             justify-content: center;
-             align-items: center;
-             gap: 8px;
-             border: none;
-             color: white;
-             font-weight: bold;
-             cursor: pointer;
-             position: relative;
-             top: 0;
-             transition: all 0.1s;
+             background-color: #90a4ae; box-shadow: 0 4px 0 #546e7a;
+             font-size: 1.1em; padding: 10px 15px; width: 180px; margin-top: 25px;
+             border-radius: 10px; display: inline-flex; justify-content: center;
+             align-items: center; gap: 8px; border: none; color: white;
+             font-weight: bold; cursor: pointer; position: relative; top: 0;
         }
         .dv-button-secondary:active { box-shadow: 0 2px 0 #546e7a; top: 4px; }
 
-
-        /* --- Feedback --- */
         .dv-feedback {
             text-align: center; font-size: 1.3em; font-weight: bold;
             margin-top: 20px; min-height: 1.3em; color: var(--incorrect-color); 
-            opacity: 0;
-            transition: opacity 0.2s;
+            opacity: 0; transition: opacity 0.2s;
         }
-        .dv-feedback.show {
-            opacity: 1;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .dv-feedback.show { opacity: 1; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .dv-feedback.success { color: var(--correct-color); } 
         @keyframes popIn { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
 
 
         /* --- Game 1 (Action) --- */
-        #dv-game1-char-area {
-            width: 90%;
-            height: 150px;
-            margin: 10px auto;
-            background: #f1f8e9; 
-            border: 3px dashed #c5e1a5;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; 
+        #dv-game1-icon-area {
+            width: 90%; height: 150px; margin: 10px auto;
+            background: #f1f8e9; border: 3px dashed #c5e1a5; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
         }
-        #dv-game1-char-img {
-            height: 140px;
-            object-fit: contain;
+        #dv-game1-play-btn {
+            font-size: 1.2em; background: var(--primary); color: white;
+            border: none; padding: 10px 20px; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 4px 0 #3f51b5; margin-bottom: 10px;
         }
+        #dv-game1-play-btn:active { transform: translateY(4px); box-shadow: none; }
+
         #dv-game1-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
         }
         .dv-game1-option-card {
-            border: 4px solid var(--accent); 
-            border-radius: 15px;
-            padding: 10px;
-            cursor: pointer;
+            border: 4px solid var(--accent); border-radius: 15px; padding: 20px 10px;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #fff;
+            transition: all 0.2s; text-align: center; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; height: 120px;
+        }
+        .dv-game1-option-card:hover { transform: scale(1.03); background-color: #fff8e1; }
+        .dv-game1-option-card i { font-size: 3em; color: #555; margin-bottom: 10px; }
+        .dv-game1-option-card.disabled { opacity: 0.5; pointer-events: none; }
+
+
+        /* --- Game 2 (Tense - Improved) --- */
+        #dv-game2-container {
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .dv-game2-context-box {
+            width: 90%; padding: 15px; border-radius: 15px;
+            text-align: center; font-weight: bold; font-size: 1.5em;
+            border: 4px solid; position: relative; background: white;
+        }
+        .dv-game2-context-box.future {
+            border-color: #4fc3f7; color: #0288d1; background: #e1f5fe;
+        }
+        .dv-game2-context-box.past {
+            border-color: #ffb74d; color: #ef6c00; background: #fff3e0;
+        }
+        .dv-game2-arrow { font-size: 2em; margin: 10px 0; color: #999; }
+        
+        #dv-game2-main-icon {
+            font-size: 4em; color: #555; margin: 10px;
+            padding: 20px; background: white; border-radius: 50%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            background: #fff;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: center;
-        }
-        .dv-game1-option-card:hover {
-            background-color: #fff8e1;
-            transform: scale(1.03);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-        }
-        .dv-game1-option-card img {
-            width: 100%;
-            height: 100px;
-            object-fit: contain;
-        }
-        .dv-game1-option-card.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            transform: scale(1);
         }
 
-
-        /* --- Game 2 (Tense) --- */
-        #dv-game2-anim-area {
-            width: 90%;
-            height: 200px;
-            margin: 10px auto;
-            background: #e3f2fd; 
-            border: 3px dashed #90caf9;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-        #dv-game2-anim-img {
-            height: 180px;
-            object-fit: contain;
-        }
-        #dv-game2-tense-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 3em;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            color: #ffa726;
-        }
         #dv-game2-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 10px;
         }
         .dv-game2-option-button {
-            padding: 25px;
-            font-size: 1.4em;
-            background-color: var(--primary); /* Blue */
-            box-shadow: 0 6px 0 #3f51b5;
+            padding: 20px; font-size: 1.2em;
+            background-color: var(--primary); box-shadow: 0 6px 0 #3f51b5;
         }
-        .dv-game2-option-button.correct {
-            background-color: var(--correct-color);
-            box-shadow: 0 6px 0 #388e3c;
-            transform: scale(1.05);
-        }
-        .dv-game2-option-button.incorrect {
-            background-color: var(--incorrect-color);
-            box-shadow: 0 6px 0 #c62828;
-        }
+        .dv-game2-option-button.correct { background-color: var(--correct-color); box-shadow: 0 6px 0 #388e3c; }
+        .dv-game2-option-button.incorrect { background-color: var(--incorrect-color); box-shadow: 0 6px 0 #c62828; }
 
 
         /* --- Game 3 (Sentence) --- */
         #dv-game3-drop-zone {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80px;
-            background: #e3f2fd;
-            border: 3px dashed #90caf9;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px auto;
-            width: 90%;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 80px; background: #e3f2fd; border: 3px dashed #90caf9;
+            border-radius: 10px; padding: 10px; margin: 10px auto; width: 95%;
         }
-        #dv-game3-particle {
-            font-size: 2em;
-            font-weight: bold;
-            margin: 0 10px;
-            color: var(--primary);
-        }
+        #dv-game3-particle { font-size: 2em; font-weight: bold; margin: 0 5px; color: var(--primary); }
         .dv-game3-slot {
-            width: 150px;
-            height: 70px;
-            border: 3px dashed #ccc;
-            border-radius: 8px;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            flex: 1; height: 70px; border: 3px dashed #ccc; border-radius: 8px;
+            background: #f5f5f5; display: flex; justify-content: center; align-items: center;
         }
         .dv-game3-card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            min-height: 80px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 10px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+            min-height: 60px; border: 2px solid #eee; border-radius: 10px; padding: 10px; margin-top: 5px;
         }
         .dv-game3-card {
-            padding: 15px 20px;
-            font-size: 1.2em;
-            font-weight: bold;
-            background-color: #fff;
-            border: 3px solid #00b87a;
-            color: #008a5e;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 10px 15px; font-size: 1.1em; font-weight: bold;
+            background-color: #fff; border: 3px solid #00b87a; color: #008a5e;
+            border-radius: 10px; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 5px;
         }
-        .dv-game3-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        }
+        .dv-game3-card i { font-size: 1.2em; }
         .dv-game3-slot .dv-game3-card {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-            transform: scale(1);
-            box-shadow: none;
-            border: none;
-            background: transparent;
+            width: 100%; height: 100%; justify-content: center;
+            border: none; background: transparent; box-shadow: none;
         }
-        .dv-game3-card[data-type="noun"] {
-            border-color: #4fc3f7;
-            color: #0288d1;
-        }
-        .dv-game3-card[data-type="verb"] {
-            border-color: #81c784;
-            color: #388e3c;
-        }
+        .dv-game3-card[data-type="noun"] { border-color: #4fc3f7; color: #0288d1; }
+        .dv-game3-card[data-type="verb"] { border-color: #81c784; color: #388e3c; }
+
 </style>
 </head>
 <body>
@@ -380,54 +261,58 @@
 
             <div id="dv-screen-menu" class="dv-screen active">
                 <h1>どうしゲーム</h1>
-                <p>どのゲームであそぶ？</p>
-                <button id="dv-menu-game1" class="dv-button">1. アクション (からだ で おぼえる)</button>
-                <button id="dv-menu-game2" class="dv-button">2. いま？ むかし？ (「ます」と「ました」)</button>
-                <button id="dv-menu-game3" class="dv-button">3. なにを する？ (ぶん を つくる)</button>
+                <p>音(おと)も イラストも 新しくなったよ！</p>
+                <button id="dv-menu-game1" class="dv-button"><i class="fa-solid fa-ear-listen"></i> 1. アクション (きく)</button>
+                <button id="dv-menu-game2" class="dv-button"><i class="fa-solid fa-calendar-days"></i> 2. いま？ むかし？</button>
+                <button id="dv-menu-game3" class="dv-button"><i class="fa-solid fa-shapes"></i> 3. ぶん を つくる</button>
             </div>
 
             <div id="dv-screen-game1" class="dv-screen">
-                <h2>ゲーム1: アクション</h2>
-                <p id="dv-game1-prompt">おとを きいて、おなじ アクション を えらぼう！</p>
+                <h2>1. アクション (きく)</h2>
+                <p>ボタンをおして、きこえた アクション を えらぼう！</p>
                 
-                <div id="dv-game1-char-area">
-                    <img id="dv-game1-char-img" src="assets/images/verbs/char_idle.png" alt="キャラクター">
+                <div style="text-align: center; margin: 15px 0;">
+                    <button id="dv-game1-play-btn" onclick="playCurrentGame1Sound()"><i class="fa-solid fa-volume-high"></i> もういちど きく</button>
                 </div>
                 
-                <div id="dv-game1-options">
-                    </div>
+                <div id="dv-game1-options"></div>
                 
                 <div id="dv-game1-feedback" class="dv-feedback"></div>
                 <div style="text-align: center;">
                     <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
                 </div>
             </div>
 
             <div id="dv-screen-game2" class="dv-screen">
-                <h2>ゲーム2: いま？ むかし？</h2>
-                <p>え を みて、ただしい ほう を えらぼう！</p>
+                <h2>2. いま？ むかし？</h2>
+                <p>「あした」は "ます"、「きのう」は "ました"！</p>
 
-                <div id="dv-game2-anim-area">
-                    <img id="dv-game2-anim-img" src="assets/images/verbs/anim_eating.gif" alt="アニメーション">
-                    <div id="dv-game2-tense-icon">☀️</div>
-                </div>
+                <div id="dv-game2-container">
+                    <div id="dv-game2-context" class="dv-game2-context-box">
+                        <i class="fa-solid fa-calendar-check"></i> <span id="dv-game2-time-text"></span>
+                    </div>
 
-                <div id="dv-game2-options">
-                    <button id="dv-game2-option1" class="dv-button dv-game2-option-button"></button>
-                    <button id="dv-game2-option2" class="dv-button dv-game2-option-button"></button>
+                    <div class="dv-game2-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+
+                    <div id="dv-game2-main-icon-container">
+                        <i id="dv-game2-main-icon" class="fa-solid fa-question"></i>
+                    </div>
+
+                    <div id="dv-game2-options">
+                        <button id="dv-game2-option1" class="dv-button dv-game2-option-button"></button>
+                        <button id="dv-game2-option2" class="dv-button dv-game2-option-button"></button>
+                    </div>
                 </div>
 
                 <div id="dv-game2-feedback" class="dv-feedback"></div>
                 <div style="text-align: center;">
                     <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
                 </div>
             </div>
 
             <div id="dv-screen-game3" class="dv-screen">
-                <h2>ゲーム3: なにを する？</h2>
-                <p>カードを えらんで ぶん を つくろう！</p>
+                <h2>3. ぶん を つくる</h2>
+                <p>カードを おして、ただしい ぶん を つくろう！</p>
 
                 <div id="dv-game3-drop-zone">
                     <div id="dv-game3-slot-noun" class="dv-game3-slot"></div>
@@ -435,35 +320,27 @@
                     <div id="dv-game3-slot-verb" class="dv-game3-slot"></div>
                 </div>
 
-                <p style="margin-top: 20px;">【めいし カード】</p>
-                <div id="dv-game3-card-container-noun" class="dv-game3-card-container">
-                    </div>
+                <p style="margin-top: 15px; font-size: 0.9em; font-weight: bold; color: #0288d1;">【めいし (Noun)】</p>
+                <div id="dv-game3-card-container-noun" class="dv-game3-card-container"></div>
                 
-                <p style="margin-top: 10px;">【どうし カード】</p>
-                <div id="dv-game3-card-container-verb" class="dv-game3-card-container">
-                    </div>
+                <p style="margin-top: 5px; font-size: 0.9em; font-weight: bold; color: #388e3c;">【どうし (Verb)】</p>
+                <div id="dv-game3-card-container-verb" class="dv-game3-card-container"></div>
 
-                <button id="dv-game3-check-button" class="dv-button">できた！</button>
+                <button id="dv-game3-check-button" class="dv-button" style="background:#5c7aff;">できた！</button>
                 <div id="dv-game3-feedback" class="dv-feedback"></div>
                 <div style="text-align: center;">
                     <button class="dv-button-secondary dv-back-to-menu"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-                    <button class="dv-button-secondary dv-home-button" style="margin-left: 10px;"><i class="fa-solid fa-house"></i> ホームへ</button>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <audio id="dv-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
-    <audio id="dv-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
-    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ----------------------------------------------------
-            // ★★★ Point System Settings ★★★
-            // ----------------------------------------------------
+            // --- Point System ---
             const GAME_ID_VERB = 'verb_game'; 
-            
             const USER_STORAGE_KEY_VERB = 'user_accounts'; 
             const SESSION_STORAGE_KEY_VERB = 'current_user'; 
             const GUEST_NAME_VERB = 'ゲスト'; 
@@ -472,10 +349,7 @@
 
             function getTodayDateString() {
                 const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
+                return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             }
 
             function checkAndAwardPoints(gameType, verbId) {
@@ -497,436 +371,270 @@
 
                 user.points = (user.points || 0) + 1;
                 user.progress[progressKey][today] = true;
-                
                 users[currentUser] = user;
                 localStorage.setItem(USER_STORAGE_KEY_VERB, JSON.stringify(users));
-                console.log(`[Game] ${currentUser} gained 1 point for ${gameType} - ${verbId}. Total: ${user.points}`);
                 return "scored"; 
             }
 
             // ----------------------------------------------------
-            // Data Definitions
+            // Data Definitions (No external images/audio)
             // ----------------------------------------------------
-            const IMG_PATH = 'assets/images/verbs/';
-            const SOUND_PATH = 'assets/sounds/verbs/';
-
+            // icon: FontAwesome classes
+            // animation: CSS animation class defined in style
             const verbData = [
-                { id: 'tabemasu', masu: 'たべます', mashita: 'たべました', english: 'eat', 
-                  tprImg: 'tpr_eat.png', animImg: 'anim_eating.gif', noun: 'ごはん', nounImg: 'noun_rice.png' },
-                { id: 'nomimasu', masu: 'のみます', mashita: 'のみました', english: 'drink', 
-                  tprImg: 'tpr_drink.png', animImg: 'anim_drinking.gif', noun: 'ジュース', nounImg: 'noun_juice.png' },
-                { id: 'nemasu', masu: 'ねます', mashita: 'ねました', english: 'sleep', 
-                  tprImg: 'tpr_sleep.png', animImg: 'anim_sleeping.gif', noun: 'ベッド', nounImg: 'noun_bed.png' },
-                { id: 'mimasu', masu: 'みます', mashita: 'みました', english: 'watch', 
-                  tprImg: 'tpr_watch.png', animImg: 'anim_watching.gif', noun: 'テレビ', nounImg: 'noun_tv.png' },
-                { id: 'yomimasu', masu: 'よみます', mashita: 'よみました', english: 'read', 
-                  tprImg: 'tpr_read.png', animImg: 'anim_reading.gif', noun: 'ほん', nounImg: 'noun_book.png' },
-                { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', english: 'write/draw', 
-                  tprImg: 'tpr_write.png', animImg: 'anim_writing.gif', noun: 'え', nounImg: 'noun_picture.png' },
-                { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', english: 'listen', 
-                  tprImg: 'tpr_listen.png', animImg: 'anim_listening.gif', noun: 'おんがく', nounImg: 'noun_music.png' },
-                { id: 'kaimasu', masu: 'かいます', mashita: 'かいました', english: 'buy', 
-                  tprImg: 'tpr_buy.png', animImg: 'anim_buying.gif', noun: 'おかし', nounImg: 'noun_snacks.png' },
-                { id: 'ikimasu', masu: 'いきます', mashita: 'いきました', english: 'go', 
-                  tprImg: 'tpr_go.png', animImg: 'anim_going.gif', noun: null, nounImg: null },
-                { id: 'kimasu', masu: 'きます', mashita: 'きました', english: 'come', 
-                  tprImg: 'tpr_come.png', animImg: 'anim_coming.gif', noun: null, nounImg: null },
-                { id: 'kaerimasu', masu: 'かえります', mashita: 'かえりました', english: 'return home', 
-                  tprImg: 'tpr_return.png', animImg: 'anim_returning.gif', noun: null, nounImg: null }
+                { id: 'tabemasu', masu: 'たべます', mashita: 'たべました', icon: 'fa-solid fa-bowl-rice', animation: 'anim-eat', noun: 'ごはん', nounIcon: 'fa-solid fa-bowl-rice' },
+                { id: 'nomimasu', masu: 'のみます', mashita: 'のみました', icon: 'fa-solid fa-mug-hot', animation: 'anim-drink', noun: 'ジュース', nounIcon: 'fa-solid fa-glass-water' },
+                { id: 'nemasu', masu: 'ねます', mashita: 'ねました', icon: 'fa-solid fa-bed', animation: 'anim-sleep', noun: 'ベッド', nounIcon: 'fa-solid fa-bed' },
+                { id: 'mimasu', masu: 'みます', mashita: 'みました', icon: 'fa-solid fa-tv', animation: 'anim-listen', noun: 'テレビ', nounIcon: 'fa-solid fa-tv' },
+                { id: 'yomimasu', masu: 'よみます', mashita: 'よみました', icon: 'fa-solid fa-book-open', animation: 'anim-listen', noun: 'ほん', nounIcon: 'fa-solid fa-book' },
+                { id: 'kakimasu', masu: 'かきます', mashita: 'かきました', icon: 'fa-solid fa-pen', animation: 'anim-eat', noun: 'え', nounIcon: 'fa-solid fa-image' },
+                { id: 'kikimasu', masu: 'ききます', mashita: 'ききました', icon: 'fa-solid fa-headphones', animation: 'anim-listen', noun: 'おんがく', nounIcon: 'fa-solid fa-music' },
+                { id: 'kaimasu', masu: 'かいます', mashita: 'かいました', icon: 'fa-solid fa-cart-shopping', animation: 'anim-walk', noun: 'おかし', nounIcon: 'fa-solid fa-cookie' },
+                { id: 'ikimasu', masu: 'いきます', mashita: 'いきました', icon: 'fa-solid fa-person-walking', animation: 'anim-walk', noun: null, nounIcon: null },
+                { id: 'kimasu', masu: 'きます', mashita: 'きました', icon: 'fa-solid fa-person-walking-arrow-right', animation: 'anim-walk', noun: null, nounIcon: null }
             ];
 
-            const audioCache = {};
-            function loadAudio(id, type) {
-                const verb = verbData.find(v => v.id === id);
-                if (!verb) return;
-                const file = (type === 'masu') ? verb.masu : verb.mashita;
-                // Note: File names are presumed to match the Japanese characters.
-                // In a real scenario, map these correctly or rename files to match ids.
-                // For this example, assuming file names match the 'id' + '_masu' pattern might be safer, 
-                // but following original logic:
-                const path = `${SOUND_PATH}${file}.mp3`; 
-                if (!audioCache[path]) {
-                    audioCache[path] = new Audio(path);
+            // ----------------------------------------------------
+            // Web Speech API (Browser Text-to-Speech)
+            // ----------------------------------------------------
+            function speak(text) {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // Stop previous
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ja-JP'; // Japanese
+                    utterance.rate = 1.0; 
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.warn("Web Speech API not supported.");
                 }
-                return audioCache[path];
             }
-            const soundCorrect = document.getElementById('dv-sound-correct');
-            const soundIncorrect = document.getElementById('dv-sound-incorrect');
+            
+            // Simple beep sounds for feedback (using Web Audio API or simple tone not needed, simply Speech for "Seikai"?)
+            // Let's use Speech for feedback too to keep it asset-free.
+            function speakFeedback(isCorrect) {
+                if(isCorrect) speak("せいかい！");
+                else speak("ちがうよ");
+            }
 
             // ----------------------------------------------------
-            // DOM Elements
+            // DOM & Logic
             // ----------------------------------------------------
             const screens = document.querySelectorAll('.dv-screen');
-            const backToMenuButtons = document.querySelectorAll('.dv-back-to-menu');
-            const homeButtons = document.querySelectorAll('.dv-home-button');
-
             const menuScreen = document.getElementById('dv-screen-menu');
-            const menuGame1Btn = document.getElementById('dv-menu-game1');
-            const menuGame2Btn = document.getElementById('dv-menu-game2');
-            const menuGame3Btn = document.getElementById('dv-menu-game3');
-
-            // Game 1 Elements
-            const game1Screen = document.getElementById('dv-screen-game1');
-            const game1Prompt = document.getElementById('dv-game1-prompt');
-            const game1CharImg = document.getElementById('dv-game1-char-img');
-            const game1Options = document.getElementById('dv-game1-options');
-            const game1Feedback = document.getElementById('dv-game1-feedback');
-
-            // Game 2 Elements
-            const game2Screen = document.getElementById('dv-screen-game2');
-            const game2AnimImg = document.getElementById('dv-game2-anim-img');
-            const game2TenseIcon = document.getElementById('dv-game2-tense-icon');
-            let game2Option1 = document.getElementById('dv-game2-option1');
-            let game2Option2 = document.getElementById('dv-game2-option2');
-            const game2Feedback = document.getElementById('dv-game2-feedback');
-
-            // Game 3 Elements
-            const game3Screen = document.getElementById('dv-screen-game3');
-            const game3SlotNoun = document.getElementById('dv-game3-slot-noun');
-            const game3SlotVerb = document.getElementById('dv-game3-slot-verb');
-            const game3ContainerNoun = document.getElementById('dv-game3-card-container-noun');
-            const game3ContainerVerb = document.getElementById('dv-game3-card-container-verb');
-            const game3CheckBtn = document.getElementById('dv-game3-check-button');
-            const game3Feedback = document.getElementById('dv-game3-feedback');
-
-            // ----------------------------------------------------
-            // Utility Functions
-            // ----------------------------------------------------
             
-            function showScreen(screenElement) {
+            function showScreen(screen) {
                 screens.forEach(s => s.classList.remove('active'));
-                screenElement.classList.add('active');
+                screen.classList.add('active');
             }
 
-            function playSound(audioElement) {
-                audioElement.currentTime = 0;
-                audioElement.play().catch(e => console.error("Sound play error:", e));
+            function shuffle(array) {
+                return array.sort(() => Math.random() - 0.5);
             }
 
-            function shuffleArray(array) {
-                let newArray = [...array];
-                for (let i = newArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-                }
-                return newArray;
-            }
-
-            // ----------------------------------------------------
-            // Menu Logic
-            // ----------------------------------------------------
-            
-            menuGame1Btn.onclick = () => { setupGame1(); showScreen(game1Screen); };
-            menuGame2Btn.onclick = () => { setupGame2(); showScreen(game2Screen); };
-            menuGame3Btn.onclick = () => { setupGame3(); showScreen(game3Screen); };
-
-            backToMenuButtons.forEach(btn => {
-                btn.onclick = () => {
-                    if (gameTimer) clearTimeout(gameTimer);
-                    game1CharImg.src = `${IMG_PATH}char_idle.png`;
-                    showScreen(menuScreen);
-                };
+            // Setup Menu
+            document.querySelectorAll('.dv-back-to-menu').forEach(btn => {
+                btn.onclick = () => showScreen(menuScreen);
             });
+
+            document.getElementById('dv-menu-game1').onclick = () => { setupGame1(); showScreen(document.getElementById('dv-screen-game1')); };
+            document.getElementById('dv-menu-game2').onclick = () => { setupGame2(); showScreen(document.getElementById('dv-screen-game2')); };
+            document.getElementById('dv-menu-game3').onclick = () => { setupGame3(); showScreen(document.getElementById('dv-screen-game3')); };
+
+            // --- Game 1: Action (Listen) ---
+            let game1Target = null;
             
-            homeButtons.forEach(btn => {
-                btn.onclick = () => {
-                    window.location.href = 'index.html'; 
-                };
-            });
-            
-            // ----------------------------------------------------
-            // Game 1 Logic (Action Association)
-            // ----------------------------------------------------
-            let game1AnswerId = '';
+            window.playCurrentGame1Sound = function() {
+                if(game1Target) speak(game1Target.masu);
+            }
 
             function setupGame1() {
-                if (gameTimer) clearTimeout(gameTimer);
+                const optionsDiv = document.getElementById('dv-game1-options');
+                const feedback = document.getElementById('dv-game1-feedback');
+                optionsDiv.innerHTML = '';
+                feedback.textContent = '';
+                feedback.className = 'dv-feedback';
 
-                game1Options.innerHTML = '';
-                game1Feedback.textContent = '';
-                game1Feedback.classList.remove('show');
-                game1CharImg.src = `${IMG_PATH}char_idle.png`;
+                const shuffled = shuffle([...verbData]);
+                const choices = shuffled.slice(0, 4);
+                game1Target = choices[Math.floor(Math.random() * choices.length)];
 
-                const shuffledVerbs = shuffleArray(verbData);
-                const currentOptions = shuffledVerbs.slice(0, 4);
-                
-                const correctVerb = currentOptions[Math.floor(Math.random() * 4)];
-                game1AnswerId = correctVerb.id;
+                // Play sound (Delayed slightly to allow screen transition)
+                setTimeout(() => speak(game1Target.masu), 500);
 
-                // Playing sound logic needs checking against file naming convention
-                // Assuming sound files are named after the kana in the data e.g. "たべます.mp3"
-                const sound = loadAudio(correctVerb.id, 'masu');
-                game1Prompt.textContent = `おとを きいて、おなじ アクション を えらぼう！`;
-                if(sound) {
-                    playSound(sound);
-                }
-
-                currentOptions.forEach(verb => {
+                choices.forEach(v => {
                     const card = document.createElement('div');
                     card.className = 'dv-game1-option-card';
-                    card.dataset.id = verb.id;
+                    // Use FontAwesome Icon instead of Image
+                    card.innerHTML = `<i class="${v.icon}"></i>`;
                     
-                    const img = document.createElement('img');
-                    img.src = `${IMG_PATH}${verb.tprImg}`;
-                    img.alt = verb.english;
-                    card.appendChild(img);
-                    
-                    card.onclick = handleGame1Choice;
-                    game1Options.appendChild(card);
+                    card.onclick = () => {
+                        if (v.id === game1Target.id) {
+                            card.style.background = '#dcedc8';
+                            card.innerHTML = `<i class="${v.icon} ${v.animation}"></i>`; // Add animation
+                            feedback.textContent = 'せいかい！';
+                            feedback.className = 'dv-feedback show success';
+                            speakFeedback(true);
+                            checkAndAwardPoints('game1', v.id);
+                            setTimeout(setupGame1, 2000);
+                        } else {
+                            feedback.textContent = 'ちがうよ';
+                            feedback.className = 'dv-feedback show';
+                            speakFeedback(false);
+                        }
+                    };
+                    optionsDiv.appendChild(card);
                 });
             }
 
-            function handleGame1Choice(e) {
-                const selectedCard = e.currentTarget;
-                const chosenId = selectedCard.dataset.id;
-                
-                document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.add('disabled'));
-
-                if (gameTimer) clearTimeout(gameTimer);
-
-                if (chosenId === game1AnswerId) {
-                    playSound(soundCorrect);
-                    
-                    const result = checkAndAwardPoints('game1', game1AnswerId);
-                    let msg = 'せいかい！';
-                    if (result === "scored") {
-                        msg += ' (+1 ポイント！)';
-                    }
-
-                    game1Feedback.textContent = msg;
-                    game1Feedback.className = 'dv-feedback show success';
-                    const correctVerb = verbData.find(v => v.id === chosenId);
-                    game1CharImg.src = `${IMG_PATH}${correctVerb.animImg}`;
-                    
-                    gameTimer = setTimeout(setupGame1, 2500); 
-                } else {
-                    playSound(soundIncorrect);
-                    game1Feedback.textContent = 'ちがうよ';
-                    game1Feedback.className = 'dv-feedback show';
-                    
-                    gameTimer = setTimeout(() => {
-                        game1Feedback.textContent = '';
-                        game1Feedback.classList.remove('show');
-                        document.querySelectorAll('.dv-game1-option-card').forEach(c => c.classList.remove('disabled'));
-                    }, 2000);
-                }
-            }
-
-            // ----------------------------------------------------
-            // Game 2 Logic (Tense)
-            // ----------------------------------------------------
-            let game2Answer = '';
-            let game2CurrentVerbId = '';
+            // --- Game 2: Tense (Now vs Past) ---
+            // Improved logic: Show "Tomorrow" or "Yesterday" context box
+            let game2Target = null;
+            let game2IsPast = false;
 
             function setupGame2() {
-                if (gameTimer) clearTimeout(gameTimer);
-
-                const verb = verbData[Math.floor(Math.random() * verbData.length)];
-                game2CurrentVerbId = verb.id;
+                const feedback = document.getElementById('dv-game2-feedback');
+                feedback.textContent = '';
+                feedback.className = 'dv-feedback';
                 
-                const isMasu = Math.random() < 0.5;
-                game2Answer = isMasu ? 'masu' : 'mashita';
+                game2Target = verbData[Math.floor(Math.random() * verbData.length)];
+                game2IsPast = Math.random() < 0.5;
 
-                game2AnimImg.src = `${IMG_PATH}${verb.animImg}`;
-                game2TenseIcon.textContent = isMasu ? '☀️' : '🌙';
+                // Update Context Box
+                const contextBox = document.getElementById('dv-game2-context');
+                const timeText = document.getElementById('dv-game2-time-text');
                 
-                const options = shuffleArray([
-                    { text: verb.masu, tense: 'masu' },
-                    { text: verb.mashita, tense: 'mashita' }
-                ]);
+                contextBox.className = 'dv-game2-context-box ' + (game2IsPast ? 'past' : 'future');
+                // Explicit text prompt
+                timeText.textContent = game2IsPast ? 'きのう (Past)' : 'あした (Future)';
 
-                // Replacing buttons to clear event listeners
-                const oldBtn1 = document.getElementById('dv-game2-option1');
-                const oldBtn2 = document.getElementById('dv-game2-option2');
+                // Show Verb Icon
+                const mainIcon = document.getElementById('dv-game2-main-icon');
+                mainIcon.className = game2Target.icon; // Reset class
                 
-                const newBtn1 = oldBtn1.cloneNode(true);
-                const newBtn2 = oldBtn2.cloneNode(true);
-
-                newBtn1.textContent = options[0].text;
-                newBtn1.dataset.tense = options[0].tense;
-                newBtn1.className = 'dv-button dv-game2-option-button';
-                newBtn1.disabled = false;
-                newBtn1.addEventListener('click', handleGame2Choice);
+                // Setup Options
+                const opt1 = document.getElementById('dv-game2-option1');
+                const opt2 = document.getElementById('dv-game2-option2');
                 
-                newBtn2.textContent = options[1].text;
-                newBtn2.dataset.tense = options[1].tense;
-                newBtn2.className = 'dv-button dv-game2-option-button';
-                newBtn2.disabled = false;
-                newBtn2.addEventListener('click', handleGame2Choice);
-
-                oldBtn1.parentNode.replaceChild(newBtn1, oldBtn1);
-                oldBtn2.parentNode.replaceChild(newBtn2, oldBtn2);
-
-                game2Option1 = newBtn1;
-                game2Option2 = newBtn2;
-
-                game2Feedback.textContent = '';
-                game2Feedback.classList.remove('show');
+                // Shuffle order
+                const isOrderNormal = Math.random() < 0.5;
+                const txt1 = isOrderNormal ? game2Target.masu : game2Target.mashita;
+                const txt2 = isOrderNormal ? game2Target.mashita : game2Target.masu;
+                
+                opt1.textContent = txt1;
+                opt2.textContent = txt2;
+                
+                opt1.onclick = () => checkGame2(txt1, opt1);
+                opt2.onclick = () => checkGame2(txt2, opt2);
+                
+                // Reset button styles
+                opt1.className = 'dv-button dv-game2-option-button';
+                opt2.className = 'dv-button dv-game2-option-button';
             }
 
-            function handleGame2Choice(e) {
-                const chosenBtn = e.currentTarget;
-                const chosenTense = chosenBtn.dataset.tense;
+            function checkGame2(selectedText, btn) {
+                const correctText = game2IsPast ? game2Target.mashita : game2Target.masu;
+                const feedback = document.getElementById('dv-game2-feedback');
 
-                game2Option1.disabled = true;
-                game2Option2.disabled = true;
-
-                if (gameTimer) clearTimeout(gameTimer);
-
-                if (chosenTense === game2Answer) {
-                    playSound(soundCorrect);
-                    chosenBtn.classList.add('correct');
-                    
-                    const result = checkAndAwardPoints('game2', game2CurrentVerbId);
-                    let msg = 'せいかい！';
-                    if (result === "scored") {
-                        msg += ' (+1 ポイント！)';
-                    }
-
-                    game2Feedback.textContent = msg;
-                    game2Feedback.className = 'dv-feedback show success';
-                    
-                    gameTimer = setTimeout(setupGame2, 2000); 
+                if (selectedText === correctText) {
+                    btn.classList.add('correct');
+                    feedback.textContent = 'せいかい！';
+                    feedback.className = 'dv-feedback show success';
+                    speak(correctText); // Speak the correct answer
+                    checkAndAwardPoints('game2', game2Target.id);
+                    setTimeout(setupGame2, 2000);
                 } else {
-                    playSound(soundIncorrect);
-                    chosenBtn.classList.add('incorrect');
-                    game2Feedback.textContent = 'ちがうよ';
-                    game2Feedback.className = 'dv-feedback show';
-                    
-                    const correctBtn = (game2Option1.dataset.tense === game2Answer) ? game2Option1 : game2Option2;
-                    correctBtn.classList.add('correct');
-                    
-                    gameTimer = setTimeout(setupGame2, 2500); 
+                    btn.classList.add('incorrect');
+                    feedback.textContent = 'ちがうよ';
+                    feedback.className = 'dv-feedback show';
+                    speakFeedback(false);
                 }
             }
 
-
-            // ----------------------------------------------------
-            // Game 3 Logic (Sentence Building)
-            // ----------------------------------------------------
-            
+            // --- Game 3: Sentence Building ---
             function setupGame3() {
-                if (gameTimer) clearTimeout(gameTimer);
+                const nounContainer = document.getElementById('dv-game3-card-container-noun');
+                const verbContainer = document.getElementById('dv-game3-card-container-verb');
+                const slotNoun = document.getElementById('dv-game3-slot-noun');
+                const slotVerb = document.getElementById('dv-game3-slot-verb');
+                const feedback = document.getElementById('dv-game3-feedback');
+                const checkBtn = document.getElementById('dv-game3-check-button');
 
-                game3SlotNoun.innerHTML = '';
-                game3SlotVerb.innerHTML = '';
-                game3ContainerNoun.innerHTML = '';
-                game3ContainerVerb.innerHTML = '';
-                game3Feedback.textContent = '';
-                game3Feedback.className = 'dv-feedback';
-                game3CheckBtn.disabled = false;
+                nounContainer.innerHTML = '';
+                verbContainer.innerHTML = '';
+                slotNoun.innerHTML = '';
+                slotVerb.innerHTML = '';
+                feedback.textContent = '';
+                feedback.className = 'dv-feedback';
+                checkBtn.disabled = false;
+                checkBtn.style.background = '#5c7aff';
 
-                const game3Verbs = verbData.filter(v => v.noun !== null);
-                
-                const shuffledData = shuffleArray(game3Verbs);
-                
-                const optionsCount = Math.min(shuffledData.length, 3);
-                
-                if (optionsCount === 0) {
-                     game3Feedback.textContent = 'ゲーム3でつかえる ことば がありません。';
-                     game3CheckBtn.disabled = true;
-                     return;
-                }
-                const currentPairs = shuffledData.slice(0, optionsCount);
+                // Filter verbs that have nouns
+                const availableVerbs = verbData.filter(v => v.noun);
+                const shuffled = shuffle(availableVerbs).slice(0, 3); // Pick 3 random pairs
 
                 const nounCards = [];
                 const verbCards = [];
-                
-                currentPairs.forEach(pair => {
-                    nounCards.push({ text: pair.noun, id: pair.id, type: 'noun' });
-                    verbCards.push({ text: pair.masu, id: pair.id, type: 'verb' });
+
+                shuffled.forEach(v => {
+                    nounCards.push({ id: v.id, text: v.noun, icon: v.nounIcon, type: 'noun' });
+                    verbCards.push({ id: v.id, text: v.masu, icon: v.icon, type: 'verb' });
                 });
 
-                shuffleArray(nounCards).forEach(cardData => createGame3Card(cardData, game3ContainerNoun));
-                shuffleArray(verbCards).forEach(cardData => createGame3Card(cardData, game3ContainerVerb));
-                
-                document.querySelectorAll('.dv-game3-card').forEach(card => {
-                    card.addEventListener('click', handleGame3CardClick);
-                });
-            }
+                shuffle(nounCards).forEach(data => createGame3Card(data, nounContainer));
+                shuffle(verbCards).forEach(data => createGame3Card(data, verbContainer));
 
-            function createGame3Card(cardData, container) {
-                const card = document.createElement('div');
-                card.className = 'dv-game3-card';
-                card.textContent = cardData.text;
-                card.dataset.id = cardData.id;
-                card.dataset.type = cardData.type;
-                container.appendChild(card);
-            }
-
-            function handleGame3CardClick(e) {
-                const clickedCard = e.currentTarget;
-                const type = clickedCard.dataset.type;
-                
-                let targetSlot, targetContainer;
-
-                if (type === 'noun') {
-                    targetSlot = game3SlotNoun;
-                    targetContainer = game3ContainerNoun;
-                } else {
-                    targetSlot = game3SlotVerb;
-                    targetContainer = game3ContainerVerb;
-                }
-
-                if (clickedCard.parentNode === targetSlot) {
-                    targetContainer.appendChild(clickedCard);
-                } 
-                else {
-                    if (targetSlot.children.length > 0) {
-                        targetContainer.appendChild(targetSlot.children[0]);
+                checkBtn.onclick = () => {
+                    const n = slotNoun.querySelector('.dv-game3-card');
+                    const v = slotVerb.querySelector('.dv-game3-card');
+                    if(!n || !v) {
+                        feedback.textContent = 'カードを えらんでね';
+                        feedback.className = 'dv-feedback show';
+                        return;
                     }
-                    targetSlot.appendChild(clickedCard);
-                }
-            }
-            
-            game3CheckBtn.onclick = () => {
-                const nounCard = game3SlotNoun.querySelector('.dv-game3-card');
-                const verbCard = game3SlotVerb.querySelector('.dv-game3-card');
-
-                if (!nounCard || !verbCard) {
-                    game3Feedback.textContent = 'カードを えらんでね';
-                    game3Feedback.className = 'dv-feedback show';
-                    return;
-                }
-
-                const nounId = nounCard.dataset.id;
-                const verbId = verbCard.dataset.id;
-                
-                game3CheckBtn.disabled = true;
-
-                if (gameTimer) clearTimeout(gameTimer);
-
-                if (nounId === verbId) {
-                    const correctPair = verbData.find(v => v.id === nounId);
-
-                    playSound(soundCorrect);
-
-                    const result = checkAndAwardPoints('game3', nounId);
-                    let msg = 'せいかい！';
-                    if (result === "scored") {
-                        msg += ' (+1 ポイント！)';
+                    if(n.dataset.id === v.dataset.id) {
+                        feedback.textContent = 'せいかい！';
+                        feedback.className = 'dv-feedback show success';
+                        speak(n.textContent + "を" + v.textContent);
+                        checkAndAwardPoints('game3', n.dataset.id);
+                        setTimeout(setupGame3, 2500);
+                    } else {
+                        feedback.textContent = 'ちがうよ';
+                        feedback.className = 'dv-feedback show';
+                        speakFeedback(false);
+                        // Return cards
+                        nounContainer.appendChild(n);
+                        verbContainer.appendChild(v);
                     }
+                };
+            }
 
-                    game3Feedback.textContent = `${msg}「${correctPair.noun} を ${correctPair.masu}」`;
-                    game3Feedback.className = 'dv-feedback show success';
+            function createGame3Card(data, container) {
+                const el = document.createElement('div');
+                el.className = 'dv-game3-card';
+                el.dataset.id = data.id;
+                el.dataset.type = data.type;
+                el.innerHTML = `<i class="${data.icon}"></i> ${data.text}`;
+                
+                el.onclick = () => {
+                    // Move logic
+                    const targetSlot = (data.type === 'noun') ? document.getElementById('dv-game3-slot-noun') : document.getElementById('dv-game3-slot-verb');
+                    const originalContainer = (data.type === 'noun') ? document.getElementById('dv-game3-card-container-noun') : document.getElementById('dv-game3-card-container-verb');
                     
-                    gameTimer = setTimeout(setupGame3, 2500); 
-                } else {
-                    playSound(soundIncorrect);
-                    game3Feedback.textContent = 'ちがうよ。ただしい くみあわせは どれかな？';
-                    game3Feedback.className = 'dv-feedback show';
-                    
-                    gameTimer = setTimeout(() => {
-                        game3CheckBtn.disabled = false;
-                        game3Feedback.textContent = '';
-                        game3Feedback.classList.remove('show');
-                        if (nounCard) game3ContainerNoun.appendChild(nounCard);
-                        if (verbCard) game3ContainerVerb.appendChild(verbCard);
-                    }, 2500);
-                }
-            };
+                    speak(data.text); // Speak card text on click
 
-            showScreen(menuScreen); 
+                    if(el.parentElement === targetSlot) {
+                        originalContainer.appendChild(el); // Return
+                    } else {
+                        if(targetSlot.children.length > 0) {
+                            originalContainer.appendChild(targetSlot.firstChild); // Swap
+                        }
+                        targetSlot.appendChild(el);
+                    }
+                };
+                container.appendChild(el);
+            }
+
         });
     </script>
 </body>
