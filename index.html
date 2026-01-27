@@ -243,6 +243,41 @@ header {
   .game-card { height: 120px; padding: 10px; }
   .card-icon { font-size: 2em; }
 }
+
+/* --- プレミアム/ロック機能のスタイル --- */
+.game-card.locked {
+  position: relative;
+  opacity: 0.8;
+  background: #f9f9f9;
+}
+/* 鍵アイコンを中央に配置 */
+.game-card.locked::after {
+  content: '\f023'; /* FontAwesomeの鍵アイコン */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: #555;
+  opacity: 0.7;
+  z-index: 2;
+  pointer-events: none; /* クリックを邪魔しないように */
+}
+/* PROバッジを右上に配置 */
+.premium-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(45deg, #ffd700, #ffaa00);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.7em;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 3;
+}
 </style>
 </head>
 <body>
@@ -521,7 +556,8 @@ window.loginWithLine = async () => {
     if (!userSnap.exists()) {
       await setDoc(userRef, {
         email: user.email || "", displayName: user.displayName || "LINE User",
-        points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {} 
+        points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {},
+        isPremium: false // ★デフォルトは無料会員
       });
     } else {
       await updateDoc(userRef, { lastLogin: new Date().toISOString() });
@@ -585,7 +621,8 @@ window.submitAuth = async () => {
       const user = userCredential.user;
       await setDoc(doc(db, "users", user.uid), {
         email: email, displayName: displayName, points: 0, streak: 1,
-        lastLogin: new Date().toISOString(), dailyTracker: {}
+        lastLogin: new Date().toISOString(), dailyTracker: {},
+        isPremium: false // ★デフォルトは無料会員
       });
       sessionStorage.setItem(SESS_KEY, 'authenticated');
       window.closeAuthModal();
@@ -597,7 +634,8 @@ window.submitAuth = async () => {
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: email, displayName: email.split('@')[0], points: 0, streak: 1,
-          lastLogin: new Date().toISOString(), dailyTracker: {}
+          lastLogin: new Date().toISOString(), dailyTracker: {},
+          isPremium: false // ★デフォルトは無料会員
         });
       } else {
         await updateDoc(userRef, { lastLogin: new Date().toISOString() });
@@ -647,6 +685,7 @@ window.updateUI = function(userState) {
   const welcome = document.getElementById('guest-welcome');
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
   if (userState === 'guest') {
+    window.isUserPremium = false; // ゲストは無料扱い
     welcome.classList.add('hidden');
     dash.classList.remove('hidden');
     document.getElementById('user-name').textContent = 'ゲスト';
@@ -661,6 +700,9 @@ window.updateUI = function(userState) {
     currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
+        // ★プレミアム状態を取得しグローバル変数にセット
+        window.isUserPremium = data.isPremium || false;
+        
         document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
         document.getElementById('streak-val').textContent = data.streak || 0;
         document.getElementById('point-val').textContent = data.points || 0;
@@ -671,6 +713,7 @@ window.updateUI = function(userState) {
       }
     });
   } else {
+    window.isUserPremium = false; // 未ログイン
     welcome.classList.remove('hidden');
     dash.classList.add('hidden');
   }
@@ -727,6 +770,7 @@ onAuthStateChanged(auth, async (user) => {
 
 <script>
 window.currentLang = 'ja'; 
+window.isUserPremium = false; // デフォルトはfalse
 
 window.i18nData = {
 ja: {
@@ -859,6 +903,7 @@ const gameStructure = [
 { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase" }
 ]},
 { id: "culture", icon: "fa-solid fa-torii-gate", color: "#9c27b0", titleKey: "cat_culture", games: [
+{ url: "culture_map.html", titleKey: "btn_sengoku", icon: "fa-solid fa-khanda", isPremium: true }, /* ★プレミアム対象に変更 */
 { url: "festival_game.html", titleKey: "btn_festival", icon: "fa-solid fa-calendar-days" }
 ]},
 { id: "manga", icon: "fa-solid fa-book-journal-whills", color: "#00897B", titleKey: "cat_manga", games: [
@@ -893,11 +938,26 @@ backBtn.style.display = 'block';
 document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
 category.games.forEach(game => {
 const a = document.createElement('a');
-a.href = game.url;
 a.className = 'game-card';
 a.style.borderColor = category.color;
+
+// ★ロック機能の実装
+const isLocked = game.isPremium && !window.isUserPremium;
+if (isLocked) {
+  a.classList.add('locked');
+  a.href = "javascript:void(0)";
+  a.onclick = (e) => { e.preventDefault(); window.openPremiumModal(); };
+} else {
+  a.href = game.url;
+}
+
 const gameTitle = window.i18nData[window.currentLang][game.titleKey] || game.title;
-a.innerHTML = `<i class="${game.icon} card-icon" style="color:${category.color}"></i><span class="card-title">${gameTitle}</span>`;
+let badgeHtml = game.isPremium ? '<div class="premium-badge"><i class="fa-solid fa-crown"></i> PRO</div>' : '';
+
+a.innerHTML = `
+${badgeHtml}
+<i class="${game.icon} card-icon" style="color:${category.color}"></i>
+<span class="card-title">${gameTitle}</span>`;
 gameGrid.appendChild(a);
 });
 gameGrid.classList.remove('fade-in');
@@ -909,6 +969,11 @@ const sectionHeader = document.getElementById('game-section-title').closest('.se
 const y = sectionHeader.getBoundingClientRect().top + window.scrollY - 80; // -80はヘッダー分のオフセット
 window.scrollTo({top: y, behavior: 'smooth'});
 }
+
+// 課金誘導モーダル（簡易版）
+window.openPremiumModal = () => {
+    alert("このゲームはプレミアム会員限定です！\n\n(※開発中: ここに支払いページへのリンクなどが入ります)");
+};
 
 window.setLanguage = (lang) => {
 window.currentLang = lang;
