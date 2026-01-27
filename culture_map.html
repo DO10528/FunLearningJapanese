@@ -440,11 +440,13 @@
     
     init();
 
-    // ▼▼▼ ここが重要な追加・変更箇所です（セキュリティガード） ▼▼▼
+    // ▼▼▼ セキュリティガード (お支払い誘導付き) ▼▼▼
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            // 1. ログインしていない（ゲスト）なら即退場
-            alert("このゲームはプレミアム会員限定です。\nログインしてください。");
+            // 1. ログインしていない（ゲスト）
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
             window.location.href = "index.html"; 
             return;
         }
@@ -454,8 +456,10 @@
         const userDocSnap = await getDoc(userDocRef);
         
         if (!userDocSnap.exists() || !userDocSnap.data().isPremium) {
-            // プレミアムじゃないなら退場
-            alert("このゲームはプレミアム会員限定です。\nメニューに戻ります。");
+            // プレミアムじゃないなら
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
             window.location.href = "index.html";
             return;
         }
@@ -672,6 +676,13 @@
         else sessionStorage.setItem('sengoku_save_v2', JSON.stringify(userState));
         window.openKura();
     }
+
+    // ★追加: どこからでも課金画面を呼び出せるようにする
+    window.openPremiumModal = () => {
+        if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+            window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+        }
+    };
 </script>
 
 </body>
