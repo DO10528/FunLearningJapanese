@@ -46,6 +46,11 @@
         font-size: 0.9em; font-weight: bold; text-decoration: none;
     }
 
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.8em; margin: 10px 0; font-weight: bold; color: var(--primary-dark);
+    }
+
     /* --- 画面切り替え --- */
     .screen { display: none; padding: 20px; max-width: 800px; margin: 0 auto; animation: fadeIn 0.3s ease; }
     .screen.active { display: block; }
@@ -171,6 +176,8 @@
     <a href="index.html" class="btn-home">ホーム</a>
 </header>
 
+<div id="auth-status">認証中...</div>
+
 <div id="view-list" class="screen active">
     <div class="list-header">
         <h2 class="list-title"><i class="fa-solid fa-book-open"></i> 文章リスト</h2>
@@ -252,6 +259,66 @@
         <button onclick="showList()" style="background:none; border:none; color:#777; text-decoration:underline; cursor:pointer;">リストにもどる</button>
     </div>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
+      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+      projectId: "funlearningjapanese-b8e08",
+      storageBucket: "funlearningjapanese-b8e08.appspot.com",
+      messagingSenderId: "1055688629268",
+      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+      measurementId: "G-LCMXVLPS81"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    window.currentUserId = null;
+    const authStatusEl = document.getElementById('auth-status');
+    
+    // ▼▼▼ セキュリティガード (お支払い誘導付き) ▼▼▼
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // 1. ログインしていない（ゲスト）
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
+            window.location.href = "index.html"; 
+            return;
+        }
+
+        // 2. ユーザーがいたら、プレミアム会員かどうかチェック
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (!userDocSnap.exists() || !userDocSnap.data().isPremium) {
+            // プレミアムじゃないなら
+            if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+                window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
+            }
+            window.location.href = "index.html";
+            return;
+        }
+
+        // 3. 合格（ログイン＆プレミアム）
+        window.currentUserId = user.uid;
+        authStatusEl.textContent = `✅ ログイン中 (${user.displayName || 'User'})`;
+    });
+    // ▲▲▲ セキュリティガードここまで ▲▲▲
+
+    window.addPoints = async function(points) { 
+        if (!window.currentUserId) return;
+        try {
+            await updateDoc(doc(db, "users", window.currentUserId), { points: increment(points) });
+        } catch (e) { console.error(e); }
+    }
+</script>
 
 <script>
     const synth = window.speechSynthesis;
@@ -366,9 +433,7 @@
         [ // 6. Birthday/Party
             { pre: "<ruby>来週<rt>らいしゅう</rt></ruby>は <ruby>私<rt>わたし</rt></ruby>の", reading: "たん", target: "誕", post: "<ruby>生<rt>じょう</rt></ruby><ruby>日<rt>び</rt></ruby>です。(※N5外)", // Keeping simple
               pre: "<ruby>来週<rt>らいしゅう</rt></ruby>は <ruby>私<rt>わたし</rt></ruby>の", reading: "う", target: "生", post: "まれた<ruby>日<rt>ひ</rt></ruby>です。", wrong1: "年", wrong2: "先", en: "Next week is my birthday.", role: "A" },
-            { pre: "おめでとうございます。パーティーを", reading: "し", target: "見", post: "ませんか。(Wrong target)", 
-              // Fix
-              pre: "おめでとう。<ruby>何<rt>なに</rt></ruby>か", reading: "の", target: "飲", post: "みませんか。", wrong1: "食", wrong2: "飯", en: "Congratulations. Shall we drink something?", role: "B", prev: "A: 来週は 私の 生まれた日です。" },
+            { pre: "おめでとう。<ruby>何<rt>なに</rt></ruby>か", reading: "の", target: "飲", post: "みませんか。", wrong1: "食", wrong2: "飯", en: "Congratulations. Shall we drink something?", role: "B", prev: "A: 来週は 私の 生まれた日です。" },
             { pre: "ありがとう。<ruby>日曜日<rt>にちようび</rt></ruby>の", reading: "ご", target: "午", post: "<ruby>後<rt>ご</rt></ruby>は どうですか。", wrong1: "牛", wrong2: "千", en: "Thanks. How about Sunday afternoon?", role: "C", prev: "A: 来週は 私の 生まれた日です。<br>B: おめでとう。何か 飲みませんか。" }
         ]
     ];
@@ -535,6 +600,8 @@
             feedback.textContent = '⭕';
             feedback.style.color = '#4caf50';
             
+            if(window.addPoints) window.addPoints(1); // ポイント加算
+
             const blank = document.getElementById('blank-spot');
             blank.textContent = q.target;
             blank.classList.add('solved');
