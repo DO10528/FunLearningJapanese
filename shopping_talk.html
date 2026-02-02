@@ -25,13 +25,11 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0; padding: 0; 
-        /* 固定ボタンのために下部余白を確保 */
         padding-bottom: 100px;
         min-height: 100vh;
         display: flex; flex-direction: column;
     }
 
-    /* ヘッダー */
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white; padding: 15px 20px; width: 100%;
@@ -42,32 +40,22 @@
     .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
     .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
 
-    /* メインコンテナ */
     .container {
         flex-grow: 1; padding: 20px;
         width: 100%; max-width: 800px; margin: 0 auto;
         display: flex; flex-direction: column;
     }
 
-    #auth-status {
-        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
-    }
+    #auth-status { text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary); }
 
-    /* --- 画面切り替え --- */
     .screen { display: none; animation: fadeIn 0.4s ease-out; }
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- メニューグリッド --- */
-    .menu-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 15px;
-    }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
     .scenario-card {
-        background: white; border-radius: 20px; padding: 20px;
-        text-align: center; cursor: pointer;
-        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-        border: 2px solid transparent; transition: all 0.2s;
+        background: white; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s;
         display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
     .scenario-card:hover { transform: translateY(-3px); }
@@ -75,21 +63,13 @@
     .card-icon { font-size: 2.5em; margin-bottom: 5px; }
     .card-title { font-weight: 800; font-size: 1.1em; color: #555; }
 
-    /* --- 練習リスト --- */
-    .practice-list {
-        display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;
-    }
+    .practice-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
     .practice-item {
         background: white; border-radius: 15px; padding: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        border-left: 5px solid var(--primary);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
     }
-    .practice-row {
-        display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
-    }
-    .role-badge {
-        font-size: 0.7em; padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; width: 60px; text-align: center; flex-shrink: 0;
-    }
+    .practice-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .role-badge { font-size: 0.7em; padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; width: 60px; text-align: center; flex-shrink: 0; }
     .badge-clerk { background: #90a4ae; }
     .badge-you { background: var(--primary); }
     
@@ -104,20 +84,15 @@
     }
     .play-btn-mini:hover { background: #e3f2fd; }
 
-    /* 答えリスト */
     .answer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .answer-item { display: flex; align-items: center; gap: 10px; padding: 5px; border-bottom: 1px dashed #eee; }
     .answer-item:last-child { border-bottom: none; }
 
-
-    /* --- シミュレーション画面 (音声用) --- */
     .sim-header {
-        text-align: center; margin-bottom: 20px;
-        background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px;
-        position: relative;
+        text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.8);
+        padding: 10px; border-radius: 15px; position: relative;
     }
     
-    /* 店員エリア */
     .clerk-area { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 20px; }
     .clerk-icon {
         width: 70px; height: 70px; background: white; border-radius: 50%;
@@ -129,15 +104,12 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; flex-grow: 1;
     }
     
-    /* ユーザー発話エリア */
     .user-area {
         background: white; padding: 20px; border-radius: 20px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center;
         margin-top: 10px; border: 3px solid #eee;
     }
-    .target-phrase-box {
-        background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px;
-    }
+    .target-phrase-box { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     .target-label { font-size: 0.8em; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
     .target-text { font-size: 1.3em; font-weight: 900; color: #333; }
     .target-sub { font-size: 0.9em; color: #777; margin-top: 5px; }
@@ -151,6 +123,7 @@
     }
     .mic-btn:active { transform: scale(0.95); }
     .mic-btn.listening { background: #ef5350; animation: pulse 1.5s infinite; }
+    .mic-btn.processing { background: #ffd54f; } /* 準備中 */
     
     @keyframes pulse {
         0% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.7); }
@@ -158,43 +131,29 @@
         100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0); }
     }
 
-    /* 結果表示 */
     .result-display { margin-top: 20px; min-height: 60px; }
     .recognized-text { font-size: 1.1em; color: #555; margin-bottom: 5px; font-weight: bold; }
-    .score-badge { 
-        display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white;
-    }
+    .score-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white; }
     .score-high { background: var(--correct-color); }
     .score-low { background: var(--incorrect-color); }
 
-    /* 共通ボタン */
     .action-btn {
         background: var(--primary); color: white; border: none;
         padding: 12px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1em;
         cursor: pointer; box-shadow: 0 4px 0 #3949ab; width: 100%; max-width: 300px;
-        display: block; text-align: center;
-        margin: 0 auto;
+        display: block; text-align: center; margin: 0 auto;
     }
     .action-btn:active { transform: translateY(3px); box-shadow: none; }
-    
     .btn-secondary { background: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
     .btn-small { padding: 5px 15px; font-size: 0.9em; width: auto; display: inline-block; margin: 0; }
 
-    /* --- 固定フッター (Startボタン用) --- */
     .fixed-footer {
         position: fixed; bottom: 0; left: 0; width: 100%;
-        background: white; padding: 15px;
-        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
-        text-align: center; z-index: 900;
-        display: none; /* デフォルト非表示、JSで制御 */
+        background: white; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        text-align: center; z-index: 900; display: none;
     }
-    /* 練習画面でのみ表示するためのクラス */
     #practice-screen.active ~ .fixed-footer-practice { display: block; }
-    
-    /* 上部のボタンコンテナ */
-    .top-controls {
-        display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;
-    }
+    .top-controls { display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px; }
 
 </style>
 </head>
@@ -240,11 +199,8 @@
             <h2 id="practice-title" style="margin:5px 0; color:var(--primary);"></h2>
             <p style="margin:0; font-size:0.9em; color:#777;">会話を練習しましょう！この中から一つがクイズに出ます。</p>
         </div>
-
-        <div id="practice-list" class="practice-list">
-            </div>
-        
-        </div>
+        <div id="practice-list" class="practice-list"></div>
+    </div>
 
     <div id="sim-screen" class="screen">
         <div class="sim-header">
@@ -357,68 +313,115 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Speech API Setup (iPad/iOS Fixed) ---
+    // --- 音声認識のセットアップ (Safari/iOS対応強化版) ---
+    // window.webkitSpeechRecognition を明示的に優先して取得
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
+    let recognition = null;
     let isRecording = false;
 
-    // iPad/iPhone対策: 音声認識オブジェクトの初期化を関数化
-    function initRecognition() {
-        if (!SpeechRecognition) return null;
-        const rec = new SpeechRecognition();
-        rec.lang = 'ja-JP';
-        rec.interimResults = false;
-        rec.maxAlternatives = 1;
-        rec.continuous = false; // iPadでの安定性のために一回ごとに切る
-
-        rec.onstart = () => {
-            isRecording = true;
-            document.getElementById('mic-btn').classList.add('listening');
-            document.getElementById('recognized-text').textContent = "聞いています...";
-        };
-
-        rec.onend = () => {
-            isRecording = false;
-            document.getElementById('mic-btn').classList.remove('listening');
-        };
-
-        rec.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('recognized-text').textContent = `「${transcript}」`;
-            evaluateSpeech(transcript);
-        };
-        
-        rec.onerror = (event) => {
-            console.error("Speech Recognition Error:", event.error);
-            isRecording = false;
-            document.getElementById('mic-btn').classList.remove('listening');
-            
-            // iPad/iOS向けにエラーメッセージを具体化
-            if (event.error === 'not-allowed') {
-                document.getElementById('recognized-text').textContent = "マイクを許可してください";
-                alert("ブラウザの設定でマイクの使用を許可してください。");
-            } else if (event.error === 'no-speech') {
-                document.getElementById('recognized-text').textContent = "声が聞こえませんでした";
-            } else {
-                document.getElementById('recognized-text').textContent = "もう一度押してください";
-            }
-        };
-        return rec;
+    // --- 初期チェック ---
+    if (!SpeechRecognition) {
+        alert("お使いのブラウザは音声認識に対応していません。\nGoogle ChromeまたはSafariをご利用ください。");
     }
-
-    recognition = initRecognition();
 
     const synth = window.speechSynthesis;
     let voices = [];
     synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     setTimeout(() => { voices = synth.getVoices(); }, 500);
 
-    // iPad/iOS対策: 音声合成を活性化させるためのダミー再生
-    function unlockAudio() {
-        if(synth.speaking) synth.cancel(); // 他の音声を止める
-        const silent = new SpeechSynthesisUtterance("");
-        synth.speak(silent);
-    }
+    // 音声読み上げ（TTS）
+    window.speak = (text) => {
+        if (synth.speaking) synth.cancel();
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.lang = 'ja-JP';
+        utterThis.rate = 1.0;
+        const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+        if(jpVoice) utterThis.voice = jpVoice;
+        synth.speak(utterThis);
+    };
+
+    // --- マイクボタンを押した時の処理（ここが修正の肝） ---
+    window.toggleRecording = () => {
+        const micBtn = document.getElementById('mic-btn');
+        const statusText = document.getElementById('recognized-text');
+
+        // 1. まず読み上げを強制停止（マイクの邪魔をしないため）
+        if (synth.speaking) {
+            synth.cancel();
+        }
+
+        // 2. 録音中なら止める
+        if (isRecording) {
+            if (recognition) recognition.stop();
+            isRecording = false;
+            micBtn.classList.remove('listening');
+            statusText.textContent = "停止しました";
+            return;
+        }
+
+        // 3. 録音開始処理（iOSでは毎回インスタンスを作り直すのが一番安全）
+        try {
+            statusText.textContent = "マイク起動中...";
+            micBtn.classList.add('processing'); // 黄色くする（準備中）
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.continuous = false; // iOSはfalse推奨
+
+            recognition.onstart = () => {
+                isRecording = true;
+                micBtn.classList.remove('processing');
+                micBtn.classList.add('listening'); // 赤くする（録音中）
+                statusText.textContent = "聞いています...どうぞ！";
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                micBtn.classList.remove('listening');
+                micBtn.classList.remove('processing');
+                // 結果が出ずに終わった場合のみメッセージを変える
+                if (statusText.textContent === "聞いています...どうぞ！") {
+                    statusText.textContent = "もう一度押してください";
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                statusText.textContent = `「${transcript}」`;
+                evaluateSpeech(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Error:", event.error);
+                isRecording = false;
+                micBtn.classList.remove('listening');
+                micBtn.classList.remove('processing');
+
+                if (event.error === 'not-allowed') {
+                    alert("マイクの使用が許可されていません。\n端末の[設定] > [Safari] > [マイク] を許可にしてください。");
+                    statusText.textContent = "マイク許可が必要です";
+                } else if (event.error === 'no-speech') {
+                    statusText.textContent = "声が聞こえませんでした";
+                } else {
+                    // iOS/Safari特有の謎エラーの場合もここ
+                    statusText.textContent = "エラー: もう一度押してください";
+                }
+            };
+
+            // いざ、開始！
+            recognition.start();
+
+        } catch (e) {
+            console.error("Start Error:", e);
+            alert("マイクの起動に失敗しました。ページを再読み込みしてください。");
+            isRecording = false;
+            micBtn.classList.remove('listening');
+            micBtn.classList.remove('processing');
+        }
+    };
+
 
     // --- シナリオデータ ---
     const scenarios = {
@@ -550,11 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function normalizeText(text) {
         if(!text) return "";
         let t = text;
-        
-        // 1. 記号とスペースを削除
         t = t.replace(/[ 、。！？,.!?]/g, "");
-
-        // --- 漢字・ひらがな揺れ修正 ---
         t = t.replace(/照り焼き|照焼/g, "てりやき");
         t = t.replace(/ビッグマック/g, "ビックマック");
         t = t.replace(/珈琲/g, "コーヒー");
@@ -567,37 +566,29 @@ document.addEventListener('DOMContentLoaded', () => {
         t = t.replace(/唐揚/g, "唐揚げ");
         t = t.replace(/鳥皿/g, "取り皿");
         t = t.replace(/取皿/g, "取り皿");
-
-        // --- 数詞の統一 ---
         t = t.replace(/ふたり|二人/g, "2人");
         t = t.replace(/ひとり|一人/g, "1人");
         t = t.replace(/さんにん|三人/g, "3人");
         t = t.replace(/ひとつ|一つ/g, "1つ");
         t = t.replace(/ふたつ|二つ/g, "2つ");
         t = t.replace(/みっつ|三つ/g, "3つ");
-
         t = t.replace(/一/g, "1");
         t = t.replace(/二/g, "2");
         t = t.replace(/三/g, "3");
         t = t.replace(/四/g, "4");
         t = t.replace(/五/g, "5");
-        
         t = t.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
-
         return t;
     }
 
     function getSimilarity(s1, s2) {
         s1 = normalizeText(s1);
         s2 = normalizeText(s2);
-
         const len1 = s1.length;
         const len2 = s2.length;
         const matrix = [];
-
         for (let i = 0; i <= len1; i++) matrix[i] = [i];
         for (let j = 0; j <= len2; j++) matrix[0][j] = j;
-
         for (let i = 1; i <= len1; i++) {
             for (let j = 1; j <= len2; j++) {
                 const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
@@ -620,23 +611,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
         
-        // フッター制御
         const footer = document.getElementById('fixed-footer-practice');
         if(id === 'practice-screen') {
             footer.style.display = 'block';
         } else {
             footer.style.display = 'none';
         }
-    };
-
-    window.speak = (text) => {
-        if (synth.speaking) synth.cancel();
-        const utterThis = new SpeechSynthesisUtterance(text);
-        utterThis.lang = 'ja-JP';
-        utterThis.rate = 1.0;
-        const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
-        if(jpVoice) utterThis.voice = jpVoice;
-        synth.speak(utterThis);
     };
 
     // --- 1. 練習画面ロード ---
@@ -686,10 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. スピーキングテスト開始 ---
     window.startSimulation = () => {
-        if (!recognition) {
-            alert("音声認識が使えないため、このモードは利用できません。");
-            return;
-        }
         stepIndex = 0;
         document.getElementById('total-step').textContent = currentData.steps.length;
         window.showScreen('sim-screen');
@@ -700,18 +676,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = currentData.steps[stepIndex];
         document.getElementById('step-count').textContent = stepIndex + 1;
         
-        // 店員
         document.getElementById('clerk-text-jp').textContent = step.clerk.jp;
         document.getElementById('clerk-text-en').textContent = step.clerk.en;
         window.speak(step.clerk.jp);
 
-        // UIリセット
         document.getElementById('score-result').innerHTML = '';
         document.getElementById('recognized-text').textContent = '...';
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('mic-btn').disabled = false;
         
-        // ターゲット回答をランダムに選定
         const correctOpts = step.options.filter(o => o.correct);
         const randomOpt = correctOpts[Math.floor(Math.random() * correctOpts.length)];
         currentTargetPhrase = randomOpt;
@@ -719,30 +692,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('target-phrase').textContent = randomOpt.jp;
         document.getElementById('target-sub').textContent = randomOpt.en;
     }
-
-    // iPad/iOS対応のマイク切替処理
-    window.toggleRecording = () => {
-        // 1. 他の音声を止める（これが重要！）
-        if (synth.speaking) synth.cancel();
-
-        // 2. 認識オブジェクトがなければ作る
-        if (!recognition) {
-            recognition = initRecognition();
-        }
-
-        if (isRecording) {
-            recognition.stop();
-        } else {
-            // 3. 録音開始（エラーが出たら再トライ）
-            try {
-                recognition.start();
-            } catch (e) {
-                // すでに開始中などのエラー対策
-                recognition.stop();
-                setTimeout(() => { recognition.start(); }, 100);
-            }
-        }
-    };
 
     window.playTargetVoice = () => {
         if(currentTargetPhrase) window.speak(currentTargetPhrase.jp);
@@ -757,26 +706,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!currentTargetPhrase) return;
         
         const targetText = currentTargetPhrase.jp;
-        // 正規化してから類似度計算
         const similarity = getSimilarity(userText, targetText);
         const percentage = Math.floor(similarity * 100);
 
         const resultEl = document.getElementById('score-result');
         const nextBtn = document.getElementById('next-btn');
 
-        if (percentage >= 90) {
-            // 合格
+        if (percentage >= 80) { // 判定を少し甘く80%に
             resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
-            document.getElementById('mic-btn').disabled = true; // 連打防止
+            document.getElementById('mic-btn').disabled = true;
             
-            // ポイント加算
             if(window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
             
             nextBtn.style.display = 'block';
             nextBtn.textContent = '次へ';
             nextBtn.onclick = nextStep;
         } else {
-            // 不合格
             resultEl.innerHTML = `<span class="score-badge score-low">Try again... ${percentage}%</span><br><span style="font-size:0.8em; color:#777;">もう一度マイクを押してね</span>`;
         }
     }
