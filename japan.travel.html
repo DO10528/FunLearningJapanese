@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Japan Trip Worksheet - Travel Scenes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Zen Maru Gothic', sans-serif; background-color: #f0f8ff; margin: 0; padding: 20px; color: #333; }
+        .worksheet { background: white; max-width: 800px; margin: 0 auto; padding: 40px; border: 3px solid #5c7aff; border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #5c7aff; text-align: center; font-size: 28px; border-bottom: 2px dashed #5c7aff; padding-bottom: 10px; margin-bottom: 30px; }
+        .info-box { display: flex; justify-content: space-between; margin-bottom: 30px; font-weight: bold; }
+        .input-line { border-bottom: 1px solid #999; display: inline-block; min-width: 150px; margin-left: 5px; font-size: 0.9em; }
+        
+        .section { margin-bottom: 30px; background: #eef6ff; padding: 15px 20px; border-radius: 10px; }
+        .section-title { font-weight: 900; color: #1e3a8a; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.3em; }
+        .thai-hint { font-size: 0.8em; color: #666; font-weight: normal; margin-left: 5px; }
+        
+        .question-box { background: white; border: 1px solid #d0e0f0; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
+        .question-box i { font-size: 1.5em; color: #5c7aff; flex-shrink: 0; margin-top: 3px; }
+        .question-content { flex-grow: 1; }
+        .question-text { font-weight: bold; margin-bottom: 5px; }
+        .answer-line { border-bottom: 1px solid #bbb; display: block; width: 90%; min-height: 25px; margin-top: 5px; margin-left: auto; margin-right: auto; }
+        .choice-list { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px; }
+        .choice { display: flex; align-items: center; gap: 5px; font-size: 0.95em; }
+        .checkbox { width: 18px; height: 18px; border: 2px solid #5c7aff; border-radius: 3px; flex-shrink: 0; }
+        
+        .note-area { height: 120px; border: 1px solid #ccc; background: white; border-radius: 5px; margin-top: 10px; width: 100%; }
+
+        @media print { 
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; color-adjust: exact; } 
+            .worksheet { border: 1px solid #000; box-shadow: none; padding: 30px; } 
+            h1 { font-size: 24px; border-bottom-color: #aaa; }
+            .section { background: #eef6ff !important; border: none; }
+            .section-title { color: #1e3a8a !important; font-size: 1.2em; }
+            .question-box { border: 1px solid #e0e0e0; }
+            .question-box i { color: #5c7aff !important; }
+            .input-line, .answer-line { border-bottom-color: #666; }
+            .checkbox { border-color: #5c7aff !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="worksheet">
+    <h1>🇯🇵 日本旅行ワークシート - シーン別 <br><span style="font-size: 16px;">แบบฝึกหัดเที่ยวญี่ปุ่น - สถานการณ์</span></h1>
+
+    <div class="info-box">
+        <div>Name (ชื่อ): <span class="input-line"></span></div>
+        <div>Date (วันที่): <span class="input-line"></span></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            🗓️ 2月！北海道と東京の天気 <span class="thai-hint">| อากาศที่ฮอกไกโดและโตเกียวในเดือนกุมภาพันธ์</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-temperature-low"></i>
+            <div class="question-content">
+                <div class="question-text">2月の日本はとても寒いです。何を着ていく？</div>
+                <span class="thai-hint">เดือนกุมภาพันธ์ที่ญี่ปุ่นอากาศหนาวมาก จะใส่เสื้อผ้าแบบไหนดี?</span>
+                <div class="choice-list">
+                    <div class="choice"><div class="checkbox"></div> あついコート (เสื้อโค้ทหนา)</div>
+                    <div class="choice"><div class="checkbox"></div> Tシャツ (เสื้อยืด)</div>
+                    <div class="choice"><div class="checkbox"></div> マフラー・手袋 (ผ้าพันคอ, ถุงมือ)</div>
+                    <div class="choice"><div class="checkbox"></div> サンダル (รองเท้าแตะ)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            ✈️ 空港についたら (At the Airport) <span class="thai-hint">| เมื่อถึงสนามบิน</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-plane-arrival"></i>
+            <div class="question-content">
+                <div class="question-text">空港で、わからないことがあったら、誰に聞く？</div>
+                <span class="thai-hint">ถ้ามีอะไรไม่เข้าใจที่สนามบิน จะถามใครดี?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-language"></i>
+            <div class="question-content">
+                <div class="question-text">「すみません」は何という意味？</div>
+                <span class="thai-hint">"Sumimasen" (ขอโทษ/รบกวนหน่อย) แปลว่าอะไร?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            🚕 移動手段 (Transportation) <span class="thai-hint">| การเดินทาง</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-taxi"></i>
+            <div class="question-content">
+                <div class="question-text">タクシーに乗りたい時、どうする？</div>
+                <span class="thai-hint">เมื่อต้องการขึ้นแท็กซี่ ต้องทำอย่างไร?</span>
+                <div class="choice-list">
+                    <div class="choice"><div class="checkbox"></div> 手をあげる (ยกมือ)</div>
+                    <div class="choice"><div class="checkbox"></div> 走って追いかける (วิ่งตาม)</div>
+                    <div class="choice"><div class="checkbox"></div> タクシー乗り場を探す (หาจุดจอดแท็กซี่)</div>
+                </div>
+            </div>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-train"></i>
+            <div class="question-content">
+                <div class="question-text">東京で電車に乗るとき、何が必要？</div>
+                <span class="thai-hint">เมื่อขึ้นรถไฟที่โตเกียว ต้องใช้อะไร?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            🏨 ホテルについたら (At the Hotel) <span class="thai-hint">| เมื่อถึงโรงแรม</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-hotel"></i>
+            <div class="question-content">
+                <div class="question-text">ホテルの受付で何と言う？</div>
+                <span class="thai-hint">จะพูดว่าอะไรที่แผนกต้อนรับของโรงแรม?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-bed"></i>
+            <div class="question-content">
+                <div class="question-text">ホテルの部屋で、日本のテレビを見てみよう！</div>
+                <span class="thai-hint">ลองดูทีวีญี่ปุ่นในห้องพักโรงแรมกันเถอะ!</span>
+                <div class="answer-line" style="min-height: 50px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            ⛷️ 北海道：スキー場へ行こう！ (Hokkaido: Ski Resort) <span class="thai-hint">| ฮอกไกโด: ไปลานสกีกันเถอะ!</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-skiing"></i>
+            <div class="question-content">
+                <div class="question-text">スキー場で何をしてみたい？</div>
+                <span class="thai-hint">อยากลองทำอะไรที่ลานสกี?</span>
+                <div class="choice-list">
+                    <div class="choice"><div class="checkbox"></div> スキーをする (เล่นสกี)</div>
+                    <div class="choice"><div class="checkbox"></div> スノーボード (เล่นสโนว์บอร์ด)</div>
+                    <div class="choice"><div class="checkbox"></div> 雪だるまを作る (ปั้นตุ๊กตาหิมะ)</div>
+                    <div class="choice"><div class="checkbox"></div> あったかいココアを飲む (ดื่มโกโก้อุ่นๆ)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            🍜 レストラン・コンビニ (Restaurant & Convenience Store) <span class="thai-hint">| ร้านอาหารและร้านสะดวกซื้อ</span>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-ramen-soup"></i>
+            <div class="question-content">
+                <div class="question-text">レストランで「ラーメンをください」と頼むには？</div>
+                <span class="thai-hint">ถ้าจะสั่งราเมนที่ร้านอาหาร จะพูดว่าอะไร?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-store"></i>
+            <div class="question-content">
+                <div class="question-text">コンビニで、おやつを買おう！何が食べたい？</div>
+                <span class="thai-hint">ซื้อขนมที่ร้านสะดวกซื้อกันเถอะ! อยากกินอะไร?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+        <div class="question-box">
+            <i class="fas fa-yen-sign"></i>
+            <div class="question-content">
+                <div class="question-text">日本の「100円」は、タイのお金でいくらくらい？ (約25～30バーツ)</div>
+                <span class="thai-hint">"100 เยน" ของญี่ปุ่น เท่ากับเงินไทยประมาณเท่าไหร่?</span>
+                <div class="answer-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            📝 自由にかこう！ (Free Drawing/Notes) <span class="thai-hint">| วาดรูปหรือเขียนบันทึกตามใจชอบ</span>
+        </div>
+        <div class="note-area"></div>
+    </div>
+</div>
+
+</body>
+</html>
