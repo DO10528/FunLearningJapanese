@@ -357,48 +357,68 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Speech API Setup ---
+    // --- Speech API Setup (iPad/iOS Fixed) ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
     let isRecording = false;
 
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
+    // iPad/iPhone対策: 音声認識オブジェクトの初期化を関数化
+    function initRecognition() {
+        if (!SpeechRecognition) return null;
+        const rec = new SpeechRecognition();
+        rec.lang = 'ja-JP';
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        rec.continuous = false; // iPadでの安定性のために一回ごとに切る
 
-        recognition.onstart = () => {
+        rec.onstart = () => {
             isRecording = true;
             document.getElementById('mic-btn').classList.add('listening');
             document.getElementById('recognized-text').textContent = "聞いています...";
         };
 
-        recognition.onend = () => {
+        rec.onend = () => {
             isRecording = false;
             document.getElementById('mic-btn').classList.remove('listening');
         };
 
-        recognition.onresult = (event) => {
+        rec.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             document.getElementById('recognized-text').textContent = `「${transcript}」`;
             evaluateSpeech(transcript);
         };
         
-        recognition.onerror = (event) => {
-            console.error(event.error);
-            document.getElementById('recognized-text').textContent = "エラー：もう一度押してください";
+        rec.onerror = (event) => {
+            console.error("Speech Recognition Error:", event.error);
             isRecording = false;
             document.getElementById('mic-btn').classList.remove('listening');
+            
+            // iPad/iOS向けにエラーメッセージを具体化
+            if (event.error === 'not-allowed') {
+                document.getElementById('recognized-text').textContent = "マイクを許可してください";
+                alert("ブラウザの設定でマイクの使用を許可してください。");
+            } else if (event.error === 'no-speech') {
+                document.getElementById('recognized-text').textContent = "声が聞こえませんでした";
+            } else {
+                document.getElementById('recognized-text').textContent = "もう一度押してください";
+            }
         };
-    } else {
-        alert("このブラウザは音声認識に対応していません。Google ChromeやSafariをご利用ください。");
+        return rec;
     }
+
+    recognition = initRecognition();
 
     const synth = window.speechSynthesis;
     let voices = [];
     synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+    // iPad/iOS対策: 音声合成を活性化させるためのダミー再生
+    function unlockAudio() {
+        if(synth.speaking) synth.cancel(); // 他の音声を止める
+        const silent = new SpeechSynthesisUtterance("");
+        synth.speak(silent);
+    }
 
     // --- シナリオデータ ---
     const scenarios = {
@@ -700,11 +720,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('target-sub').textContent = randomOpt.en;
     }
 
+    // iPad/iOS対応のマイク切替処理
     window.toggleRecording = () => {
+        // 1. 他の音声を止める（これが重要！）
+        if (synth.speaking) synth.cancel();
+
+        // 2. 認識オブジェクトがなければ作る
+        if (!recognition) {
+            recognition = initRecognition();
+        }
+
         if (isRecording) {
             recognition.stop();
         } else {
-            recognition.start();
+            // 3. 録音開始（エラーが出たら再トライ）
+            try {
+                recognition.start();
+            } catch (e) {
+                // すでに開始中などのエラー対策
+                recognition.stop();
+                setTimeout(() => { recognition.start(); }, 100);
+            }
         }
     };
 
