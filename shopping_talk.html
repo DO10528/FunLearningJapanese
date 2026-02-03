@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>実戦！お買い物トーク (音声版) - FunLearnJP</title>
+<title>実戦！お買い物トーク (完全版) - FunLearnJP</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -42,7 +42,7 @@
 
     .container {
         flex-grow: 1; padding: 20px;
-        width: 100%; max-width: 800px; margin: 0 auto;
+        width: 100%; max-width: 900px; margin: 0 auto;
         display: flex; flex-direction: column;
     }
 
@@ -52,17 +52,19 @@
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+    /* メニューグリッド */
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
     .scenario-card {
         background: white; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer;
         box-shadow: 0 8px 15px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s;
-        display: flex; flex-direction: column; align-items: center; gap: 10px;
+        display: flex; flex-direction: column; align-items: center; gap: 10px; height: 160px; justify-content: center;
     }
     .scenario-card:hover { transform: translateY(-3px); }
     .scenario-card:active { transform: scale(0.98); }
     .card-icon { font-size: 2.5em; margin-bottom: 5px; }
-    .card-title { font-weight: 800; font-size: 1.1em; color: #555; }
+    .card-title { font-weight: 800; font-size: 1.0em; color: #555; }
 
+    /* 練習リスト */
     .practice-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
     .practice-item {
         background: white; border-radius: 15px; padding: 15px;
@@ -88,6 +90,7 @@
     .answer-item { display: flex; align-items: center; gap: 10px; padding: 5px; border-bottom: 1px dashed #eee; }
     .answer-item:last-child { border-bottom: none; }
 
+    /* シミュレーション画面 */
     .sim-header {
         text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.8);
         padding: 10px; border-radius: 15px; position: relative;
@@ -123,7 +126,7 @@
     }
     .mic-btn:active { transform: scale(0.95); }
     .mic-btn.listening { background: #ef5350; animation: pulse 1.5s infinite; }
-    .mic-btn.processing { background: #ffd54f; } /* 準備中 */
+    .mic-btn.processing { background: #ffd54f; }
     
     @keyframes pulse {
         0% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.7); }
@@ -168,7 +171,7 @@
     <div id="auth-status">認証中...</div>
 
     <div id="menu-screen" class="screen active">
-        <h2 style="text-align:center; color:#555;"><i class="fa-solid fa-store"></i> お店を選んでね</h2>
+        <h2 style="text-align:center; color:#555; margin-bottom:20px;"><i class="fa-solid fa-store"></i> お店を選んでね (Select Shop)</h2>
         <div class="menu-grid">
             <div class="scenario-card" onclick="loadScenario('konbini')" style="border-bottom: 4px solid #ffcc5c;">
                 <i class="fa-solid fa-store card-icon" style="color:#ffcc5c;"></i>
@@ -182,9 +185,25 @@
                 <i class="fa-solid fa-mug-hot card-icon" style="color:#8d6e63;"></i>
                 <span class="card-title">カフェ</span>
             </div>
-            <div class="scenario-card" onclick="loadScenario('restaurant')" style="border-bottom: 4px solid #66bb6a;">
-                <i class="fa-solid fa-utensils card-icon" style="color:#66bb6a;"></i>
-                <span class="card-title">レストラン</span>
+            <div class="scenario-card" onclick="loadScenario('ramen')" style="border-bottom: 4px solid #e67e22;">
+                <i class="fa-solid fa-bowl-food card-icon" style="color:#e67e22;"></i>
+                <span class="card-title">ラーメン屋</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('yakiniku')" style="border-bottom: 4px solid #d32f2f;">
+                <i class="fa-solid fa-fire card-icon" style="color:#d32f2f;"></i>
+                <span class="card-title">焼肉屋</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('izakaya')" style="border-bottom: 4px solid #3f51b5;">
+                <i class="fa-solid fa-beer-mug-empty card-icon" style="color:#3f51b5;"></i>
+                <span class="card-title">居酒屋</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('pizza')" style="border-bottom: 4px solid #4caf50;">
+                <i class="fa-solid fa-pizza-slice card-icon" style="color:#4caf50;"></i>
+                <span class="card-title">ピザ屋</span>
+            </div>
+            <div class="scenario-card" onclick="loadScenario('restaurant')" style="border-bottom: 4px solid #607d8b;">
+                <i class="fa-solid fa-utensils card-icon" style="color:#607d8b;"></i>
+                <span class="card-title">ファミレス</span>
             </div>
         </div>
     </div>
@@ -215,7 +234,7 @@
         <div class="clerk-area">
             <div class="clerk-icon"><i class="fa-solid fa-user-tie"></i></div>
             <div class="speech-bubble">
-                <div style="font-size:0.8em; color:#999; font-weight:bold; margin-bottom:5px;">店員 (Clerk)</div>
+                <div style="font-size:0.8em; color:#999; font-weight:bold; margin-bottom:5px;">店員 / Situation</div>
                 <div id="clerk-text-jp" style="font-size:1.2em; font-weight:bold; margin-bottom:5px;"></div>
                 <div id="clerk-text-en" style="font-size:0.9em; color:#888;"></div>
                 <button onclick="replayClerkVoice()" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-top:10px; font-weight:bold;">
@@ -270,16 +289,7 @@
     import { getFirestore, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.appspot.com",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls", authDomain: "funlearningjapanese-b8e08.firebaseapp.com", projectId: "funlearningjapanese-b8e08", storageBucket: "funlearningjapanese-b8e08.appspot.com", messagingSenderId: "1055688629268", appId: "1:1055688629268:web:248183b62f15c34a2d5b01", measurementId: "G-LCMXVLPS81" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
@@ -313,13 +323,10 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 音声認識のセットアップ (Safari/iOS対応強化版) ---
-    // window.webkitSpeechRecognition を明示的に優先して取得
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isRecording = false;
 
-    // --- 初期チェック ---
     if (!SpeechRecognition) {
         alert("お使いのブラウザは音声認識に対応していません。\nGoogle ChromeまたはSafariをご利用ください。");
     }
@@ -329,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
     synth.onvoiceschanged = () => { voices = synth.getVoices(); };
     setTimeout(() => { voices = synth.getVoices(); }, 500);
 
-    // 音声読み上げ（TTS）
     window.speak = (text) => {
         if (synth.speaking) synth.cancel();
         const utterThis = new SpeechSynthesisUtterance(text);
@@ -340,17 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
         synth.speak(utterThis);
     };
 
-    // --- マイクボタンを押した時の処理（ここが修正の肝） ---
     window.toggleRecording = () => {
         const micBtn = document.getElementById('mic-btn');
         const statusText = document.getElementById('recognized-text');
 
-        // 1. まず読み上げを強制停止（マイクの邪魔をしないため）
-        if (synth.speaking) {
-            synth.cancel();
-        }
+        if (synth.speaking) synth.cancel();
 
-        // 2. 録音中なら止める
         if (isRecording) {
             if (recognition) recognition.stop();
             isRecording = false;
@@ -359,21 +360,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 3. 録音開始処理（iOSでは毎回インスタンスを作り直すのが一番安全）
         try {
             statusText.textContent = "マイク起動中...";
-            micBtn.classList.add('processing'); // 黄色くする（準備中）
+            micBtn.classList.add('processing');
 
             recognition = new SpeechRecognition();
             recognition.lang = 'ja-JP';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.continuous = false; // iOSはfalse推奨
+            recognition.continuous = false;
 
             recognition.onstart = () => {
                 isRecording = true;
                 micBtn.classList.remove('processing');
-                micBtn.classList.add('listening'); // 赤くする（録音中）
+                micBtn.classList.add('listening');
                 statusText.textContent = "聞いています...どうぞ！";
             };
 
@@ -381,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 isRecording = false;
                 micBtn.classList.remove('listening');
                 micBtn.classList.remove('processing');
-                // 結果が出ずに終わった場合のみメッセージを変える
                 if (statusText.textContent === "聞いています...どうぞ！") {
                     statusText.textContent = "もう一度押してください";
                 }
@@ -394,36 +393,28 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             recognition.onerror = (event) => {
-                console.error("Speech Error:", event.error);
                 isRecording = false;
                 micBtn.classList.remove('listening');
                 micBtn.classList.remove('processing');
-
                 if (event.error === 'not-allowed') {
-                    alert("マイクの使用が許可されていません。\n端末の[設定] > [Safari] > [マイク] を許可にしてください。");
                     statusText.textContent = "マイク許可が必要です";
                 } else if (event.error === 'no-speech') {
                     statusText.textContent = "声が聞こえませんでした";
                 } else {
-                    // iOS/Safari特有の謎エラーの場合もここ
                     statusText.textContent = "エラー: もう一度押してください";
                 }
             };
-
-            // いざ、開始！
             recognition.start();
 
         } catch (e) {
             console.error("Start Error:", e);
-            alert("マイクの起動に失敗しました。ページを再読み込みしてください。");
             isRecording = false;
             micBtn.classList.remove('listening');
             micBtn.classList.remove('processing');
         }
     };
 
-
-    // --- シナリオデータ ---
+    // --- シナリオデータ（大幅増量版） ---
     const scenarios = {
         'konbini': {
             name: "コンビニ (Convenience Store)",
@@ -433,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     options: [
                         { jp: "現金でお願いします。", en: "Cash, please.", correct: true },
                         { jp: "カードで。", en: "By credit card.", correct: true },
-                        { jp: "Suicaで。", en: "By Suica.", correct: true }
+                        { jp: "PayPayで。", en: "By PayPay.", correct: true }
                     ]
                 },
                 {
@@ -447,15 +438,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     clerk: { jp: "お箸はお使いになりますか？", en: "Do you need chopsticks?" },
                     options: [
                         { jp: "はい、一膳ください。", en: "Yes, one pair please.", correct: true },
-                        { jp: "スプーンをください。", en: "Spoon, please.", correct: true },
-                        { jp: "フォークとおしぼりをください。", en: "Fork and wet towel please.", correct: true }
+                        { jp: "スプーンをください。", en: "Spoon, please.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "レジ袋はご利用ですか？", en: "Do you need a plastic bag?" },
+                    options: [
+                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true },
+                        { jp: "大丈夫です。持っています。", en: "I'm fine. I have one.", correct: true }
                     ]
                 },
                 {
                     clerk: { jp: "レシートはご利用ですか？", en: "Do you need a receipt?" },
                     options: [
                         { jp: "はい、ください。", en: "Yes, please.", correct: true },
-                        { jp: "大丈夫です。", en: "I'm fine.", correct: true }
+                        { jp: "いりません。", en: "No need.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "（店員に何か質問してみよう）", en: "(Ask the clerk something)" },
+                    options: [
+                        { jp: "すみません、トイレはありますか？", en: "Excuse me, is there a toilet?", correct: true },
+                        { jp: "両替はできますか？", en: "Can I exchange money?", correct: true },
+                        { jp: "肉まんはありますか？", en: "Do you have meat buns?", correct: true }
                     ]
                 }
             ]
@@ -466,23 +471,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     clerk: { jp: "いらっしゃいませ。ご注文をお伺いします。", en: "May I take your order?" },
                     options: [
-                        { jp: "ビックマックのセットを一つ。", en: "One Big Mac set.", correct: true },
-                        { jp: "チーズバーガーを二つください。", en: "Two Cheeseburgers please.", correct: true },
-                        { jp: "てりやきバーガーを単品で。", en: "Teriyaki burger, a la carte.", correct: true }
+                        { jp: "チーズバーガーをひとつ。", en: "One Cheeseburger.", correct: true },
+                        { jp: "てりやきバーガーセットをください。", en: "Teriyaki Burger Set please.", correct: true },
+                        { jp: "フィレオフィッシュをお願いします。", en: "Filet-O-Fish please.", correct: true },
+                        { jp: "ビッグマックを単品で。", en: "Big Mac (item only).", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "セットのお飲み物はいかがしますか？", en: "What would you like to drink with that?" },
+                    clerk: { jp: "セットのお飲み物はいかがしますか？", en: "What drink for the set?" },
                     options: [
                         { jp: "コーラで。", en: "Coke.", correct: true },
-                        { jp: "ホットコーヒーで。", en: "Hot coffee.", correct: true }
+                        { jp: "ウーロン茶で。", en: "Oolong tea.", correct: true },
+                        { jp: "オレンジジュースで。", en: "Orange juice.", correct: true },
+                        { jp: "アイスティーで。", en: "Iced tea.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "サイズはいかがなさいますか？", en: "Which size would you like?" },
+                    clerk: { jp: "サイズはいかがなさいますか？", en: "Which size?" },
                     options: [
-                        { jp: "Mサイズで。", en: "Medium size.", correct: true },
-                        { jp: "大きくしてください。", en: "Large size.", correct: true }
+                        { jp: "Sサイズで。", en: "Small.", correct: true },
+                        { jp: "Mサイズで。", en: "Medium.", correct: true },
+                        { jp: "Lサイズにしてください。", en: "Large.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "ご一緒にサイドメニューはいかがですか？", en: "Any side menu?" },
+                    options: [
+                        { jp: "ポテトをください。", en: "Fries please.", correct: true },
+                        { jp: "チキンナゲットをください。", en: "Chicken nuggets please.", correct: true },
+                        { jp: "アップルパイをお願いします。", en: "Apple pie please.", correct: true },
+                        { jp: "サラダをください。", en: "Salad please.", correct: true },
+                        { jp: "結構です。", en: "No thank you.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "お召し上がりですか？お持ち帰りですか？", en: "For here or to go?" },
+                    options: [
+                        { jp: "店内で。", en: "For here.", correct: true },
+                        { jp: "持ち帰りで。", en: "To go.", correct: true }
                     ]
                 }
             ]
@@ -491,53 +517,202 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "カフェ (Cafe)",
             steps: [
                 {
-                    clerk: { jp: "こんにちは。ご注文をどうぞ。", en: "Hello. Order please." },
+                    clerk: { jp: "こんにちは。ご注文をどうぞ。", en: "Order please." },
                     options: [
-                        { jp: "アイスコーヒーを一つください。", en: "One Iced Coffee please.", correct: true },
-                        { jp: "ホットのカフェラテをお願いします。", en: "Hot Cafe Latte please.", correct: true },
-                        { jp: "抹茶ラテはありますか？", en: "Do you have Matcha Latte?", correct: true }
+                        { jp: "スターバックスラテをください。", en: "Starbucks Latte please.", correct: true },
+                        { jp: "キャラメルフラペチーノをお願いします。", en: "Caramel Frappuccino please.", correct: true },
+                        { jp: "アイスコーヒーをください。", en: "Iced coffee please.", correct: true },
+                        { jp: "カプチーノをください。", en: "Cappuccino please.", correct: true },
+                        { jp: "抹茶ティーラテをお願いします。", en: "Matcha Tea Latte please.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "店内をご利用ですか？", en: "For here?" },
+                    clerk: { jp: "サイズはいかがなさいますか？", en: "Which size?" },
                     options: [
-                        { jp: "はい、店内で。", en: "For here.", correct: true },
-                        { jp: "持ち帰りで。", en: "To go.", correct: true }
+                        { jp: "ショートで。", en: "Short.", correct: true },
+                        { jp: "トールで。", en: "Tall.", correct: true },
+                        { jp: "グランデで。", en: "Grande.", correct: true },
+                        { jp: "ベンティで。", en: "Venti.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "ご一緒にフードはいかがですか？", en: "Any food?" },
+                    options: [
+                        { jp: "チョコレートスコーンをください。", en: "Chocolate scone please.", correct: true },
+                        { jp: "チーズケーキをお願いします。", en: "Cheesecake please.", correct: true },
+                        { jp: "サンドイッチをください。", en: "Sandwich please.", correct: true },
+                        { jp: "ドーナツをひとつ。", en: "One donut.", correct: true },
+                        { jp: "大丈夫です。", en: "I'm fine.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "「キャラメルフラペチーノのお客様！」", en: "(Calling your drink/number)" },
+                    options: [
+                        { jp: "はい、私です。", en: "Yes, that's me.", correct: true },
+                        { jp: "ありがとうございます。", en: "Thank you.", correct: true }
+                    ]
+                }
+            ]
+        },
+        'ramen': {
+            name: "ラーメン屋 (Ramen Shop)",
+            steps: [
+                {
+                    clerk: { jp: "いらっしゃいませ！ご注文はお決まりですか？", en: "Ready to order?" },
+                    options: [
+                        { jp: "醤油ラーメンをください。", en: "Shoyu Ramen.", correct: true },
+                        { jp: "味噌ラーメンをお願いします。", en: "Miso Ramen.", correct: true },
+                        { jp: "豚骨ラーメンをひとつ。", en: "Tonkotsu Ramen.", correct: true },
+                        { jp: "塩ラーメンをください。", en: "Shio Ramen.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "麺の硬さはどうしますか？", en: "Noodle firmness?" },
+                    options: [
+                        { jp: "硬めでお願いします。", en: "Firm (Katame).", correct: true },
+                        { jp: "普通で。", en: "Normal (Futsuu).", correct: true },
+                        { jp: "柔らかめで。", en: "Soft (Yawarakame).", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "トッピングやサイドメニューはいかがですか？", en: "Toppings or sides?" },
+                    options: [
+                        { jp: "味玉をトッピングしてください。", en: "Add seasoned egg.", correct: true },
+                        { jp: "チャーシューを追加で。", en: "Extra chashu pork.", correct: true },
+                        { jp: "餃子をください。", en: "Gyoza please.", correct: true },
+                        { jp: "チャーハンをお願いします。", en: "Fried rice please.", correct: true },
+                        { jp: "替え玉をください。", en: "Extra noodles (Kaedama).", correct: true }
+                    ]
+                }
+            ]
+        },
+        'yakiniku': {
+            name: "焼肉屋 (Yakiniku/BBQ)",
+            steps: [
+                {
+                    clerk: { jp: "いらっしゃいませ。コースになさいますか？", en: "Would you like a course?" },
+                    options: [
+                        { jp: "食べ放題コースで。", en: "All-you-can-eat course.", correct: true },
+                        { jp: "単品で注文します。", en: "A la carte.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "お肉のご注文をどうぞ。", en: "Please order meat." },
+                    options: [
+                        { jp: "カルビとロースをください。", en: "Kalbi and Loin.", correct: true },
+                        { jp: "牛タンとハラミをお願いします。", en: "Beef tongue and Skirt steak.", correct: true },
+                        { jp: "ホルモンをください。", en: "Horumon.", correct: true },
+                        { jp: "豚トロをお願いします。", en: "Pork neck.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "お飲み物は？", en: "Drinks?" },
+                    options: [
+                        { jp: "生ビールをください。", en: "Draft beer.", correct: true },
+                        { jp: "ウーロン茶をお願いします。", en: "Oolong tea.", correct: true },
+                        { jp: "飲み放題にしてください。", en: "All-you-can-drink.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "（網が汚れてきました...）", en: "(The grill net is dirty...)" },
+                    options: [
+                        { jp: "すみません、網交換をお願いします。", en: "Excuse me, change the net please.", correct: true },
+                        { jp: "お水をもらえますか？", en: "Can I have water?", correct: true }
+                    ]
+                }
+            ]
+        },
+        'izakaya': {
+            name: "居酒屋 (Izakaya/Pub)",
+            steps: [
+                {
+                    clerk: { jp: "何名様ですか？おタバコは吸われますか？", en: "How many? Smoking?" },
+                    options: [
+                        { jp: "2人です。禁煙席で。", en: "Two. Non-smoking.", correct: true },
+                        { jp: "4人です。喫煙席で。", en: "Four. Smoking.", correct: true },
+                        { jp: "個室は空いていますか？", en: "Is a private room available?", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "お飲み物は決まりましたか？", en: "Drinks?" },
+                    options: [
+                        { jp: "とりあえず生ふたつ。", en: "Two draft beers for now.", correct: true },
+                        { jp: "ハイボールをください。", en: "Highball please.", correct: true },
+                        { jp: "レモンサワーをお願いします。", en: "Lemon sour please.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "お食事のご注文をどうぞ。", en: "Food order?" },
+                    options: [
+                        { jp: "枝豆と唐揚げをください。", en: "Edamame and Fried chicken.", correct: true },
+                        { jp: "焼き鳥の盛り合わせをお願いします。", en: "Yakitori platter.", correct: true },
+                        { jp: "刺身の盛り合わせをください。", en: "Sashimi platter.", correct: true },
+                        { jp: "ポテトサラダをお願いします。", en: "Potato salad.", correct: true }
+                    ]
+                }
+            ]
+        },
+        'pizza': {
+            name: "ピザ屋 (Pizza Shop)",
+            steps: [
+                {
+                    clerk: { jp: "ご注文をお伺いします。", en: "Order please." },
+                    options: [
+                        { jp: "マルゲリータをください。", en: "Margherita.", correct: true },
+                        { jp: "シーフードピザをお願いします。", en: "Seafood Pizza.", correct: true },
+                        { jp: "テリヤキチキンピザをください。", en: "Teriyaki Chicken Pizza.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "サイズと生地はどうしますか？", en: "Size and Crust?" },
+                    options: [
+                        { jp: "Mサイズのクリスピーで。", en: "Medium, Crispy.", correct: true },
+                        { jp: "Lサイズのハンドトスで。", en: "Large, Hand-tossed.", correct: true },
+                        { jp: "耳にチーズを入れてください。", en: "Cheese in the crust.", correct: true }
+                    ]
+                },
+                {
+                    clerk: { jp: "配達ですか？お持ち帰りですか？", en: "Delivery or Carry out?" },
+                    options: [
+                        { jp: "配達でお願いします。", en: "Delivery please.", correct: true },
+                        { jp: "持ち帰ります。", en: "I'll take it out.", correct: true }
                     ]
                 }
             ]
         },
         'restaurant': {
-            name: "レストラン・居酒屋 (Restaurant)",
+            name: "ファミレス (Family Restaurant)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。何名様ですか？", en: "Welcome. How many people?" },
+                    clerk: { jp: "いらっしゃいませ。何名様ですか？", en: "How many people?" },
                     options: [
+                        { jp: "3人です。", en: "Three people.", correct: true },
                         { jp: "ひとりです。", en: "One person.", correct: true },
-                        { jp: "ふたりです。", en: "Two people.", correct: true },
-                        { jp: "さんにんです。", en: "Three people.", correct: true }
+                        { jp: "子供用の椅子はありますか？", en: "Do you have a child chair?", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "（店員を呼んでください）", en: "(Please call the staff)" },
+                    clerk: { jp: "ご注文はお決まりですか？", en: "Ready to order?" },
                     options: [
-                        { jp: "すみません！", en: "Excuse me!", correct: true }
+                        { jp: "ハンバーグステーキをください。", en: "Hamburg steak.", correct: true },
+                        { jp: "オムライスをお願いします。", en: "Omurice.", correct: true },
+                        { jp: "カレーライスをください。", en: "Curry rice.", correct: true },
+                        { jp: "お子様ランチをひとつ。", en: "Kid's meal.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "はい、ご注文をお伺いします。", en: "Yes, may I take your order?" },
+                    clerk: { jp: "セットはいかがですか？", en: "Set meal?" },
                     options: [
-                        { jp: "唐揚げとビールをください。", en: "Fried chicken and Beer.", correct: true },
-                        { jp: "とりあえず枝豆で。", en: "Edamame for now.", correct: true },
-                        { jp: "メニューをください。", en: "Menu please.", correct: true }
+                        { jp: "ドリンクバーをつけてください。", en: "Add drink bar.", correct: true },
+                        { jp: "ライスセットで。", en: "Rice set.", correct: true },
+                        { jp: "パンとスープのセットで。", en: "Bread and soup set.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "他にご注文はありますか？", en: "Anything else?" },
+                    clerk: { jp: "（店員を呼びたい...）", en: "(Call the staff)" },
                     options: [
-                        { jp: "取り皿を3枚ください。", en: "3 small plates please.", correct: true },
-                        { jp: "お水をください。", en: "Water please.", correct: true },
-                        { jp: "お会計をお願いします。", en: "Check please.", correct: true }
+                        { jp: "ピンポンを押します。", en: "(Press the bell)", correct: true },
+                        { jp: "すみません、デザートをお願いします。", en: "Excuse me, dessert please.", correct: true }
                     ]
                 }
             ]
@@ -549,20 +724,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let stepIndex = 0;
     let currentTargetPhrase = null;
 
-    // --- 文字列の正規化と類似度計算 ---
     function normalizeText(text) {
         if(!text) return "";
         let t = text;
         t = t.replace(/[ 、。！？,.!?]/g, "");
+        // 表記ゆれ吸収
         t = t.replace(/照り焼き|照焼/g, "てりやき");
         t = t.replace(/ビッグマック/g, "ビックマック");
         t = t.replace(/珈琲/g, "コーヒー");
         t = t.replace(/下さい/g, "ください");
         t = t.replace(/致します/g, "いたします");
         t = t.replace(/御座います/g, "ございます");
-        t = t.replace(/宜しく/g, "よろしく");
-        t = t.replace(/有難う/g, "ありがとう");
-        t = t.replace(/御願い/g, "お願い");
         t = t.replace(/唐揚/g, "唐揚げ");
         t = t.replace(/鳥皿/g, "取り皿");
         t = t.replace(/取皿/g, "取り皿");
@@ -599,27 +771,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
             }
         }
-        const distance = matrix[len1][len2];
-        const maxLength = Math.max(len1, len2);
-        if (maxLength === 0) return 1.0;
-        return (maxLength - distance) / maxLength;
+        return (Math.max(len1, len2) - matrix[len1][len2]) / Math.max(len1, len2);
     }
 
-    // --- 画面操作 ---
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
         
         const footer = document.getElementById('fixed-footer-practice');
-        if(id === 'practice-screen') {
-            footer.style.display = 'block';
-        } else {
-            footer.style.display = 'none';
-        }
+        if(id === 'practice-screen') footer.style.display = 'block';
+        else footer.style.display = 'none';
     };
 
-    // --- 1. 練習画面ロード ---
     window.loadScenario = (id) => {
         currentScenarioId = id;
         currentData = scenarios[id];
@@ -664,7 +828,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.showScreen('practice-screen');
     };
 
-    // --- 2. スピーキングテスト開始 ---
     window.startSimulation = () => {
         stepIndex = 0;
         document.getElementById('total-step').textContent = currentData.steps.length;
@@ -701,10 +864,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.speak(currentData.steps[stepIndex].clerk.jp);
     };
 
-    // --- 評価ロジック ---
     function evaluateSpeech(userText) {
         if(!currentTargetPhrase) return;
-        
         const targetText = currentTargetPhrase.jp;
         const similarity = getSimilarity(userText, targetText);
         const percentage = Math.floor(similarity * 100);
@@ -712,12 +873,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const resultEl = document.getElementById('score-result');
         const nextBtn = document.getElementById('next-btn');
 
-        if (percentage >= 80) { // 判定を少し甘く80%に
+        if (percentage >= 80) {
             resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
             document.getElementById('mic-btn').disabled = true;
-            
             if(window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
-            
             nextBtn.style.display = 'block';
             nextBtn.textContent = '次へ';
             nextBtn.onclick = nextStep;
@@ -735,7 +894,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.showScreen('result-screen');
         }
     };
-
 });
 </script>
 </body>
