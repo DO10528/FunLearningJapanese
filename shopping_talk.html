@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>実戦！お買い物トーク (完全版) - FunLearnJP</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
@@ -28,6 +28,7 @@
         padding-bottom: 100px;
         min-height: 100vh;
         display: flex; flex-direction: column;
+        -webkit-tap-highlight-color: transparent;
     }
 
     header {
@@ -323,96 +324,170 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- 音声認識の初期化 ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isRecording = false;
 
+    // iPad/iPhone対応: ブラウザチェック
     if (!SpeechRecognition) {
-        alert("お使いのブラウザは音声認識に対応していません。\nGoogle ChromeまたはSafariをご利用ください。");
+        alert("このブラウザは音声認識に対応していません。\niPadの場合はSafariをご利用ください。");
+    } else {
+        // インスタンスを事前に作成しておく（iPadでの安定性向上のため）
+        try {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+            recognition.interimResults = false; // iPadではfalse推奨
+            recognition.maxAlternatives = 1;
+            recognition.continuous = false; // iPadでは都度止める方が安定する
+        } catch (e) {
+            console.error("Mic init error:", e);
+        }
     }
 
+    // --- 音声合成（読み上げ）の設定 ---
     const synth = window.speechSynthesis;
     let voices = [];
-    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
-    setTimeout(() => { voices = synth.getVoices(); }, 500);
+    
+    // iOSは非同期でボイスがロードされるための対策
+    const loadVoices = () => {
+        voices = synth.getVoices();
+    };
+    synth.onvoiceschanged = loadVoices;
+    loadVoices(); // 初回実行
 
     window.speak = (text) => {
-        if (synth.speaking) synth.cancel();
+        if (!text) return;
+        // マイクが動いていたら止める（競合回避）
+        if (isRecording && recognition) {
+            try { recognition.stop(); } catch(e){}
+            isRecording = false;
+            updateMicUI('stop');
+        }
+        
+        // 既存の読み上げをキャンセル
+        synth.cancel();
+
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
         utterThis.rate = 1.0;
+        
+        // 日本語ボイスを優先的に探す
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
         if(jpVoice) utterThis.voice = jpVoice;
+        
         synth.speak(utterThis);
     };
 
+    // --- マイク切り替え機能（iPad対応強化版） ---
     window.toggleRecording = () => {
         const micBtn = document.getElementById('mic-btn');
         const statusText = document.getElementById('recognized-text');
 
-        if (synth.speaking) synth.cancel();
+        if (!recognition) return;
 
+        // 1. まず読み上げを完全に止める（iPadで必須）
+        if (synth.speaking || synth.pending) {
+            synth.cancel();
+        }
+
+        // 2. 録音中なら止める処理
         if (isRecording) {
-            if (recognition) recognition.stop();
+            try {
+                recognition.stop(); 
+            } catch(e) { console.log(e); }
             isRecording = false;
-            micBtn.classList.remove('listening');
+            updateMicUI('stop');
             statusText.textContent = "停止しました";
             return;
         }
 
+        // 3. 録音開始処理
         try {
             statusText.textContent = "マイク起動中...";
             micBtn.classList.add('processing');
+            micBtn.disabled = true; // 連打防止
 
-            recognition = new SpeechRecognition();
-            recognition.lang = 'ja-JP';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            recognition.continuous = false;
-
-            recognition.onstart = () => {
-                isRecording = true;
-                micBtn.classList.remove('processing');
-                micBtn.classList.add('listening');
-                statusText.textContent = "聞いています...どうぞ！";
-            };
-
-            recognition.onend = () => {
-                isRecording = false;
-                micBtn.classList.remove('listening');
-                micBtn.classList.remove('processing');
-                if (statusText.textContent === "聞いています...どうぞ！") {
-                    statusText.textContent = "もう一度押してください";
+            // iPadは認識開始まで少しラグがあるため、非同期的に開始
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Start error:", e);
+                    // すでに開始されているエラーの場合は無視して続行
+                    if (e.name !== 'InvalidStateError') {
+                        micBtn.disabled = false;
+                        micBtn.classList.remove('processing');
+                        statusText.textContent = "エラー: 再読み込みしてください";
+                    }
                 }
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                statusText.textContent = `「${transcript}」`;
-                evaluateSpeech(transcript);
-            };
-
-            recognition.onerror = (event) => {
-                isRecording = false;
-                micBtn.classList.remove('listening');
-                micBtn.classList.remove('processing');
-                if (event.error === 'not-allowed') {
-                    statusText.textContent = "マイク許可が必要です";
-                } else if (event.error === 'no-speech') {
-                    statusText.textContent = "声が聞こえませんでした";
-                } else {
-                    statusText.textContent = "エラー: もう一度押してください";
-                }
-            };
-            recognition.start();
+            }, 100);
 
         } catch (e) {
-            console.error("Start Error:", e);
-            isRecording = false;
-            micBtn.classList.remove('listening');
-            micBtn.classList.remove('processing');
+            console.error("Critical Start Error:", e);
+            micBtn.disabled = false;
         }
     };
+
+    // --- イベントハンドラの設定 ---
+    if (recognition) {
+        recognition.onstart = () => {
+            isRecording = true;
+            updateMicUI('recording');
+            document.getElementById('recognized-text').textContent = "聞いています...どうぞ！";
+            document.getElementById('mic-btn').disabled = false; // ロック解除
+        };
+
+        recognition.onend = () => {
+            isRecording = false;
+            updateMicUI('stop');
+            
+            const statusText = document.getElementById('recognized-text');
+            if (statusText.textContent === "聞いています...どうぞ！") {
+                statusText.textContent = "もう一度押してください";
+            }
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('recognized-text').textContent = `「${transcript}」`;
+            evaluateSpeech(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech Error:", event.error);
+            isRecording = false;
+            updateMicUI('stop');
+            
+            const statusText = document.getElementById('recognized-text');
+            if (event.error === 'not-allowed') {
+                statusText.textContent = "マイクの使用が許可されていません";
+                alert("iPadの設定でSafariのマイクアクセスを許可してください。\nまたは、アドレスバーの「ぁあ」から「モバイル用Webサイト」に切り替えてください。");
+            } else if (event.error === 'no-speech') {
+                statusText.textContent = "声が聞こえませんでした";
+            } else if (event.error === 'aborted') {
+                statusText.textContent = "中断されました";
+            } else {
+                statusText.textContent = "エラー: もう一度押してください";
+            }
+        };
+    }
+
+    // UI更新用ヘルパー関数
+    function updateMicUI(state) {
+        const micBtn = document.getElementById('mic-btn');
+        if(!micBtn) return;
+        
+        micBtn.classList.remove('processing');
+        micBtn.disabled = false;
+        
+        if (state === 'recording') {
+            micBtn.classList.add('listening');
+        } else {
+            micBtn.classList.remove('listening');
+        }
+    }
+
 
     // --- シナリオデータ（大幅増量版） ---
     const scenarios = {
@@ -873,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const resultEl = document.getElementById('score-result');
         const nextBtn = document.getElementById('next-btn');
 
-        if (percentage >= 80) {
+        if (percentage >= 60) {
             resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
             document.getElementById('mic-btn').disabled = true;
             if(window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
