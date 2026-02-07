@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Shopping Talk Worksheet (Full Ver.)</title>
+    <title>Shopping Talk Worksheet (Complete 8 Stages)</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -21,10 +21,10 @@
         h1 { 
             color: #5c7aff; 
             text-align: center; 
-            font-size: 26px; 
+            font-size: 24px; 
             border-bottom: 3px solid #5c7aff; 
-            padding-bottom: 15px; 
-            margin-bottom: 30px; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
         }
         .sub-title { 
             font-size: 0.6em; 
@@ -39,7 +39,7 @@
             display: flex; 
             justify-content: flex-end; 
             gap: 30px; 
-            margin-bottom: 40px; 
+            margin-bottom: 30px; 
             font-weight: bold; 
             font-size: 1.1em;
         }
@@ -52,29 +52,29 @@
 
         /* シナリオセクション */
         .scenario-section { 
-            margin-bottom: 50px; 
+            margin-bottom: 30px; 
             border: 2px solid #eee;
             border-radius: 15px;
-            padding: 20px;
-            page-break-inside: avoid; /* なるべく途中で切れないように */
+            padding: 15px;
+            page-break-inside: avoid; /* 印刷時に途中で切れないように */
         }
         
         .scenario-title { 
             font-weight: 900; 
-            font-size: 1.4em; 
+            font-size: 1.3em; 
             display: flex; 
             align-items: center; 
             gap: 10px;
-            margin-bottom: 25px; 
-            padding-bottom: 10px;
+            margin-bottom: 15px; 
+            padding-bottom: 5px;
             border-bottom: 2px dashed #ccc;
         }
 
         /* 会話の行 */
         .dialogue-row { 
             display: flex; 
-            gap: 20px; 
-            margin-bottom: 25px; 
+            gap: 15px; 
+            margin-bottom: 15px; 
             align-items: flex-start; 
         }
         
@@ -82,34 +82,34 @@
         .clerk-box { 
             width: 45%; 
             background: #f0f4f8; 
-            padding: 15px; 
+            padding: 10px 15px; 
             border-radius: 12px; 
             position: relative; 
             border-left: 5px solid #90a4ae;
         }
         .clerk-label { 
-            font-size: 0.8em; 
+            font-size: 0.75em; 
             color: #546e7a; 
             font-weight: bold; 
-            margin-bottom: 5px; 
+            margin-bottom: 3px; 
             display:block; 
         }
-        .text-jp { font-size: 1.1em; font-weight: bold; line-height: 1.5; }
-        .text-thai { font-size: 0.85em; color: #888; display: block; margin-top: 5px; }
+        .text-jp { font-size: 1.0em; font-weight: bold; line-height: 1.4; }
+        .text-thai { font-size: 0.8em; color: #888; display: block; margin-top: 3px; }
 
         /* あなた（右側・記入欄） */
         .student-box { width: 55%; }
         .answer-area { 
             width: 100%; 
-            height: 60px; /* 書き込みやすい高さ */
+            height: 50px; /* 少し高さを抑えて枚数節約 */
             border: 2px solid #5c7aff; 
             border-radius: 8px; 
             background: white; 
             margin-top: 5px; 
-            padding: 10px;
+            padding: 8px;
         }
         .student-label { 
-            font-size: 0.8em; 
+            font-size: 0.75em; 
             color: #5c7aff; 
             font-weight: bold; 
             text-align: right; 
@@ -117,12 +117,12 @@
             margin-bottom: 2px;
         }
 
-        /* ヒントボックス（各セクションの最後） */
+        /* ヒントボックス */
         .hint-mini {
             background: #fff9c4;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             margin-top: 10px;
             color: #f57f17;
             border: 1px dashed #fbc02d;
@@ -132,7 +132,7 @@
         @media print {
             body { background: white; padding: 0; }
             .worksheet { width: 100%; max-width: 100%; border: none; }
-            .scenario-section { page-break-inside: avoid; border: 1px solid #ddd; }
+            .scenario-section { page-break-inside: avoid; border: 1px solid #ddd; margin-bottom: 20px; }
             .answer-area { border: 1px solid #333; }
         }
     </style>
@@ -141,8 +141,8 @@
 
 <div class="worksheet">
     <h1>
-        <i class="fa-solid fa-comments"></i> お買い物ロールプレイ・ワークシート
-        <span class="sub-title">แบบฝึกหัดบทสนทนาการซื้อของ (Shopping Roleplay)</span>
+        <i class="fa-solid fa-comments"></i> お買い物ロールプレイ (全8ステージ)
+        <span class="sub-title">แบบฝึกหัดบทสนทนาการซื้อของ (Shopping Roleplay - Complete Ver.)</span>
     </h1>
 
     <div class="info-box">
@@ -154,196 +154,298 @@
         <div class="scenario-title" style="color:#ef6c00;">
             <i class="fa-solid fa-store"></i> 1. コンビニ (Convenience Store / ร้านสะดวกซื้อ)
         </div>
-        
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">いらっしゃいませ。<br>お支払いはどうなさいますか？</div>
-                <span class="text-thai">ยินดีต้อนรับครับ/ค่ะ จ่ายเงินด้วยวิธีไหนครับ/คะ?</span>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">お支払いはどうなさいますか？</div>
+                <span class="text-thai">จ่ายเงินด้วยวิธีไหนครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
+                <span class="clerk-label">店員</span>
                 <div class="text-jp">お弁当は温めますか？</div>
                 <span class="text-thai">จะอุ่นข้าวกล่องไหมครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">お箸はお使いになりますか？</div>
-                <span class="text-thai">รับตะเกียบไหมครับ/คะ?</span>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">レジ袋はご利用ですか？</div>
+                <span class="text-thai">รับถุงพลาสติกไหมครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
-        <div class="dialogue-row">
-            <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">レシートはご利用ですか？</div>
-                <span class="text-thai">รับใบเสร็จไหมครับ/คะ?</span>
-            </div>
-            <div class="student-box">
-                <span class="student-label">あなた (You)</span>
-                <div class="answer-area"></div>
-            </div>
-        </div>
-
-        <div class="hint-mini">
-            <strong>ヒント:</strong> げんきんで / カードで / はい、おねがいします / いいえ、けっこうです / だいじょうぶです
-        </div>
+        <div class="hint-mini">Hint: げんきんで / カードで / はい、おねがいします / いいえ、けっこうです</div>
     </div>
 
     <div class="scenario-section">
         <div class="scenario-title" style="color:#c62828;">
             <i class="fa-solid fa-burger"></i> 2. ハンバーガー (Burger Shop / ร้านเบอร์เกอร์)
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">いらっしゃいませ。<br>ご注文をお伺いします。</div>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">ご注文をお伺いします。</div>
                 <span class="text-thai">รับอะไรดีครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">セットのお飲み物は<br>いかがしますか？</div>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">セットのお飲み物は？</div>
                 <span class="text-thai">รับเครื่องดื่มอะไรดีครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">サイズはいかがなさいますか？</div>
-                <span class="text-thai">รับไซส์ไหนดีครับ/คะ?</span>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">店内でお召し上がりですか？</div>
+                <span class="text-thai">ทานที่ร้านไหมครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
-        <div class="hint-mini">
-            <strong>ヒント:</strong> 〇〇セットをひとつ / コーラ / ホットコーヒー / Mサイズで
-        </div>
+        <div class="hint-mini">Hint: チーズバーガーセット / コーラ / てんなで (Here) / もちかえりで (To go)</div>
     </div>
 
     <div class="scenario-section">
         <div class="scenario-title" style="color:#5d4037;">
             <i class="fa-solid fa-mug-hot"></i> 3. カフェ (Cafe / คาเฟ่)
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">こんにちは。<br>ご注文をどうぞ。</div>
-                <span class="text-thai">สวัสดีครับ/ค่ะ รับอะไรดีครับ/คะ?</span>
-            </div>
-            <div class="student-box">
-                <span class="student-label">あなた (You)</span>
-                <div class="answer-area"></div>
-            </div>
-        </div>
-
-        <div class="dialogue-row">
-            <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">店内をご利用ですか？</div>
-                <span class="text-thai">ทานที่ร้านไหมครับ/คะ?</span>
-            </div>
-            <div class="student-box">
-                <span class="student-label">あなた (You)</span>
-                <div class="answer-area"></div>
-            </div>
-        </div>
-
-        <div class="hint-mini">
-            <strong>ヒント:</strong> アイスコーヒー / てんないで / もちかえりで (Take out)
-        </div>
-    </div>
-
-    <div class="scenario-section">
-        <div class="scenario-title" style="color:#2e7d32;">
-            <i class="fa-solid fa-utensils"></i> 4. レストラン (Restaurant / ร้านอาหาร)
-        </div>
-
-        <div class="dialogue-row">
-            <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">いらっしゃいませ。<br>何名様ですか？</div>
-                <span class="text-thai">กี่ท่านครับ/คะ?</span>
-            </div>
-            <div class="student-box">
-                <span class="student-label">あなた (You)</span>
-                <div class="answer-area"></div>
-            </div>
-        </div>
-
-        <div class="dialogue-row">
-            <div class="clerk-box" style="background:#fff3e0; border-left-color:#ffb74d;">
-                <span class="clerk-label">状況 (Situation)</span>
-                <div class="text-jp">（店員を呼んでください）</div>
-                <span class="text-thai">(เรียกพนักงานหน่อยครับ/ค่ะ)</span>
-            </div>
-            <div class="student-box">
-                <span class="student-label">あなた (You)</span>
-                <div class="answer-area"></div>
-            </div>
-        </div>
-
-        <div class="dialogue-row">
-            <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">はい、ご注文をお伺いします。</div>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">ご注文をどうぞ。</div>
                 <span class="text-thai">รับอะไรดีครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
-
         <div class="dialogue-row">
             <div class="clerk-box">
-                <span class="clerk-label">店員 (Clerk)</span>
-                <div class="text-jp">他にご注文はありますか？</div>
-                <span class="text-thai">รับอะไรเพิ่มไหมครับ/คะ?</span>
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">サイズはいかがなさいますか？</div>
+                <span class="text-thai">รับไซส์ไหนดีครับ/คะ?</span>
             </div>
             <div class="student-box">
-                <span class="student-label">あなた (You)</span>
+                <span class="student-label">あなた</span>
                 <div class="answer-area"></div>
             </div>
         </div>
+        <div class="hint-mini">Hint: アイスコーヒー / ホットラテ / ショート(S) / トール(M) / グランデ(L)</div>
+    </div>
 
-        <div class="hint-mini">
-            <strong>ヒント:</strong> ふたりです / すみません / からあげ / とりざら / おかいけい (Check)
+    <div class="scenario-section">
+        <div class="scenario-title" style="color:#e67e22;">
+            <i class="fa-solid fa-bowl-food"></i> 4. ラーメン屋 (Ramen Shop / ร้านราเมง)
         </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">ご注文はお決まりですか？</div>
+                <span class="text-thai">รับอะไรดีครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">麺の硬さはどうしますか？</div>
+                <span class="text-thai">ระดับความแข็งของเส้นเอาแบบไหนครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">サイドメニューはいかがですか？</div>
+                <span class="text-thai">รับเมนูข้างเคียงเพิ่มไหมครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="hint-mini">Hint: しょうゆラーメン / かため (Hard) / ふつう (Normal) / ギョーザ / チャーハン</div>
+    </div>
+
+    <div class="scenario-section">
+        <div class="scenario-title" style="color:#d32f2f;">
+            <i class="fa-solid fa-fire"></i> 5. 焼肉屋 (Yakiniku BBQ / ร้านเนื้อย่าง)
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">コースになさいますか？</div>
+                <span class="text-thai">รับเป็นคอร์สบุฟเฟต์ไหมครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">お肉のご注文をどうぞ。</div>
+                <span class="text-thai">สั่งเนื้ออะไรดีครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box" style="background:#fff3e0; border-left-color:#ffb74d;">
+                <span class="clerk-label">状況 (Situation)</span>
+                <div class="text-jp">（網を交換してほしい...）</div>
+                <span class="text-thai">(อยากเปลี่ยนตะแกรง...)</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="hint-mini">Hint: たべほうだいで / カルビ / タン / すみません、あみこうかんをおねがいします</div>
+    </div>
+
+    <div class="scenario-section">
+        <div class="scenario-title" style="color:#3f51b5;">
+            <i class="fa-solid fa-beer-mug-empty"></i> 6. 居酒屋 (Izakaya Pub / ร้านกินดื่ม)
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">何名様ですか？<br>おタバコは吸われますか？</div>
+                <span class="text-thai">กี่ท่านครับ/คะ? สูบบุหรี่ไหมครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">お飲み物は決まりましたか？</div>
+                <span class="text-thai">รับเครื่องดื่มอะไรดีครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">お食事のご注文をどうぞ。</div>
+                <span class="text-thai">สั่งอาหารเลยไหมครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="hint-mini">Hint: 2人です / きんえんせき (Non-smoking) / とりあえず生 (Beer first) / えだまめ / やきとり</div>
+    </div>
+
+    <div class="scenario-section">
+        <div class="scenario-title" style="color:#4caf50;">
+            <i class="fa-solid fa-pizza-slice"></i> 7. ピザ屋 (Pizza Shop / ร้านพิซซ่า)
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">ご注文をお伺いします。</div>
+                <span class="text-thai">รับหน้าอะไรดีครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">配達ですか？<br>お持ち帰りですか？</div>
+                <span class="text-thai">ให้ไปส่งหรือรับกลับครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="hint-mini">Hint: シーフードピザ / Mサイズ / はいたつ (Delivery) / もちかえり (Take out)</div>
+    </div>
+
+    <div class="scenario-section">
+        <div class="scenario-title" style="color:#607d8b;">
+            <i class="fa-solid fa-utensils"></i> 8. ファミレス (Restaurant / ร้านอาหารครอบครัว)
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">何名様ですか？</div>
+                <span class="text-thai">กี่ท่านครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">ご注文はお決まりですか？</div>
+                <span class="text-thai">รับอะไรดีครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="dialogue-row">
+            <div class="clerk-box">
+                <span class="clerk-label">店員</span>
+                <div class="text-jp">セットはいかがですか？</div>
+                <span class="text-thai">รับเป็นเซ็ตไหมครับ/คะ?</span>
+            </div>
+            <div class="student-box">
+                <span class="student-label">あなた</span>
+                <div class="answer-area"></div>
+            </div>
+        </div>
+        <div class="hint-mini">Hint: 4人です / ハンバーグ / ドリンクバー / ライスセット</div>
     </div>
 
 </div>
