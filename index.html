@@ -258,25 +258,14 @@ header {
 .fade-in { animation: fadeIn 0.3s ease-in; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ★修正: スマホ画面対策（最強版） */
 @media (max-width: 480px) {
-  /* バージョン表記を消す！スペース最優先 */
-  .logo .ver-text {
-    display: none;
-  }
-  
-  /* ロゴの文字を少し小さく */
-  .logo {
-    font-size: 1.2em;
-  }
-  
-  /* グリッド調整 */
+  .logo .ver-text { display: none; }
+  .logo { font-size: 1.2em; }
   .grid-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .game-card { height: 120px; padding: 10px; }
   .card-icon { font-size: 2em; }
 }
 
-/* --- プレミアム/ロック機能のスタイル --- */
 .game-card.locked {
   position: relative;
   opacity: 0.8;
@@ -471,17 +460,18 @@ header {
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+// ★重要：Firebaseのバージョンを安定版(10.12.0)に変更
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 import {
 getFirestore, doc, setDoc, updateDoc, getDocs, collection,
 query, orderBy, limit, onSnapshot, where, getDoc, increment
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
 getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
 signOut, onAuthStateChanged, OAuthProvider, signInWithPopup, linkWithPopup
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
@@ -567,14 +557,12 @@ window.requestNotificationPermission = async () => {
   }
 };
 
-// ★アプリ内ブラウザ判定
 const isInAppBrowser = () => {
   const ua = navigator.userAgent || navigator.vendor || window.opera;
   return (ua.indexOf("Line") > -1 || ua.indexOf("FBAN") > -1 || ua.indexOf("Instagram") > -1 || ua.indexOf("Twitter") > -1);
 };
 
 window.loginWithLine = async () => {
-  // アプリ内ブラウザなら警告
   if (isInAppBrowser()) {
     alert("エラー：LINEやSNSのアプリ内ブラウザではログインできません。\n\n右上のメニューや共有ボタンから「Safariで開く」または「Chromeで開く」を選んで、標準ブラウザで開き直してください。");
     return;
@@ -583,20 +571,29 @@ window.loginWithLine = async () => {
   try {
     const result = await signInWithPopup(auth, lineProvider);
     const user = result.user;
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email || "", displayName: user.displayName || "LINE User",
-        points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {},
-        isPremium: false // ★デフォルトは無料会員
-      });
-    } else {
-      await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-    }
-    sessionStorage.setItem(SESS_KEY, 'authenticated');
+    
+    // ★認証成功時にまずモーダルを閉じる
     window.closeAuthModal();
+    sessionStorage.setItem(SESS_KEY, 'authenticated');
     alert("LINEログインに成功しました！");
+
+    // その後でDB処理（エラーでもログイン状態は維持する）
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            email: user.email || "", displayName: user.displayName || "LINE User",
+            points: 0, streak: 1, lastLogin: new Date().toISOString(), dailyTracker: {},
+            isPremium: false
+          });
+        } else {
+          await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+        }
+    } catch(dbErr) {
+        console.error("DB Error (Login OK):", dbErr);
+    }
+
   } catch (error) {
     console.error(error);
     if (error.code === 'auth/popup-blocked') {
@@ -642,45 +639,53 @@ window.submitAuth = async () => {
   if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
 
   try {
+    let user;
+    // ★重複チェックは削除（権限エラー回避のため、まずは作成を試みる）
     if (window.authMode === 'signup') {
       if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("displayName", "==", displayName), limit(1));
-      const snap = await getDocs(q);
-      if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
-      
+      // 直接作成を試みる
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      const user = userCredential.user;
-      await setDoc(doc(db, "users", user.uid), {
-        email: email, displayName: displayName, points: 0, streak: 1,
-        lastLogin: new Date().toISOString(), dailyTracker: {},
-        isPremium: false // ★デフォルトは無料会員
-      });
-      sessionStorage.setItem(SESS_KEY, 'authenticated');
-      window.closeAuthModal();
+      user = userCredential.user;
     } else {
       const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-      const user = userCredential.user;
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          email: email, displayName: email.split('@')[0], points: 0, streak: 1,
-          lastLogin: new Date().toISOString(), dailyTracker: {},
-          isPremium: false // ★デフォルトは無料会員
-        });
-      } else {
-        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-      }
-      sessionStorage.setItem(SESS_KEY, 'authenticated');
-      window.closeAuthModal();
+      user = userCredential.user;
     }
+
+    // ★認証成功したら即座にUIを閉じる
+    window.closeAuthModal();
+    sessionStorage.setItem(SESS_KEY, 'authenticated');
+
+    // ★DB操作はtry-catchで囲み、失敗してもログイン状態を維持する
+    try {
+        const userRef = doc(db, "users", user.uid);
+        if (window.authMode === 'signup') {
+             await setDoc(userRef, {
+                email: email, displayName: displayName, points: 0, streak: 1,
+                lastLogin: new Date().toISOString(), dailyTracker: {},
+                isPremium: false
+            });
+        } else {
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    email: email, displayName: email.split('@')[0], points: 0, streak: 1,
+                    lastLogin: new Date().toISOString(), dailyTracker: {},
+                    isPremium: false
+                });
+            } else {
+                await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+            }
+        }
+    } catch (dbError) {
+        console.error("Database access failed, but user is logged in.", dbError);
+    }
+
   } catch (error) {
     console.error(error);
     let errorMsg = errs.err_generic;
     if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
     else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
-    msg.textContent = errorMsg;
+    msg.textContent = errorMsg + " (" + error.code + ")";
   }
 };
 
@@ -698,18 +703,20 @@ window.loginAsGuest = () => {
 };
 
 const checkMonthlyReset = async (user) => {
-  const userRef = doc(db, "users", user.uid);
-  const snapshot = await getDoc(userRef);
-  if (snapshot.exists()) {
-    const data = snapshot.data();
-    const now = new Date();
-    const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
-    if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-      await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
-    } else {
-      await updateDoc(userRef, { lastLogin: now.toISOString() });
-    }
-  }
+  try {
+      const userRef = doc(db, "users", user.uid);
+      const snapshot = await getDoc(userRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const now = new Date();
+        const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+        if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
+          await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+        } else {
+          await updateDoc(userRef, { lastLogin: now.toISOString() });
+        }
+      }
+  } catch(e) { console.error("Monthly reset check failed", e); }
 };
 
 window.updateStaticCards = (isPremium) => {
@@ -736,9 +743,8 @@ window.updateUI = function(userState) {
   if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
   
   if (userState === 'guest') {
-    window.isUserPremium = false; // ゲストは無料
+    window.isUserPremium = false;
     window.updateStaticCards(false);
-
     welcome.classList.add('hidden');
     dash.classList.remove('hidden');
     document.getElementById('user-name').textContent = 'ゲスト';
@@ -750,13 +756,13 @@ window.updateUI = function(userState) {
     welcome.classList.add('hidden');
     dash.classList.remove('hidden');
     const userId = userState.uid;
+    
+    // ★権限エラーでもUIが壊れないようにエラーハンドリング追加
     currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         window.isUserPremium = data.isPremium || false;
-        
         window.updateStaticCards(window.isUserPremium);
-
         document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
         document.getElementById('streak-val').textContent = data.streak || 0;
         document.getElementById('point-val').textContent = data.points || 0;
@@ -765,11 +771,16 @@ window.updateUI = function(userState) {
         document.getElementById('user-lvl').textContent = level;
         document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
       }
+    }, (error) => {
+        console.error("Firestore read error:", error);
+        // DB読込失敗時のフォールバック表示
+        document.getElementById('user-name').textContent = userState.displayName || userState.email || "ユーザー";
+        window.isUserPremium = false;
+        window.updateStaticCards(false);
     });
   } else {
-    window.isUserPremium = false; // 未ログイン
+    window.isUserPremium = false;
     window.updateStaticCards(false);
-
     welcome.classList.remove('hidden');
     dash.classList.add('hidden');
   }
