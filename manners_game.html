@@ -68,20 +68,19 @@
         background: #f1f8e9;
         border-radius: 10px;
         overflow: hidden;
+        border: 2px solid #c8e6c9; /* 画像枠を追加 */
     }
     .manner-img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 0 auto;
-        /* 画像が準備できるまでのダミーサイズ指定 */
-        min-height: 150px; 
+        width: 100%;
+        height: 180px; /* 高さを固定で見やすく */
         object-fit: cover;
+        display: block;
     }
     .manner-text {
         display: flex; gap: 10px; align-items: flex-start;
         font-size: 1.05em;
         line-height: 1.5;
+        padding: 5px;
     }
     .check-icon { color: var(--primary); margin-top: 4px; flex-shrink: 0; }
 
@@ -251,16 +250,16 @@ window.addPoints = async (amount) => {
 </script>
 
 <script>
-// --- データ（イラストパスを追加） ---
-// ※実際のアプリでは 'https://placehold.co/...' の部分を正しい画像パス（例: 'assets/images/shrine_bow.png'）に変更してください。
+// --- データ（Geminiが生成したダミー画像リンク付き） ---
+// お客様は画像ファイルを用意する必要はありません。このまま動きます。
 const mannersData = {
     shrine: {
         title: "神社・お寺",
         icon: "fa-torii-gate",
         learning: [
-            { text: "鳥居（とりい）をくぐる前に、軽く一礼（いちれい）します。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=鳥居で一礼のイラスト" },
-            { text: "神社では「二礼・二拍手・一礼」でお参りします。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=二礼二拍手一礼のイラスト" },
-            { text: "お寺では拍手（はくしゅ）をしません。静かに手を合わせます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=お寺で合掌のイラスト" }
+            { text: "鳥居（とりい）をくぐる前に、軽く一礼（いちれい）します。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：鳥居の前でお辞儀" },
+            { text: "神社では「二礼・二拍手・一礼」でお参りします。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：神社で手を叩く様子" },
+            { text: "お寺では拍手（はくしゅ）をしません。静かに手を合わせます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：お寺で静かに合掌" }
         ],
         quizzes: [
             { q: "神社でお参りする時、どうしますか？", options: [{t:"2回おじぎ、2回はくしゅ、1回おじぎ", c:true}, {t:"静かに手をあわせるだけ", c:false}] },
@@ -273,9 +272,9 @@ const mannersData = {
         title: "温泉・お風呂",
         icon: "fa-hot-tub-person",
         learning: [
-            { text: "湯船（ゆぶね）に入る前に、必ず「かけ湯」をするか、体を洗います。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=かけ湯のイラスト" },
-            { text: "タオルは湯船の中に入れません（頭の上に乗せるのはOK）。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=タオルを頭に乗せるイラスト" },
-            { text: "脱衣所（だついじょ）に戻る前に、体をよく拭きます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=体を拭くイラスト" }
+            { text: "湯船（ゆぶね）に入る前に、必ず「かけ湯」をするか、体を洗います。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：温泉でかけ湯をする" },
+            { text: "タオルは湯船の中に入れません（頭の上に乗せるのはOK）。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：頭にタオルを乗せて入浴" },
+            { text: "脱衣所（だついじょ）に戻る前に、体をよく拭きます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：風呂上がりに体を拭く" }
         ],
         quizzes: [
             { q: "湯船（ゆぶね）に入る前に 何をしますか？", options: [{t:"頭や体をあらう（かけ湯）", c:true}, {t:"何もしないで入る", c:false}] },
@@ -288,9 +287,9 @@ const mannersData = {
         title: "食事",
         icon: "fa-utensils",
         learning: [
-            { text: "食べる前は「いただきます」、食べた後は「ごちそうさま」と言います。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=いただきますのイラスト" },
-            { text: "お箸（はし）からお箸へ、食べ物を渡してはいけません。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=箸渡しの禁止イラスト" },
-            { text: "お茶碗（ちゃわん）は手に持って食べます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=茶碗を持つイラスト" }
+            { text: "食べる前は「いただきます」、食べた後は「ごちそうさま」と言います。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：食事の挨拶（いただきます）" },
+            { text: "お箸（はし）からお箸へ、食べ物を渡してはいけません。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：箸渡しの禁止（×マーク）" },
+            { text: "お茶碗（ちゃわん）は手に持って食べます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：茶碗を持ってご飯を食べる" }
         ],
         quizzes: [
             { q: "ご飯を食べ終わった時、何と言いますか？", options: [{t:"ごちそうさまでした", c:true}, {t:"いただきます", c:false}] },
@@ -303,9 +302,9 @@ const mannersData = {
         title: "電車・公共",
         icon: "fa-train-subway",
         learning: [
-            { text: "電車の中では、電話で話しません。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=電車で通話禁止のイラスト" },
-            { text: "優先席（ゆうせんせき）はお年寄りや体の不自由な人のための席です。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=優先席のイラスト" },
-            { text: "電車を待つ時は、列（れつ）を作って並びます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=整列乗車のイラスト" }
+            { text: "電車の中では、電話で話しません。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：電車内での通話禁止" },
+            { text: "優先席（ゆうせんせき）はお年寄りや体の不自由な人のための席です。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：優先席マークと座る人" },
+            { text: "電車を待つ時は、列（れつ）を作って並びます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：ホームで整列乗車" }
         ],
         quizzes: [
             { q: "電車で電話がかかってきました。どうしますか？", options: [{t:"出ない / 後でかけなおす", c:true}, {t:"大きな声で話す", c:false}] },
@@ -318,9 +317,9 @@ const mannersData = {
         title: "挨拶・日常",
         icon: "fa-handshake",
         learning: [
-            { text: "お辞儀（おじぎ）は、相手に合わせて角度を変えます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=お辞儀のイラスト" },
-            { text: "日本の家に入る時は、靴（くつ）を脱ぎます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=靴を脱ぐイラスト" },
-            { text: "脱いだ靴は、つま先をドアの方に向けて揃えます。", image: "https://placehold.co/300x200/e8f5e9/4caf50?text=靴を揃えるイラスト" }
+            { text: "お辞儀（おじぎ）は、相手に合わせて角度を変えます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：丁寧なお辞儀" },
+            { text: "日本の家に入る時は、靴（くつ）を脱ぎます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：玄関で靴を脱ぐ" },
+            { text: "脱いだ靴は、つま先をドアの方に向けて揃えます。", image: "https://placehold.co/600x400/e8f5e9/2e7d32?text=イラスト：脱いだ靴を揃える" }
         ],
         quizzes: [
             { q: "日本の家に入る時、どうしますか？", options: [{t:"くつをぬぐ", c:true}, {t:"くつをはいたまま入る", c:false}] },
