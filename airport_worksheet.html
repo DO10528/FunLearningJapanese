@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worksheet: Airport Survival</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    /* --- 印刷・A4サイズ用の基本設定 --- */
+    @page {
+        size: A4;
+        margin: 20mm;
+    }
+    
+    body {
+        font-family: 'Noto Sans JP', sans-serif;
+        background-color: #f0f0f0; /* 画面確認用の背景 */
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .a4-page {
+        width: 210mm;
+        min-height: 297mm;
+        background: white;
+        margin: 20px auto;
+        padding: 15mm 20mm;
+        box-sizing: border-box;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* 印刷時のみ適用されるスタイル（影や背景を消す） */
+    @media print {
+        body { background-color: white; }
+        .a4-page { margin: 0; padding: 0; box-shadow: none; border: none; width: 100%; min-height: auto; }
+        .page-break { page-break-before: always; }
+    }
+
+    /* --- ワークシートのデザイン --- */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 3px solid #333;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .title-area h1 {
+        margin: 0;
+        font-size: 26px;
+        color: #1565c0;
+    }
+    .title-area p {
+        margin: 5px 0 0 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .name-area {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .name-box {
+        display: flex;
+        align-items: flex-end;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .name-line {
+        display: inline-block;
+        width: 250px;
+        border-bottom: 1px solid #333;
+        margin-left: 10px;
+        height: 25px;
+    }
+
+    .instruction {
+        font-size: 15px;
+        font-weight: bold;
+        background: #e3f2fd;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border-left: 6px solid #1565c0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        border-bottom: 2px dashed #aaa;
+        padding-bottom: 8px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .question-block {
+        display: flex;
+        margin-bottom: 35px;
+        page-break-inside: avoid; /* 問題の途中で改ページされないようにする */
+    }
+
+    .q-number {
+        font-size: 18px;
+        font-weight: bold;
+        width: 45px;
+        color: #1565c0;
+    }
+
+    .q-content {
+        flex-grow: 1;
+    }
+
+    .q-en {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    .q-ja-box {
+        width: 100%;
+        height: 35px;
+        border-bottom: 1px solid #777;
+        position: relative;
+    }
+    
+    .q-ja-box::before {
+        content: '答:';
+        position: absolute;
+        left: -35px;
+        bottom: 5px;
+        font-size: 14px;
+        color: #888;
+        font-weight: normal;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="a4-page">
+    
+    <div class="header">
+        <div class="title-area">
+            <h1>Airport Survival Worksheet</h1>
+            <p>入国審査と税関 (Immigration & Customs)</p>
+        </div>
+        <div class="name-area">
+            <div class="name-box">Date: <span class="name-line" style="width: 150px;"></span></div>
+            <div class="name-box">Name: <span class="name-line"></span></div>
+        </div>
+    </div>
+
+    <div class="instruction">
+        📝 Translate the following English sentences into Japanese.<br>
+        （次の英語を日本語に翻訳して書きましょう。）
+    </div>
+
+    <div class="section-title">Part 1: 基本と目的 (Basics & Purpose)</div>
+    
+    <div class="question-block">
+        <div class="q-number">Q1.</div>
+        <div class="q-content">
+            <div class="q-en">Please show your passport.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+    
+    <div class="question-block">
+        <div class="q-number">Q2.</div>
+        <div class="q-content">
+            <div class="q-en">Here you go.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q3.</div>
+        <div class="q-content">
+            <div class="q-en">For sightseeing.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q4.</div>
+        <div class="q-content">
+            <div class="q-en">For business.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q5.</div>
+        <div class="q-content">
+            <div class="q-en">To study abroad.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="section-title">Part 2: 期間と滞在先 (Duration & Accommodation)</div>
+
+    <div class="question-block">
+        <div class="q-number">Q6.</div>
+        <div class="q-content">
+            <div class="q-en">For 5 days.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q7.</div>
+        <div class="q-content">
+            <div class="q-en">For 1 week.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q8.</div>
+        <div class="q-content">
+            <div class="q-en">For 2 weeks.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q9.</div>
+        <div class="q-content">
+            <div class="q-en">For 1 month.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q10.</div>
+        <div class="q-content">
+            <div class="q-en">A hotel in Tokyo.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q11.</div>
+        <div class="q-content">
+            <div class="q-en">My friend's house.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q12.</div>
+        <div class="q-content">
+            <div class="q-en">I am going to Kyoto.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+</div> <div class="page-break"></div>
+
+<div class="a4-page">
+    <div class="header" style="margin-bottom: 20px; padding-bottom: 10px;">
+        <div class="title-area">
+            <p>Airport Survival Worksheet - Page 2</p>
+        </div>
+    </div>
+
+    <div class="section-title">Part 3: 同伴者 (Companions)</div>
+
+    <div class="question-block">
+        <div class="q-number">Q13.</div>
+        <div class="q-content">
+            <div class="q-en">I am alone.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q14.</div>
+        <div class="q-content">
+            <div class="q-en">I came with my family.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q15.</div>
+        <div class="q-content">
+            <div class="q-en">I am with my friend.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="section-title">Part 4: 税関と所持金 (Customs & Money)</div>
+
+    <div class="question-block">
+        <div class="q-number">Q16.</div>
+        <div class="q-content">
+            <div class="q-en">I have nothing to declare.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q17.</div>
+        <div class="q-content">
+            <div class="q-en">About 100,000 yen.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q18.</div>
+        <div class="q-content">
+            <div class="q-en">About 200,000 yen.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q19.</div>
+        <div class="q-content">
+            <div class="q-en">I have a credit card.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q20.</div>
+        <div class="q-content">
+            <div class="q-en">I have a VISA card.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div class="question-block">
+        <div class="q-number">Q21.</div>
+        <div class="q-content">
+            <div class="q-en">I have a travel card.</div>
+            <div class="q-ja-box"></div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; color: #888; font-weight: bold;">
+        Great job! Have a safe trip to Japan! ✈️🇯Ｐ
+    </div>
+
+</div> </body>
+</html>
