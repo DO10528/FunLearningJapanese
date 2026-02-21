@@ -69,7 +69,7 @@
     .phrase-text { font-weight: 700; font-size: 1.1em; color: #333; }
     .phrase-en { font-weight: 400; font-size: 0.85em; color: #888; }
     
-    /* 修正: FontAwesomeのアイコン用ボックス */
+    /* FontAwesomeのアイコン用ボックス */
     .phrase-icon-box {
         width: 50px; height: 50px; flex-shrink: 0;
         border-radius: 12px;
@@ -166,9 +166,14 @@
 
 <header>
     <div style="font-weight:900; font-size:1.1em;"><i class="fa-solid fa-truck-medical"></i> 緊急サバイバル</div>
-    <button class="header-btn" onclick="goBack()" id="header-back-btn" style="display:none;">
-        <i class="fa-solid fa-arrow-left"></i> 戻る
-    </button>
+    <div style="display: flex; gap: 10px;">
+        <button class="header-btn" onclick="goBack()" id="header-back-btn" style="display:none;">
+            <i class="fa-solid fa-arrow-left"></i> 戻る
+        </button>
+        <button class="header-btn" onclick="location.href='index.html'" id="header-home-btn">
+            <i class="fa-solid fa-house"></i> ホーム
+        </button>
+    </div>
 </header>
 
 <div id="main-container">
@@ -226,7 +231,6 @@
 
 <script>
 // --- データ ---
-// 画像リンク(iconImage)をやめ、FontAwesomeのクラス名(faIcon)に変更しました。
 const learningData = [
     {
         title: "症状 (Symptoms)", icon: "fa-head-side-cough", class: "",
@@ -358,10 +362,21 @@ window.goBack = () => {
     }
 };
 
+// 修正: ホームボタンと戻るボタンの表示切り替えロジック
 function updateHeader() {
     const backBtn = document.getElementById('header-back-btn');
+    const homeBtn = document.getElementById('header-home-btn');
     const current = historyStack[historyStack.length - 1];
-    backBtn.style.display = (current === 'screen-learning') ? 'none' : 'block';
+    
+    if (current === 'screen-learning') {
+        // 学習画面（最初の画面）の時はホームボタンを表示
+        backBtn.style.display = 'none';
+        if (homeBtn) homeBtn.style.display = 'block';
+    } else {
+        // それ以外の画面（モード選択やゲーム中）の時は戻るボタンを表示
+        backBtn.style.display = 'block';
+        if (homeBtn) homeBtn.style.display = 'none';
+    }
 }
 
 // 1. 練習画面（FontAwesomeアイコンで描画）
