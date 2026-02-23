@@ -26,6 +26,10 @@
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* ルビ（ふりがな）のスタイル調整 */
+    ruby { ruby-align: center; }
+    rt { font-size: 0.6em; color: #555; font-weight: 500; }
+
     /* ヘッダー */
     header {
         background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
@@ -61,7 +65,7 @@
     .phrase-item:last-child { border-bottom: none; }
     
     .phrase-text-group { display: flex; flex-direction: column; gap: 4px; }
-    .phrase-text { font-weight: 700; font-size: 1.1em; color: #333; }
+    .phrase-text { font-weight: 700; font-size: 1.1em; color: #333; line-height: 1.5; }
     .phrase-en { font-weight: 400; font-size: 0.85em; color: #888; }
     
     .play-btn {
@@ -99,7 +103,7 @@
     .chat-bubble-examiner {
         background: white; padding: 15px 20px; border-radius: 0 20px 20px 20px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 1.2em; font-weight: 700;
-        color: #333; position: relative; width: 100%;
+        color: #333; position: relative; width: 100%; line-height: 1.5;
     }
     .chat-bubble-examiner::before {
         content: ''; position: absolute; top: 0; left: -10px;
@@ -113,7 +117,7 @@
         position: relative; border: 4px solid var(--primary);
     }
     .target-label { font-size: 0.9em; color: #777; font-weight: bold; margin-bottom: 10px; }
-    .target-phrase { font-size: 1.6em; font-weight: 900; color: var(--primary); margin-bottom: 30px; }
+    .target-phrase { font-size: 1.6em; font-weight: 900; color: var(--primary); margin-bottom: 30px; line-height: 1.4; }
     
     .mic-btn {
         width: 80px; height: 80px; border-radius: 50%; border: none;
@@ -221,56 +225,65 @@
 </button>
 
 <script>
+// --- ふりがなを除去してテキストだけにする便利関数（正誤判定・音声読み上げ用） ---
+function stripRuby(htmlString) {
+    if (!htmlString) return '';
+    // <rt>タグとその中身（ふりがな）を削除
+    let text = htmlString.replace(/<rt>.*?<\/rt>/g, '');
+    // 残りのHTMLタグ（<ruby>など）を削除してプレーンテキストにする
+    return text.replace(/<[^>]*>/g, '');
+}
+
 // --- データ ---
-// 英語訳と、発音が特殊なもの（1ヶ月など）の読み方(speech)を追加
+// 漢字の上にフリガナ（rubyタグ）を追加しました
 const learningData = [
     {
         title: "基本・書類 (Basics)", icon: "fa-passport",
         phrases: [
-            { text: "パスポートを見せてください", en: "Please show your passport.", speech: "ぱすぽーとをみせてください" },
+            { text: "パスポートを<ruby>見<rt>み</rt></ruby>せてください", en: "Please show your passport.", speech: "ぱすぽーとをみせてください" },
             { text: "はい、どうぞ", en: "Here you go.", speech: "はいどうぞ" }
         ]
     },
     {
         title: "目的 (Purpose)", icon: "fa-camera",
         phrases: [
-            { text: "観光です", en: "For sightseeing.", speech: "かんこうです" },
-            { text: "仕事です", en: "For business.", speech: "しごとです" },
-            { text: "留学です", en: "To study abroad.", speech: "りゅうがくです" }
+            { text: "<ruby>観光<rt>かんこう</rt></ruby>です", en: "For sightseeing.", speech: "かんこうです" },
+            { text: "<ruby>仕事<rt>しごと</rt></ruby>です", en: "For business.", speech: "しごとです" },
+            { text: "<ruby>留学<rt>りゅうがく</rt></ruby>です", en: "To study abroad.", speech: "りゅうがくです" }
         ]
     },
     {
         title: "期間 (Duration)", icon: "fa-calendar-days",
         phrases: [
-            { text: "5日間です", en: "For 5 days.", speech: "いつかかんです" },
-            { text: "1週間です", en: "For 1 week.", speech: "いっしゅうかんです" },
-            { text: "2週間です", en: "For 2 weeks.", speech: "にしゅうかんです" },
-            { text: "14日間です", en: "For 14 days.", speech: "じゅうよっかかんです" },
-            { text: "1ヶ月です", en: "For 1 month.", speech: "いっかげつです" }
+            { text: "<ruby>5日間<rt>いつかかん</rt></ruby>です", en: "For 5 days.", speech: "いつかかんです" },
+            { text: "<ruby>1週間<rt>いっしゅうかん</rt></ruby>です", en: "For 1 week.", speech: "いっしゅうかんです" },
+            { text: "<ruby>2週間<rt>にしゅうかん</rt></ruby>です", en: "For 2 weeks.", speech: "にしゅうかんです" },
+            { text: "<ruby>14日間<rt>じゅうよっかかん</rt></ruby>です", en: "For 14 days.", speech: "じゅうよっかかんです" },
+            { text: "<ruby>1ヶ月<rt>いっかげつ</rt></ruby>です", en: "For 1 month.", speech: "いっかげつです" }
         ]
     },
     {
         title: "滞在先 (Accommodation)", icon: "fa-hotel",
         phrases: [
-            { text: "東京のホテルです", en: "A hotel in Tokyo.", speech: "とうきょうのほてるです" },
-            { text: "友達の家です", en: "My friend's house.", speech: "ともだちのいえです" },
-            { text: "京都に行きます", en: "I am going to Kyoto.", speech: "きょうとにいきます" }
+            { text: "<ruby>東京<rt>とうきょう</rt></ruby>のホテルです", en: "A hotel in Tokyo.", speech: "とうきょうのほてるです" },
+            { text: "<ruby>友達<rt>ともだち</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>です", en: "My friend's house.", speech: "ともだちのいえです" },
+            { text: "<ruby>京都<rt>きょうと</rt></ruby>に<ruby>行<rt>い</rt></ruby>きます", en: "I am going to Kyoto.", speech: "きょうとにいきます" }
         ]
     },
     {
         title: "同伴者 (Companions)", icon: "fa-users",
         phrases: [
-            { text: "一人です", en: "I am alone.", speech: "ひとりです" },
-            { text: "家族と来ました", en: "I came with my family.", speech: "かぞくときました" },
-            { text: "友達と一緒です", en: "I am with my friend.", speech: "ともだちといっしょです" }
+            { text: "<ruby>一人<rt>ひとり</rt></ruby>です", en: "I am alone.", speech: "ひとりです" },
+            { text: "<ruby>家族<rt>かぞく</rt></ruby>と<ruby>来<rt>き</rt></ruby>ました", en: "I came with my family.", speech: "かぞくときました" },
+            { text: "<ruby>友達<rt>ともだち</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>です", en: "I am with my friend.", speech: "ともだちといっしょです" }
         ]
     },
     {
         title: "税関・所持金 (Customs & Money)", icon: "fa-money-bill-wave",
         phrases: [
             { text: "ありません", en: "I have nothing to declare.", speech: "ありません" },
-            { text: "10万円くらいです", en: "About 100,000 yen.", speech: "じゅうまんえんくらいです" },
-            { text: "20万円くらいです", en: "About 200,000 yen.", speech: "にじゅうまんえんくらいです" },
+            { text: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", en: "About 100,000 yen.", speech: "じゅうまんえんくらいです" },
+            { text: "<ruby>20万円<rt>にじゅうまんえん</rt></ruby>くらいです", en: "About 200,000 yen.", speech: "にじゅうまんえんくらいです" },
             { text: "クレジットカードです", en: "I have a credit card.", speech: "くれじっとかーどです" },
             { text: "VISAカードです", en: "I have a VISA card.", speech: "びざかーどです" },
             { text: "トラベルカードです", en: "I have a travel card.", speech: "とらべるかーどです" }
@@ -278,26 +291,25 @@ const learningData = [
     }
 ];
 
-// ゲームで判定を緩くするため、acceptsに数値のカンマ入り表記などを複数登録
+// ゲームデータにもフリガナ（rubyタグ）を追加
 const gameData = {
     immigration: {
         title: "入国審査",
         questions: [
-            { examiner: "パスポートを見せてください。", target: "はい、どうぞ", accepts: ["はいどうぞ", "はい"] },
-            { examiner: "目的は何ですか？", target: "観光です", accepts: ["かんこうです"] },
-            { examiner: "どのくらい滞在しますか？", target: "2週間です", accepts: ["にしゅうかんです", "2しゅうかんです"] },
-            { examiner: "どこに泊まりますか？", target: "東京のホテルです", accepts: ["とうきょうのほてるです"] },
-            { examiner: "誰と来ましたか？", target: "家族と来ました", accepts: ["かぞくときました"] }
+            { examiner: "パスポートを<ruby>見<rt>み</rt></ruby>せてください。", target: "はい、どうぞ", accepts: ["はいどうぞ", "はい"] },
+            { examiner: "<ruby>目的<rt>もくてき</rt></ruby>は<ruby>何<rt>なん</rt></ruby>ですか？", target: "<ruby>観光<rt>かんこう</rt></ruby>です", accepts: ["かんこうです"] },
+            { examiner: "どのくらい<ruby>滞在<rt>たいざい</rt></ruby>しますか？", target: "<ruby>2週間<rt>にしゅうかん</rt></ruby>です", accepts: ["にしゅうかんです", "2しゅうかんです"] },
+            { examiner: "どこに<ruby>泊<rt>と</rt></ruby>まりますか？", target: "<ruby>東京<rt>とうきょう</rt></ruby>のホテルです", accepts: ["とうきょうのほてるです"] },
+            { examiner: "<ruby>誰<rt>だれ</rt></ruby>と<ruby>来<rt>き</rt></ruby>ましたか？", target: "<ruby>家族<rt>かぞく</rt></ruby>と<ruby>来<rt>き</rt></ruby>ました", accepts: ["かぞくときました"] }
         ]
     },
     customs: {
         title: "税関",
         questions: [
-            { examiner: "申告するものはありますか？", target: "ありません", accepts: [] },
-            // 100,000円と認識されてもクリアできるようにacceptsに追加
-            { examiner: "所持金はいくらですか？", target: "10万円くらいです", accepts: ["じゅうまんえんくらいです", "十万円くらいです", "100000円くらいです", "100,000円くらいです"] },
-            { examiner: "他に支払いのカードはありますか？", target: "VISAカードです", accepts: ["びざかーどです", "クレジットカードです", "visaかーどです", "visaカードです"] },
-            { examiner: "カバンの中身を見せてください。", target: "はい、わかりました", accepts: ["はいわかりました", "はい"] }
+            { examiner: "<ruby>申告<rt>しんこく</rt></ruby>するものはありますか？", target: "ありません", accepts: [] },
+            { examiner: "<ruby>所持金<rt>しょじきん</rt></ruby>はいくらですか？", target: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", accepts: ["じゅうまんえんくらいです", "十万円くらいです", "100000円くらいです", "100,000円くらいです"] },
+            { examiner: "<ruby>他<rt>ほか</rt></ruby>に<ruby>支払<rt>しはら</rt></ruby>いのカードはありますか？", target: "VISAカードです", accepts: ["びざかーどです", "クレジットカードです", "visaかーどです", "visaカードです"] },
+            { examiner: "カバンの<ruby>中身<rt>なかみ</rt></ruby>を<ruby>見<rt>み</rt></ruby>せてください。", target: "はい、わかりました", accepts: ["はいわかりました", "はい"] }
         ]
     }
 };
@@ -354,18 +366,15 @@ window.goBack = () => {
     }
 };
 
-// 修正: ホームボタンと戻るボタンの表示切り替えロジック
 function updateHeader() {
     const backBtn = document.getElementById('header-back-btn');
     const homeBtn = document.getElementById('header-home-btn');
     const current = historyStack[historyStack.length - 1];
     
     if (current === 'screen-learning') {
-        // 学習画面（最初の画面）の時はホームボタンを表示
         backBtn.style.display = 'none';
         if (homeBtn) homeBtn.style.display = 'block';
     } else {
-        // それ以外の画面（モード選択やゲーム中）の時は戻るボタンを表示
         backBtn.style.display = 'block';
         if (homeBtn) homeBtn.style.display = 'none';
     }
@@ -382,14 +391,13 @@ function renderLearning() {
         
         let phrasesHtml = '';
         cat.phrases.forEach(phrase => {
-            // 日本語・英語の両方を表示し、音声は専用のふりがな(speech)で読み上げる
             phrasesHtml += `
                 <div class="phrase-item">
                     <div class="phrase-text-group">
                         <span class="phrase-text">${phrase.text}</span>
                         <span class="phrase-en">${phrase.en}</span>
                     </div>
-                    <button class="play-btn" onclick="speakText('${phrase.speech || phrase.text}')">
+                    <button class="play-btn" onclick="speakText('${phrase.speech || stripRuby(phrase.text)}')">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 </div>`;
@@ -407,7 +415,7 @@ window.speakText = (text) => {
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP';
-    utter.rate = 0.85; // 少しゆっくりめに発音
+    utter.rate = 0.85; 
     synth.speak(utter);
 };
 
@@ -429,15 +437,18 @@ function loadQuestion() {
     const qData = qList[currentQuestionIndex];
     
     document.getElementById('game-progress').textContent = `(${currentQuestionIndex + 1}/${qList.length})`;
-    document.getElementById('examiner-text').textContent = qData.examiner;
-    document.getElementById('target-phrase').textContent = qData.target;
+    
+    // HTMLとしてレンダリングするため、textContentではなくinnerHTMLを使用
+    document.getElementById('examiner-text').innerHTML = qData.examiner;
+    document.getElementById('target-phrase').innerHTML = qData.target;
     
     document.getElementById('feedback-text').textContent = "";
     document.getElementById('recognized-text').textContent = "";
     document.getElementById('mic-btn').classList.remove('listening');
     isListening = false;
 
-    setTimeout(() => { speakText(qData.examiner); }, 500);
+    // 読み上げるときはルビを取り除いたテキストを使用
+    setTimeout(() => { speakText(stripRuby(qData.examiner)); }, 500);
 }
 
 // 3. 音声認識と判定
@@ -486,11 +497,11 @@ if (recognition) {
     };
 }
 
-// カンマやスペースを削除して比較するための関数
+// カンマやスペース、さらにHTMLタグ(ルビ)を削除して比較する関数
 function calculateSimilarity(s1, s2) {
-    // 認識されたカンマ（, や 、）や空白を完全に削除して比較する
-    const cleanS1 = s1.toLowerCase().replace(/[\s、。！？!?,，]/g, '');
-    const cleanS2 = s2.toLowerCase().replace(/[\s、。！？!?,，]/g, '');
+    // 比較する前にHTMLタグを取り除き、純粋なテキスト同士にする
+    const cleanS1 = stripRuby(s1).toLowerCase().replace(/[\s、。！？!?,，]/g, '');
+    const cleanS2 = stripRuby(s2).toLowerCase().replace(/[\s、。！？!?,，]/g, '');
     
     if (cleanS1 === cleanS2) return 100;
     if (cleanS1.length === 0 || cleanS2.length === 0) return 0;

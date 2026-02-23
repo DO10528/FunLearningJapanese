@@ -27,6 +27,10 @@
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* ルビ（ふりがな）のスタイル調整 */
+    ruby { ruby-align: center; }
+    rt { font-size: 0.6em; color: #555; font-weight: 500; }
+
     /* ヘッダー */
     header {
         background: linear-gradient(135deg, #c62828 0%, #ef5350 100%);
@@ -59,14 +63,14 @@
     .cat-title { font-size: 1.2em; font-weight: 700; margin-bottom: 15px; color: #b71c1c; display: flex; align-items: center; gap: 10px; }
     
     .phrase-item {
-        display: flex; align-items: center; /* 上下中央揃え */
+        display: flex; align-items: center;
         padding: 12px 0; border-bottom: 1px dashed #eee;
-        gap: 12px; /* アイコン、テキスト、ボタンの間隔 */
+        gap: 12px;
     }
     .phrase-item:last-child { border-bottom: none; }
     
-    .phrase-text-group { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; /* 左側に寄せるため幅を最大化 */ }
-    .phrase-text { font-weight: 700; font-size: 1.1em; color: #333; }
+    .phrase-text-group { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+    .phrase-text { font-weight: 700; font-size: 1.1em; color: #333; line-height: 1.5; }
     .phrase-en { font-weight: 400; font-size: 0.85em; color: #888; }
     
     /* FontAwesomeのアイコン用ボックス */
@@ -75,7 +79,7 @@
         border-radius: 12px;
         display: flex; justify-content: center; align-items: center;
         background: #ffebee; color: var(--primary);
-        font-size: 1.5em; /* アイコンの大きさ */
+        font-size: 1.5em;
     }
     .pharmacy-cat .phrase-icon-box {
         background: #e8f5e9; color: var(--secondary);
@@ -122,7 +126,7 @@
         position: relative; border: 4px solid var(--primary);
     }
     .target-label { font-size: 0.9em; color: #777; font-weight: bold; margin-bottom: 10px; }
-    .target-phrase { font-size: 1.6em; font-weight: 900; color: var(--primary); margin-bottom: 30px; }
+    .target-phrase { font-size: 1.6em; font-weight: 900; color: var(--primary); margin-bottom: 30px; line-height: 1.4; }
     
     .mic-btn {
         width: 80px; height: 80px; border-radius: 50%; border: none;
@@ -230,82 +234,90 @@
 </button>
 
 <script>
+// --- ふりがなを除去してテキストだけにする便利関数（正誤判定・音声読み上げ用） ---
+function stripRuby(htmlString) {
+    if (!htmlString) return '';
+    let text = htmlString.replace(/<rt>.*?<\/rt>/g, '');
+    return text.replace(/<[^>]*>/g, '');
+}
+
 // --- データ ---
+// 漢字の上にフリガナ（rubyタグ）を追加しました
 const learningData = [
     {
         title: "症状 (Symptoms)", icon: "fa-head-side-cough", class: "",
         phrases: [
-            { text: "頭が痛いです", en: "I have a headache.", speech: "あたまがいたいです", faIcon: "fa-bolt" },
-            { text: "お腹が痛いです", en: "I have a stomachache.", speech: "おなかがいたいです", faIcon: "fa-face-grimace" },
-            { text: "熱があります", en: "I have a fever.", speech: "ねつがあります", faIcon: "fa-temperature-high" },
-            { text: "気持ち悪いです", en: "I feel sick / nauseous.", speech: "きもちわるいです", faIcon: "fa-face-dizzy" },
-            { text: "咳が出ます", en: "I have a cough.", speech: "せきがでます", faIcon: "fa-head-side-cough" },
-            { text: "喉が痛いです", en: "I have a sore throat.", speech: "のどがいたいです", faIcon: "fa-lungs-virus" },
+            { text: "<ruby>頭<rt>あたま</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", en: "I have a headache.", speech: "あたまがいたいです", faIcon: "fa-bolt" },
+            { text: "お<ruby>腹<rt>なか</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", en: "I have a stomachache.", speech: "おなかがいたいです", faIcon: "fa-face-grimace" },
+            { text: "<ruby>熱<rt>ねつ</rt></ruby>があります", en: "I have a fever.", speech: "ねつがあります", faIcon: "fa-temperature-high" },
+            { text: "<ruby>気持<rt>きも</rt></ruby>ち<ruby>悪<rt>わる</rt></ruby>いです", en: "I feel sick / nauseous.", speech: "きもちわるいです", faIcon: "fa-face-dizzy" },
+            { text: "<ruby>咳<rt>せき</rt></ruby>が<ruby>出<rt>で</rt></ruby>ます", en: "I have a cough.", speech: "せきがでます", faIcon: "fa-head-side-cough" },
+            { text: "<ruby>喉<rt>のど</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", en: "I have a sore throat.", speech: "のどがいたいです", faIcon: "fa-lungs-virus" },
             { text: "めまいがします", en: "I feel dizzy.", speech: "めまいがします", faIcon: "fa-asterisk" },
-            { text: "寒気がします", en: "I have chills.", speech: "さむけがします", faIcon: "fa-temperature-arrow-down" },
+            { text: "<ruby>寒気<rt>さむけ</rt></ruby>がします", en: "I have chills.", speech: "さむけがします", faIcon: "fa-temperature-arrow-down" },
             { text: "アレルギーがあります", en: "I have an allergy.", speech: "あれるぎーがあります", faIcon: "fa-leaf" }
         ]
     },
     {
         title: "薬局 (At the Pharmacy)", icon: "fa-capsules", class: "pharmacy-cat",
         phrases: [
-            { text: "風邪薬はありますか？", en: "Do you have cold medicine?", speech: "かぜぐすりはありますか", faIcon: "fa-pills" },
-            { text: "痛み止めをください", en: "I'd like a painkiller, please.", speech: "いたみどめをください", faIcon: "fa-capsules" },
-            { text: "胃薬をください", en: "I'd like stomach medicine, please.", speech: "いぐすりをください", faIcon: "fa-prescription-bottle-medical" },
-            { text: "目薬はありますか？", en: "Do you have eye drops?", speech: "めぐすりはありますか", faIcon: "fa-eye-dropper" },
-            { text: "酔い止めをください", en: "I'd like motion sickness medicine.", speech: "よいどめをください", faIcon: "fa-car" },
-            { text: "虫刺されの薬はどこですか？", en: "Where is the medicine for insect bites?", speech: "むしさされのくすりはどこですか", faIcon: "fa-bug" },
-            { text: "湿布はありますか？", en: "Do you have pain relief patches?", speech: "しっぷはありますか", faIcon: "fa-note-sticky" },
-            { text: "絆創膏はどこですか？", en: "Where are the band-aids?", speech: "ばんそうこうはどこですか", faIcon: "fa-bandage" },
+            { text: "<ruby>風邪薬<rt>かぜぐすり</rt></ruby>はありますか？", en: "Do you have cold medicine?", speech: "かぜぐすりはありますか", faIcon: "fa-pills" },
+            { text: "<ruby>痛<rt>いた</rt></ruby>み<ruby>止<rt>ど</rt></ruby>めをください", en: "I'd like a painkiller, please.", speech: "いたみどめをください", faIcon: "fa-capsules" },
+            { text: "<ruby>胃薬<rt>いぐすり</rt></ruby>をください", en: "I'd like stomach medicine, please.", speech: "いぐすりをください", faIcon: "fa-prescription-bottle-medical" },
+            { text: "<ruby>目薬<rt>めぐすり</rt></ruby>はありますか？", en: "Do you have eye drops?", speech: "めぐすりはありますか", faIcon: "fa-eye-dropper" },
+            { text: "<ruby>酔<rt>よ</rt></ruby>い<ruby>止<rt>ど</rt></ruby>めをください", en: "I'd like motion sickness medicine.", speech: "よいどめをください", faIcon: "fa-car" },
+            { text: "<ruby>虫刺<rt>むしさ</rt></ruby>されの<ruby>薬<rt>くすり</rt></ruby>はどこですか？", en: "Where is the medicine for insect bites?", speech: "むしさされのくすりはどこですか", faIcon: "fa-bug" },
+            { text: "<ruby>湿布<rt>しっぷ</rt></ruby>はありますか？", en: "Do you have pain relief patches?", speech: "しっぷはありますか", faIcon: "fa-note-sticky" },
+            { text: "<ruby>絆創膏<rt>ばんそうこう</rt></ruby>はどこですか？", en: "Where are the band-aids?", speech: "ばんそうこうはどこですか", faIcon: "fa-bandage" },
             { text: "マスクをください", en: "I'd like a mask, please.", speech: "ますくをください", faIcon: "fa-mask-face" }
         ]
     },
     {
         title: "緊急・助け (Emergency & Help)", icon: "fa-bell", class: "",
         phrases: [
-            { text: "助けて！", en: "Help!", speech: "たすけて", faIcon: "fa-hand-holding-hand" },
-            { text: "救急車を呼んでください", en: "Please call an ambulance.", speech: "きゅうきゅうしゃをよんでください", faIcon: "fa-truck-medical" },
-            { text: "警察を呼んでください", en: "Please call the police.", speech: "けいさつをよんでください", faIcon: "fa-building-shield" },
-            { text: "病院に行きたいです", en: "I want to go to a hospital.", speech: "びょういんにいきたいです", faIcon: "fa-hospital" }
+            { text: "<ruby>助<rt>たす</rt></ruby>けて！", en: "Help!", speech: "たすけて", faIcon: "fa-hand-holding-hand" },
+            { text: "<ruby>救急車<rt>きゅうきゅうしゃ</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>んでください", en: "Please call an ambulance.", speech: "きゅうきゅうしゃをよんでください", faIcon: "fa-truck-medical" },
+            { text: "<ruby>警察<rt>けいさつ</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>んでください", en: "Please call the police.", speech: "けいさつをよんでください", faIcon: "fa-building-shield" },
+            { text: "<ruby>病院<rt>びょういん</rt></ruby>に<ruby>行<rt>い</rt></ruby>きたいです", en: "I want to go to a hospital.", speech: "びょういんにいきたいです", faIcon: "fa-hospital" }
         ]
     },
     {
         title: "トラブル・紛失 (Trouble & Lost)", icon: "fa-passport", class: "",
         phrases: [
             { text: "パスポートをなくしました", en: "I lost my passport.", speech: "ぱすぽーとをなくしました", faIcon: "fa-passport" },
-            { text: "財布を落としました", en: "I dropped my wallet.", speech: "さいふをおとしました", faIcon: "fa-wallet" },
-            { text: "カバンを盗まれました", en: "My bag was stolen.", speech: "かばんをぬすまれました", faIcon: "fa-suitcase-rolling" },
-            { text: "道に迷いました", en: "I am lost.", speech: "みちにまよいました", faIcon: "fa-map-location-dot" }
+            { text: "<ruby>財布<rt>さいふ</rt></ruby>を<ruby>落<rt>お</rt></ruby>としました", en: "I dropped my wallet.", speech: "さいふをおとしました", faIcon: "fa-wallet" },
+            { text: "カバンを<ruby>盗<rt>ぬす</rt></ruby>まれました", en: "My bag was stolen.", speech: "かばんをぬすまれました", faIcon: "fa-suitcase-rolling" },
+            { text: "<ruby>道<rt>みち</rt></ruby>に<ruby>迷<rt>まよ</rt></ruby>いました", en: "I am lost.", speech: "みちにまよいました", faIcon: "fa-map-location-dot" }
         ]
     }
 ];
 
-// ゲームで判定を緩くするためのデータ
+// ゲームデータにもフリガナ（rubyタグ）を追加
 const gameData = {
     pharmacy: {
         title: "症状・薬局",
         color: "#2e7d32",
         questions: [
-            { situation: "You have a headache.", target: "頭が痛いです", accepts: ["あたまがいたいです"] },
-            { situation: "You have a stomachache.", target: "お腹が痛いです", accepts: ["おなかがいたいです"] },
-            { situation: "You have a cough.", target: "咳が出ます", accepts: ["せきがでます", "せきがでています"] },
+            { situation: "You have a headache.", target: "<ruby>頭<rt>あたま</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", accepts: ["あたまがいたいです"] },
+            { situation: "You have a stomachache.", target: "お<ruby>腹<rt>なか</rt></ruby>が<ruby>痛<rt>いた</rt></ruby>いです", accepts: ["おなかがいたいです"] },
+            { situation: "You have a cough.", target: "<ruby>咳<rt>せき</rt></ruby>が<ruby>出<rt>で</rt></ruby>ます", accepts: ["せきがでます", "せきがでています"] },
             { situation: "You feel dizzy.", target: "めまいがします", accepts: ["めまいがします"] },
-            { situation: "Ask for a painkiller.", target: "痛み止めをください", accepts: ["いたみどめをください", "いたみどめください"] },
-            { situation: "Ask for stomach medicine.", target: "胃薬をください", accepts: ["いぐすりをください", "いぐすりください"] },
-            { situation: "Ask if they have eye drops.", target: "目薬はありますか？", accepts: ["めぐすりはありますか", "めぐすりありますか"] },
-            { situation: "Ask for motion sickness medicine.", target: "酔い止めをください", accepts: ["よいどめをください", "よいどめください"] }
+            { situation: "Ask for a painkiller.", target: "<ruby>痛<rt>いた</rt></ruby>み<ruby>止<rt>ど</rt></ruby>めをください", accepts: ["いたみどめをください", "いたみどめください"] },
+            { situation: "Ask for stomach medicine.", target: "<ruby>胃薬<rt>いぐすり</rt></ruby>をください", accepts: ["いぐすりをください", "いぐすりください"] },
+            { situation: "Ask if they have eye drops.", target: "<ruby>目薬<rt>めぐすり</rt></ruby>はありますか？", accepts: ["めぐすりはありますか", "めぐすりありますか"] },
+            { situation: "Ask for motion sickness medicine.", target: "<ruby>酔<rt>よ</rt></ruby>い<ruby>止<rt>ど</rt></ruby>めをください", accepts: ["よいどめをください", "よいどめください"] }
         ]
     },
     emergency: {
         title: "緊急・トラブル",
         color: "#d32f2f",
         questions: [
-            { situation: "Ask for help!", target: "助けて！", accepts: ["たすけて", "たすけてください"] },
-            { situation: "Ask someone to call an ambulance.", target: "救急車を呼んでください", accepts: ["きゅうきゅうしゃをよんでください"] },
-            { situation: "Ask someone to call the police.", target: "警察を呼んでください", accepts: ["けいさつをよんでください"] },
+            { situation: "Ask for help!", target: "<ruby>助<rt>たす</rt></ruby>けて！", accepts: ["たすけて", "たすけてください"] },
+            { situation: "Ask someone to call an ambulance.", target: "<ruby>救急車<rt>きゅうきゅうしゃ</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>んでください", accepts: ["きゅうきゅうしゃをよんでください"] },
+            { situation: "Ask someone to call the police.", target: "<ruby>警察<rt>けいさつ</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>んでください", accepts: ["けいさつをよんでください"] },
             { situation: "You lost your passport.", target: "パスポートをなくしました", accepts: ["ぱすぽーとをなくしました"] },
-            { situation: "You dropped your wallet.", target: "財布を落としました", accepts: ["さいふをおとしました"] },
-            { situation: "You are lost.", target: "道に迷いました", accepts: ["みちにまよいました"] }
+            { situation: "You dropped your wallet.", target: "<ruby>財布<rt>さいふ</rt></ruby>を<ruby>落<rt>お</rt></ruby>としました", accepts: ["さいふをおとしました"] },
+            { situation: "You are lost.", target: "<ruby>道<rt>みち</rt></ruby>に<ruby>迷<rt>まよ</rt></ruby>いました", accepts: ["みちにまよいました"] }
         ]
     }
 };
@@ -362,18 +374,15 @@ window.goBack = () => {
     }
 };
 
-// 修正: ホームボタンと戻るボタンの表示切り替えロジック
 function updateHeader() {
     const backBtn = document.getElementById('header-back-btn');
     const homeBtn = document.getElementById('header-home-btn');
     const current = historyStack[historyStack.length - 1];
     
     if (current === 'screen-learning') {
-        // 学習画面（最初の画面）の時はホームボタンを表示
         backBtn.style.display = 'none';
         if (homeBtn) homeBtn.style.display = 'block';
     } else {
-        // それ以外の画面（モード選択やゲーム中）の時は戻るボタンを表示
         backBtn.style.display = 'block';
         if (homeBtn) homeBtn.style.display = 'none';
     }
@@ -390,7 +399,6 @@ function renderLearning() {
         
         let phrasesHtml = '';
         cat.phrases.forEach(phrase => {
-            // テキスト、アイコン(faIcon)、再生ボタンの順に並べる
             phrasesHtml += `
                 <div class="phrase-item">
                     <div class="phrase-text-group">
@@ -400,7 +408,7 @@ function renderLearning() {
                     <div class="phrase-icon-box">
                         <i class="fa-solid ${phrase.faIcon}"></i>
                     </div>
-                    <button class="play-btn" onclick="speakText('${phrase.speech || phrase.text}')">
+                    <button class="play-btn" onclick="speakText('${phrase.speech || stripRuby(phrase.text)}')">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 </div>`;
@@ -418,7 +426,7 @@ window.speakText = (text) => {
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP';
-    utter.rate = 0.85; // 少しゆっくりめに発音
+    utter.rate = 0.85; 
     synth.speak(utter);
 };
 
@@ -431,11 +439,9 @@ window.startGame = (type) => {
     currentGameType = type;
     currentQuestionIndex = 0;
     
-    // UIの色をモードに合わせて変更
     document.getElementById('player-area-box').style.borderColor = gameData[type].color;
     document.getElementById('target-phrase').style.color = gameData[type].color;
 
-    // シャッフルして出題
     gameData[type].questions.sort(() => Math.random() - 0.5);
 
     showScreen('screen-game');
@@ -449,7 +455,9 @@ function loadQuestion() {
     
     document.getElementById('game-progress').textContent = `(${currentQuestionIndex + 1}/${qList.length})`;
     document.getElementById('situation-text').textContent = qData.situation;
-    document.getElementById('target-phrase').textContent = qData.target;
+    
+    // HTMLとしてレンダリングするため、textContentではなくinnerHTMLを使用
+    document.getElementById('target-phrase').innerHTML = qData.target;
     
     document.getElementById('feedback-text').textContent = "";
     document.getElementById('recognized-text').textContent = "";
@@ -503,10 +511,10 @@ if (recognition) {
     };
 }
 
-// カンマやスペースを削除して比較するための関数
+// カンマやスペース、さらにHTMLタグ(ルビ)を削除して比較する関数
 function calculateSimilarity(s1, s2) {
-    const cleanS1 = s1.toLowerCase().replace(/[\s、。！？!?,，]/g, '');
-    const cleanS2 = s2.toLowerCase().replace(/[\s、。！？!?,，]/g, '');
+    const cleanS1 = stripRuby(s1).toLowerCase().replace(/[\s、。！？!?,，]/g, '');
+    const cleanS2 = stripRuby(s2).toLowerCase().replace(/[\s、。！？!?,，]/g, '');
     
     if (cleanS1 === cleanS2) return 100;
     if (cleanS1.length === 0 || cleanS2.length === 0) return 0;
