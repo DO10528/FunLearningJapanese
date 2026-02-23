@@ -14,7 +14,7 @@
 --text-color: #333;
 --success: #4caf50;
 --error: #f44336;
---jissen-color: #673ab7; /* 実践モード用の特別な色 */
+--jissen-color: #673ab7; 
 }
 
 body {
@@ -104,9 +104,8 @@ position: relative; border: 4px solid var(--primary);
 .target-label { font-size: 0.9em; color: #777; font-weight: bold; margin-bottom: 10px; }
 .target-phrase { font-size: 1.6em; font-weight: 900; color: var(--primary); margin-bottom: 30px; line-height: 1.4; }
 
-/* 実践モード用の「非表示」スタイル */
-.mode-jissen .target-phrase { display: none; }
-.mode-jissen .target-label { font-size: 1.1em; color: var(--jissen-color); }
+/* じっせんモードでお手本を消す */
+.mode-jissen .target-phrase { display: none !important; }
 
 .mic-btn {
 width: 80px; height: 80px; border-radius: 50%; border: none;
@@ -204,6 +203,7 @@ let text = htmlString.replace(/<rt>.*?<\/rt>/g, '');
 return text.replace(/<[^>]*>/g, '');
 }
 
+// --- 練習用の全データ ---
 const learningData = [
 {
 title: "基本・書類 (Basics)", icon: "fa-passport",
@@ -226,7 +226,6 @@ phrases: [
 { text: "<ruby>5日間<rt>いつかかん</rt></ruby>です", en: "For 5 days.", speech: "いつかかんです" },
 { text: "<ruby>1週間<rt>いっしゅうかん</rt></ruby>です", en: "For 1 week.", speech: "いっしゅうかんです" },
 { text: "<ruby>2週間<rt>にしゅうかん</rt></ruby>です", en: "For 2 weeks.", speech: "にしゅうかんです" },
-{ text: "<ruby>14日間<rt>じゅうよっかかん</rt></ruby>です", en: "For 14 days.", speech: "じゅうよっかかんです" },
 { text: "<ruby>1ヶ月<rt>いっかげつ</rt></ruby>です", en: "For 1 month.", speech: "いっかげつです" }
 ]
 },
@@ -235,13 +234,9 @@ title: "滞在先 (Accommodation)", icon: "fa-hotel",
 phrases: [
 { text: "<ruby>東京<rt>とうきょう</rt></ruby>のホテルです", en: "A hotel in Tokyo.", speech: "とうきょうのほてるです" },
 { text: "<ruby>大阪<rt>おおさか</rt></ruby>のホテルです", en: "A hotel in Osaka.", speech: "おおさかのほてるです" },
-{ text: "<ruby>京都<rt>きょうと</rt></ruby>のホテルです", en: "A hotel in Kyoto.", speech: "きょうとのほてるです" },
-{ text: "<ruby>友達<rt>ともだち</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>です", en: "My friend's house.", speech: "ともだちのいえです" },
-{ text: "<ruby>親戚<rt>しんせき</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>です", en: "Relative's house.", speech: "しんせきのいえです" },
 { text: "Airbnbです", en: "Airbnb.", speech: "えあびーあんどびーです" },
-{ text: "ゲストハウスです", en: "Guest house.", speech: "げすとはうすです" },
+{ text: "<ruby>友達<rt>ともだち</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>です", en: "My friend's house.", speech: "ともだちのいえです" },
 { text: "<ruby>新宿<rt>しんじゅく</rt></ruby>に<ruby>泊<rt>と</rt></ruby>まります", en: "I stay in Shinjuku.", speech: "しんじゅくにとまります" },
-{ text: "<ruby>渋谷<rt>しぶや</rt></ruby>に<ruby>泊<rt>と</rt></ruby>まります", en: "I stay in Shibuya.", speech: "しぶやにとまります" },
 { text: "<ruby>名古屋<rt>なごや</rt></ruby>のホテルです", en: "Hotel in Nagoya.", speech: "なごやのほてるです" }
 ]
 },
@@ -249,65 +244,38 @@ phrases: [
 title: "同伴者 (Companions)", icon: "fa-users",
 phrases: [
 { text: "<ruby>一人<rt>ひとり</rt></ruby>です", en: "I am alone.", speech: "ひとりです" },
-{ text: "<ruby>家族<rt>かぞく</rt></ruby>と<ruby>来<rt>き</rt></ruby>ました", en: "I came with my family.", speech: "かぞくときました" },
-{ text: "<ruby>友達<rt>ともだち</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>です", en: "I am with my friend.", speech: "ともだちといっしょです" }
+{ text: "<ruby>家族<rt>かぞく</rt></ruby>と<ruby>来<rt>き</rt></ruby>ました", en: "I came with my family.", speech: "かぞくときました" }
 ]
 },
 {
-title: "税関・所持金 (Customs & Money)", icon: "fa-money-bill-wave",
+title: "税関・所持金 (Customs)", icon: "fa-money-bill-wave",
 phrases: [
 { text: "ありません", en: "I have nothing to declare.", speech: "ありません" },
-{ text: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", en: "About 100,000 yen.", speech: "じゅうまんえんくらいです" },
-{ text: "<ruby>20万円<rt>にじゅうまんえん</rt></ruby>くらいです", en: "About 200,000 yen.", speech: "にじゅうまんえんくらいです" },
-{ text: "クレジットカードです", en: "I have a credit card.", speech: "くれじっとかーどです" },
-{ text: "VISAカードです", en: "I have a VISA card.", speech: "びざかーどです" },
-{ text: "トラベルカードです", en: "I have a travel card.", speech: "とらべるかーどです" }
+{ text: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", en: "About 100,000 yen.", speech: "じゅうまんえんくらいです" }
 ]
 }
 ];
-
-// ゲームデータにもフリガナ（rubyタグ）を追加
-const gameData = {
-immigration: {
-title: "入国審査",
-questions: [
-{ examiner: "パスポートを<ruby>見<rt>み</rt></ruby>せてください。", target: "はい、どうぞ", accepts: ["はいどうぞ", "はい"] },
-{ examiner: "<ruby>目的<rt>もくてき</rt></ruby>は<ruby>何<rt>なん</rt></ruby>ですか？", target: "<ruby>観光<rt>かんこう</rt></ruby>です", accepts: ["かんこうです"] },
-{ examiner: "どのくらい<ruby>滞在<rt>たいざい</rt></ruby>しますか？", target: "<ruby>2週間<rt>にしゅうかん</rt></ruby>です", accepts: ["にしゅうかんです", "2しゅうかんです"] },
-{ examiner: "どこに<ruby>泊<rt>と</rt></ruby>まりますか？", target: "<ruby>東京<rt>とうきょう</rt></ruby>のホテルです", accepts: ["とうきょうのほてるです"] },
-{ examiner: "<ruby>誰<rt>だれ</rt></ruby>と<ruby>来<rt>き</rt></ruby>ましたか？", target: "<ruby>家族<rt>かぞく</rt></ruby>と<ruby>来<rt>き</rt></ruby>ました", accepts: ["かぞくときました"] }
-]
-},
-customs: {
-title: "税関",
-questions: [
-{ examiner: "<ruby>申告<rt>しんこく</rt></ruby>するものはありますか？", target: "ありません", accepts: [] },
-{ examiner: "<ruby>所持金<rt>しょじきん</rt></ruby>はいくらですか？", target: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", accepts: ["じゅうまんえんくらいです", "十万円くらいです", "100000円くらいです", "100,000円くらいです"] },
-{ examiner: "<ruby>他<rt>ほか</rt></ruby>に<ruby>支払<rt>しはら</rt></ruby>いのカードはありますか？", target: "VISAカードです", accepts: ["びざかーどです", "クレジットカードです", "visaかーどです", "visaカードです"] },
-{ examiner: "カバンの<ruby>中身<rt>なかみ</rt></ruby>を<ruby>見<rt>み</rt></ruby>せてください。", target: "はい、わかりました", accepts: ["はいわかりました", "はい"] }
-]
-}
-};
 
 const gameData = {
 immigration: {
 title: "入国審査", color: "#1976d2",
 questions: [
-{ examiner: "<ruby>目的<rt>もくてき</rt></ruby>は<ruby>何<rt>なん</rt></ruby>ですか？", target: "<ruby>観光<rt>かんこう</rt></ruby>です", accepts: ["かんこうです", "りょこうです", "あそびにきました"] }
+{ examiner: "パスポートを<ruby>見<rt>み</rt></ruby>せてください。", target: "はい、どうぞ", accepts: ["はいどうぞ", "はい", "これです"] },
+{ examiner: "<ruby>目的<rt>もくてき</rt></ruby>は何ですか？", target: "<ruby>観光<rt>かんこう</rt></ruby>です", accepts: ["かんこうです", "りょこうです", "あそびにきました"] }
 ]
 },
 customs: {
 title: "税関", color: "#1976d2",
 questions: [
-{ examiner: "<ruby>所持金<rt>しょじきん</rt></ruby>はいくらですか？", target: "<ruby>10万円<rt>じゅうまんえん</rt></ruby>くらいです", accepts: ["じゅうまんえんくらいです", "10まんえんです", "100000えんくらいです"] }
+{ examiner: "<ruby>申告<rt>しんこく</rt></ruby>するものはありますか？", target: "ありません", accepts: ["ないです", "いいえ"] }
 ]
 },
 jissen: {
 title: "じっせんゲーム", color: "#673ab7",
 questions: [
-{ examiner: "<ruby>目的<rt>もくてき</rt></ruby>は何ですか？", target: "(自分で答えてね)", accepts: ["かんこうです", "りょこうです", "しごとです", "あそびにきました", "べんきょうです", "りゅうがくです"] },
-{ examiner: "どこに<ruby>泊<rt>と</rt></ruby>まりますか？", target: "(自分で答えてね)", accepts: ["ほてるです", "ともだちのいえです", "えあびーです", "とうきょうです", "おおさかです", "しんじゅくにとまります"] },
-{ examiner: "どのくらい<ruby>滞在<rt>たいざい</rt></ruby>しますか？", target: "(自分で答えてね)", accepts: ["いつかかんです", "1しゅうかんです", "2しゅうかんです", "にしゅうかんです", "1かげつです"] }
+{ examiner: "<ruby>目的<rt>もくてき</rt></ruby>は何ですか？", target: "(自分で答えてね)", accepts: ["かんこうです", "りょこうです", "しごとです", "べんきょうです", "あそびにきました"] },
+{ examiner: "どこに<ruby>泊<rt>と</rt></ruby>まりますか？", target: "(自分で答えてね)", accepts: ["ほてるです", "ともだちのいえです", "えあびーです", "しんじゅくにとまります", "なごやのほてるです"] },
+{ examiner: "どのくらい<ruby>滞在<rt>たいざい</rt></ruby>しますか？", target: "(自分で答えてね)", accepts: ["いつかかんです", "1しゅうかんです", "2しゅうかんです", "1かげつです"] }
 ]
 }
 };
@@ -386,13 +354,12 @@ if (!SpeechRecognition) { alert("音声認識非対応です"); return; }
 currentGameType = type;
 currentQuestionIndex = 0;
 
-// 実践モードかどうかのクラスを付与
-const playerBox = document.getElementById('player-box');
+const screenGame = document.getElementById('screen-game');
 if (type === 'jissen') {
-playerBox.parentElement.classList.add('mode-jissen');
+screenGame.classList.add('mode-jissen');
 document.getElementById('label-text').textContent = "ヒントなし！自分で答えてね";
 } else {
-playerBox.parentElement.classList.remove('mode-jissen');
+screenGame.classList.remove('mode-jissen');
 document.getElementById('label-text').textContent = "お手本を読んでね";
 }
 
@@ -464,18 +431,17 @@ function checkAnswer(transcript) {
 const qData = gameData[currentGameType].questions[currentQuestionIndex];
 const fbText = document.getElementById('feedback-text');
 
-// 全ての許容パターン(accepts)と比較して一番高い一致率を採用
 let maxSim = 0;
 qData.accepts.forEach(acc => {
 const sim = calculateSimilarity(transcript, acc);
 if (sim > maxSim) maxSim = sim;
 });
-
-// 通常のお手本とも比較
 const targetSim = calculateSimilarity(transcript, qData.target);
 if (targetSim > maxSim) maxSim = targetSim;
 
-if (maxSim >= 85) { // ヒントなしなので少しだけ基準を下げて柔軟に
+const threshold = (currentGameType === 'jissen') ? 80 : 85;
+
+if (maxSim >= threshold) { 
 fbText.textContent = "合格！ (Excellent)";
 fbText.className = "feedback-text fb-success";
 speakText("ピンポーン！");
