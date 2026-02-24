@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         body {
@@ -33,11 +34,13 @@
             border: 3px solid #80deea;
         }
         
-        .tc-screen { display: none; }
+        .tc-screen { display: none; animation: fadeIn 0.3s ease; }
         .tc-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         h1, h2 { text-align: center; color: #00838f; }
-        h1 { font-size: 2.2em; }
-        h2 { font-size: 1.8em; }
+        h1 { font-size: 2.2em; margin-bottom: 20px; }
+        h2 { font-size: 1.8em; margin-bottom: 20px; }
         p { text-align: center; font-size: 1.1em; }
 
         /* --- ボタン共通 --- */
@@ -55,6 +58,14 @@
         .tc-button:active { top: 3px; box-shadow: 0 2px 0 #00838f; }
         .tc-button-secondary { background-color: #90a4ae; box-shadow: 0 5px 0 #546e7a; }
         .tc-button-secondary:active { top: 3px; box-shadow: 0 2px 0 #546e7a; }
+
+        /* モード選択ボタンの色分け */
+        .btn-game1 { background-color: #ff9f43; box-shadow: 0 5px 0 #d35400; }
+        .btn-game1:active { box-shadow: 0 2px 0 #d35400; }
+        .btn-game2 { background-color: #1dd1a1; box-shadow: 0 5px 0 #01a3a4; }
+        .btn-game2:active { box-shadow: 0 2px 0 #01a3a4; }
+        .btn-game3 { background-color: #ff6b81; box-shadow: 0 5px 0 #c0392b; }
+        .btn-game3:active { box-shadow: 0 2px 0 #c0392b; }
 
         /* --- フィードバック --- */
         #tc-feedback {
@@ -80,38 +91,23 @@
         .tc-study-item:hover { transform: scale(1.05); }
         .tc-study-item span { font-size: 1.4em; display: block; }
         .tc-study-item p { font-size: 1.1em; margin: 5px 0 0 0; }
-        .tc-study-item.type-fun {
-            background: #e0f7fa; border-color: #00bcd4; color: #00838f;
-        }
-        .tc-study-item.type-pun {
-            background: #fff8e1; border-color: #ffb300; color: #e65100;
-        }
-        .tc-study-item.type-han {
-            background: #e8f5e9; border-color: #4caf50; color: #1b5e20;
-            grid-column: 1 / -1; font-size: 1.2em;
-        }
+        .tc-study-item.type-fun { background: #e0f7fa; border-color: #00bcd4; color: #00838f; }
+        .tc-study-item.type-pun { background: #fff8e1; border-color: #ffb300; color: #e65100; }
+        .tc-study-item.type-han { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; grid-column: 1 / -1; font-size: 1.2em; }
 
         /* --- 2. クイズスクリーン --- */
         #tc-quiz-prompt-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            min-height: 200px; 
-        }
-        
-        /* クイズA (音声) の再生ボタン */
-        #tc-play-sound-button {
-            font-size: 4em; width: 120px; height: 120px; padding: 0;
-            border-radius: 50%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            margin-bottom: 20px; min-height: 200px; 
         }
 
-        /* クイズB (アナログ時計) */
+        /* アナログ時計のスタイル */
         .tc-clock-face {
             width: 200px; height: 200px; position: relative; 
             background-image: url('assets/images/clocks/clock_face_base.png');
             background-size: contain; background-repeat: no-repeat;
-            background-position: center;
+            background-position: center; margin: 0 auto;
         }
         .tc-hand {
             position: absolute; top: 50%; left: 50%; 
@@ -141,64 +137,34 @@
         }
         
         .tc-option-button {
-            padding: 15px 10px;
-            font-size: 1.2em; 
-            font-weight: 700;
-            background-color: #fff;
-            color: #00838f;
-            border: 4px solid #b2ebf2;
-            border-radius: 15px;
-            box-shadow: none; 
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            top: 0;
+            padding: 15px 10px; font-size: 1.2em; font-weight: 700;
+            background-color: #fff; color: #00838f;
+            border: 4px solid #b2ebf2; border-radius: 15px;
+            box-shadow: none; cursor: pointer; transition: all 0.2s ease;
+            position: relative; top: 0;
         }
-        .tc-option-button:hover {
-            background-color: #e0f7fa;
-            transform: scale(1.05);
-        }
-        .tc-option-button:active {
-             top: 0px; 
-             transform: scale(0.98);
-        }
+        .tc-option-button:hover { background-color: #e0f7fa; transform: scale(1.05); }
+        .tc-option-button:active { top: 0px; transform: scale(0.98); }
 
-        /* クイズB (デジタル + 日本語) */
-        .tc-option-text-button span {
-            display: block;
-            font-size: 1.3em;
-            color: #006064;
-            margin-bottom: 5px;
-        }
-        
-        /* クイズA (デジタルのみ) */
-        .tc-option-digital-button {
-            font-size: 1.8em;
-            font-weight: 800;
-            padding: 25px 10px;
-        }
+        .tc-option-text-button span { display: block; font-size: 1.3em; color: #006064; margin-bottom: 5px; }
+        .tc-option-digital-button { font-size: 1.8em; font-weight: 800; padding: 25px 10px; }
 
-        .tc-option.correct {
-            border-color: #00bcd4;
-            background-color: #e0f7fa;
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #00bcd4;
+        .tc-option.correct { border-color: #00bcd4; background-color: #e0f7fa; transform: scale(1.05); box-shadow: 0 0 15px #00bcd4; }
+        .tc-option.incorrect { border-color: #d9534f; background-color: #fbe9e7; opacity: 0.6; }
+        .tc-option.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* ゲーム3用マイクUI */
+        .mic-btn {
+            width: 90px; height: 90px; border-radius: 50%; border: none;
+            background: #ff6b81; color: white; font-size: 2.5em;
+            box-shadow: 0 6px 0 #c0392b; cursor: pointer; transition: 0.1s;
+            margin: 10px auto; display: flex; justify-content: center; align-items: center;
         }
-        .tc-option.incorrect {
-            border-color: #d9534f;
-            background-color: #fbe9e7;
-            opacity: 0.6;
-        }
-        .tc-option.disabled {
-            pointer-events: none;
-            opacity: 0.7;
-        }
+        .mic-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .mic-btn.listening { animation: pulse 1s infinite; background: #ff4757; box-shadow: none; transform: translateY(6px); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
         
-        /* 認証ステータスのスタイル */
-        #auth-status-tc2 {
-            text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: #00838f;
-        }
-        
+        #auth-status-tc2 { text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: #00838f; }
 
         @media (max-width: 400px) {
             #tc-study-grid { grid-template-columns: repeat(2, 1fr); }
@@ -217,25 +183,42 @@
         <div id="tc-screen-study" class="tc-screen active">
             <h1>「ふん」と「ぷん」</h1>
             <p>タップして おと を きいてね。</p>
-            <div id="tc-study-grid">
-                </div>
-            <button id="tc-start-quiz-button" class="tc-button">クイズを はじめる</button>
+            <div id="tc-study-grid"></div>
+            <button id="tc-btn-to-modes" class="tc-button">ゲームを はじめる</button>
             <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+        </div>
+
+        <div id="tc-screen-modes" class="tc-screen">
+            <h2>どのゲームであそぶ？</h2>
+            <button class="tc-button btn-game1" onclick="startSpecificQuiz(1)">
+                <i class="fa-solid fa-ear-listen"></i> ゲーム1：きいて えらぼう
+            </button>
+            <button class="tc-button btn-game2" onclick="startSpecificQuiz(2)">
+                <i class="fa-solid fa-eye"></i> ゲーム2：みて えらぼう
+            </button>
+            <button class="tc-button btn-game3" onclick="startSpecificQuiz(3)">
+                <i class="fa-solid fa-microphone"></i> ゲーム3：はなしてみよう
+            </button>
+            <button class="tc-button tc-button-secondary" onclick="showScreen(document.getElementById('tc-screen-study'))">べんきょう に もどる</button>
         </div>
 
         <div id="tc-screen-quiz" class="tc-screen">
             <h2 id="tc-quiz-title">この とけい は なんじ？</h2>
             
-            <div id="tc-quiz-prompt-area">
-                </div>
+            <div id="tc-quiz-prompt-area"></div>
+            <div id="tc-quiz-options"></div>
             
-            <div id="tc-quiz-options">
-                </div>
+            <div id="tc-quiz3-area" style="display:none; text-align:center;">
+                <div id="quiz3-instruction" style="font-size:1.2em; font-weight:bold; margin-bottom:10px; color:#00838f;"></div>
+                <button id="tc-mic-btn" class="mic-btn" onclick="toggleMic()">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div id="quiz3-transcript" style="color:#666; font-size:0.9em; margin-top:5px; font-weight:bold;"></div>
+            </div>
             
             <div id="tc-feedback"></div>
             
-            <button id="tc-back-to-study-button" class="tc-button tc-button-secondary">べんきょう に もどる</button>
-            <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+            <button class="tc-button tc-button-secondary" onclick="showScreen(document.getElementById('tc-screen-modes'))">ゲームを えらぶ</button>
         </div>
 
     </div>
@@ -244,13 +227,10 @@
     <audio id="tc-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
 
     <script type="module">
-        // 1. Firebase SDKのインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-        // 2. あなたのFirebase設定 (index.htmlなどからコピー)
         const firebaseConfig = {
           apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
           authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -261,7 +241,6 @@
           measurementId: "G-LCMXVLPS81"
         };
 
-        // 3. Firebaseサービスの初期化とグローバル変数
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -269,10 +248,6 @@
         window.currentUserId = null;
         const authStatusEl = document.getElementById('auth-status-tc2');
         
-        // ポイントルール: 各問題の正解で1ポイント
-        const POINTS_PER_QUESTION = 1; 
-        
-        // 4. 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUserId = user.uid;
@@ -290,29 +265,12 @@
             }
         });
 
-
-        /**
-         * ポイント加算関数 (Firestoreに記録)
-         * @param {number} points - 加算するポイント数
-         * @returns {Promise<boolean>} 成功/失敗
-         */
         window.addPointsToUser = async function(points, timeKey) { 
-            if (!window.currentUserId || points <= 0) {
-                return false;
-            }
-            
+            if (!window.currentUserId || points <= 0) return false;
             try {
                 const userRef = doc(db, "users", window.currentUserId);
-                const progressKey = `clock_time_level2_${timeKey}`; // 時と分のキー
-
-                // 2. ポイントを加算
-                await updateDoc(userRef, {
-                    points: increment(points) 
-                });
-                
-                console.log(`${points} ポイントを Firestore に加算しました (キー: ${timeKey})。`);
+                await updateDoc(userRef, { points: increment(points) });
                 return true;
-
             } catch (e) {
                 console.error("ポイント更新エラー:", e);
                 return false;
@@ -321,97 +279,96 @@
     </script>
     
     <script>
+        // AI音声の準備
+        const synth = window.speechSynthesis;
+        function speakText(text) {
+            if (synth.speaking) synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ja-JP';
+            utter.rate = 0.9; 
+            synth.speak(utter);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ----------------------------------------------------
-            // ★★★ Firebase連携ポイント関数を再定義 (ダミー/定数) ★★★
-            // モジュールロードが遅れた場合のエラー回避のためのダミー関数
             if (typeof window.addPointsToUser !== 'function') {
                 window.addPointsToUser = async () => { return false; };
             }
-            const POINTS_PER_QUESTION = 1; // Firebase連携スクリプトと同期
-            // ----------------------------------------------------
+            const POINTS_PER_QUESTION = 1;
 
-            // ----------------------------------------------------
-            // データ定義
-            // ----------------------------------------------------
-            const SOUND_PATH_HOURS = 'assets/sounds/hours/';
-            const SOUND_PATH_MINUTES = 'assets/sounds/minutes/';
-
+            // --- データ定義 (accepts追加) ---
             const hourData = [
-                { hour: 1, text: 'いちじ', sound: '1ji.mp3' },
-                { hour: 2, text: 'にじ', sound: '2ji.mp3' },
-                { hour: 3, text: 'さんじ', sound: '3ji.mp3' },
-                { hour: 4, text: 'よじ', sound: '4ji.mp3' }, 
-                { hour: 5, text: 'ごじ', sound: '5ji.mp3' },
-                { hour: 6, text: 'ろくじ', sound: '6ji.mp3' },
-                { hour: 7, text: 'しちじ', sound: '7ji.mp3' }, 
-                { hour: 8, text: 'はちじ', sound: '8ji.mp3' },
-                { hour: 9, text: 'くじ', sound: '9ji.mp3' }, 
-                { hour: 10, text: 'じゅうじ', sound: '10ji.mp3' },
-                { hour: 11, text: 'じゅういちじ', sound: '11ji.mp3' },
-                { hour: 12, text: 'じゅうにじ', sound: '12ji.mp3' }
+                { hour: 1, text: 'いちじ', accepts: ['いちじ', '1時', '一時'] },
+                { hour: 2, text: 'にじ', accepts: ['にじ', '2時', '二時'] },
+                { hour: 3, text: 'さんじ', accepts: ['さんじ', '3時', '三時'] },
+                { hour: 4, text: 'よじ', accepts: ['よじ', '4時', '四時', 'よんじ'] }, 
+                { hour: 5, text: 'ごじ', accepts: ['ごじ', '5時', '五時'] },
+                { hour: 6, text: 'ろくじ', accepts: ['ろくじ', '6時', '六時'] },
+                { hour: 7, text: 'しちじ', accepts: ['しちじ', '7時', '七時', 'ななじ'] }, 
+                { hour: 8, text: 'はちじ', accepts: ['はちじ', '8時', '八時'] },
+                { hour: 9, text: 'くじ', accepts: ['くじ', '9時', '九時', 'きゅうじ'] }, 
+                { hour: 10, text: 'じゅうじ', accepts: ['じゅうじ', '10時', '十時'] },
+                { hour: 11, text: 'じゅういちじ', accepts: ['じゅういちじ', '11時', '十一時'] },
+                { hour: 12, text: 'じゅうにじ', accepts: ['じゅうにじ', '12時', '十二時'] }
             ];
             const minuteData = [
-                { min: 5, text: 'ごふん', sound: '5fun.mp3', type: 'fun' },
-                { min: 10, text: 'じゅっぷん', sound: '10pun.mp3', type: 'pun' },
-                { min: 15, text: 'じゅうごふん', sound: '15fun.mp3', type: 'fun' },
-                { min: 20, text: 'にじゅっぷん', sound: '20pun.mp3', type: 'pun' },
-                { min: 25, text: 'にじゅうごふん', sound: '25fun.mp3', type: 'fun' },
-                { min: 30, text: 'さんじゅっぷん', sound: '30pun.mp3', type: 'pun' },
-                { min: 35, text: 'さんじゅうごふん', sound: '35fun.mp3', type: 'fun' },
-                { min: 40, text: 'よんじゅっぷん', sound: '40pun.mp3', type: 'pun' },
-                { min: 45, text: 'よんじゅうごふん', sound: '45fun.mp3', type: 'fun' },
-                { min: 50, text: 'ごじゅっぷん', sound: '50pun.mp3', type: 'pun' },
-                { min: 55, text: 'ごじゅうごふん', sound: '55fun.mp3', type: 'fun' }
+                { min: 5, text: 'ごふん', type: 'fun', accepts: ['ごふん', '5分', '五分'] },
+                { min: 10, text: 'じゅっぷん', type: 'pun', accepts: ['じゅっぷん', 'じっぷん', '10分', '十分'] },
+                { min: 15, text: 'じゅうごふん', type: 'fun', accepts: ['じゅうごふん', '15分', '十五分'] },
+                { min: 20, text: 'にじゅっぷん', type: 'pun', accepts: ['にじゅっぷん', 'にじっぷん', '20分', '二十分'] },
+                { min: 25, text: 'にじゅうごふん', type: 'fun', accepts: ['にじゅうごふん', '25分', '二十五分'] },
+                { min: 30, text: 'さんじゅっぷん', type: 'pun', accepts: ['さんじゅっぷん', 'さんじっぷん', '30分', '三十分'] },
+                { min: 35, text: 'さんじゅうごふん', type: 'fun', accepts: ['さんじゅうごふん', '35分', '三十五分'] },
+                { min: 40, text: 'よんじゅっぷん', type: 'pun', accepts: ['よんじゅっぷん', 'よんじっぷん', '40分', '四十分'] },
+                { min: 45, text: 'よんじゅうごふん', type: 'fun', accepts: ['よんじゅうごふん', '45分', '四十五分'] },
+                { min: 50, text: 'ごじゅっぷん', type: 'pun', accepts: ['ごじゅっぷん', 'ごじっぷん', '50分', '五十分'] },
+                { min: 55, text: 'ごじゅうごふん', type: 'fun', accepts: ['ごじゅうごふん', '55分', '五十五分'] }
             ];
-            const hanData = { min: 30, text: 'はん', sound: 'han.mp3', type: 'han' };
+            const hanData = { 
+                min: 30, text: 'はん', type: 'han', 
+                accepts: ['はん', '半', 'さんじゅっぷん', 'さんじっぷん', '30分', '三十分'] 
+            };
 
-            const audioCache = {};
-            function loadAudio(soundFile) {
-                let path = `${SOUND_PATH_MINUTES}${soundFile}`;
-                if (soundFile.endsWith('ji.mp3')) {
-                    path = `${SOUND_PATH_HOURS}${soundFile}`;
-                }
-                
-                if (!audioCache[path]) {
-                    const audio = new Audio(path);
-                    audio.onerror = () => { console.error("音声ファイルが見つかりません:", path); };
-                    audioCache[path] = audio;
-                }
-                return audioCache[path];
-            }
             const soundCorrect = document.getElementById('tc-sound-correct');
             const soundIncorrect = document.getElementById('tc-sound-incorrect');
 
-            // ----------------------------------------------------
-            // DOM要素の取得
-            // ----------------------------------------------------
+            // --- DOM ---
             const screens = document.querySelectorAll('.tc-screen');
             const studyScreen = document.getElementById('tc-screen-study');
+            const modesScreen = document.getElementById('tc-screen-modes');
             const quizScreen = document.getElementById('tc-screen-quiz');
             
             const studyGrid = document.getElementById('tc-study-grid');
-            const startQuizButton = document.getElementById('tc-start-quiz-button');
+            const btnToModes = document.getElementById('tc-btn-to-modes');
             
             const quizTitle = document.getElementById('tc-quiz-title'); 
             const quizPromptArea = document.getElementById('tc-quiz-prompt-area');
             const quizOptions = document.getElementById('tc-quiz-options');
+            const quiz3Area = document.getElementById('tc-quiz3-area');
             const feedback = document.getElementById('tc-feedback');
-            
-            const backToStudyButton = document.getElementById('tc-back-to-study-button');
-            
+
             let currentCorrectText = ""; 
             let currentHourValue = 0; 
             let currentMinuteValue = 0;
-            let currentHourSound = null;
-            let currentMinuteSound = null;
+            let currentMode = 1;
             
-            // ----------------------------------------------------
-            // 汎用関数
-            // ----------------------------------------------------
-            
-            function showScreen(screenElement) {
+            // --- 音声認識APIの準備 ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition = null;
+            let isListening = false;
+            let quiz3Step = 1; 
+            let quiz3CorrectHour = null;
+            let quiz3CorrectMinute = null;
+
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ja-JP';
+                recognition.interimResults = false;
+                recognition.continuous = false;
+            }
+
+            // --- 汎用関数 ---
+            window.showScreen = function(screenElement) {
                 screens.forEach(s => s.classList.remove('active'));
                 screenElement.classList.add('active');
             }
@@ -432,73 +389,62 @@
                 return newArray;
             }
 
-            // ★ 新しい関数：時間を連続再生する
-            function playFullTimeSound() {
-                if (currentHourSound) {
-                    playSound(currentHourSound);
-                    currentHourSound.onended = () => {
-                        playSound(currentMinuteSound);
-                    };
-                }
+            // アナログ時計の描画共通処理
+            function drawAnalogClock(hour, minute) {
+                quizPromptArea.innerHTML = `
+                    <div class="tc-clock-face">
+                        <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
+                        <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>
+                        <div class="tc-center-dot"></div>
+                    </div>`;
+                const hourHand = document.getElementById('tc-hour-hand');
+                const minuteHand = document.getElementById('tc-minute-hand');
+                const h = hour % 12; 
+                const hourDeg = (h * 30) + (minute * 0.5);
+                const minuteDeg = minute * 6;
+                hourHand.style.transform = `translateY(-50%) rotate(${hourDeg - 90}deg)`;
+                minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg - 90}deg)`;
             }
 
-            // ----------------------------------------------------
-            // 勉強スクリーンのロジック
-            // ----------------------------------------------------
-            
+            // --- 勉強スクリーン ---
             function setupStudyScreen() {
                 studyGrid.innerHTML = '';
                 minuteData.forEach(min => {
                     const item = document.createElement('div');
                     item.className = `tc-study-item type-${min.type}`;
                     item.innerHTML = `<span>${min.min}</span><p>${min.text}</p>`;
-                    item.onclick = () => {
-                        const sound = loadAudio(min.sound);
-                        playSound(sound);
-                    };
+                    item.onclick = () => speakText(min.text);
                     studyGrid.appendChild(item);
                 });
                 const hanItem = document.createElement('div');
                 hanItem.className = 'tc-study-item type-han';
                 hanItem.innerHTML = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
-                hanItem.onclick = () => {
-                    const sound = loadAudio(hanData.sound);
-                    playSound(sound);
-                };
+                hanItem.onclick = () => speakText(hanData.text);
                 studyGrid.appendChild(hanItem);
             }
 
-            startQuizButton.onclick = () => {
-                startQuiz();
-                showScreen(quizScreen);
-            };
-            
-            backToStudyButton.onclick = () => {
-                showScreen(studyScreen);
-            };
+            btnToModes.onclick = () => showScreen(modesScreen);
 
-            // ----------------------------------------------------
-            // クイズのメインロジック
-            // ----------------------------------------------------
-            
-            function startQuiz() {
-                quizPromptArea.innerHTML = ''; 
+            // --- クイズ起動 ---
+            window.startSpecificQuiz = function(mode) {
+                currentMode = mode;
+                quizPromptArea.innerHTML = '';
                 quizOptions.innerHTML = '';
+                quiz3Area.style.display = 'none';
                 feedback.textContent = '';
                 feedback.className = '';
                 
-                if (Math.random() < 0.5) {
-                    setupQuizA();
-                } else {
-                    setupQuizB();
-                }
+                showScreen(quizScreen);
+
+                if (mode === 1) setupQuiz1();
+                else if (mode === 2) setupQuiz2();
+                else if (mode === 3) setupQuiz3();
             }
 
-            // --- クイズA (音声 → デジタル時計) ---
-            function setupQuizA() {
-                quizTitle.textContent = 'きいて えらぼう！';
+            // --- ゲーム1 (音声 → デジタル時計) ---
+            function setupQuiz1() {
+                quizTitle.textContent = 'ゲーム1：きいて えらぼう！';
                 
-                // 1. 正解の時間を決定
                 const correctHour = hourData[Math.floor(Math.random() * hourData.length)];
                 let correctMinute, correctMinuteText;
                 
@@ -513,35 +459,30 @@
                 currentHourValue = correctHour.hour; 
                 currentMinuteValue = correctMinute.min;
                 
-                // 2. 音声をキャッシュ
-                currentHourSound = loadAudio(correctHour.sound);
-                currentMinuteSound = loadAudio((correctMinuteText === hanData.text) ? hanData.sound : correctMinute.sound);
-                
-                // 3. 音声再生ボタンを作成
+                // 再生ボタン
                 const soundButton = document.createElement('button');
-                soundButton.id = 'tc-play-sound-button';
-                soundButton.className = 'tc-button';
-                soundButton.textContent = '▶';
-                soundButton.onclick = playFullTimeSound;
+                soundButton.className = 'tc-button btn-game1';
+                soundButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                soundButton.style.fontSize = '3em';
+                soundButton.style.width = '100px';
+                soundButton.style.height = '100px';
+                soundButton.style.borderRadius = '50%';
+                soundButton.onclick = () => speakText(currentCorrectText);
                 quizPromptArea.appendChild(soundButton);
-                playFullTimeSound(); // 最初に再生
+                
+                setTimeout(() => speakText(currentCorrectText), 500);
 
-                // 4. 選択肢を作成
                 let options = [{ hour: correctHour.hour, min: correctMinute.min, digital: `${correctHour.hour}:${String(correctMinute.min).padStart(2, '0')}` }];
 
-                // 5. ダミー選択肢を作成
                 while (options.length < 4) {
                     const dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
                     const dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
-                    
                     const newOption = { hour: dummyHour.hour, min: dummyMinute.min, digital: `${dummyHour.hour}:${String(dummyMinute.min).padStart(2, '0')}` };
-                    
                     if (!options.some(opt => opt.digital === newOption.digital)) {
                         options.push(newOption);
                     }
                 }
                 
-                // 6. デジタル時計の選択肢ボタンを配置
                 shuffleArray(options).forEach(opt => {
                     const button = document.createElement('button');
                     button.className = 'tc-option-button tc-option-digital-button tc-option';
@@ -553,23 +494,10 @@
                 });
             }
 
-            // --- クイズB (アナログ時計 → 文字) ---
-            function setupQuizB() {
-                quizTitle.textContent = 'この とけい は なんじ？';
+            // --- ゲーム2 (アナログ時計 → 文字) ---
+            function setupQuiz2() {
+                quizTitle.textContent = 'ゲーム2：みて えらぼう！';
 
-                // 1. アナログ時計のHTMLを作成
-                quizPromptArea.innerHTML = `
-                    <div class="tc-clock-face">
-                        <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
-                        <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>
-                        <div class="tc-center-dot"></div>
-                    </div>`;
-                
-                // 2. DOMを再取得
-                const hourHand = document.getElementById('tc-hour-hand');
-                const minuteHand = document.getElementById('tc-minute-hand');
-
-                // 3. 正解の時間を決定
                 const correctHour = hourData[Math.floor(Math.random() * hourData.length)];
                 let correctMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 let correctMinuteText = correctMinute.text;
@@ -580,36 +508,20 @@
                 currentHourValue = correctHour.hour; 
                 currentMinuteValue = correctMinute.min;
 
-                // 4. 時計の針をセット
-                const h = correctHour.hour % 12; 
-                const m = correctMinute.min;
-                const hourDeg = (h * 30) + (m * 0.5);
-                const minuteDeg = m * 6;
-                hourHand.style.transform = `translateY(-50%) rotate(${hourDeg - 90}deg)`;
-                minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg - 90}deg)`;
+                drawAnalogClock(currentHourValue, currentMinuteValue);
 
-                // 5. 選択肢を作成
-                let options = [{ 
-                    text: currentCorrectText, 
-                    digital: `${correctHour.text} ${correctMinuteText}` 
-                }];
-
-                // 6. ダミー選択肢を作成 (4つ揃える)
+                let options = [{ text: currentCorrectText }];
                 let optionsSet = new Set([currentCorrectText]);
 
                 // ダミー1: 時が違う
                 let dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
-                while(dummyHour.hour === correctHour.hour) {
-                    dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
-                }
+                while(dummyHour.hour === correctHour.hour) dummyHour = hourData[Math.floor(Math.random() * hourData.length)];
                 options.push({ text: `${dummyHour.text} ${correctMinuteText}` });
                 optionsSet.add(`${dummyHour.text} ${correctMinuteText}`);
 
                 // ダミー2: 分が違う
                 let dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
-                while(dummyMinute.min === correctMinute.min) {
-                    dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
-                }
+                while(dummyMinute.min === correctMinute.min) dummyMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
                 options.push({ text: `${correctHour.text} ${dummyMinute.text}` });
                 optionsSet.add(`${correctHour.text} ${dummyMinute.text}`);
 
@@ -618,21 +530,16 @@
                 if (correctMinute.min === 30) {
                     trapText = (correctMinuteText === hanData.text) ? minuteData.find(m => m.min === 30).text : hanData.text;
                 } else {
-                    trapText = (correctMinute.type === 'fun') ? 
-                        correctMinute.text.replace('ふん', 'ぷん') : 
-                        correctMinute.text.replace('ぷん', 'ふん');
+                    trapText = (correctMinute.type === 'fun') ? correctMinute.text.replace('ふん', 'ぷん') : correctMinute.text.replace('ぷん', 'ふん');
                 }
                 const trapOption = `${correctHour.text} ${trapText}`;
-                if (!optionsSet.has(trapOption)) {
-                    options.push({ text: trapOption });
-                }
+                if (!optionsSet.has(trapOption)) options.push({ text: trapOption });
                 
-                // 7. 選択肢ボタンをシャッフルして配置
                 shuffleArray(options).slice(0, 4).forEach(opt => {
                     const button = document.createElement('button');
                     button.className = 'tc-option-button tc-option-text-button tc-option';
                     button.innerHTML = opt.text;
-                    button.dataset.text = opt.text; // 答え合わせ用にテキストを保持
+                    button.dataset.text = opt.text; 
                     button.dataset.hour = (opt.text === currentCorrectText) ? currentHourValue : 0; 
                     button.dataset.min = (opt.text === currentCorrectText) ? currentMinuteValue : 0;
                     button.onclick = handleQuizChoice;
@@ -640,71 +547,174 @@
                 });
             }
             
-            // --- 答え合わせ ---
+            // --- ゲーム1 & 2 答え合わせ ---
             async function handleQuizChoice(e) { 
                 const chosenOption = e.currentTarget;
+                if (chosenOption.classList.contains('disabled')) return;
                 
-                if (chosenOption.classList.contains('disabled')) {
-                    return;
-                }
-                
-                const isQuizB = quizTitle.textContent === 'この とけい は なんじ？';
+                const isQuiz2 = quizTitle.textContent.includes('ゲーム2');
                 let isCorrect = false;
                 
-                if (isQuizB) {
-                    // クイズB: テキスト比較
+                if (isQuiz2) {
                     isCorrect = chosenOption.dataset.text === currentCorrectText;
                 } else {
-                    // クイズA: 時と分の値の比較
                     const chosenHour = parseInt(chosenOption.dataset.hour);
                     const chosenMin = parseInt(chosenOption.dataset.min);
                     isCorrect = chosenHour === currentHourValue && chosenMin === currentMinuteValue;
                 }
                 
-                // ポイントキーの生成 (時-分 の形式)
                 const pointKey = `${currentHourValue}_${currentMinuteValue}`;
                 
                 if (isCorrect) {
-                    // --- 正解の場合 ---
                     playSound(soundCorrect);
-
-                    // ★★★ Firebaseポイント付与ロジック ★★★
                     const success = await window.addPointsToUser(POINTS_PER_QUESTION, pointKey);
                     
-                    let message = 'せいかい！';
-                    if (success) {
-                        message += ' (+1 ポイント記録)';
-                    } else if (window.currentUserId) {
-                        message += ' (ポイント記録エラー)';
-                    }
-                    // ★★★ Firebaseポイント付与ロジック 終了 ★★★
-
-                    feedback.textContent = message;
+                    feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
                     feedback.className = 'success show';
                     
-                    quizOptions.querySelectorAll('.tc-option').forEach(opt => {
-                        opt.classList.add('disabled');
-                    });
+                    quizOptions.querySelectorAll('.tc-option').forEach(opt => opt.classList.add('disabled'));
                     chosenOption.classList.add('correct');
-                    
-                    setTimeout(startQuiz, 2000); 
-                    
+                    setTimeout(() => startSpecificQuiz(currentMode), 2000); 
                 } else {
-                    // --- 不正解の場合 ---
                     playSound(soundIncorrect);
                     feedback.textContent = 'ちがうよ、もういちど！';
                     feedback.className = 'show';
-                    
-                    // 間違えた選択肢だけを無効化＆ハイライト
                     chosenOption.classList.add('incorrect', 'disabled');
                 }
             }
 
-            // ----------------------------------------------------
-            // ゲーム開始
-            // ----------------------------------------------------
+            // --- ゲーム3: スピーキング ---
+            function setupQuiz3() {
+                quizTitle.textContent = 'ゲーム3：はなしてみよう！';
+                quiz3Area.style.display = 'block';
+                quiz3Step = 1;
+
+                quiz3CorrectHour = hourData[Math.floor(Math.random() * hourData.length)];
+                quiz3CorrectMinute = minuteData[Math.floor(Math.random() * minuteData.length)];
+                
+                // 30分の場合は特別にhanDataを使うか決定（受け入れワードには両方含めるため判定用データとしてセット）
+                if(quiz3CorrectMinute.min === 30 && Math.random() < 0.5) {
+                    quiz3CorrectMinute = hanData; 
+                }
+
+                currentHourValue = quiz3CorrectHour.hour;
+                currentMinuteValue = quiz3CorrectMinute.min;
+
+                document.getElementById('quiz3-instruction').textContent = "「いま、なんじですか？」ときいてね！";
+                document.getElementById('quiz3-transcript').textContent = "";
+                document.getElementById('tc-mic-btn').style.display = 'flex';
+            }
+
+            window.toggleMic = function() {
+                if (!recognition) return alert("お使いのブラウザは音声認識に対応していません。");
+                if (isListening) { recognition.stop(); return; }
+
+                isListening = true;
+                const btn = document.getElementById('tc-mic-btn');
+                btn.classList.add('listening');
+                document.getElementById('quiz3-transcript').textContent = "きいています...";
+
+                if (synth.speaking) synth.cancel();
+
+                try { recognition.start(); } catch(e){}
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('quiz3-transcript').textContent = `「${transcript}」`;
+                    handleSpeechResult(transcript);
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    btn.classList.remove('listening');
+                };
+                recognition.onerror = () => {
+                    isListening = false;
+                    btn.classList.remove('listening');
+                    document.getElementById('quiz3-transcript').textContent = "うまくききとれませんでした";
+                };
+            }
+
+            async function handleSpeechResult(transcript) {
+                const cleanSpeech = transcript.replace(/[\s、。！？!?,，]/g, '');
+
+                if (quiz3Step === 1) {
+                    if (cleanSpeech.includes('何時') || cleanSpeech.includes('なんじ') || cleanSpeech.includes('いまなんじ')) {
+                        playSound(soundCorrect);
+                        quiz3Step = 2;
+                        
+                        document.getElementById('quiz3-instruction').textContent = "とけいを みて、「いま、〇〇じ 〇〇ふん(はん) です」と こたえてね！";
+                        
+                        // アナログ時計の描画
+                        drawAnalogClock(currentHourValue, currentMinuteValue);
+
+                    } else {
+                        playSound(soundIncorrect);
+                        document.getElementById('quiz3-transcript').textContent += " (もういちど！)";
+                    }
+                } else if (quiz3Step === 2) {
+                    let maxSim = 0;
+                    let targetAccepts = [];
+                    
+                    // 「今 〇時 〇分 です」のパターンを作成
+                    quiz3CorrectHour.accepts.forEach(hAcc => {
+                        // もし30分の場合はhanDataとminuteDataの両方のacceptsを許可する
+                        let minuteAccepts = quiz3CorrectMinute.accepts;
+                        if(currentMinuteValue === 30) {
+                            minuteAccepts = [...new Set([...hanData.accepts, ...minuteData.find(m => m.min === 30).accepts])];
+                        }
+                        
+                        minuteAccepts.forEach(mAcc => {
+                            targetAccepts.push(`いま${hAcc}${mAcc}です`);
+                            targetAccepts.push(`今${hAcc}${mAcc}です`);
+                        });
+                    });
+
+                    targetAccepts.forEach(acc => {
+                        const sim = calculateSimilarity(cleanSpeech, acc);
+                        if (sim > maxSim) maxSim = sim;
+                    });
+
+                    if (maxSim >= 80) {
+                        playSound(soundCorrect);
+                        const pointKey = `${currentHourValue}_${currentMinuteValue}`;
+                        const success = await window.addPointsToUser(POINTS_PER_QUESTION, pointKey);
+                        
+                        feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
+                        feedback.className = 'success show';
+                        document.getElementById('tc-mic-btn').style.display = 'none';
+                        
+                        setTimeout(() => startSpecificQuiz(3), 2000);
+                    } else {
+                        playSound(soundIncorrect);
+                        feedback.textContent = 'ちがうよ、もういちど！';
+                        feedback.className = 'show';
+                    }
+                }
+            }
+
+            function calculateSimilarity(s1, s2) {
+                if (s1 === s2) return 100;
+                if (!s1 || !s2) return 0;
+                let costs = [];
+                for (let i = 0; i <= s1.length; i++) {
+                    let lastVal = i;
+                    for (let j = 0; j <= s2.length; j++) {
+                        if (i === 0) costs[j] = j;
+                        else if (j > 0) {
+                            let newVal = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1)) newVal = Math.min(Math.min(newVal, lastVal), costs[j]) + 1;
+                            costs[j - 1] = lastVal; lastVal = newVal;
+                        }
+                    }
+                    if (i > 0) costs[s2.length] = lastVal;
+                }
+                return ((1 - costs[s2.length] / Math.max(s1.length, s2.length)) * 100);
+            }
+
+            // --- 初期起動 ---
             setupStudyScreen();
-            showScreen(studyScreen); // 最初に勉強スクリーンを表示
+            showScreen(studyScreen);
 
         });
     </script>
