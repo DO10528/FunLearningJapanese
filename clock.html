@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         body {
@@ -33,8 +34,9 @@
             border: 3px solid #80deea;
         }
         
-        .tc-screen { display: none; }
+        .tc-screen { display: none; animation: fadeIn 0.3s ease; }
         .tc-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         h1, h2 { text-align: center; color: #00838f; }
         h1 { font-size: 2.2em; margin-bottom: 20px; }
@@ -63,6 +65,14 @@
              top: 3px;
              box-shadow: 0 2px 0 #546e7a;
         }
+
+        /* モード選択ボタンの色分け */
+        .btn-game1 { background-color: #ff9f43; box-shadow: 0 5px 0 #d35400; }
+        .btn-game1:active { box-shadow: 0 2px 0 #d35400; }
+        .btn-game2 { background-color: #1dd1a1; box-shadow: 0 5px 0 #01a3a4; }
+        .btn-game2:active { box-shadow: 0 2px 0 #01a3a4; }
+        .btn-game3 { background-color: #ff6b81; box-shadow: 0 5px 0 #c0392b; }
+        .btn-game3:active { box-shadow: 0 2px 0 #c0392b; }
 
         /* --- フィードバック --- */
         #tc-feedback {
@@ -94,19 +104,12 @@
         }
         .tc-study-item.irregular p { color: #d9534f; font-weight: 800; }
 
-        /* --- 2. クイズスクリーン --- */
+        /* --- クイズスクリーン --- */
         #tc-quiz-prompt-area {
             min-height: 150px; display: flex;
             justify-content: center; align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 20px; flex-direction: column;
         }
-        #tc-play-sound-button {
-            font-size: 4em; width: 120px; height: 120px; padding: 0;
-            border-radius: 50%; background-color: #00bcd4;
-            box-shadow: 0 6px 0 #00838f;
-            display: flex; justify-content: center; align-items: center;
-        }
-        #tc-play-sound-button:active { top: 3px; box-shadow: 0 3px 0 #00838f; }
         #tc-quiz-image { width: 150px; height: 150px; object-fit: contain; }
 
         #tc-quiz-options {
@@ -116,7 +119,7 @@
         }
         .tc-option-image-card {
             border: 4px solid #b2ebf2; border-radius: 10px; padding: 10px;
-            cursor: pointer; transition: all 0.2s ease;
+            cursor: pointer; transition: all 0.2s ease; background: white;
         }
         .tc-option-image-card img {
             width: 100%; height: 100px; object-fit: contain;
@@ -133,6 +136,17 @@
             opacity: 0.6;
         }
         .tc-option.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* ゲーム3用マイクUI */
+        .mic-btn {
+            width: 90px; height: 90px; border-radius: 50%; border: none;
+            background: #ff6b81; color: white; font-size: 2.5em;
+            box-shadow: 0 6px 0 #c0392b; cursor: pointer; transition: 0.1s;
+            margin: 10px auto; display: flex; justify-content: center; align-items: center;
+        }
+        .mic-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .mic-btn.listening { animation: pulse 1s infinite; background: #ff4757; box-shadow: none; transform: translateY(6px); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
 
         /* 認証ステータスのスタイル */
         #auth-status-tc {
@@ -156,27 +170,42 @@
         <div id="tc-screen-study" class="tc-screen active">
             <h1>とけい の よみかた</h1>
             <p>タップして おと を きいてね。</p>
-            <div id="tc-study-grid">
-                </div>
-            <button id="tc-start-quiz-button" class="tc-button">クイズを はじめる</button>
-            
+            <div id="tc-study-grid"></div>
+            <button id="tc-btn-to-modes" class="tc-button">ゲームを はじめる</button>
             <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+        </div>
+
+        <div id="tc-screen-modes" class="tc-screen">
+            <h2>どのゲームであそぶ？</h2>
+            <button class="tc-button btn-game1" onclick="startSpecificQuiz(1)">
+                <i class="fa-solid fa-ear-listen"></i> ゲーム1：きいて えらぼう
+            </button>
+            <button class="tc-button btn-game2" onclick="startSpecificQuiz(2)">
+                <i class="fa-solid fa-eye"></i> ゲーム2：みて えらぼう
+            </button>
+            <button class="tc-button btn-game3" onclick="startSpecificQuiz(3)">
+                <i class="fa-solid fa-microphone"></i> ゲーム3：はなしてみよう
+            </button>
+            <button class="tc-button tc-button-secondary" onclick="showScreen(document.getElementById('tc-screen-study'))">べんきょう に もどる</button>
         </div>
 
         <div id="tc-screen-quiz" class="tc-screen">
             <h2 id="tc-quiz-title">クイズ！</h2>
             
-            <div id="tc-quiz-prompt-area">
-                </div>
+            <div id="tc-quiz-prompt-area"></div>
+            <div id="tc-quiz-options"></div>
             
-            <div id="tc-quiz-options">
-                </div>
+            <div id="tc-quiz3-area" style="display:none; text-align:center;">
+                <div id="quiz3-instruction" style="font-size:1.2em; font-weight:bold; margin-bottom:10px; color:#00838f;"></div>
+                <button id="tc-mic-btn" class="mic-btn" onclick="toggleMic()">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div id="quiz3-transcript" style="color:#666; font-size:0.9em; margin-top:5px; font-weight:bold;"></div>
+            </div>
             
             <div id="tc-feedback"></div>
             
-            <button id="tc-back-to-study-button" class="tc-button tc-button-secondary">べんきょう に もどる</button>
-
-            <a href="index.html" class="tc-button tc-button-secondary">ホームにもどる</a>
+            <button class="tc-button tc-button-secondary" onclick="showScreen(document.getElementById('tc-screen-modes'))">ゲームを えらぶ</button>
         </div>
 
     </div>
@@ -185,13 +214,10 @@
     <audio id="tc-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
     
     <script type="module">
-        // 1. Firebase SDKのインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-        // 2. あなたのFirebase設定 (index.htmlなどからコピー)
         const firebaseConfig = {
           apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
           authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -202,7 +228,6 @@
           measurementId: "G-LCMXVLPS81"
         };
 
-        // 3. Firebaseサービスの初期化とグローバル変数
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -210,10 +235,6 @@
         window.currentUserId = null;
         const authStatusEl = document.getElementById('auth-status-tc');
         
-        // ポイントルール: 各問題の正解で1ポイント
-        const POINTS_PER_QUESTION = 1; 
-        
-        // 4. 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUserId = user.uid;
@@ -224,36 +245,18 @@
                     displayName = userDocSnap.data().displayName || 'ユーザー';
                 }
                 authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
-
             } else {
                 window.currentUserId = null;
                 authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
             }
         });
 
-
-        /**
-         * ポイント加算関数 (Firestoreに記録)
-         * @param {number} points - 加算するポイント数
-         * @returns {Promise<boolean>} 成功/失敗
-         */
         window.addPointsToUser = async function(points, hourId) { 
-            if (!window.currentUserId || points <= 0) {
-                return false;
-            }
-            
+            if (!window.currentUserId || points <= 0) return false;
             try {
                 const userRef = doc(db, "users", window.currentUserId);
-                const progressKey = `clock_hour_${hourId}`; // 時間ごとのキー
-
-                // 2. ポイントを加算
-                await updateDoc(userRef, {
-                    points: increment(points) 
-                });
-                
-                console.log(`${points} ポイントを Firestore に加算しました (時間: ${hourId})。`);
+                await updateDoc(userRef, { points: increment(points) });
                 return true;
-
             } catch (e) {
                 console.error("ポイント更新エラー:", e);
                 return false;
@@ -262,76 +265,77 @@
     </script>
     
     <script>
+        // AI音声（SpeechSynthesis）の準備
+        const synth = window.speechSynthesis;
+        function speakText(text) {
+            if (synth.speaking) synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ja-JP';
+            utter.rate = 0.9; // 少しゆっくりめに
+            synth.speak(utter);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ----------------------------------------------------
-            // ★★★ Firebase連携ポイント関数を再定義 (ダミー) ★★★
-            // モジュールロードが遅れた場合のエラー回避のためのダミー関数
             if (typeof window.addPointsToUser !== 'function') {
                 window.addPointsToUser = async () => { return false; };
             }
-            const POINTS_PER_QUESTION = 1; // Firebase連携スクリプトと同期
-            // ----------------------------------------------------
+            const POINTS_PER_QUESTION = 1;
 
-            // ----------------------------------------------------
-            // データ定義
-            // ----------------------------------------------------
-            
+            // --- データ定義 (音声認識の揺れに対応するため accepts を追加) ---
             const IMG_PATH = 'assets/images/clocks/';
-            const SOUND_PATH = 'assets/sounds/hours/';
-
             const timeData = [
-                { hour: 1, text: 'いちじ', sound: '1ji.mp3', img: 'clock_1.png' },
-                { hour: 2, text: 'にじ', sound: '2ji.mp3', img: 'clock_2.png' },
-                { hour: 3, text: 'さんじ', sound: '3ji.mp3', img: 'clock_3.png' },
-                { hour: 4, text: 'よじ', sound: '4ji.mp3', img: 'clock_4.png', dummy: 'よんじ', irregular: true },
-                { hour: 5, text: 'ごじ', sound: '5ji.mp3', img: 'clock_5.png' },
-                { hour: 6, text: 'ろくじ', sound: '6ji.mp3', img: 'clock_6.png' },
-                { hour: 7, text: 'しちじ', sound: '7ji.mp3', img: 'clock_7.png', dummy: 'ななじ', irregular: true },
-                { hour: 8, text: 'はちじ', sound: '8ji.mp3', img: 'clock_8.png' },
-                { hour: 9, text: 'くじ', sound: '9ji.mp3', img: 'clock_9.png', dummy: 'きゅうじ', irregular: true },
-                { hour: 10, text: 'じゅうじ', sound: '10ji.mp3', img: 'clock_10.png' },
-                { hour: 11, text: 'じゅういちじ', sound: '11ji.mp3', img: 'clock_11.png' },
-                { hour: 12, text: 'じゅうにじ', sound: '12ji.mp3', img: 'clock_12.png' }
+                { hour: 1, text: 'いちじ', img: 'clock_1.png', accepts: ['いちじ', '1時', '一時'] },
+                { hour: 2, text: 'にじ', img: 'clock_2.png', accepts: ['にじ', '2時', '二時'] },
+                { hour: 3, text: 'さんじ', img: 'clock_3.png', accepts: ['さんじ', '3時', '三時'] },
+                { hour: 4, text: 'よじ', img: 'clock_4.png', dummy: 'よんじ', irregular: true, accepts: ['よじ', '4時', '四時', 'よんじ'] },
+                { hour: 5, text: 'ごじ', img: 'clock_5.png', accepts: ['ごじ', '5時', '五時'] },
+                { hour: 6, text: 'ろくじ', img: 'clock_6.png', accepts: ['ろくじ', '6時', '六時'] },
+                { hour: 7, text: 'しちじ', img: 'clock_7.png', dummy: 'ななじ', irregular: true, accepts: ['しちじ', '7時', '七時', 'ななじ'] },
+                { hour: 8, text: 'はちじ', img: 'clock_8.png', accepts: ['はちじ', '8時', '八時'] },
+                { hour: 9, text: 'くじ', img: 'clock_9.png', dummy: 'きゅうじ', irregular: true, accepts: ['くじ', '9時', '九時', 'きゅうじ'] },
+                { hour: 10, text: 'じゅうじ', img: 'clock_10.png', accepts: ['じゅうじ', '10時', '十時'] },
+                { hour: 11, text: 'じゅういちじ', img: 'clock_11.png', accepts: ['じゅういちじ', '11時', '十一時'] },
+                { hour: 12, text: 'じゅうにじ', img: 'clock_12.png', accepts: ['じゅうにじ', '12時', '十二時'] }
             ];
 
-            const audioCache = {};
-            function loadAudio(soundFile) {
-                const path = `${SOUND_PATH}${soundFile}`;
-                if (!audioCache[path]) {
-                    const audio = new Audio(path);
-                    audio.onerror = () => { console.error("音声ファイルが見つかりません:", path); };
-                    audioCache[path] = audio;
-                }
-                return audioCache[path];
-            }
             const soundCorrect = document.getElementById('tc-sound-correct');
             const soundIncorrect = document.getElementById('tc-sound-incorrect');
 
-            // ----------------------------------------------------
-            // DOM要素の取得
-            // ----------------------------------------------------
+            // --- DOM要素 ---
             const screens = document.querySelectorAll('.tc-screen');
             const studyScreen = document.getElementById('tc-screen-study');
+            const modesScreen = document.getElementById('tc-screen-modes');
             const quizScreen = document.getElementById('tc-screen-quiz');
             
             const studyGrid = document.getElementById('tc-study-grid');
-            const startQuizButton = document.getElementById('tc-start-quiz-button');
+            const btnToModes = document.getElementById('tc-btn-to-modes');
             
             const quizTitle = document.getElementById('tc-quiz-title');
             const quizPromptArea = document.getElementById('tc-quiz-prompt-area');
             const quizOptions = document.getElementById('tc-quiz-options');
+            const quiz3Area = document.getElementById('tc-quiz3-area');
             const feedback = document.getElementById('tc-feedback');
-            
-            const backToStudyButton = document.getElementById('tc-back-to-study-button');
-            
-            let currentCorrectAnswer = null;
 
-            // ----------------------------------------------------
-            // 汎用関数
-            // ----------------------------------------------------
-            
-            function showScreen(screenElement) {
+            let currentCorrectAnswer = null;
+            let currentMode = 1;
+
+            // --- 音声認識APIの準備 (ゲーム3用) ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition = null;
+            let isListening = false;
+            let quiz3Step = 1; // 1:質問する, 2:答える
+            let quiz3CorrectData = null;
+
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ja-JP';
+                recognition.interimResults = false;
+                recognition.continuous = false;
+            }
+
+            // --- 汎用関数 ---
+            window.showScreen = function(screenElement) {
                 screens.forEach(s => s.classList.remove('active'));
                 screenElement.classList.add('active');
             }
@@ -352,74 +356,64 @@
                 return newArray;
             }
 
-            // ----------------------------------------------------
-            // 勉強スクリーンのロジック
-            // ----------------------------------------------------
-            
+            // --- 勉強スクリーン ---
             function setupStudyScreen() {
                 studyGrid.innerHTML = '';
                 timeData.forEach(time => {
                     const item = document.createElement('div');
                     item.className = 'tc-study-item';
-                    if (time.irregular) {
-                        item.classList.add('irregular');
-                    }
+                    if (time.irregular) item.classList.add('irregular');
+                    
                     const img = document.createElement('img');
                     img.src = `${IMG_PATH}${time.img}`;
-                    img.alt = `${time.hour}時`;
+                    
                     const p = document.createElement('p');
                     p.textContent = time.text;
+                    
                     item.appendChild(img);
                     item.appendChild(p);
-                    item.onclick = () => {
-                        const sound = loadAudio(time.sound);
-                        playSound(sound);
-                    };
+                    item.onclick = () => speakText(time.text); // AI音声読み上げに変更
                     studyGrid.appendChild(item);
                 });
             }
 
-            startQuizButton.onclick = () => {
-                startQuiz();
-                showScreen(quizScreen);
-            };
-            
-            backToStudyButton.onclick = () => {
-                showScreen(studyScreen);
-            };
+            btnToModes.onclick = () => showScreen(modesScreen);
 
-            // ----------------------------------------------------
-            // クイズのメインロジック
-            // ----------------------------------------------------
-            
-            function startQuiz() {
+            // --- クイズのメインロジック ---
+            window.startSpecificQuiz = function(mode) {
+                currentMode = mode;
                 quizPromptArea.innerHTML = '';
                 quizOptions.innerHTML = '';
+                quiz3Area.style.display = 'none';
                 feedback.textContent = '';
                 feedback.className = '';
                 
-                if (Math.random() < 0.5) {
-                    setupQuizA();
-                } else {
-                    setupQuizB();
-                }
+                showScreen(quizScreen);
+
+                if (mode === 1) setupQuiz1();
+                else if (mode === 2) setupQuiz2();
+                else if (mode === 3) setupQuiz3();
             }
 
-            // --- クイズA (音声 → 時計) ---
-            function setupQuizA() {
-                quizTitle.textContent = 'きいて えらぼう！';
+            // --- ゲーム1: 音声 → 時計 ---
+            function setupQuiz1() {
+                quizTitle.textContent = 'ゲーム1：きいて えらぼう！';
                 const optionsData = shuffleArray(timeData).slice(0, 4);
                 const correctData = optionsData[Math.floor(Math.random() * 4)];
                 currentCorrectAnswer = correctData.hour;
                 
                 const soundButton = document.createElement('button');
-                soundButton.id = 'tc-play-sound-button';
-                soundButton.className = 'tc-button';
-                soundButton.textContent = '▶';
-                const sound = loadAudio(correctData.sound);
-                soundButton.onclick = () => playSound(sound);
+                soundButton.className = 'tc-button btn-game1';
+                soundButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                soundButton.style.fontSize = '3em';
+                soundButton.style.width = '100px';
+                soundButton.style.height = '100px';
+                soundButton.style.borderRadius = '50%';
+                soundButton.onclick = () => speakText(correctData.text);
                 quizPromptArea.appendChild(soundButton);
-                playSound(sound); 
+                
+                // 自動で1回読み上げる
+                setTimeout(() => speakText(correctData.text), 500);
 
                 optionsData.forEach(time => {
                     const card = document.createElement('div');
@@ -427,17 +421,15 @@
                     card.dataset.hour = time.hour;
                     const img = document.createElement('img');
                     img.src = `${IMG_PATH}${time.img}`;
-                    img.alt = `${time.hour}時`;
                     card.appendChild(img);
                     card.onclick = handleQuizChoice;
                     quizOptions.appendChild(card);
                 });
             }
             
-            // --- クイズB (時計 → 文字) ---
-            function setupQuizB() {
-                quizTitle.textContent = 'みて えらぼう！';
-                
+            // --- ゲーム2: 時計 → 文字 ---
+            function setupQuiz2() {
+                quizTitle.textContent = 'ゲーム2：みて えらぼう！';
                 let correctData;
                 if (Math.random() < 0.7) { 
                     const irregulars = timeData.filter(t => t.irregular);
@@ -450,97 +442,177 @@
                 const img = document.createElement('img');
                 img.id = 'tc-quiz-image';
                 img.src = `${IMG_PATH}${correctData.img}`;
-                img.alt = `時計`;
                 quizPromptArea.appendChild(img);
 
                 let optionsText = [correctData.text];
-                if (correctData.dummy) {
-                    optionsText.push(correctData.dummy);
-                }
+                if (correctData.dummy) optionsText.push(correctData.dummy);
                 
                 const allTexts = timeData.map(t => t.text);
-                if (correctData.dummy) {
-                    allTexts.push(correctData.dummy); 
-                }
+                if (correctData.dummy) allTexts.push(correctData.dummy); 
                 
                 while (optionsText.length < 4) {
                     const randomText = allTexts[Math.floor(Math.random() * allTexts.length)];
-                    if (!optionsText.includes(randomText)) {
-                        optionsText.push(randomText);
-                    }
+                    if (!optionsText.includes(randomText)) optionsText.push(randomText);
                 }
                 
                 shuffleArray(optionsText).forEach(text => {
                     const button = document.createElement('button');
                     button.className = 'tc-button tc-option-text-button tc-option';
                     button.textContent = text;
-                    let hourValue = 0;
-                    if (text === correctData.text) {
-                        hourValue = correctData.hour;
-                    } 
-                    button.dataset.hour = hourValue; 
+                    button.dataset.hour = (text === correctData.text) ? correctData.hour : 0; 
                     button.onclick = handleQuizChoice;
                     quizOptions.appendChild(button);
                 });
             }
-            
-            // --- 答え合わせ ---
-            async function handleQuizChoice(e) { // ★ async関数に変更
+
+            // --- ゲーム1 & 2 答え合わせ ---
+            async function handleQuizChoice(e) {
                 const chosenOption = e.currentTarget;
-                
-                // 既に無効化（不正解）されたボタンは無視
-                if (chosenOption.classList.contains('disabled')) {
-                    return;
-                }
+                if (chosenOption.classList.contains('disabled')) return;
                 
                 const chosenHour = parseInt(chosenOption.dataset.hour);
                 
                 if (chosenHour === currentCorrectAnswer) {
-                    // --- 正解の場合 ---
                     playSound(soundCorrect);
-
-                    // ★★★ Firebaseポイント付与ロジック ★★★
                     const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
                     
-                    let message = 'せいかい！';
-                    if (success) {
-                        message += ' (+1 ポイント記録)';
-                    } else if (window.currentUserId) {
-                        message += ' (ポイント記録エラー)';
-                    }
-                    // ★★★ Firebaseポイント付与ロジック 終了 ★★★
-
-                    feedback.textContent = message;
+                    feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
                     feedback.className = 'success show';
                     
-                    // 全ての選択肢を無効化
-                    quizOptions.querySelectorAll('.tc-option').forEach(opt => {
-                        opt.classList.add('disabled');
-                    });
-                    // 正解の選択肢をハイライト
+                    quizOptions.querySelectorAll('.tc-option').forEach(opt => opt.classList.add('disabled'));
                     chosenOption.classList.add('correct');
                     
-                    // 2秒後に次の問題へ
-                    setTimeout(startQuiz, 2000);
-                    
+                    setTimeout(() => startSpecificQuiz(currentMode), 2000);
                 } else {
-                    // --- 不正解の場合 ---
                     playSound(soundIncorrect);
                     feedback.textContent = 'ちがうよ、もういちど！';
                     feedback.className = 'show';
-                    
-                    // 間違えた選択肢だけを無効化＆ハイライト
                     chosenOption.classList.add('incorrect', 'disabled');
                 }
             }
 
-            // ----------------------------------------------------
-            // ゲーム開始
-            // ----------------------------------------------------
+            // --- ゲーム3: スピーキング ---
+            function setupQuiz3() {
+                quizTitle.textContent = 'ゲーム3：はなしてみよう！';
+                quiz3Area.style.display = 'block';
+                quiz3Step = 1;
+                quiz3CorrectData = timeData[Math.floor(Math.random() * timeData.length)];
+                currentCorrectAnswer = quiz3CorrectData.hour;
+
+                document.getElementById('quiz3-instruction').textContent = "「いま、なんじですか？」ときいてね！";
+                document.getElementById('quiz3-transcript').textContent = "";
+                document.getElementById('tc-mic-btn').style.display = 'flex';
+            }
+
+            window.toggleMic = function() {
+                if (!recognition) return alert("お使いのブラウザは音声認識に対応していません。");
+                if (isListening) { recognition.stop(); return; }
+
+                isListening = true;
+                const btn = document.getElementById('tc-mic-btn');
+                btn.classList.add('listening');
+                document.getElementById('quiz3-transcript').textContent = "きいています...";
+
+                if (synth.speaking) synth.cancel();
+
+                try { recognition.start(); } catch(e){}
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('quiz3-transcript').textContent = `「${transcript}」`;
+                    handleSpeechResult(transcript);
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    btn.classList.remove('listening');
+                };
+                recognition.onerror = () => {
+                    isListening = false;
+                    btn.classList.remove('listening');
+                    document.getElementById('quiz3-transcript').textContent = "うまくききとれませんでした";
+                };
+            }
+
+            async function handleSpeechResult(transcript) {
+                const cleanSpeech = transcript.replace(/[\s、。！？!?,，]/g, '');
+
+                if (quiz3Step === 1) {
+                    // 質問フェーズ
+                    if (cleanSpeech.includes('何時') || cleanSpeech.includes('なんじ') || cleanSpeech.includes('いまなんじ')) {
+                        playSound(soundCorrect);
+                        quiz3Step = 2;
+                        
+                        // ★ 指示テキストの変更
+                        document.getElementById('quiz3-instruction').textContent = "とけいを みて、「いま、〇〇じ です」と こたえてね！";
+                        
+                        // 時計の画像を表示
+                        const img = document.createElement('img');
+                        img.src = `${IMG_PATH}${quiz3CorrectData.img}`;
+                        img.style.width = '150px';
+                        quizPromptArea.innerHTML = '';
+                        quizPromptArea.appendChild(img);
+                    } else {
+                        playSound(soundIncorrect);
+                        document.getElementById('quiz3-transcript').textContent += " (もういちど！)";
+                    }
+                } else if (quiz3Step === 2) {
+                    // 回答フェーズ
+                    let maxSim = 0;
+                    
+                    // ★ 「今〇〇時です」のパターンを作成して判定
+                    let targetAccepts = [];
+                    quiz3CorrectData.accepts.forEach(acc => {
+                        targetAccepts.push(`いま${acc}です`);
+                        targetAccepts.push(`今${acc}です`);
+                    });
+
+                    targetAccepts.forEach(acc => {
+                        const sim = calculateSimilarity(cleanSpeech, acc);
+                        if (sim > maxSim) maxSim = sim;
+                    });
+
+                    if (maxSim >= 80) {
+                        playSound(soundCorrect);
+                        const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                        
+                        feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
+                        feedback.className = 'success show';
+                        document.getElementById('tc-mic-btn').style.display = 'none';
+                        
+                        setTimeout(() => startSpecificQuiz(3), 2000);
+                    } else {
+                        playSound(soundIncorrect);
+                        feedback.textContent = 'ちがうよ、もういちど！';
+                        feedback.className = 'show';
+                    }
+                }
+            }
+
+            function calculateSimilarity(s1, s2) {
+                if (s1 === s2) return 100;
+                if (!s1 || !s2) return 0;
+                let costs = [];
+                for (let i = 0; i <= s1.length; i++) {
+                    let lastVal = i;
+                    for (let j = 0; j <= s2.length; j++) {
+                        if (i === 0) costs[j] = j;
+                        else if (j > 0) {
+                            let newVal = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1)) newVal = Math.min(Math.min(newVal, lastVal), costs[j]) + 1;
+                            costs[j - 1] = lastVal; lastVal = newVal;
+                        }
+                    }
+                    if (i > 0) costs[s2.length] = lastVal;
+                }
+                return ((1 - costs[s2.length] / Math.max(s1.length, s2.length)) * 100);
+            }
+
+            // --- 初期起動 ---
             setupStudyScreen();
-            showScreen(studyScreen); // 最初に勉強スクリーンを表示
+            showScreen(studyScreen);
 
         });
     </script>
-    </body>
+</body>
 </html>
