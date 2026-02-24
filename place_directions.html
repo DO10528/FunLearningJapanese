@@ -96,20 +96,6 @@
     .target-image { max-width: 150px; height: 150px; object-fit: contain; margin: 0 auto 20px; display: block; }
     .target-phrase { font-size: 1.8em; font-weight: 900; color: var(--secondary); margin-bottom: 30px; line-height: 1.4; }
 
-    /* マップ（地図）コンテナ */
-    .map-container {
-        display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
-        background: #e8f5e9; padding: 20px; border-radius: 20px;
-        border: 3px dashed #81c784; margin-bottom: 20px;
-    }
-    .map-spot {
-        background: white; border-radius: 15px; padding: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
-        transition: 0.2s; border: 3px solid transparent; display: flex; flex-direction: column; align-items: center;
-    }
-    .map-spot img { width: 70px; height: 70px; object-fit: contain; }
-    .map-spot.selected { border-color: var(--primary); transform: scale(1.05); background: #e0f7fa; }
-
     /* マイク関連 */
     .mic-btn {
         width: 80px; height: 80px; border-radius: 50%; border: none;
@@ -201,8 +187,6 @@
             
             <img id="game-image" class="target-image" src="" alt="場所">
             
-            <div id="game-map" class="map-container hidden"></div>
-
             <div id="game-phrase" class="target-phrase"></div>
 
             <button id="mic-btn" class="mic-btn active-mic" onclick="toggleSpeech()">
@@ -227,7 +211,6 @@
     const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
 
     // --- 20箇所の単語データ ---
-    // カタカナの単語は file と hira をカタカナ表記に修正しています
     const placesList = [
         { hira: 'がっこう', kanji: '学校', file: 'がっこう', accepts: ['がっこう', '学校', 'ガッコウ'] },
         { hira: 'くうこう', kanji: '空港', file: 'くうこう', accepts: ['くうこう', '空港', 'クウコウ'] },
@@ -239,13 +222,13 @@
         { hira: 'じんじゃ', kanji: '神社', file: 'じんじゃ', accepts: ['じんじゃ', '神社', 'ジンジャ'] },
         { hira: 'ふじさん', kanji: '富士山', file: 'ふじさん', accepts: ['ふじさん', '富士山', 'フジサン'] },
         { hira: 'ぎんこう', kanji: '銀行', file: 'ぎんこう', accepts: ['ぎんこう', '銀行', 'ギンコウ'] },
-        { hira: 'トイレ', kanji: 'トイレ', file: 'トイレ', accepts: ['といれ', 'トイレ', 'お手洗い'] }, // ★修正
-        { hira: 'レストラン', kanji: 'レストラン', file: 'レストラン', accepts: ['れすとらん', 'レストラン', 'restaurant'] }, // ★修正
-        { hira: 'コンビニ', kanji: 'コンビニ', file: 'コンビニ', accepts: ['こんびに', 'コンビニ', 'convenience'] }, // ★修正
+        { hira: 'トイレ', kanji: 'トイレ', file: 'トイレ', accepts: ['といれ', 'トイレ', 'お手洗い'] },
+        { hira: 'レストラン', kanji: 'レストラン', file: 'レストラン', accepts: ['れすとらん', 'レストラン', 'restaurant'] },
+        { hira: 'コンビニ', kanji: 'コンビニ', file: 'コンビニ', accepts: ['こんびに', 'コンビニ', 'convenience'] },
         { hira: 'おてら', kanji: 'お寺', file: 'おてら', accepts: ['おてら', 'お寺', '寺', 'てら'] },
         { hira: 'びょういん', kanji: '病院', file: 'びょういん', accepts: ['びょういん', '病院', 'ビョウイン'] },
         { hira: 'やま', kanji: '山', file: 'やま', accepts: ['やま', '山', 'ヤマ'] },
-        { hira: 'ホテル', kanji: 'ホテル', file: 'ホテル', accepts: ['ほてる', 'ホテル', 'hotel'] }, // ★修正
+        { hira: 'ホテル', kanji: 'ホテル', file: 'ホテル', accepts: ['ほてる', 'ホテル', 'hotel'] },
         { hira: 'りょかん', kanji: '旅館', file: 'りょかん', accepts: ['りょかん', '旅館', 'リョカン'] },
         { hira: 'やきにくや', kanji: '焼肉屋', file: 'やきにくや', accepts: ['やきにくや', '焼肉屋', 'やきにく'] },
         { hira: 'いざかや', kanji: '居酒屋', file: 'いざかや', accepts: ['いざかや', '居酒屋', 'イザカヤ'] }
@@ -255,11 +238,10 @@
 
     // --- ゲームの進行状態 ---
     let historyStack = ['screen-learning'];
-    let currentQuestions = []; // 今回遊ぶ5問のデータ
-    let currentQIndex = 0;     // 現在何問目か (0~4)
-    let currentStep = 1;       // 1:単語発音, 2:質問, 3:地図, 4:お礼
-    let targetDirectionPhrase = ''; // STEP3で読む正解フレーズ
-    let isMapTapped = false;   // STEP3で地図をタップしたか
+    let currentQuestions = []; 
+    let currentQIndex = 0;     
+    let currentStep = 1;       // 1:単語発音, 2:質問, 3:教える, 4:お礼
+    let targetDirectionPhrase = ''; 
 
     // --- 音声関連 API ---
     const synth = window.speechSynthesis;
@@ -289,6 +271,7 @@
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
             `;
+            // 学習用の単語読み上げ機能はそのまま残します
             card.onclick = () => speakText(place.hira);
             grid.appendChild(card);
         });
@@ -307,7 +290,6 @@
         document.getElementById(id).classList.add('active');
         if (historyStack[historyStack.length - 1] !== id) historyStack.push(id);
         
-        // スタートボタンの表示切替
         document.getElementById('start-btn').style.display = (id === 'screen-learning') ? 'flex' : 'none';
         updateHeader();
         window.scrollTo(0,0);
@@ -338,7 +320,7 @@
             alert("お使いのブラウザは音声認識に対応していません。");
             return;
         }
-        // 20箇所からランダムに5つ選ぶ
+        
         let shuffled = [...placesList].sort(() => 0.5 - Math.random());
         currentQuestions = shuffled.slice(0, 5);
         currentQIndex = 0;
@@ -358,101 +340,37 @@
         document.getElementById('user-transcript').textContent = '';
         
         const imgEl = document.getElementById('game-image');
-        const mapEl = document.getElementById('game-map');
         const phraseEl = document.getElementById('game-phrase');
         const micBtn = document.getElementById('mic-btn');
         const missionText = document.getElementById('mission-text');
 
-        // カタカナと漢字が同じ場合（トイレ、コンビニ等）はルビを振らない
         const rubyHtml = (place.kanji === place.hira) ? place.kanji : `<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>`;
 
-        micBtn.classList.remove('hidden');
-        isMapTapped = false;
-
+        // ゲーム中は読み上げ（ヒント）を行わないため、setTimeoutでのspeakText呼び出しを削除しました
+        
         if (currentStep === 1) {
-            // STEP 1: 単語の発音
             missionText.textContent = "この場所はどこ？（なまえを言ってね）";
             imgEl.src = `${IMG_PATH}${place.file}.png`;
             imgEl.onerror = function() { this.src = 'https://placehold.co/150x150?text=Image'; };
             imgEl.classList.remove('hidden');
-            mapEl.classList.add('hidden');
             phraseEl.innerHTML = rubyHtml;
             
         } else if (currentStep === 2) {
-            // STEP 2: 質問する
             missionText.textContent = "道を聞いてみよう！";
             imgEl.classList.remove('hidden');
-            mapEl.classList.add('hidden');
             phraseEl.innerHTML = `すみません、${rubyHtml}は<br>どこですか？`;
             
         } else if (currentStep === 3) {
-            // STEP 3: 地図をタップして教える
-            missionText.textContent = `${place.kanji}はどれ？タップしてね！`;
-            imgEl.classList.add('hidden');
-            mapEl.classList.remove('hidden');
-            phraseEl.textContent = "地図から探してね";
-            micBtn.classList.add('hidden'); // タップするまではマイクを隠す
-            
-            // 地図の生成
-            generateMap(place);
+            // STEP 3: マップ探索をスキップし、そのまま返答の練習へ進む
+            missionText.textContent = "道を教えてあげて！";
+            imgEl.classList.remove('hidden'); // 対象の場所のイラストを表示し続ける
             targetDirectionPhrase = directionWords[Math.floor(Math.random() * directionWords.length)];
+            phraseEl.textContent = targetDirectionPhrase;
 
         } else if (currentStep === 4) {
-            // STEP 4: お礼を言う
             missionText.textContent = "お礼を言おう！";
-            imgEl.classList.add('hidden');
-            mapEl.classList.add('hidden');
+            imgEl.classList.add('hidden'); // お礼のときはイラストを非表示に
             phraseEl.textContent = "ありがとうございます";
-        }
-
-        // 自動でヒント音声を流す
-        if (currentStep !== 3) {
-            setTimeout(() => {
-                const plainText = phraseEl.textContent.replace(/\s+/g, '');
-                speakText(plainText);
-            }, 600);
-        }
-    }
-
-    function generateMap(correctPlace) {
-        const mapEl = document.getElementById('game-map');
-        mapEl.innerHTML = '';
-        
-        // 正解以外のダミーを3つ選ぶ
-        let others = placesList.filter(p => p.kanji !== correctPlace.kanji);
-        others.sort(() => 0.5 - Math.random());
-        let mapItems = [correctPlace, others[0], others[1], others[2]];
-        mapItems.sort(() => 0.5 - Math.random()); // 4つの位置をシャッフル
-
-        mapItems.forEach(item => {
-            const spot = document.createElement('div');
-            spot.className = 'map-spot';
-            spot.innerHTML = `
-                <img src="${IMG_PATH}${item.file}.png" onerror="this.src='https://placehold.co/70x70?text=Map'">
-            `;
-            spot.onclick = () => handleMapTap(item, correctPlace, spot);
-            mapEl.appendChild(spot);
-        });
-    }
-
-    function handleMapTap(tappedItem, correctPlace, spotEl) {
-        if (isMapTapped) return; 
-
-        if (tappedItem.kanji === correctPlace.kanji) {
-            SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play();
-            isMapTapped = true;
-            spotEl.classList.add('selected');
-            
-            document.getElementById('mission-text').textContent = "道を教えてあげて！";
-            document.getElementById('game-phrase').textContent = targetDirectionPhrase;
-            document.getElementById('mic-btn').classList.remove('hidden');
-            
-            setTimeout(() => { speakText(targetDirectionPhrase); }, 500);
-
-        } else {
-            SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play();
-            spotEl.style.backgroundColor = "#ffc0cb";
-            setTimeout(() => { spotEl.style.backgroundColor = "white"; }, 500);
         }
     }
 
