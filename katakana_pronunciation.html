@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>カタカナ発音マスター</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #ff9f43;    /* カタカナ用のテーマカラー（オレンジ系） */
+        --secondary: #48dbfb;
+        --tertiary: #9b59b6;   /* ミックスモード用 */
+        --bg: #f7f7f7;
+        --text: #2d3436;
+        --current-theme: #ff9f43; 
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0; padding: 0;
+        overflow-x: hidden;
+        user-select: none;
+    }
+
+    /* ヘッダー */
+    header {
+        background: white; padding: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0; z-index: 100;
+        transition: background-color 0.3s;
+    }
+    .header-title { font-weight: 900; color: var(--current-theme); font-size: 1.2em; transition: color 0.3s; }
+    .back-btn { border: none; background: #eee; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+
+    /* メインコンテナ */
+    #main-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+    .screen { display: none; animation: slideIn 0.3s ease-out; }
+    .active { display: block; }
+    @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* モード選択カード */
+    .mode-card {
+        background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;
+        display: flex; align-items: center; gap: 20px; border: 3px solid transparent;
+        transition: 0.2s;
+    }
+    .mode-card:active { transform: scale(0.98); }
+    .mode-card.game1 { border-color: var(--primary); }
+    .mode-card.game2 { border-color: var(--secondary); }
+    .mode-card.game3 { border-color: var(--tertiary); }
+    
+    .mode-icon { width: 60px; height: 60px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 2em; color: white; }
+    .game1 .mode-icon { background: var(--primary); }
+    .game2 .mode-icon { background: var(--secondary); }
+    .game3 .mode-icon { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+    
+    .mode-info h3 { margin: 0; font-size: 1.2em; }
+    .mode-info p { margin: 5px 0 0; font-size: 0.85em; color: #777; }
+
+    /* レベル選択グリッド */
+    .level-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+    .level-btn {
+        border: none; padding: 20px 10px; border-radius: 15px; color: white;
+        font-weight: 900; font-size: 1.2em; box-shadow: 0 4px 0 rgba(0,0,0,0.2); cursor: pointer;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2); transition: 0.1s;
+    }
+    .level-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+    /* ゲーム画面 */
+    .game-display {
+        background: white; border-radius: 30px; padding: 40px 20px;
+        text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        margin-bottom: 30px; border: 5px solid var(--current-theme); min-height: 250px;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        transition: border-color 0.3s;
+    }
+    .word-img { max-width: 200px; max-height: 200px; margin-bottom: 20px; border-radius: 20px; }
+    .word-text { font-size: 4em; font-weight: 900; color: var(--text); letter-spacing: 5px; }
+    
+    .mic-section { text-align: center; }
+    .mic-btn {
+        width: 90px; height: 90px; border-radius: 50%; border: none;
+        background: var(--current-theme); color: white; font-size: 2.5em;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.2); cursor: pointer; transition: 0.1s;
+    }
+    .mic-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .mic-btn.listening { animation: pulse 1s infinite; opacity: 0.8; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,0,0,0.4); } 70% { box-shadow: 0 0 0 20px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+
+    .result-text { font-size: 1.2em; font-weight: bold; margin-top: 20px; min-height: 1.5em; }
+    .success { color: #2ecc71; }
+    .retry { color: #e74c3c; }
+
+    .progress-bar { width: 100%; height: 10px; background: #ddd; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--current-theme); transition: width 0.3s, background-color 0.3s; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-title" id="game-title"><i class="fa-solid fa-star"></i> カタカナマスター</div>
+    <button class="back-btn" onclick="goHome()"><i class="fa-solid fa-house"></i> 戻る</button>
+</header>
+
+<div id="main-container">
+
+    <div id="screen-modes" class="screen active">
+        <h2 style="text-align:center;">どのゲームであそぶ？</h2>
+        <div class="mode-card game1" onclick="selectGameMode(1)">
+            <div class="mode-icon"><i class="fa-solid fa-image"></i></div>
+            <div class="mode-info">
+                <h3>ゲーム1：これなあに？</h3>
+                <p>イラストをみて、なまえをいってね！</p>
+            </div>
+        </div>
+        <div class="mode-card game2" onclick="selectGameMode(2)">
+            <div class="mode-icon"><i class="fa-solid fa-font"></i></div>
+            <div class="mode-info">
+                <h3>ゲーム2：なんてよむ？</h3>
+                <p>カタカナをみて、よんでね！</p>
+            </div>
+        </div>
+        <div class="mode-card game3" onclick="selectGameMode(3)">
+            <div class="mode-icon"><i class="fa-solid fa-shuffle"></i></div>
+            <div class="mode-info">
+                <h3>ゲーム3：ミックス！</h3>
+                <p>イラストとカタカナがランダムにでるよ！</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-levels" class="screen">
+        <h2 style="text-align:center;">どのグループからやる？</h2>
+        <div class="level-grid" id="level-buttons"></div>
+    </div>
+
+    <div id="screen-play" class="screen">
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #888; font-size: 1.2em;">
+            グループ <span id="current-level-display"></span> : <span id="word-progress-text"></span>
+        </div>
+        
+        <div class="game-display">
+            <img id="display-image" class="word-img" src="" style="display:none;" alt="">
+            <div id="display-text" class="word-text" style="display:none;"></div>
+        </div>
+
+        <div class="mic-section">
+            <button id="mic-btn" class="mic-btn" onclick="startSpeechRecognition()">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <div id="result-text" class="result-text"></div>
+            <div id="transcript-text" style="color:#aaa; font-size:0.9em; margin-top:5px;"></div>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- 画像・音声パスの設定 ---
+    const IMG_PATH = 'assets/images/katakana_words/';
+    const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
+    const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
+
+    // --- データ定義 ---
+    // 音声認識が「あいす」や英語の「ice」に変換してしまうケースをカバーするため、acceptsを定義しています
+    const gameLevels = [
+        { level: 1, color: '#ff9f43', words: [ 
+            { kata: 'アイス', file: 'アイス', accepts: ['アイス', 'あいす', 'ice'] }, 
+            { kata: 'イヤホン', file: 'イヤホン', accepts: ['イヤホン', 'いやほん', 'earphone'] }, 
+            { kata: 'ウインナー', file: 'ウインナー', accepts: ['ウインナー', 'ういんなー', 'ウィンナー', 'wiener'] }, 
+            { kata: 'エプロン', file: 'エプロン', accepts: ['エプロン', 'えぷろん', 'apron'] }, 
+            { kata: 'オムライス', file: 'オムライス', accepts: ['オムライス', 'おむらいす', 'omurice'] } 
+        ] },
+        { level: 2, color: '#feca57', words: [ 
+            { kata: 'カレンダー', file: 'カレンダー', accepts: ['カレンダー', 'かれんだー', 'calendar'] }, 
+            { kata: 'キャベツ', file: 'キャベツ', accepts: ['キャベツ', 'きゃべつ', 'cabbage'] }, 
+            { kata: 'クレヨン', file: 'クレヨン', accepts: ['クレヨン', 'くれよん', 'crayon'] }, 
+            { kata: 'ケーキ', file: 'ケーキ', accepts: ['ケーキ', 'けーき', 'cake'] }, 
+            { kata: 'コップ', file: 'コップ', accepts: ['コップ', 'こっぷ', 'cup'] } 
+        ] },
+        { level: 3, color: '#1dd1a1', words: [ 
+            { kata: 'サッカー', file: 'サッカー', accepts: ['サッカー', 'さっかー', 'soccer'] }, 
+            { kata: 'シャツ', file: 'シャツ', accepts: ['シャツ', 'しゃつ', 'shirt'] }, 
+            { kata: 'ストロー', file: 'ストロー', accepts: ['ストロー', 'すとろー', 'straw'] }, 
+            { kata: 'セーター', file: 'セーター', accepts: ['セーター', 'せーたー', 'sweater'] }, 
+            { kata: 'ソーダ', file: 'ソーダ', accepts: ['ソーダ', 'そーだ', 'soda'] } 
+        ] },
+        { level: 4, color: '#01a3a4', words: [ 
+            { kata: 'タオル', file: 'タオル', accepts: ['タオル', 'たおる', 'towel'] }, 
+            { kata: 'チョコ', file: 'チョコ', accepts: ['チョコ', 'ちょこ', 'チョコレート', 'chocolate', 'choco'] }, 
+            { kata: 'ツナ', file: 'ツナ', accepts: ['ツナ', 'つな', 'tuna'] }, 
+            { kata: 'テント', file: 'テント', accepts: ['テント', 'てんと', 'tent'] }, 
+            { kata: 'トナカイ', file: 'トナカイ', accepts: ['トナカイ', 'となかい', 'reindeer'] } 
+        ] },
+        { level: 5, color: '#54a0ff', words: [ 
+            { kata: 'ナマズ', file: 'ナマズ', accepts: ['ナマズ', 'なまず', '鯰', 'catfish'] }, 
+            { kata: 'ニワトリ', file: 'ニワトリ', accepts: ['ニワトリ', 'にわとり', '鶏', 'chicken'] }, 
+            { kata: 'ヌードル', file: 'ヌードル', accepts: ['ヌードル', 'ぬーどる', 'noodle'] }, 
+            { kata: 'ネクタイ', file: 'ネクタイ', accepts: ['ネクタイ', 'ねくたい', 'tie', 'necktie'] }, 
+            { kata: 'ノート', file: 'ノート', accepts: ['ノート', 'のーと', 'note', 'notebook'] } 
+        ] },
+        { level: 6, color: '#2e86de', words: [ 
+            { kata: 'ハンガー', file: 'ハンガー', accepts: ['ハンガー', 'はんがー', 'hanger'] }, 
+            { kata: 'ヒトデ', file: 'ヒトデ', accepts: ['ヒトデ', 'ひとで', '人手', '海星'] }, 
+            { kata: 'フグ', file: 'フグ', accepts: ['フグ', 'ふぐ', '河豚'] }, 
+            { kata: 'ヘルメット', file: 'ヘルメット', accepts: ['ヘルメット', 'へるめっと', 'helmet'] }, 
+            { kata: 'ホタテ', file: 'ホタテ', accepts: ['ホタテ', 'ほたて', '帆立'] } 
+        ] },
+        { level: 7, color: '#9b59b6', words: [ 
+            { kata: 'マフラー', file: 'マフラー', accepts: ['マフラー', 'まふらー', 'muffler'] }, 
+            { kata: 'ミミズ', file: 'ミミズ', accepts: ['ミミズ', 'みみず', '蚯蚓'] }, 
+            { kata: 'ムササビ', file: 'ムササビ', accepts: ['ムササビ', 'むささび'] }, 
+            { kata: 'メダカ', file: 'メダカ', accepts: ['メダカ', 'めだか', '鱂'] }, 
+            { kata: 'メモ', file: 'メモ', accepts: ['メモ', 'めも', 'memo'] } 
+        ] },
+        { level: 8, color: '#e84393', words: [ 
+            { kata: 'タイヤ', file: 'タイヤ', accepts: ['タイヤ', 'たいや', 'tire', 'tyre'] }, 
+            { kata: 'ユーフォー', file: 'ユーフォー', accepts: ['ユーフォー', 'ゆーふぉー', 'UFO', 'ufo'] }, 
+            { kata: 'ヨーヨー', file: 'ヨーヨー', accepts: ['ヨーヨー', 'よーよー', 'yoyo'] }, 
+            { kata: 'ワイン', file: 'ワイン', accepts: ['ワイン', 'わいん', 'wine'] }, 
+            { kata: 'パン', file: 'パン', accepts: ['パン', 'ぱん', 'pan', 'bread'] } 
+        ] },
+        { level: 9, color: '#ff6b81', words: [ 
+            { kata: 'ラーメン', file: 'ラーメン', accepts: ['ラーメン', 'らーめん', 'ramen', '拉麺'] }, 
+            { kata: 'リュック', file: 'リュック', accepts: ['リュック', 'りゅっく', 'リュックサック', 'backpack'] }, 
+            { kata: 'ルビー', file: 'ルビー', accepts: ['ルビー', 'るびー', 'ruby'] }, 
+            { kata: 'レタス', file: 'レタス', accepts: ['レタス', 'れたす', 'lettuce'] }, 
+            { kata: 'ロケット', file: 'ロケット', accepts: ['ロケット', 'ろけっと', 'rocket'] } 
+        ] }
+    ];
+
+    let selectedMode = 1; // 1: イラスト, 2: 文字, 3: ミックス
+    let currentLevelIdx = 0;
+    let currentWordIdx = 0;
+    let isListening = false;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+    }
+
+    window.onload = () => {
+        const grid = document.getElementById('level-buttons');
+        gameLevels.forEach((lv, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.innerHTML = `グループ ${lv.level}`;
+            btn.style.backgroundColor = lv.color; 
+            btn.onclick = () => startLevel(idx);
+            grid.appendChild(btn);
+        });
+    };
+
+    function selectGameMode(mode) {
+        selectedMode = mode;
+        showScreen('screen-levels');
+    }
+
+    function startLevel(idx) {
+        currentLevelIdx = idx;
+        currentWordIdx = 0;
+        showScreen('screen-play');
+        loadWord();
+    }
+
+    function loadWord() {
+        const levelData = gameLevels[currentLevelIdx];
+        const wordData = levelData.words[currentWordIdx];
+        
+        // CSS変数を更新して、画面全体のテーマカラーを変更
+        document.documentElement.style.setProperty('--current-theme', levelData.color);
+
+        document.getElementById('current-level-display').textContent = levelData.level;
+        document.getElementById('word-progress-text').textContent = `${currentWordIdx + 1} / ${levelData.words.length}`;
+        document.getElementById('result-text').textContent = "";
+        document.getElementById('transcript-text').textContent = "";
+        
+        const totalInLevel = levelData.words.length;
+        document.getElementById('progress-fill').style.width = `${((currentWordIdx) / totalInLevel) * 100}%`;
+
+        const imgEl = document.getElementById('display-image');
+        const textEl = document.getElementById('display-text');
+
+        // 表示モードの決定（ミックスモードの場合はランダム）
+        let displayMode = selectedMode;
+        if (selectedMode === 3) {
+            displayMode = Math.random() < 0.5 ? 1 : 2; // 1か2をランダムに選ぶ
+        }
+
+        if (displayMode === 1) {
+            // イラスト表示
+            imgEl.src = `${IMG_PATH}${wordData.file}.png`;
+            imgEl.alt = wordData.kata;
+            imgEl.style.display = 'block';
+            textEl.style.display = 'none';
+        } else {
+            // カタカナ表示
+            textEl.textContent = wordData.kata;
+            textEl.style.display = 'block';
+            imgEl.style.display = 'none';
+        }
+    }
+
+    function startSpeechRecognition() {
+        if (!recognition) {
+            alert("お使いのブラウザは音声認識に対応していません。");
+            return;
+        }
+        if (isListening) return;
+
+        isListening = true;
+        const btn = document.getElementById('mic-btn');
+        const resText = document.getElementById('result-text');
+        
+        btn.classList.add('listening');
+        resText.textContent = "きいています...";
+        resText.className = "result-text";
+
+        recognition.start();
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
+            checkPronunciation(transcript);
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            btn.classList.remove('listening');
+        };
+
+        recognition.onerror = () => {
+            isListening = false;
+            btn.classList.remove('listening');
+            resText.textContent = "うまくききとれませんでした。";
+        };
+    }
+
+    function checkPronunciation(speech) {
+        const wordData = gameLevels[currentLevelIdx].words[currentWordIdx];
+        const resText = document.getElementById('result-text');
+
+        // カタカナそのものとの一致率を計算
+        let maxSim = calculateSimilarity(speech, wordData.kata);
+        
+        // 追加したひらがな・英語・漢字のバリエーションとの一致率も計算して、一番高いものを採用
+        if (wordData.accepts) {
+            wordData.accepts.forEach(acc => {
+                const sim = calculateSimilarity(speech, acc);
+                if (sim > maxSim) maxSim = sim;
+            });
+        }
+
+        console.log(`Speech: ${speech}, Max Similarity: ${maxSim}%`);
+
+        if (maxSim >= 80) {
+            resText.textContent = "合格！ (Excellent!)";
+            resText.className = "result-text success";
+            
+            // 正解の音を鳴らす
+            SOUND_CORRECT.currentTime = 0;
+            SOUND_CORRECT.play();
+            
+            setTimeout(() => {
+                nextStep();
+            }, 1500);
+        } else {
+            resText.textContent = "おしい！もういちど。";
+            resText.className = "result-text retry";
+            
+            // 不正解の音を鳴らす
+            SOUND_INCORRECT.currentTime = 0;
+            SOUND_INCORRECT.play();
+        }
+    }
+
+    function nextStep() {
+        currentWordIdx++;
+        const levelWords = gameLevels[currentLevelIdx].words;
+
+        if (currentWordIdx < levelWords.length) {
+            loadWord();
+        } else {
+            currentLevelIdx++;
+            if (currentLevelIdx < gameLevels.length) {
+                currentWordIdx = 0;
+                loadWord();
+            } else {
+                alert("ぜんぶクリア！おめでとう！");
+                goHome();
+            }
+        }
+    }
+
+    // 類似度計算アルゴリズム
+    function calculateSimilarity(s1, s2) {
+        const cleanS1 = s1.replace(/[\s、。！？]/g, '');
+        const cleanS2 = s2.replace(/[\s、。！？]/g, '');
+        
+        if (cleanS1 === cleanS2) return 100;
+        if (!cleanS1 || !cleanS2) return 0;
+        
+        let costs = new Array();
+        for (let i = 0; i <= cleanS1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= cleanS2.length; j++) {
+                if (i == 0) costs[j] = j;
+                else if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (cleanS1.charAt(i - 1) != cleanS2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+            if (i > 0) costs[cleanS2.length] = lastValue;
+        }
+        const distance = costs[cleanS2.length];
+        const maxLen = Math.max(cleanS1.length, cleanS2.length);
+        return ((1 - distance / maxLen) * 100);
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function goHome() {
+        showScreen('screen-modes');
+    }
+
+</script>
+
+</body>
+</html>
