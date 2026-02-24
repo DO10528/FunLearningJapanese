@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ばしょ・道案内サバイバル</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #00cec9;   /* 爽やかなエメラルドグリーン */
+        --secondary: #0984e3; /* ブルー */
+        --accent: #fdcb6e;
+        --bg: #f0f8ff;
+        --text: #2d3436;
+        --success: #00b894;
+        --error: #d63031;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        overflow-x: hidden;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    ruby { ruby-align: center; }
+    rt { font-size: 0.6em; color: #555; font-weight: 500; }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white; padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0; z-index: 100;
+    }
+    .header-title { font-weight: 900; font-size: 1.2em; display: flex; align-items: center; gap: 8px; }
+    .header-btns { display: flex; gap: 10px; }
+    .nav-btn {
+        border: none; background: rgba(255,255,255,0.25); padding: 8px 15px;
+        border-radius: 20px; cursor: pointer; font-weight: bold; color: white;
+        transition: 0.2s;
+    }
+    .nav-btn:active { background: rgba(255,255,255,0.4); }
+
+    /* メインコンテナ */
+    #main-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+    .screen { display: none; animation: fadeIn 0.3s ease-out; }
+    .active { display: block; }
+    @keyframes fadeIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* 練習画面（学習ページ） */
+    .learning-section {
+        background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+    }
+    .section-title { color: var(--secondary); margin-top: 0; font-size: 1.2em; border-bottom: 2px dashed #eee; padding-bottom: 10px; }
+    
+    .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+    .vocab-card {
+        background: #f8fbff; border: 2px solid #e1f0ff; border-radius: 12px; padding: 10px 5px;
+        text-align: center; cursor: pointer; transition: 0.1s;
+    }
+    .vocab-card:active { transform: scale(0.95); background: #dfefff; }
+    .vocab-card img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 5px; }
+    .vocab-card span { display: block; font-size: 0.8em; font-weight: bold; }
+
+    .phrase-list { display: flex; flex-direction: column; gap: 10px; }
+    .phrase-item {
+        background: #f8fbff; padding: 15px; border-radius: 12px;
+        display: flex; justify-content: space-between; align-items: center;
+        border: 2px solid #e1f0ff; cursor: pointer;
+    }
+    .phrase-item:active { background: #dfefff; }
+    .phrase-text { font-weight: bold; font-size: 1.1em; }
+    .phrase-sub { font-size: 0.8em; color: #666; margin-top: 5px; }
+    .play-icon { color: var(--secondary); font-size: 1.5em; }
+
+    /* ゲーム画面全体 */
+    .game-card {
+        background: white; border-radius: 25px; padding: 30px 20px;
+        text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        border: 4px solid var(--primary); position: relative;
+    }
+    .step-indicator {
+        position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+        background: var(--accent); color: #d35400; padding: 5px 20px;
+        border-radius: 20px; font-weight: 900; box-shadow: 0 4px 0 #e67e22;
+    }
+    .mission-text { font-size: 1.1em; color: #555; font-weight: bold; margin-bottom: 20px; margin-top: 10px; }
+    
+    .target-image { max-width: 150px; height: 150px; object-fit: contain; margin: 0 auto 20px; display: block; }
+    .target-phrase { font-size: 1.8em; font-weight: 900; color: var(--secondary); margin-bottom: 30px; line-height: 1.4; }
+
+    /* マップ（地図）コンテナ */
+    .map-container {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+        background: #e8f5e9; padding: 20px; border-radius: 20px;
+        border: 3px dashed #81c784; margin-bottom: 20px;
+    }
+    .map-spot {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
+        transition: 0.2s; border: 3px solid transparent; display: flex; flex-direction: column; align-items: center;
+    }
+    .map-spot img { width: 70px; height: 70px; object-fit: contain; }
+    .map-spot.selected { border-color: var(--primary); transform: scale(1.05); background: #e0f7fa; }
+
+    /* マイク関連 */
+    .mic-btn {
+        width: 80px; height: 80px; border-radius: 50%; border: none;
+        background: var(--error); color: white; font-size: 2.5em;
+        box-shadow: 0 6px 0 #b2bec3; cursor: pointer; transition: 0.1s;
+        margin: 0 auto; display: flex; justify-content: center; align-items: center;
+    }
+    .mic-btn.active-mic { background: var(--error); box-shadow: 0 6px 0 #c0392b; }
+    .mic-btn.active-mic:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+    .mic-btn.listening { animation: pulse 1s infinite; background: #ff7675; box-shadow: none; transform: translateY(6px); }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(214, 48, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0); } }
+
+    .feedback-text { font-size: 1.2em; font-weight: bold; margin-top: 15px; min-height: 1.5em; }
+    .fb-success { color: var(--success); }
+    .fb-fail { color: var(--error); }
+    .user-transcript { font-size: 0.9em; color: #888; margin-top: 5px; font-style: italic; }
+
+    /* 下部固定スタートボタン */
+    .fixed-bottom-btn {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        width: 90%; max-width: 400px;
+        background: var(--accent); color: #d35400; border: none;
+        padding: 18px; border-radius: 30px; font-size: 1.3em; font-weight: 900;
+        box-shadow: 0 6px 0 #e67e22, 0 10px 20px rgba(0,0,0,0.2); cursor: pointer;
+        z-index: 90; display: flex; justify-content: center; align-items: center; gap: 10px;
+        transition: 0.1s;
+    }
+    .fixed-bottom-btn:active { transform: translate(-50%, 6px); box-shadow: 0 0 0 transparent, 0 4px 10px rgba(0,0,0,0.2); }
+
+    /* 非表示ユーティリティ */
+    .hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-title"><i class="fa-solid fa-map-location-dot"></i> 道案内サバイバル</div>
+    <div class="header-btns">
+        <button class="nav-btn" id="btn-back" onclick="goBack()" style="display:none;"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
+        <button class="nav-btn" id="btn-home" onclick="location.href='index.html'"><i class="fa-solid fa-house"></i></button>
+    </div>
+</header>
+
+<div id="main-container">
+
+    <div id="screen-learning" class="screen active">
+        <div class="learning-section">
+            <h3 class="section-title"><i class="fa-solid fa-building"></i> 場所の単語（20こ）</h3>
+            <div class="vocab-grid" id="vocab-grid"></div>
+        </div>
+        
+        <div class="learning-section">
+            <h3 class="section-title"><i class="fa-solid fa-comments"></i> 会話の練習</h3>
+            <div class="phrase-list">
+                <div class="phrase-item" onclick="speakText('すみません、えきはどこですか')">
+                    <div>
+                        <div class="phrase-text">Q. すみません、〇〇は どこですか？</div>
+                        <div class="phrase-sub">Excuse me, where is 〇〇?</div>
+                    </div>
+                    <i class="fa-solid fa-volume-high play-icon"></i>
+                </div>
+                <div class="phrase-item" onclick="speakText('ここですよ')">
+                    <div>
+                        <div class="phrase-text">A. ここ / そこ / あそこ ですよ。</div>
+                        <div class="phrase-sub">It is here / there / over there.</div>
+                    </div>
+                    <i class="fa-solid fa-volume-high play-icon"></i>
+                </div>
+                <div class="phrase-item" onclick="speakText('ありがとうございます')">
+                    <div>
+                        <div class="phrase-text">ありがとうございます。</div>
+                        <div class="phrase-sub">Thank you.</div>
+                    </div>
+                    <i class="fa-solid fa-volume-high play-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div style="height: 80px;"></div> </div>
+
+    <div id="screen-play" class="screen">
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #888;">
+            クエスト <span id="q-current">1</span> / <span id="q-total">5</span>
+        </div>
+
+        <div class="game-card">
+            <div class="step-indicator" id="step-badge">STEP 1</div>
+            <div class="mission-text" id="mission-text">この場所はどこ？</div>
+            
+            <img id="game-image" class="target-image" src="" alt="場所">
+            
+            <div id="game-map" class="map-container hidden"></div>
+
+            <div id="game-phrase" class="target-phrase"></div>
+
+            <button id="mic-btn" class="mic-btn active-mic" onclick="toggleSpeech()">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            
+            <div id="feedback-text" class="feedback-text"></div>
+            <div id="user-transcript" class="user-transcript"></div>
+        </div>
+    </div>
+
+</div>
+
+<button id="start-btn" class="fixed-bottom-btn" onclick="startGame()">
+    <i class="fa-solid fa-play"></i> ゲームスタート！
+</button>
+
+<script>
+    // --- 画像・音声パス ---
+    const IMG_PATH = 'assets/images/places/'; // 実際にあるフォルダに書き換えてください
+    const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
+    const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
+
+    // --- 20箇所の単語データ ---
+    const placesList = [
+        { hira: 'がっこう', kanji: '学校', file: 'がっこう', accepts: ['がっこう', '学校', 'ガッコウ'] },
+        { hira: 'くうこう', kanji: '空港', file: 'くうこう', accepts: ['くうこう', '空港', 'クウコウ'] },
+        { hira: 'かわ', kanji: '川', file: 'かわ', accepts: ['かわ', '川', 'カワ'] },
+        { hira: 'うみ', kanji: '海', file: 'うみ', accepts: ['うみ', '海', 'ウミ'] },
+        { hira: 'えき', kanji: '駅', file: 'えき', accepts: ['えき', '駅', 'エキ'] },
+        { hira: 'おんせん', kanji: '温泉', file: 'おんせん', accepts: ['おんせん', '温泉', 'オンセン'] },
+        { hira: 'にほん', kanji: '日本', file: 'にほん', accepts: ['にほん', '日本', 'ニホン', 'にっぽん'] },
+        { hira: 'じんじゃ', kanji: '神社', file: 'じんじゃ', accepts: ['じんじゃ', '神社', 'ジンジャ'] },
+        { hira: 'ふじさん', kanji: '富士山', file: 'ふじさん', accepts: ['ふじさん', '富士山', 'フジサン'] },
+        { hira: 'ぎんこう', kanji: '銀行', file: 'ぎんこう', accepts: ['ぎんこう', '銀行', 'ギンコウ'] },
+        { hira: 'といれ', kanji: 'トイレ', file: 'といれ', accepts: ['といれ', 'トイレ', 'お手洗い'] },
+        { hira: 'れすとらん', kanji: 'レストラン', file: 'れすとらん', accepts: ['れすとらん', 'レストラン', 'restaurant'] },
+        { hira: 'こんびに', kanji: 'コンビニ', file: 'こんびに', accepts: ['こんびに', 'コンビニ', 'convenience'] },
+        { hira: 'おてら', kanji: 'お寺', file: 'おてら', accepts: ['おてら', 'お寺', '寺', 'てら'] },
+        { hira: 'びょういん', kanji: '病院', file: 'びょういん', accepts: ['びょういん', '病院', 'ビョウイン'] },
+        { hira: 'やま', kanji: '山', file: 'やま', accepts: ['やま', '山', 'ヤマ'] },
+        { hira: 'ほてる', kanji: 'ホテル', file: 'ほてる', accepts: ['ほてる', 'ホテル', 'hotel'] },
+        { hira: 'りょかん', kanji: '旅館', file: 'りょかん', accepts: ['りょかん', '旅館', 'リョカン'] },
+        { hira: 'やきにくや', kanji: '焼肉屋', file: 'やきにくや', accepts: ['やきにくや', '焼肉屋', 'やきにく'] },
+        { hira: 'いざかや', kanji: '居酒屋', file: 'いざかや', accepts: ['いざかや', '居酒屋', 'イザカヤ'] }
+    ];
+
+    const directionWords = ['ここですよ', 'そこですよ', 'あそこですよ'];
+
+    // --- ゲームの進行状態 ---
+    let historyStack = ['screen-learning'];
+    let currentQuestions = []; // 今回遊ぶ5問のデータ
+    let currentQIndex = 0;     // 現在何問目か (0~4)
+    let currentStep = 1;       // 1:単語発音, 2:質問, 3:地図, 4:お礼
+    let targetDirectionPhrase = ''; // STEP3で読む正解フレーズ
+    let isMapTapped = false;   // STEP3で地図をタップしたか
+
+    // --- 音声関連 API ---
+    const synth = window.speechSynthesis;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+    }
+
+    // --- 初期化 ---
+    window.onload = () => {
+        renderVocabGrid();
+        updateHeader();
+    };
+
+    function renderVocabGrid() {
+        const grid = document.getElementById('vocab-grid');
+        placesList.forEach(place => {
+            const card = document.createElement('div');
+            card.className = 'vocab-card';
+            // 今回はダミーアイコンの代わりに画像パスを指定します
+            card.innerHTML = `
+                <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
+                <span>${place.kanji}</span>
+            `;
+            card.onclick = () => speakText(place.hira);
+            grid.appendChild(card);
+        });
+    }
+
+    function speakText(text) {
+        if (synth.speaking) synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ja-JP'; utter.rate = 0.9;
+        synth.speak(utter);
+    }
+
+    // --- 画面遷移管理 ---
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (historyStack[historyStack.length - 1] !== id) historyStack.push(id);
+        
+        // スタートボタンの表示切替
+        document.getElementById('start-btn').style.display = (id === 'screen-learning') ? 'flex' : 'none';
+        updateHeader();
+        window.scrollTo(0,0);
+    }
+
+    function goBack() {
+        if (historyStack.length > 1) {
+            historyStack.pop();
+            const prev = historyStack[historyStack.length - 1];
+            if (synth.speaking) synth.cancel();
+            if (isListening && recognition) recognition.stop();
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(prev).classList.add('active');
+            document.getElementById('start-btn').style.display = (prev === 'screen-learning') ? 'flex' : 'none';
+            updateHeader();
+        }
+    }
+
+    function updateHeader() {
+        const current = historyStack[historyStack.length - 1];
+        document.getElementById('btn-back').style.display = (current === 'screen-learning') ? 'none' : 'block';
+        document.getElementById('btn-home').style.display = (current === 'screen-learning') ? 'block' : 'none';
+    }
+
+    // --- ゲームの進行 ---
+    function startGame() {
+        if (!SpeechRecognition) {
+            alert("お使いのブラウザは音声認識に対応していません。");
+            return;
+        }
+        // 20箇所からランダムに5つ選ぶ
+        let shuffled = [...placesList].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffled.slice(0, 5);
+        currentQIndex = 0;
+        
+        showScreen('screen-play');
+        document.getElementById('q-total').textContent = currentQuestions.length;
+        startStep(1);
+    }
+
+    function startStep(stepNum) {
+        currentStep = stepNum;
+        const place = currentQuestions[currentQIndex];
+        
+        document.getElementById('q-current').textContent = currentQIndex + 1;
+        document.getElementById('step-badge').textContent = `STEP ${currentStep}`;
+        document.getElementById('feedback-text').textContent = '';
+        document.getElementById('user-transcript').textContent = '';
+        
+        const imgEl = document.getElementById('game-image');
+        const mapEl = document.getElementById('game-map');
+        const phraseEl = document.getElementById('game-phrase');
+        const micBtn = document.getElementById('mic-btn');
+        const missionText = document.getElementById('mission-text');
+
+        // マイクボタンは初期状態ではアクティブ
+        micBtn.classList.remove('hidden');
+        isMapTapped = false;
+
+        if (currentStep === 1) {
+            // STEP 1: 単語の発音
+            missionText.textContent = "この場所はどこ？（なまえを言ってね）";
+            imgEl.src = `${IMG_PATH}${place.file}.png`;
+            imgEl.onerror = function() { this.src = 'https://placehold.co/150x150?text=Image'; };
+            imgEl.classList.remove('hidden');
+            mapEl.classList.add('hidden');
+            phraseEl.innerHTML = `<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>`;
+            
+        } else if (currentStep === 2) {
+            // STEP 2: 質問する
+            missionText.textContent = "道を聞いてみよう！";
+            imgEl.classList.remove('hidden');
+            mapEl.classList.add('hidden');
+            phraseEl.innerHTML = `すみません、<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>は<br>どこですか？`;
+            
+        } else if (currentStep === 3) {
+            // STEP 3: 地図をタップして教える
+            missionText.textContent = `${place.kanji}はどれ？タップしてね！`;
+            imgEl.classList.add('hidden');
+            mapEl.classList.remove('hidden');
+            phraseEl.textContent = "地図から探してね";
+            micBtn.classList.add('hidden'); // タップするまではマイクを隠す
+            
+            // 地図の生成（ダミー3つ ＋ 正解1つ）
+            generateMap(place);
+            
+            // 読むべきフレーズをランダム決定
+            targetDirectionPhrase = directionWords[Math.floor(Math.random() * directionWords.length)];
+
+        } else if (currentStep === 4) {
+            // STEP 4: お礼を言う
+            missionText.textContent = "お礼を言おう！";
+            imgEl.classList.add('hidden');
+            mapEl.classList.add('hidden');
+            phraseEl.textContent = "ありがとうございます";
+        }
+
+        // 自動でヒント音声を流す
+        if (currentStep !== 3) {
+            setTimeout(() => {
+                const plainText = phraseEl.textContent.replace(/\s+/g, '');
+                speakText(plainText);
+            }, 600);
+        }
+    }
+
+    function generateMap(correctPlace) {
+        const mapEl = document.getElementById('game-map');
+        mapEl.innerHTML = '';
+        
+        // 正解以外のダミーを3つ選ぶ
+        let others = placesList.filter(p => p.hira !== correctPlace.hira);
+        others.sort(() => 0.5 - Math.random());
+        let mapItems = [correctPlace, others[0], others[1], others[2]];
+        mapItems.sort(() => 0.5 - Math.random()); // 4つの位置をシャッフル
+
+        mapItems.forEach(item => {
+            const spot = document.createElement('div');
+            spot.className = 'map-spot';
+            spot.innerHTML = `
+                <img src="${IMG_PATH}${item.file}.png" onerror="this.src='https://placehold.co/70x70?text=Map'">
+            `;
+            spot.onclick = () => handleMapTap(item, correctPlace, spot);
+            mapEl.appendChild(spot);
+        });
+    }
+
+    function handleMapTap(tappedItem, correctPlace, spotEl) {
+        if (isMapTapped) return; // すでに正解済みの場合は無視
+
+        if (tappedItem.hira === correctPlace.hira) {
+            // 正解の場所をタップした！
+            SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play();
+            isMapTapped = true;
+            spotEl.classList.add('selected');
+            
+            document.getElementById('mission-text').textContent = "道を教えてあげて！";
+            document.getElementById('game-phrase').textContent = targetDirectionPhrase;
+            document.getElementById('mic-btn').classList.remove('hidden');
+            
+            setTimeout(() => { speakText(targetDirectionPhrase); }, 500);
+
+        } else {
+            // 不正解
+            SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play();
+            spotEl.style.backgroundColor = "#ffc0cb";
+            setTimeout(() => { spotEl.style.backgroundColor = "white"; }, 500);
+        }
+    }
+
+    // --- 音声認識 ---
+    function toggleSpeech() {
+        if (!recognition) return;
+        if (isListening) { recognition.stop(); return; }
+
+        isListening = true;
+        const btn = document.getElementById('mic-btn');
+        const resText = document.getElementById('feedback-text');
+        
+        if(synth.speaking) synth.cancel();
+        
+        btn.classList.add('listening');
+        resText.textContent = "聞いています...";
+        resText.className = "feedback-text";
+
+        try { recognition.start(); } catch(e){}
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('user-transcript').textContent = `あなたの声: 「${transcript}」`;
+            checkAnswer(transcript);
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            btn.classList.remove('listening');
+        };
+        recognition.onerror = () => {
+            isListening = false;
+            btn.classList.remove('listening');
+            resText.textContent = "うまく聞き取れませんでした";
+            resText.className = "feedback-text fb-fail";
+        };
+    }
+
+    function cleanText(text) {
+        // スペース、句読点、疑問符をすべて削除して比較しやすくする
+        return text.replace(/[\s、。！？!?,，]/g, '');
+    }
+
+    function checkAnswer(speech) {
+        const place = currentQuestions[currentQIndex];
+        const resText = document.getElementById('feedback-text');
+        const cleanSpeech = cleanText(speech);
+        let maxSim = 0;
+
+        // STEPごとの正解パターンを作成
+        let accepts = [];
+
+        if (currentStep === 1) {
+            accepts = place.accepts;
+        } else if (currentStep === 2) {
+            // "すみません〇〇はどこですか"
+            place.accepts.forEach(acc => {
+                accepts.push(`すみません${acc}はどこですか`);
+                accepts.push(`すいません${acc}はどこですか`);
+                accepts.push(`${acc}はどこですか`); // 少し甘くする
+            });
+        } else if (currentStep === 3) {
+            // "ここですよ" etc.
+            accepts = [targetDirectionPhrase, targetDirectionPhrase.replace('ですよ', 'です')];
+        } else if (currentStep === 4) {
+            accepts = ['ありがとうございます', 'ありがとございます'];
+        }
+
+        // 最も高い一致率を計算
+        accepts.forEach(acc => {
+            const sim = calculateSimilarity(cleanSpeech, cleanText(acc));
+            if (sim > maxSim) maxSim = sim;
+        });
+
+        if (maxSim >= 80) {
+            resText.textContent = "合格！ Excellent!";
+            resText.className = "feedback-text fb-success";
+            SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play();
+            
+            setTimeout(() => { proceedToNextStep(); }, 1500);
+        } else {
+            resText.textContent = `もう一度！ (一致: ${Math.floor(maxSim)}%)`;
+            resText.className = "feedback-text fb-fail";
+            SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play();
+        }
+    }
+
+    function proceedToNextStep() {
+        if (currentStep < 4) {
+            startStep(currentStep + 1);
+        } else {
+            // 4ステップ終わったら次の問題へ
+            currentQIndex++;
+            if (currentQIndex < currentQuestions.length) {
+                startStep(1);
+            } else {
+                alert("ぜんぶクリア！完璧な道案内だったよ！");
+                goBack();
+            }
+        }
+    }
+
+    // レーベンシュタイン距離による類似度計算
+    function calculateSimilarity(s1, s2) {
+        if (s1 === s2) return 100;
+        if (!s1 || !s2) return 0;
+        let costs = [];
+        for (let i = 0; i <= s1.length; i++) {
+            let lastVal = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i === 0) costs[j] = j;
+                else if (j > 0) {
+                    let newVal = costs[j - 1];
+                    if (s1.charAt(i - 1) !== s2.charAt(j - 1)) newVal = Math.min(Math.min(newVal, lastVal), costs[j]) + 1;
+                    costs[j - 1] = lastVal; lastVal = newVal;
+                }
+            }
+            if (i > 0) costs[s2.length] = lastVal;
+        }
+        return ((1 - costs[s2.length] / Math.max(s1.length, s2.length)) * 100);
+    }
+
+</script>
+</body>
+</html>
