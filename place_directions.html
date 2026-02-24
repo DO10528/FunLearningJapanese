@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
     :root {
-        --primary: #00cec9;   /* 爽やかなエメラルドグリーン */
-        --secondary: #0984e3; /* ブルー */
+        --primary: #00cec9;   
+        --secondary: #0984e3; 
         --accent: #fdcb6e;
         --bg: #f0f8ff;
         --text: #2d3436;
@@ -222,11 +222,12 @@
 
 <script>
     // --- 画像・音声パス ---
-    const IMG_PATH = 'assets/images/places/'; // 実際にあるフォルダに書き換えてください
+    const IMG_PATH = 'assets/images/places/'; 
     const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
     const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
 
     // --- 20箇所の単語データ ---
+    // カタカナの単語は file と hira をカタカナ表記に修正しています
     const placesList = [
         { hira: 'がっこう', kanji: '学校', file: 'がっこう', accepts: ['がっこう', '学校', 'ガッコウ'] },
         { hira: 'くうこう', kanji: '空港', file: 'くうこう', accepts: ['くうこう', '空港', 'クウコウ'] },
@@ -238,13 +239,13 @@
         { hira: 'じんじゃ', kanji: '神社', file: 'じんじゃ', accepts: ['じんじゃ', '神社', 'ジンジャ'] },
         { hira: 'ふじさん', kanji: '富士山', file: 'ふじさん', accepts: ['ふじさん', '富士山', 'フジサン'] },
         { hira: 'ぎんこう', kanji: '銀行', file: 'ぎんこう', accepts: ['ぎんこう', '銀行', 'ギンコウ'] },
-        { hira: 'といれ', kanji: 'トイレ', file: 'といれ', accepts: ['といれ', 'トイレ', 'お手洗い'] },
-        { hira: 'れすとらん', kanji: 'レストラン', file: 'れすとらん', accepts: ['れすとらん', 'レストラン', 'restaurant'] },
-        { hira: 'こんびに', kanji: 'コンビニ', file: 'こんびに', accepts: ['こんびに', 'コンビニ', 'convenience'] },
+        { hira: 'トイレ', kanji: 'トイレ', file: 'トイレ', accepts: ['といれ', 'トイレ', 'お手洗い'] }, // ★修正
+        { hira: 'レストラン', kanji: 'レストラン', file: 'レストラン', accepts: ['れすとらん', 'レストラン', 'restaurant'] }, // ★修正
+        { hira: 'コンビニ', kanji: 'コンビニ', file: 'コンビニ', accepts: ['こんびに', 'コンビニ', 'convenience'] }, // ★修正
         { hira: 'おてら', kanji: 'お寺', file: 'おてら', accepts: ['おてら', 'お寺', '寺', 'てら'] },
         { hira: 'びょういん', kanji: '病院', file: 'びょういん', accepts: ['びょういん', '病院', 'ビョウイン'] },
         { hira: 'やま', kanji: '山', file: 'やま', accepts: ['やま', '山', 'ヤマ'] },
-        { hira: 'ほてる', kanji: 'ホテル', file: 'ほてる', accepts: ['ほてる', 'ホテル', 'hotel'] },
+        { hira: 'ホテル', kanji: 'ホテル', file: 'ホテル', accepts: ['ほてる', 'ホテル', 'hotel'] }, // ★修正
         { hira: 'りょかん', kanji: '旅館', file: 'りょかん', accepts: ['りょかん', '旅館', 'リョカン'] },
         { hira: 'やきにくや', kanji: '焼肉屋', file: 'やきにくや', accepts: ['やきにくや', '焼肉屋', 'やきにく'] },
         { hira: 'いざかや', kanji: '居酒屋', file: 'いざかや', accepts: ['いざかや', '居酒屋', 'イザカヤ'] }
@@ -284,7 +285,6 @@
         placesList.forEach(place => {
             const card = document.createElement('div');
             card.className = 'vocab-card';
-            // 今回はダミーアイコンの代わりに画像パスを指定します
             card.innerHTML = `
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
@@ -363,7 +363,9 @@
         const micBtn = document.getElementById('mic-btn');
         const missionText = document.getElementById('mission-text');
 
-        // マイクボタンは初期状態ではアクティブ
+        // カタカナと漢字が同じ場合（トイレ、コンビニ等）はルビを振らない
+        const rubyHtml = (place.kanji === place.hira) ? place.kanji : `<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>`;
+
         micBtn.classList.remove('hidden');
         isMapTapped = false;
 
@@ -374,14 +376,14 @@
             imgEl.onerror = function() { this.src = 'https://placehold.co/150x150?text=Image'; };
             imgEl.classList.remove('hidden');
             mapEl.classList.add('hidden');
-            phraseEl.innerHTML = `<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>`;
+            phraseEl.innerHTML = rubyHtml;
             
         } else if (currentStep === 2) {
             // STEP 2: 質問する
             missionText.textContent = "道を聞いてみよう！";
             imgEl.classList.remove('hidden');
             mapEl.classList.add('hidden');
-            phraseEl.innerHTML = `すみません、<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>は<br>どこですか？`;
+            phraseEl.innerHTML = `すみません、${rubyHtml}は<br>どこですか？`;
             
         } else if (currentStep === 3) {
             // STEP 3: 地図をタップして教える
@@ -391,10 +393,8 @@
             phraseEl.textContent = "地図から探してね";
             micBtn.classList.add('hidden'); // タップするまではマイクを隠す
             
-            // 地図の生成（ダミー3つ ＋ 正解1つ）
+            // 地図の生成
             generateMap(place);
-            
-            // 読むべきフレーズをランダム決定
             targetDirectionPhrase = directionWords[Math.floor(Math.random() * directionWords.length)];
 
         } else if (currentStep === 4) {
@@ -419,7 +419,7 @@
         mapEl.innerHTML = '';
         
         // 正解以外のダミーを3つ選ぶ
-        let others = placesList.filter(p => p.hira !== correctPlace.hira);
+        let others = placesList.filter(p => p.kanji !== correctPlace.kanji);
         others.sort(() => 0.5 - Math.random());
         let mapItems = [correctPlace, others[0], others[1], others[2]];
         mapItems.sort(() => 0.5 - Math.random()); // 4つの位置をシャッフル
@@ -436,10 +436,9 @@
     }
 
     function handleMapTap(tappedItem, correctPlace, spotEl) {
-        if (isMapTapped) return; // すでに正解済みの場合は無視
+        if (isMapTapped) return; 
 
-        if (tappedItem.hira === correctPlace.hira) {
-            // 正解の場所をタップした！
+        if (tappedItem.kanji === correctPlace.kanji) {
             SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play();
             isMapTapped = true;
             spotEl.classList.add('selected');
@@ -451,7 +450,6 @@
             setTimeout(() => { speakText(targetDirectionPhrase); }, 500);
 
         } else {
-            // 不正解
             SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play();
             spotEl.style.backgroundColor = "#ffc0cb";
             setTimeout(() => { spotEl.style.backgroundColor = "white"; }, 500);
@@ -494,7 +492,6 @@
     }
 
     function cleanText(text) {
-        // スペース、句読点、疑問符をすべて削除して比較しやすくする
         return text.replace(/[\s、。！？!?,，]/g, '');
     }
 
@@ -504,26 +501,22 @@
         const cleanSpeech = cleanText(speech);
         let maxSim = 0;
 
-        // STEPごとの正解パターンを作成
         let accepts = [];
 
         if (currentStep === 1) {
             accepts = place.accepts;
         } else if (currentStep === 2) {
-            // "すみません〇〇はどこですか"
             place.accepts.forEach(acc => {
                 accepts.push(`すみません${acc}はどこですか`);
                 accepts.push(`すいません${acc}はどこですか`);
-                accepts.push(`${acc}はどこですか`); // 少し甘くする
+                accepts.push(`${acc}はどこですか`); 
             });
         } else if (currentStep === 3) {
-            // "ここですよ" etc.
             accepts = [targetDirectionPhrase, targetDirectionPhrase.replace('ですよ', 'です')];
         } else if (currentStep === 4) {
             accepts = ['ありがとうございます', 'ありがとございます'];
         }
 
-        // 最も高い一致率を計算
         accepts.forEach(acc => {
             const sim = calculateSimilarity(cleanSpeech, cleanText(acc));
             if (sim > maxSim) maxSim = sim;
@@ -546,7 +539,6 @@
         if (currentStep < 4) {
             startStep(currentStep + 1);
         } else {
-            // 4ステップ終わったら次の問題へ
             currentQIndex++;
             if (currentQIndex < currentQuestions.length) {
                 startStep(1);
@@ -557,7 +549,6 @@
         }
     }
 
-    // レーベンシュタイン距離による類似度計算
     function calculateSimilarity(s1, s2) {
         if (s1 === s2) return 100;
         if (!s1 || !s2) return 0;
