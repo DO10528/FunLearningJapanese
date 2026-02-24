@@ -839,6 +839,7 @@ onAuthStateChanged(auth, async (user) => {
 window.currentLang = 'ja'; 
 window.isUserPremium = false; // デフォルトはfalse
 
+// ★翻訳データに「btn_h_hatsuon」を追加
 window.i18nData = {
 ja: {
 main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト",
@@ -847,7 +848,7 @@ btn_kiso: "ひらがなカタカナ", btn_hiragana_video: "動画練習", btn_ke
 cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
 cat_clock: "とけい", cat_date_time: "日付・時間",
 cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう", cat_practice: "じっせん", cat_manga: "マンガ", cat_culture: "文化・行事", cat_prefecture: "都道府県",
-btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_match: "ひらがなマッチ",
+btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_hatsuon: "発音マスター", btn_h_match: "ひらがなマッチ",
 btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
 btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_match: "カタカナマッチ", btn_k_pair: "ひらカタあわせ",
 btn_shiri1: "しりとり1", btn_shiri2: "しりとり2", btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
@@ -878,7 +879,7 @@ btn_kiso: "Hiragana/Katakana", btn_hiragana_video: "Video Practice", btn_keiyosh
 cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
 cat_clock: "Clock", cat_date_time: "Date & Time",
 cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Grammar & Sentences", cat_practice: "Practice", cat_manga: "Manga", cat_culture: "Culture", cat_prefecture: "Prefectures",
-btn_h_write: "Writing Dojo", btn_h_sound: "Sound Quiz", btn_h_match: "Matching",
+btn_h_write: "Writing Dojo", btn_h_sound: "Sound Quiz", btn_h_hatsuon: "Pronunciation", btn_h_match: "Matching",
 btn_h_vocab: "Vocabulary", btn_h_reorder: "Unscramble", btn_h_meteor: "Meteor Quiz",
 btn_k_write: "Writing Dojo", btn_k_sound: "Sound Quiz", btn_k_match: "Matching", btn_k_pair: "Hira-Kata Pair",
 btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2", btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings",
@@ -905,9 +906,11 @@ err_auth_fail: "Incorrect email or password."
 };
 
 const gameStructure = [
+// ★hiraganaカテゴリの配列に「hiragana_hatsuon.html」を追加
 { id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
 { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
 { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
+{ url: "hiragana_pronunciation.html", titleKey: "btn_h_hatsuon", icon: "fa-solid fa-microphone" },
 { url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
 { url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
 { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
