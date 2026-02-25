@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
         meteorSpeed = 3.33; 
         scoreDisplay.textContent = score;
         lifeDisplay.textContent = life;
-        skyArea.innerHTML = ''; 
+        skyArea.textContent = ''; 
 
         isQuestionActive = false;
 

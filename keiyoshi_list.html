@@ -220,7 +220,7 @@
 
             // 2. リスト描画関数
             function renderList(list) {
-                container.innerHTML = '';
+                container.textContent = '';
                 if (list.length === 0) {
                     container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
                     return;

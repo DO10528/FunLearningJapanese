@@ -435,7 +435,7 @@ if (homeBtn) homeBtn.style.display = 'none';
 
 function renderLearning() {
 const container = document.getElementById('learning-content');
-container.innerHTML = '';
+container.textContent = '';
 learningData.forEach(cat => {
 const section = document.createElement('div');
 section.className = 'learning-section';

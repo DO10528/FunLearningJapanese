@@ -210,7 +210,7 @@
     const synth = window.speechSynthesis;
 
     function renderCards(type) {
-        container.innerHTML = '';
+        container.textContent = '';
         const filtered = rawData.adjectives.filter(a => a.type === type);
 
         filtered.forEach(item => {

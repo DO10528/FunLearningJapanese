@@ -308,7 +308,7 @@
         
         if (g1CurrentIndex >= g1FilteredItems.length) {
             document.getElementById('g1-q').innerText = "Clear! よくできました！";
-            document.getElementById('g1-choices').innerHTML = "";
+            document.getElementById('g1-choices').textContent = "";
             document.getElementById('g1-next').style.display = 'none';
             document.getElementById('g1-result').innerHTML = '<button class="next-btn" style="display:block" onclick="location.reload()">もういちど</button>';
             return;
@@ -320,7 +320,7 @@
         document.getElementById('g1-next').style.display = 'none';
 
         const grid = document.getElementById('g1-choices');
-        grid.innerHTML = '';
+        grid.textContent = '';
         
         const shuffled = [...data.choices].sort(() => Math.random() - 0.5);
         
@@ -363,12 +363,12 @@
         }
         const data = g2Data[g2CurrentIndex];
         document.getElementById('g2-eng').innerText = data.eng;
-        document.getElementById('g2-dropzone').innerHTML = '';
+        document.getElementById('g2-dropzone').textContent = '';
         document.getElementById('g2-result').innerText = '';
         document.getElementById('g2-next').style.display = 'none';
 
         const bank = document.getElementById('g2-bank');
-        bank.innerHTML = '';
+        bank.textContent = '';
         
         let blocksToShow = [...data.blocks].sort(() => Math.random() - 0.5);
 
@@ -398,7 +398,7 @@
 
     function resetG2Puzzle() {
         g2CurrentBlocks = [];
-        document.getElementById('g2-dropzone').innerHTML = '';
+        document.getElementById('g2-dropzone').textContent = '';
         document.getElementById('g2-result').innerText = '';
         const blocks = document.querySelectorAll('#g2-bank .block');
         blocks.forEach(b => b.classList.remove('used'));
@@ -437,7 +437,7 @@
         document.getElementById('g3-next').style.display = 'none';
 
         const grid = document.getElementById('g3-choices');
-        grid.innerHTML = '';
+        grid.textContent = '';
 
         const card1 = createImgCard(data.correctText, data.correctIcon, true);
         const card2 = createImgCard(data.wrongText, data.wrongIcon, false);

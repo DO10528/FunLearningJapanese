@@ -364,8 +364,8 @@
 
     function loadQuestion() {
         if (currentQIndex >= questions.length) {
-            sentenceArea.innerHTML = "🎉 ぜんぶ クリア！";
-            choicesArea.innerHTML = "";
+            sentenceArea.textContent = "🎉 ぜんぶ クリア！";
+            choicesArea.textContent = "";
             nextBtn.style.display = 'none';
             feedbackMsg.textContent = "おめでとう！";
             return;
@@ -378,7 +378,7 @@
         progressText.textContent = `だい ${currentQIndex + 1} もん`;
 
         // 文の生成
-        sentenceArea.innerHTML = '';
+        sentenceArea.textContent = '';
         let ansIndex = 0;
         currentQuestion.parts.forEach(part => {
             if (part === "target") {
@@ -397,7 +397,7 @@
         });
 
         // 選択肢の生成 (正解を含みつつ、プールからランダムに数個追加)
-        choicesArea.innerHTML = '';
+        choicesArea.textContent = '';
         // 必要な正解
         let choices = [...currentQuestion.answers];
         // ダミーを追加 (合計5個くらいになるまで)

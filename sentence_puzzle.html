@@ -334,8 +334,8 @@
                 currentCorrectParts = japaneseParts; 
 
                 // 1. UIをリセット
-                dropZone.innerHTML = '';
-                cardContainer.innerHTML = '';
+                dropZone.textContent = '';
+                cardContainer.textContent = '';
                 feedbackMessage.classList.add('hidden');
                 feedbackMessage.className = 'sp-quiz-feedback-message hidden'; 
                 checkButton.disabled = false;
@@ -499,7 +499,7 @@
                     card.classList.remove('correct-slot', 'wrong-slot');
                 });
                 
-                dropZone.innerHTML = '';
+                dropZone.textContent = '';
                 displayFeedback(false, `パズルをリセットしました。`);
                 feedbackMessage.className = 'sp-quiz-feedback-message hidden';
                 checkButton.disabled = false;
@@ -526,8 +526,8 @@
                 playSound(SOUND_CORRECT_PATH); 
                 questionText.textContent = `🎉 ゲームクリア！`;
                 englishTranslation.textContent = `おめでとうございます！`;
-                dropZone.innerHTML = '';
-                cardContainer.innerHTML = '';
+                dropZone.textContent = '';
+                cardContainer.textContent = '';
                 checkButton.disabled = true;
                 resetButton.disabled = true;
                 displayFeedback(true, `全問終了！最終スコアは ${score} 点です。`);

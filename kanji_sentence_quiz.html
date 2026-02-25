@@ -401,7 +401,7 @@
     // --- 1. 文章一覧生成 ---
     function initList() {
         const container = document.getElementById('study-list-container');
-        container.innerHTML = '';
+        container.textContent = '';
         
         // リスト用に全データをフラットにする（グループも分解）
         let allData = [...level1Data];
@@ -519,7 +519,7 @@
         const choices = [q.target, q.wrong1, q.wrong2];
         choices.sort(() => 0.5 - Math.random());
 
-        choicesContainer.innerHTML = '';
+        choicesContainer.textContent = '';
         choices.forEach(char => {
             const btn = document.createElement('button');
             btn.className = 'choice-btn';

@@ -770,7 +770,7 @@
     window.selectLevel = (level) => {
         const data = kanjiDatabase[level];
         // リスト表示
-        grid.innerHTML = '';
+        grid.textContent = '';
         data.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';

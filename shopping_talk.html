@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const listEl = document.getElementById('practice-list');
-        listEl.innerHTML = '';
+        listEl.textContent = '';
         document.getElementById('practice-title').textContent = currentData.name;
 
         currentData.steps.forEach((step, idx) => {
@@ -847,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('clerk-text-en').textContent = step.clerk.en;
         window.speak(step.clerk.jp);
 
-        document.getElementById('score-result').innerHTML = '';
+        document.getElementById('score-result').textContent = '';
         document.getElementById('recognized-text').textContent = '...';
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('mic-btn').disabled = false;

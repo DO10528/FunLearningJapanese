@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // セルを空に戻す
-            targetCell.innerHTML = '';
+            targetCell.textContent = '';
             targetCell.classList.remove('filled');
             targetCell.classList.add('drop-target');
             // datasetのデータもクリア

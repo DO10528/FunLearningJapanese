@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const shuffled = shuffleArray([...chars]);
 
         // ドロップゾーン作成 (答えの数だけ枠を作る)
-        ANSWER_CONTAINER.innerHTML = '';
+        ANSWER_CONTAINER.textContent = '';
         chars.forEach((_, i) => {
             const slot = document.createElement('div');
             slot.className = 'drop-slot';
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // 文字ピース作成 (プールに配置)
-        POOL_CONTAINER.innerHTML = '';
+        POOL_CONTAINER.textContent = '';
         setupDropZone(POOL_CONTAINER); // プールもドロップ可能にする
 
         shuffled.forEach((char, i) => {

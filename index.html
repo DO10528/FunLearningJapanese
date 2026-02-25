@@ -620,7 +620,7 @@ const gameGrid = document.getElementById('game-grid');
 const backBtn = document.getElementById('game-back-btn');
 
 window.renderGameCategories = () => {
-gameGrid.innerHTML = '';
+gameGrid.textContent = '';
 backBtn.style.display = 'none';
 document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang].group_learning;
 gameStructure.forEach(cat => {
@@ -638,7 +638,7 @@ gameGrid.classList.add('fade-in');
 };
 
 function renderGameList(category) {
-    gameGrid.innerHTML = '';
+    gameGrid.textContent = '';
     backBtn.style.display = 'block';
     document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
     

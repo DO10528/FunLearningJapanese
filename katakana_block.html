@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.initPractice = (level) => {
         currentLevel = level;
         const container = document.getElementById('practice-container');
-        container.innerHTML = '';
+        container.textContent = '';
         level.chars.forEach(char => {
             const block = document.createElement('div');
             block.className = 'practice-block';
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupGameBoard(level) {
         const board = document.getElementById('game-board');
-        board.innerHTML = '';
+        board.textContent = '';
         document.getElementById('level-indicator').textContent = `Level ${level.id}`;
         document.getElementById('judge-msg').textContent = '';
         placedCount = 0;
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sourceBlocks.forEach(b => {
                 if(b.dataset.char === char) b.classList.remove('placeholder');
             });
-            slot.innerHTML = '';
+            slot.textContent = '';
             placedCount--;
         };
         

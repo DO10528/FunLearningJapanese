@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderChoices(choices, lastChar) {
-    CHOICE_AREA.innerHTML = '';
+    CHOICE_AREA.textContent = '';
     QUESTION_TEXT.textContent = `「${lastChar}」から はじまるのは？`;
 
     choices.forEach(word => {
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 終了処理 ---
     async function endGame(isWin, finalScore) { 
-        CHOICE_AREA.innerHTML = '';
+        CHOICE_AREA.textContent = '';
         QUESTION_TEXT.textContent = '';
         
         END_CONTROLS.style.display = 'block';

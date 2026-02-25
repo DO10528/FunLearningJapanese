@@ -358,7 +358,7 @@
 
             // --- 勉強スクリーン ---
             function setupStudyScreen() {
-                studyGrid.innerHTML = '';
+                studyGrid.textContent = '';
                 minuteData.forEach(min => {
                     const item = document.createElement('div');
                     item.className = `tc-study-item type-${min.type}`;
@@ -378,8 +378,8 @@
             // --- クイズ起動 ---
             window.startSpecificQuiz = function(mode) {
                 currentMode = mode;
-                quizPromptArea.innerHTML = '';
-                quizOptions.innerHTML = '';
+                quizPromptArea.textContent = '';
+                quizOptions.textContent = '';
                 quiz3Area.style.display = 'none';
                 feedback.textContent = '';
                 feedback.className = '';

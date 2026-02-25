@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 選択肢ボタン生成
         if (CHOICE_BUTTONS_AREA) {
-            CHOICE_BUTTONS_AREA.innerHTML = '';
+            CHOICE_BUTTONS_AREA.textContent = '';
         }
         if (FEEDBACK) {
             FEEDBACK.textContent = '';

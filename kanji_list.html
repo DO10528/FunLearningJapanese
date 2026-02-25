@@ -730,7 +730,7 @@
 
         // ▼ リスト描画関数 ▼
         function renderList(list, borderColor = '#ccc') {
-            kanjiContainer.innerHTML = '';
+            kanjiContainer.textContent = '';
             
             if (list.length === 0) {
                 kanjiContainer.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';

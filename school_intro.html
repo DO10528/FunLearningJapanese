@@ -334,7 +334,7 @@
         document.getElementById('feedback-text').className = 'feedback-text';
         document.getElementById('mic-btn').classList.add('hidden');
         document.getElementById('options-area').classList.add('hidden');
-        document.getElementById('image-area').innerHTML = '';
+        document.getElementById('image-area').textContent = '';
 
         if (currentMode === 1) setupGame1();
         else if (currentMode === 2) setupGame2();
@@ -369,7 +369,7 @@
         ]);
 
         const optArea = document.getElementById('options-area');
-        optArea.innerHTML = '';
+        optArea.textContent = '';
         
         options.forEach(opt => {
             const btn = document.createElement('div');

@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('practice-title').textContent = data.title;
         
         const listEl = document.getElementById('word-list');
-        listEl.innerHTML = '';
+        listEl.textContent = '';
         data.words.forEach(w => {
             const div = document.createElement('div');
             div.className = 'practice-item';
@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
         iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
 
         const container = document.getElementById('options-container');
-        container.innerHTML = '';
+        container.textContent = '';
         
         const options = [...q.options].sort(() => Math.random() - 0.5);
         

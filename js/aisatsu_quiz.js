@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 練習モード初期化 (★ここを変更しました)
     // ----------------------------------------------------
     function initStudyScreen() {
-        studyGridEl.innerHTML = '';
+        studyGridEl.textContent = '';
         greetingsData.forEach(word => {
             const item = document.createElement('div');
             item.className = 'aq-study-item';
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrongOptions = shuffleArray(problem.wrongs).slice(0, 2); 
         const options = shuffleArray([problem.correct, ...wrongOptions]);
         
-        choicesContainerEl.innerHTML = '';
+        choicesContainerEl.textContent = '';
         options.forEach(optionText => {
             const button = document.createElement('button');
             button.textContent = optionText;

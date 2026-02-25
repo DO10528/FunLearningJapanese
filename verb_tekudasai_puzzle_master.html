@@ -383,9 +383,9 @@
         scenarioText.innerText = currentQ.scenario;
         verbMasuDisplay.innerText = `V-ます形: ${currentQ.v_masu}`;
         
-        constructionArea.innerHTML = '';
+        constructionArea.textContent = '';
         constructionArea.classList.remove('shaking');
-        resultMessage.innerHTML = '';
+        resultMessage.textContent = '';
         checkBtn.disabled = false;
         
         const fixedKudasai = createBlock("ください", true);
@@ -400,7 +400,7 @@
     }
     
     function renderBlocks(shuffledBlocks) {
-        blockChoices.innerHTML = '';
+        blockChoices.textContent = '';
         shuffledBlocks.forEach(word => {
             const block = createBlock(word, false);
             blockChoices.appendChild(block);
@@ -465,7 +465,7 @@
             
             currentQIndex++;
             setTimeout(() => { 
-                resultMessage.innerHTML = '';
+                resultMessage.textContent = '';
                 checkBtn.disabled = false;
                 nextQuestion(); 
             }, 2500);

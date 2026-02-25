@@ -391,7 +391,7 @@ function updateHeader() {
 // 1. 練習画面（FontAwesomeアイコンで描画）
 function renderLearning() {
     const container = document.getElementById('learning-content');
-    container.innerHTML = '';
+    container.textContent = '';
     
     learningData.forEach(cat => {
         const section = document.createElement('div');

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 初期化 ---
     function initGame() {
-        LEVEL_GRID.innerHTML = '';
+        LEVEL_GRID.textContent = '';
         gameLevels.forEach(level => {
             const btn = document.createElement('button');
             btn.className = 'level-btn';
@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         FEEDBACK.textContent = '';
         FEEDBACK.className = 'feedback-msg';
 
-        ILLUST_POOL.innerHTML = '';
-        WORD_LIST.innerHTML = '';
+        ILLUST_POOL.textContent = '';
+        WORD_LIST.textContent = '';
 
         // シャッフル
         const words = shuffleArray([...levelData.words]);

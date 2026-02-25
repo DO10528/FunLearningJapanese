@@ -323,7 +323,7 @@ window.showScreen = (id) => {
 // 1. 練習画面の描画（イラスト付き）
 function renderLearning() {
     const container = document.getElementById('learning-content');
-    container.innerHTML = '';
+    container.textContent = '';
     
     Object.keys(mannersData).forEach(key => {
         const data = mannersData[key];
@@ -354,7 +354,7 @@ function renderLearning() {
 // 2. カテゴリ選択ボタンの描画
 function renderCategoryButtons() {
     const grid = document.getElementById('cat-grid');
-    grid.innerHTML = '';
+    grid.textContent = '';
     Object.keys(mannersData).forEach(key => {
         const data = mannersData[key];
         const btn = document.createElement('button');
@@ -385,7 +385,7 @@ function loadQuiz() {
     speak(qData.q);
 
     const optionsDiv = document.getElementById('quiz-options');
-    optionsDiv.innerHTML = '';
+    optionsDiv.textContent = '';
 
     // 選択肢シャッフル
     const options = [...qData.options].sort(() => Math.random() - 0.5);

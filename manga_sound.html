@@ -409,7 +409,7 @@
     // --- 辞書生成 ---
     function initDictionary() {
         const container = document.getElementById('dictionary-container');
-        container.innerHTML = '';
+        container.textContent = '';
         
         // 全データをフラットに
         let allWords = [];
@@ -497,7 +497,7 @@
         choices.sort(() => 0.5 - Math.random());
         
         const btnContainer = document.getElementById('choice-container');
-        btnContainer.innerHTML = '';
+        btnContainer.textContent = '';
         
         choices.forEach(c => {
             const btn = document.createElement('button');

@@ -260,7 +260,7 @@
         setTimeout(() => playQuestionSound(), 300);
 
         const container = document.getElementById('choices-area');
-        container.innerHTML = '';
+        container.textContent = '';
 
         const isLeftCorrect = Math.random() > 0.5;
         const leftContent = isLeftCorrect ? currentQ.correct : currentQ.wrong;

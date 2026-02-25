@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const options = shuffleArray([correctAnswer, ...wrongAnswers]);
 
         // ボタン配置
-        choicesContainer.innerHTML = '';
+        choicesContainer.textContent = '';
         
         // ★もし正解演出中ならメッセージは消さない、そうでなければ消す
         if (!isAnswering) {

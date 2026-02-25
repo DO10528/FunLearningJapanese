@@ -321,7 +321,7 @@
     // --- 初期化：練習リスト生成 ---
     function initPractice() {
         const container = document.getElementById('practice-container');
-        container.innerHTML = '';
+        container.textContent = '';
         
         for(let l=1; l<=4; l++) {
             signsData[l].forEach(item => {
@@ -403,7 +403,7 @@
         options.sort(() => 0.5 - Math.random());
 
         const btnContainer = document.getElementById('choice-container');
-        btnContainer.innerHTML = '';
+        btnContainer.textContent = '';
         
         options.forEach(opt => {
             const btn = document.createElement('button');

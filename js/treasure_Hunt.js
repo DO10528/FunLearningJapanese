@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ★ 5. トピック選択ロジック
     // ----------------------------------------------------
     function initTopicScreen() {
-        topicGrid.innerHTML = '';
+        topicGrid.textContent = '';
         Object.keys(GAME_DATA).forEach(key => {
             const data = GAME_DATA[key];
             const card = document.createElement('div');
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 勉強画面のセットアップ
         studyTitle.textContent = `「${GAME_DATA[key].title}」の ことば`;
-        studyGrid.innerHTML = '';
+        studyGrid.textContent = '';
 
         currentWordList.forEach(word => {
             const item = document.createElement('div');

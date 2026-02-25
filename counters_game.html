@@ -415,7 +415,7 @@ function showFeedback(isCorrect) {
 // --- 練習モード ---
 function startPractice() {
     const list = document.getElementById('practice-list');
-    list.innerHTML = '';
+    list.textContent = '';
     
     // 定義された順に表示
     Object.keys(counters).forEach(key => {
@@ -626,7 +626,7 @@ function startLevel3() {
     
     // 箱エリア (中央揃え済)
     const boxContainer = document.getElementById('l3-boxes');
-    boxContainer.innerHTML = '';
+    boxContainer.textContent = '';
     targetKeys.forEach(key => {
         const div = document.createElement('div');
         div.className = 'category-box';
@@ -638,7 +638,7 @@ function startLevel3() {
 
     // アイテムプール作成 (重複なしロジック)
     const pool = document.getElementById('l3-items');
-    pool.innerHTML = '';
+    pool.textContent = '';
     
     // 1. 対象の助数詞を持つアイテム候補を全て集める
     let candidates = items.filter(it => targetKeys.includes(it.counter));

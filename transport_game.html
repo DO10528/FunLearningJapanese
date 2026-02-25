@@ -348,7 +348,7 @@
 
     function renderGrid(elemId, dataList) {
         const container = document.getElementById(elemId);
-        container.innerHTML = '';
+        container.textContent = '';
         dataList.forEach(item => {
             const div = document.createElement('div');
             div.className = 'card';
@@ -363,7 +363,7 @@
     
     function initGame1() {
         document.getElementById('feedback-game1').innerText = '';
-        document.getElementById('area-game1').innerHTML = '';
+        document.getElementById('area-game1').textContent = '';
         
         const sub = getRandom(people);
         const plc = getRandom(places);
@@ -385,7 +385,7 @@
         g1Answer = parts.map(p => p.text).join('');
 
         const pool = document.getElementById('pool-game1');
-        pool.innerHTML = '';
+        pool.textContent = '';
         shuffle([...parts]).forEach(p => {
             const btn = document.createElement('div');
             btn.className = 'word-block';
@@ -471,7 +471,7 @@
         const fixArea = document.getElementById('area-fix-game2');
         fixArea.style.display = 'block';
         const optsDiv = document.getElementById('opts-game2');
-        optsDiv.innerHTML = '';
+        optsDiv.textContent = '';
         
         let dummy = getRandom(places);
         while(dummy.id === g2Target.id) dummy = getRandom(places);
@@ -549,7 +549,7 @@
     function showFixQuestion3() {
         document.getElementById('area-fix-game3').style.display = 'block';
         const optsDiv = document.getElementById('opts-game3');
-        optsDiv.innerHTML = '';
+        optsDiv.textContent = '';
         
         let dummy = getRandom(transports);
         while(dummy.id === g3Target.id) dummy = getRandom(transports);
@@ -581,7 +581,7 @@
 
     function initGame4() {
         document.getElementById('feedback-game4').innerText = '';
-        document.getElementById('area-game4').innerHTML = '';
+        document.getElementById('area-game4').textContent = '';
 
         const sub = getRandom(people);
         const trn = getRandom(transports);
@@ -607,7 +607,7 @@
 
         const parts = [p1, p2, p3, p4];
         const pool = document.getElementById('pool-game4');
-        pool.innerHTML = '';
+        pool.textContent = '';
         shuffle(parts).forEach(txt => {
             const btn = document.createElement('div');
             btn.className = 'word-block';

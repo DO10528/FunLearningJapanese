@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ここで要素が確実に作られるようにする
     const levelGrid = document.getElementById('level-grid');
     if (levelGrid) {
-        levelGrid.innerHTML = ''; // クリア
+        levelGrid.textContent = ''; // クリア
         hiraganaData.forEach(level => {
             const btn = document.createElement('div'); 
             btn.className = 'level-btn';
@@ -296,7 +296,7 @@ window.speak = (text) => {
 window.initPractice = (level) => {
     currentLevel = level;
     const container = document.getElementById('practice-container');
-    container.innerHTML = '';
+    container.textContent = '';
     level.chars.forEach(char => {
         const block = document.createElement('div');
         block.className = 'practice-block';
@@ -315,7 +315,7 @@ window.startGame = () => {
 
 function setupGameBoard(level) {
     const board = document.getElementById('game-board');
-    board.innerHTML = '';
+    board.textContent = '';
     document.getElementById('level-indicator').textContent = `Level ${level.id}`;
     document.getElementById('judge-msg').textContent = '';
     placedCount = 0;
@@ -436,7 +436,7 @@ function placeChar(slot, char) {
         sourceBlocks.forEach(b => {
             if(b.dataset.char === char) b.classList.remove('placeholder');
         });
-        slot.innerHTML = '';
+        slot.textContent = '';
         placedCount--;
     };
     

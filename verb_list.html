@@ -437,7 +437,7 @@
 
     function renderList(containerId, data) {
         const container = document.getElementById(containerId);
-        container.innerHTML = '';
+        container.textContent = '';
         
         data.forEach((item) => {
             const card = document.createElement('div');

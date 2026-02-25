@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questionNumberElement.textContent = `第 ${currentQuestionIndex + 1} 問 (全 ${QUIZ_TOTAL_QUESTIONS} 問)`;
         questionMeaningElement.textContent = question.meaning;
         
-        choicesContainer.innerHTML = ''; 
+        choicesContainer.textContent = ''; 
         question.choices.forEach(adjective => {
             const button = document.createElement('button');
             
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function endQuiz() {
         questionNumberElement.textContent = "クイズ終了！";
         questionMeaningElement.textContent = "お疲れ様でした！";
-        choicesContainer.innerHTML = ''; 
+        choicesContainer.textContent = ''; 
         // choicesContainer.style.display = 'none'; 
 
         quizImageElement.src = ''; 

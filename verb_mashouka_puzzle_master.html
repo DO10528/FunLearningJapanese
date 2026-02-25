@@ -332,9 +332,9 @@
         scenarioText.innerText = currentQ.scenario;
         verbMasuDisplay.innerText = `V-ます形: ${currentQ.v_masu}`;
         
-        constructionArea.innerHTML = '';
+        constructionArea.textContent = '';
         constructionArea.classList.remove('shaking');
-        resultMessage.innerHTML = '';
+        resultMessage.textContent = '';
         checkBtn.disabled = false;
         
         const fixedBlock = createBlock("ましょうか", true);
@@ -348,7 +348,7 @@
     }
     
     function renderBlocks(shuffledBlocks) {
-        blockChoices.innerHTML = '';
+        blockChoices.textContent = '';
         shuffledBlocks.forEach(word => {
             blockChoices.appendChild(createBlock(word, false));
         });
@@ -410,7 +410,7 @@
             speak("せいかい！"); 
             currentQIndex++;
             setTimeout(() => { 
-                resultMessage.innerHTML = ''; checkBtn.disabled = false; nextQuestion(); 
+                resultMessage.textContent = ''; checkBtn.disabled = false; nextQuestion(); 
             }, 2500);
         } else {
             playBubu();

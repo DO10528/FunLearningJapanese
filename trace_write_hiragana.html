@@ -272,7 +272,7 @@
 
     // --- 初期化: レベルボタン生成 ---
     function initLevelMenu() {
-        levelGrid.innerHTML = '';
+        levelGrid.textContent = '';
         hiraganaLevels.forEach(level => {
             const btn = document.createElement('div');
             btn.className = 'level-btn';
