@@ -548,7 +548,7 @@
 
         // ヘッダーボタンの更新
         const btn = document.getElementById('header-back-btn');
-        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 練習に戻る';
+        if(btn) btn.textContent = '<i class="fa-solid fa-arrow-left"></i> 練習に戻る';
     }
 
 
@@ -567,7 +567,7 @@
 
         // ヘッダーボタンの更新
         const btn = document.getElementById('header-back-btn');
-        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ';
+        if(btn) btn.textContent = '<i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ';
 
         let sourceData;
         if (mode === 1) {
@@ -823,7 +823,7 @@
             checkBtn.disabled = false;
         }
         
-        document.getElementById(`feedback-message-${mode}`).innerHTML = feedback;
+        document.getElementById(`feedback-message-${mode}`).textContent = feedback;
     }
 
     function nextQuestion(mode) {
@@ -844,15 +844,15 @@
         const scoreboard = document.getElementById('scoreboard');
         scoreboard.style.display = 'block';
 
-        document.getElementById('score-text').innerHTML = 
+        document.getElementById('score-text').textContent = 
             `<p>お疲れ様でした！</p>
             <p style="font-size:2em; margin:10px 0;">あなたのスコアは <span style="color:var(--accent);">${score}</span> / ${maxQuestions} 点です。</p>`;
         
         if (score >= maxQuestions * 0.7) { 
-            document.getElementById('score-text').innerHTML += 
+            document.getElementById('score-text').textContent += 
                 `<p style="color:var(--accent); font-weight:900;">🎉 素晴らしい！ポイント獲得チャンスを活かしました！ 🎉</p>`;
         } else {
-            document.getElementById('score-text').innerHTML += 
+            document.getElementById('score-text').textContent += 
                 `<p style="font-weight:700;">もう一度チャレンジして、ポイントを獲得しましょう！</p>`;
         }
     }

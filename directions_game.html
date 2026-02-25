@@ -336,7 +336,7 @@
     places.forEach(p => {
         const div = document.createElement('div');
         div.className = 'vocab-card';
-        div.innerHTML = `<div class="vocab-icon"><i class="fa-solid ${p.icon}" style="color:${p.color}"></i></div><div>${p.name}</div><div style="font-size:0.8em; color:#888;">${p.kana}</div>`;
+        div.textContent = `<div class="vocab-icon"><i class="fa-solid ${p.icon}" style="color:${p.color}"></i></div><div>${p.name}</div><div style="font-size:0.8em; color:#888;">${p.kana}</div>`;
         div.onclick = () => speak(p.kana);
         vGrid.appendChild(div);
     });
@@ -350,7 +350,7 @@
     extras.forEach(d => {
         const div = document.createElement('div');
         div.className = 'vocab-card';
-        div.innerHTML = `<div class="vocab-icon"><i class="fa-solid ${d.i}" style="color:#555"></i></div><div>${d.n}</div><div style="font-size:0.8em; color:#888;">${d.k}</div>`;
+        div.textContent = `<div class="vocab-icon"><i class="fa-solid ${d.i}" style="color:#555"></i></div><div>${d.n}</div><div style="font-size:0.8em; color:#888;">${d.k}</div>`;
         div.onclick = () => speak(d.k);
         vGrid.appendChild(div);
     });
@@ -363,7 +363,7 @@
         askTarget = places[Math.floor(Math.random() * places.length)];
         document.getElementById('ask-target-text').textContent = askTarget.name;
         document.getElementById('ask-target-kana').textContent = askTarget.name;
-        document.getElementById('ask-target-icon').innerHTML = `<i class="fa-solid ${askTarget.icon}" style="color:${askTarget.color}"></i>`;
+        document.getElementById('ask-target-icon').textContent = `<i class="fa-solid ${askTarget.icon}" style="color:${askTarget.color}"></i>`;
         document.getElementById('ask-feedback').textContent = "";
     };
     window.checkSpeechGame2 = () => {
@@ -528,16 +528,16 @@
                 if(currentGameMode === 5) {
                     // Game 5: 全て同じアイコン
                     if((x === targetPos.x && y === targetPos.y) || distractions.some(d => d.pos.x===x && d.pos.y===y)) {
-                        cell.innerHTML = `<i class="fa-solid fa-building building-icon" style="color:#607d8b;"></i>`;
+                        cell.textContent = `<i class="fa-solid fa-building building-icon" style="color:#607d8b;"></i>`;
                     }
                 } else {
                     // Game 4: アイコンのみ（文字なし）
                     if(x === targetPos.x && y === targetPos.y) {
-                        cell.innerHTML = `<i class="fa-solid ${targetObj.icon} building-icon" style="color:${targetObj.color}"></i>`;
+                        cell.textContent = `<i class="fa-solid ${targetObj.icon} building-icon" style="color:${targetObj.color}"></i>`;
                     }
                     distractions.forEach(d => {
                         if(d.pos.x === x && d.pos.y === y) {
-                            cell.innerHTML = `<i class="fa-solid ${d.obj.icon} building-icon" style="color:${d.obj.color}"></i>`;
+                            cell.textContent = `<i class="fa-solid ${d.obj.icon} building-icon" style="color:${d.obj.color}"></i>`;
                         }
                     });
                 }

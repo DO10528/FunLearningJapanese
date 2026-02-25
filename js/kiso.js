@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        seionContainer.innerHTML = html;
+        seionContainer.textContent = html;
     }
 
     // 4b. 濁音・半濁音 (3列テーブルの描画)
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>
             `;
         });
-        tbody.innerHTML = html;
+        tbody.textContent = html;
     }
 
     renderTable('kiso-tbody-dakuon', DAKUON_DATA);

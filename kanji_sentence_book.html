@@ -219,7 +219,7 @@
         level1Data.forEach((q, i) => {
             const div = document.createElement('div');
             div.className = 'question-item';
-            div.innerHTML = `
+            div.textContent = `
                 <div class="sentence">${i+1}. ${q.pre}<span class="blank">（${q.reading}）</span>${q.post}</div>
                 <div class="choices">
                     ${q.choices.map(c => `<div class="choice">${c}</div>`).join('')}
@@ -234,11 +234,11 @@
         data.forEach((group, i) => {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'conversation-group';
-            groupDiv.innerHTML = `<strong>【セット ${i+1}】</strong>`;
+            groupDiv.textContent = `<strong>【セット ${i+1}】</strong>`;
             group.forEach(q => {
                 const div = document.createElement('div');
                 div.className = 'question-item';
-                div.innerHTML = `
+                div.textContent = `
                     <div class="sentence"><span class="role-badge">${q.role}</span> ${q.pre}<span class="blank">（${q.reading}）</span>${q.post}</div>
                     <div class="choices">
                         ${q.choices.map(c => `<div class="choice">${c}</div>`).join('')}

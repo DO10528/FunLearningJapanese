@@ -329,9 +329,9 @@
         
         // V-ます形表示を更新
         if (currentMode === 'ask') {
-            questionHeader.innerHTML = `V-ます形: ${currentQ.v_masu}`;
+            questionHeader.textContent = `V-ます形: ${currentQ.v_masu}`;
         } else {
-            questionHeader.innerHTML = currentQ.v_masu;
+            questionHeader.textContent = currentQ.v_masu;
         }
         
         constructionArea.textContent = '';
@@ -394,7 +394,7 @@
         if (constructedSentence === correctSentence) {
             playSeikai(); score++; updateScore();
             resultMessage.className = 'correct-msg';
-            resultMessage.innerHTML = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}${currentQ.fixed_suffix}）</span>`;
+            resultMessage.textContent = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}${currentQ.fixed_suffix}）</span>`;
             speak("せいかい！"); 
             currentQIndex++;
             setTimeout(() => { 
@@ -404,7 +404,7 @@
             playBubu();
             constructionArea.classList.add('shaking');
             resultMessage.className = 'incorrect-msg';
-            resultMessage.innerHTML = `❌ **ちがいます...** もう一度ならびかえてみてね！`;
+            resultMessage.textContent = `❌ **ちがいます...** もう一度ならびかえてみてね！`;
             speak("ちがいます");
             setTimeout(() => {
                 constructionArea.classList.remove('shaking'); isChecking = false; checkBtn.disabled = false;
@@ -413,7 +413,7 @@
     }
 
     function showFinalResult() {
-        document.getElementById('main-game-area').innerHTML = `
+        document.getElementById('main-game-area').textContent = `
             <div class="main-card">
                 <h2 style="color:var(--primary-dark);">ゲーム終了！</h2>
                 <p style="font-size:1.5em; font-weight:bold;">${currentQuizData.length}問中 ${score} 点です。</p>

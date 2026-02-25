@@ -341,7 +341,7 @@
 
             // アナログ時計の描画共通処理
             function drawAnalogClock(hour, minute) {
-                quizPromptArea.innerHTML = `
+                quizPromptArea.textContent = `
                     <div class="tc-clock-face">
                         <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
                         <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>
@@ -362,13 +362,13 @@
                 minuteData.forEach(min => {
                     const item = document.createElement('div');
                     item.className = `tc-study-item type-${min.type}`;
-                    item.innerHTML = `<span>${min.min}</span><p>${min.text}</p>`;
+                    item.textContent = `<span>${min.min}</span><p>${min.text}</p>`;
                     item.onclick = () => speakText(min.text);
                     studyGrid.appendChild(item);
                 });
                 const hanItem = document.createElement('div');
                 hanItem.className = 'tc-study-item type-han';
-                hanItem.innerHTML = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
+                hanItem.textContent = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
                 hanItem.onclick = () => speakText(hanData.text);
                 studyGrid.appendChild(hanItem);
             }
@@ -412,7 +412,7 @@
                 // 再生ボタン
                 const soundButton = document.createElement('button');
                 soundButton.className = 'tc-button btn-game1';
-                soundButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                soundButton.textContent = '<i class="fa-solid fa-volume-high"></i>';
                 soundButton.style.fontSize = '3em';
                 soundButton.style.width = '100px';
                 soundButton.style.height = '100px';
@@ -488,7 +488,7 @@
                 shuffleArray(options).slice(0, 4).forEach(opt => {
                     const button = document.createElement('button');
                     button.className = 'tc-option-button tc-option-text-button tc-option';
-                    button.innerHTML = opt.text;
+                    button.textContent = opt.text;
                     button.dataset.text = opt.text; 
                     button.dataset.hour = (opt.text === currentCorrectText) ? currentHourValue : 0; 
                     button.dataset.min = (opt.text === currentCorrectText) ? currentMinuteValue : 0;

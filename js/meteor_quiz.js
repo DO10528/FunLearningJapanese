@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverText.style.marginBottom = '10px';
 
         const scoreText = document.createElement('p');
-        scoreText.innerHTML = `最終スコア: ${finalScore}<br><span style="font-size: 0.8em;">${scoreRecordMsg}</span>`;
+        scoreText.textContent = `最終スコア: ${finalScore}<br><span style="font-size: 0.8em;">${scoreRecordMsg}</span>`;
         scoreText.style.color = 'white';
         scoreText.style.fontSize = '1.5em';
         scoreText.style.marginBottom = '30px';

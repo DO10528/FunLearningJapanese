@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.words.forEach(w => {
             const div = document.createElement('div');
             div.className = 'practice-item';
-            div.innerHTML = `
+            div.textContent = `
                 <div class="phrase-row">
                     <div class="phrase-content">
                         <div class="phrase-jp">${w.jp}</div>
@@ -540,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('question-text').textContent = q.question;
         
         const iconEl = document.getElementById('char-icon');
-        iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
+        iconEl.textContent = `<i class="fa-solid ${q.icon}"></i>`;
 
         const container = document.getElementById('options-container');
         container.textContent = '';
@@ -575,14 +575,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if(opt.correct) {
             btn.classList.add('correct');
-            icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
+            icon.textContent = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
             title.textContent = "正解！";
             title.style.color = "#4caf50";
             score += 1;
             if(window.addPoints) window.addPoints(1);
         } else {
             btn.classList.add('incorrect');
-            icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
+            icon.textContent = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
             title.textContent = "おしい！";
             title.style.color = "#f44336";
         }

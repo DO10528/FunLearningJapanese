@@ -14,7 +14,7 @@ async function loadDataAndGenerateTable() {
         const kanjiList = data.kanji_list;
         
         if (!kanjiList || kanjiList.length === 0) {
-            kanjiTbody.innerHTML = '<tr><td colspan="5">漢字のデータが見つかりません。</td></tr>';
+            kanjiTbody.textContent = '<tr><td colspan="5">漢字のデータが見つかりません。</td></tr>';
             return;
         }
 
@@ -24,19 +24,19 @@ async function loadDataAndGenerateTable() {
 
             // 1. ★連番 (No.) のセルを追加
             let cell0 = row.insertCell();
-            cell0.innerHTML = `<span class="kanji-number">${index + 1}</span>`;
+            cell0.textContent = `<span class="kanji-number">${index + 1}</span>`;
 
             // 2. 漢字
             let cell1 = row.insertCell();
-            cell1.innerHTML = `<span class="kanji-char">${item.kanji}</span>`;
+            cell1.textContent = `<span class="kanji-char">${item.kanji}</span>`;
 
             // 3. 訓読み
             let cell2 = row.insertCell();
-            cell2.innerHTML = `<span class="reading-kun">${item.kun || ''}</span>`;
+            cell2.textContent = `<span class="reading-kun">${item.kun || ''}</span>`;
 
             // 4. 音読み
             let cell3 = row.insertCell();
-            cell3.innerHTML = `<span class="reading-on">${item.on || ''}</span>`;
+            cell3.textContent = `<span class="reading-on">${item.on || ''}</span>`;
 
             // 5. 意味
             let cell4 = row.insertCell();
@@ -45,7 +45,7 @@ async function loadDataAndGenerateTable() {
         
     } catch (error) {
         console.error("漢字データの読み込み中にエラーが発生しました:", error);
-        kanjiTbody.innerHTML = '<tr><td colspan="5">データの読み込みに失敗しました。ファイルパスやJSON形式を確認してください。</td></tr>';
+        kanjiTbody.textContent = '<tr><td colspan="5">データの読み込みに失敗しました。ファイルパスやJSON形式を確認してください。</td></tr>';
     }
 }
 

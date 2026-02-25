@@ -258,12 +258,12 @@
 
     const gridPlaces = document.getElementById('grid-places');
     places.forEach(p => {
-        gridPlaces.innerHTML += createItem(p);
+        gridPlaces.textContent += createItem(p);
     });
 
     const gridDirs = document.getElementById('grid-dirs');
     dirs.forEach(d => {
-        gridDirs.innerHTML += createItem(d);
+        gridDirs.textContent += createItem(d);
     });
 
     // 答え表示切り替え

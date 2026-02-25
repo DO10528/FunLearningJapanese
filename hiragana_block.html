@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 安全策: onclick属性ではなくJSでイベント設定
             btn.addEventListener('click', () => initPractice(level));
             
-            btn.innerHTML = `
+            btn.textContent = `
                 <div class="level-char-icon" style="color:${level.color}">${level.label}</div>
                 <div class="level-title">${level.label}行</div>
                 <div class="level-tag" style="background:${level.color}">Level ${level.id}</div>
@@ -344,7 +344,7 @@ function setupGameBoard(level) {
 
         const audioBtn = document.createElement('button');
         audioBtn.className = 'block audio-btn';
-        audioBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        audioBtn.textContent = '<i class="fa-solid fa-volume-high"></i>';
         audioBtn.onclick = () => window.speak(pair.char);
         colRight.appendChild(audioBtn);
     });

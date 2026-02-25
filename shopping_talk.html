@@ -800,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const div = document.createElement('div');
             div.className = 'practice-item';
-            div.innerHTML = `
+            div.textContent = `
                 <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
                 <div class="practice-row">
                     <div class="role-badge badge-clerk">店員</div>
@@ -843,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 店員ラベルに現在の店舗名を表示
         document.getElementById('clerk-role-label').textContent = `店員 / Situation [${step.shopName}]`;
 
-        document.getElementById('clerk-text-jp').innerHTML = step.clerk.jp;
+        document.getElementById('clerk-text-jp').textContent = step.clerk.jp;
         document.getElementById('clerk-text-en').textContent = step.clerk.en;
         window.speak(step.clerk.jp);
 
@@ -856,7 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomOpt = correctOpts[Math.floor(Math.random() * correctOpts.length)];
         currentTargetPhrase = randomOpt;
 
-        document.getElementById('target-phrase').innerHTML = randomOpt.jp;
+        document.getElementById('target-phrase').textContent = randomOpt.jp;
         document.getElementById('target-sub').textContent = randomOpt.en;
     }
 
@@ -874,14 +874,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextBtn = document.getElementById('next-btn');
 
         if (percentage >= 60) {
-            resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
+            resultEl.textContent = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
             document.getElementById('mic-btn').disabled = true;
             if(window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
             nextBtn.style.display = 'block';
             nextBtn.textContent = '次へ';
             nextBtn.onclick = nextStep;
         } else {
-            resultEl.innerHTML = `<span class="score-badge score-low">Try again... ${percentage}%</span><br><span style="font-size:0.8em; color:#777;">もう一度マイクを押してね</span>`;
+            resultEl.textContent = `<span class="score-badge score-low">Try again... ${percentage}%</span><br><span style="font-size:0.8em; color:#777;">もう一度マイクを押してね</span>`;
         }
     }
 

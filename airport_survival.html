@@ -453,7 +453,7 @@ phrasesHtml += `
 </div>`;
 });
 
-section.innerHTML = `
+section.textContent = `
 <div class="cat-title"><i class="fa-solid ${cat.icon}"></i> ${cat.title}</div>
 <div>${phrasesHtml}</div>
 `;
@@ -489,8 +489,8 @@ const qData = qList[currentQuestionIndex];
 currentTargetData = qData.targets[Math.floor(Math.random() * qData.targets.length)];
 
 document.getElementById('game-progress').textContent = `(${currentQuestionIndex + 1}/${qList.length})`;
-document.getElementById('examiner-text').innerHTML = qData.examiner;
-document.getElementById('target-phrase').innerHTML = currentTargetData.text;
+document.getElementById('examiner-text').textContent = qData.examiner;
+document.getElementById('target-phrase').textContent = currentTargetData.text;
 document.getElementById('feedback-text').textContent = "";
 document.getElementById('recognized-text').textContent = "";
 document.getElementById('mic-btn').classList.remove('listening');

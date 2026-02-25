@@ -414,7 +414,7 @@ function renderLearning() {
                 </div>`;
         });
 
-        section.innerHTML = `
+        section.textContent = `
             <div class="cat-title"><i class="fa-solid ${cat.icon}"></i> ${cat.title}</div>
             <div>${phrasesHtml}</div>
         `;
@@ -457,7 +457,7 @@ function loadQuestion() {
     document.getElementById('situation-text').textContent = qData.situation;
     
     // HTMLとしてレンダリングするため、textContentではなくinnerHTMLを使用
-    document.getElementById('target-phrase').innerHTML = qData.target;
+    document.getElementById('target-phrase').textContent = qData.target;
     
     document.getElementById('feedback-text').textContent = "";
     document.getElementById('recognized-text').textContent = "";

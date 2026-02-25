@@ -263,7 +263,7 @@
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = `vocab-card ${extraClass}`;
-            card.innerHTML = `
+            card.textContent = `
                 <img src="${IMG_PATH}${item.word}.png" onerror="this.src='https://placehold.co/80?text=img'" alt="${item.word}">
                 <span>${item.kanji}</span>
             `;
@@ -293,13 +293,13 @@
         
         if (currentScreen === 'screen-learning') {
             btn.className = 'fixed-bottom-btn';
-            btn.innerHTML = '<i class="fa-solid fa-play"></i> <span id="fixed-btn-text">ゲームスタート！</span>';
+            btn.textContent = '<i class="fa-solid fa-play"></i> <span id="fixed-btn-text">ゲームスタート！</span>';
         } else if (currentScreen === 'screen-modes') {
             btn.className = 'fixed-bottom-btn btn-mode-return';
-            btn.innerHTML = '<i class="fa-solid fa-book"></i> <span id="fixed-btn-text">れんしゅう に もどる</span>';
+            btn.textContent = '<i class="fa-solid fa-book"></i> <span id="fixed-btn-text">れんしゅう に もどる</span>';
         } else {
             btn.className = 'fixed-bottom-btn btn-mode-return';
-            btn.innerHTML = '<i class="fa-solid fa-list"></i> <span id="fixed-btn-text">ゲームを えらぶ</span>';
+            btn.textContent = '<i class="fa-solid fa-list"></i> <span id="fixed-btn-text">ゲームを えらぶ</span>';
         }
     }
 
@@ -374,7 +374,7 @@
         options.forEach(opt => {
             const btn = document.createElement('div');
             btn.className = 'option-btn';
-            btn.innerHTML = `
+            btn.textContent = `
                 <div class="opt-images">
                     <img src="${IMG_PATH}${opt.place.word}.png" onerror="this.src='https://placehold.co/50'">
                     <i class="fa-solid fa-plus" style="margin:auto; color:#ccc;"></i>
@@ -393,7 +393,7 @@
         const playBtn = document.createElement('button');
         playBtn.className = 'mic-btn';
         playBtn.style.background = '#4a69bd'; playBtn.style.boxShadow = '0 6px 0 #1e3799';
-        playBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        playBtn.textContent = '<i class="fa-solid fa-volume-high"></i>';
         playBtn.onclick = () => speakText(correctSentence);
         imgArea.appendChild(playBtn);
 
@@ -485,7 +485,7 @@
 
         // 画像描画
         const imgArea = document.getElementById('image-area');
-        imgArea.innerHTML = `
+        imgArea.textContent = `
             <div class="combo-item">
                 <img src="${IMG_PATH}${base.word}.png" onerror="this.src='https://placehold.co/80'">
             </div>
@@ -557,7 +557,7 @@
 
     function drawComboImage(img1, img2, showCross = false) {
         const imgArea = document.getElementById('image-area');
-        imgArea.innerHTML = `
+        imgArea.textContent = `
             <div class="combo-item">
                 <img src="${IMG_PATH}${img1}.png" onerror="this.src='https://placehold.co/80'">
             </div>

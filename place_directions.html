@@ -267,7 +267,7 @@
         placesList.forEach(place => {
             const card = document.createElement('div');
             card.className = 'vocab-card';
-            card.innerHTML = `
+            card.textContent = `
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
             `;
@@ -353,12 +353,12 @@
             imgEl.src = `${IMG_PATH}${place.file}.png`;
             imgEl.onerror = function() { this.src = 'https://placehold.co/150x150?text=Image'; };
             imgEl.classList.remove('hidden');
-            phraseEl.innerHTML = rubyHtml;
+            phraseEl.textContent = rubyHtml;
             
         } else if (currentStep === 2) {
             missionText.textContent = "道を聞いてみよう！";
             imgEl.classList.remove('hidden');
-            phraseEl.innerHTML = `すみません、${rubyHtml}は<br>どこですか？`;
+            phraseEl.textContent = `すみません、${rubyHtml}は<br>どこですか？`;
             
         } else if (currentStep === 3) {
             // STEP 3: マップ探索をスキップし、そのまま返答の練習へ進む

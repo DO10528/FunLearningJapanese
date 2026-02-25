@@ -733,7 +733,7 @@
             kanjiContainer.textContent = '';
             
             if (list.length === 0) {
-                kanjiContainer.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';
+                kanjiContainer.textContent = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';
                 return;
             }
 
@@ -746,7 +746,7 @@
                 const kunDisplay = (item.kun && item.kun !== "") ? item.kun : "-";
                 const onDisplay  = (item.on && item.on !== "") ? item.on : "-";
 
-                card.innerHTML = `
+                card.textContent = `
                     <div class="char-box">${item.kanji}</div>
                     <div class="info-box">
                         <div class="meaning">${item.meaning}</div>

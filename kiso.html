@@ -335,7 +335,7 @@
                 </div>
             `;
 
-            container.innerHTML = html;
+            container.textContent = html;
         }
 
         // 2. 濁音・半濁音チャートの描画
@@ -352,7 +352,7 @@ function renderDakuonHandakuonChart() {
         
         html += generateCardHTML(item.h, item.k, item.r, typeColor);
     });
-    container.innerHTML = html;
+    container.textContent = html;
 }
 
 // 3. 拗音チャートの描画
@@ -380,7 +380,7 @@ function renderYoonChart() {
             </div>
         `;
     });
-    container.innerHTML = html;
+    container.textContent = html;
 }
 
         // ページロード時に全てを実行

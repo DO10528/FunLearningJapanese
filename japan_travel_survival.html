@@ -275,8 +275,8 @@
     
     places.forEach((p, index) => {
         const html = createRow(p);
-        if(index < 5) pLeft.innerHTML += html;
-        else pRight.innerHTML += html;
+        if(index < 5) pLeft.textContent += html;
+        else pRight.textContent += html;
     });
 
     // 方向のレンダリング
@@ -284,8 +284,8 @@
     const dContainer2 = document.getElementById('directions-container-2');
     directions.forEach((d, index) => {
         const html = createRow(d);
-        if(index < 2) dContainer.innerHTML += html;
-        else dContainer2.innerHTML += html;
+        if(index < 2) dContainer.textContent += html;
+        else dContainer2.textContent += html;
     });
 
     // 数のレンダリング
@@ -293,8 +293,8 @@
     const cContainer2 = document.getElementById('counters-container-2');
     counters.forEach((c, index) => {
         const html = createRow(c);
-        if(index < 2) cContainer.innerHTML += html;
-        else cContainer2.innerHTML += html;
+        if(index < 2) cContainer.textContent += html;
+        else cContainer2.textContent += html;
     });
 
 </script>

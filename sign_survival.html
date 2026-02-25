@@ -327,7 +327,7 @@
             signsData[l].forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'practice-item';
-                div.innerHTML = `
+                div.textContent = `
                     <div style="height:100px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
                         <div style="transform:scale(0.5);">${item.html}</div>
                     </div>
@@ -390,7 +390,7 @@
         const q = questionList[currentIndex];
         document.getElementById('q-current').textContent = currentIndex + 1;
         
-        document.getElementById('sign-display').innerHTML = q.html;
+        document.getElementById('sign-display').textContent = q.html;
 
         // 誤答生成
         let allSigns = [];

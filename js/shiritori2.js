@@ -113,11 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         gameWords = [];
         
         // グリッドの初期化 (cell-0のしりとりはHTMLに固定)
-        SHIRITORI_GRID.innerHTML = document.getElementById('cell-0').outerHTML;
+        SHIRITORI_GRID.textContent = document.getElementById('cell-0').outerHTML;
         
         // 残りのマス目を生成
         for (let i = 1; i <= MAX_WORDS; i++) {
-            SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}" data-word-id=""></div>`;
+            SHIRITORI_GRID.textContent += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}" data-word-id=""></div>`;
         }
         
         RETURN_CARD_BUTTON.style.display = 'none';
@@ -139,13 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedChain.length < chainLength) {
             GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットして再試行してください。';
-            CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
+            CARD_SELECTION_AREA.textContent = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
             return;
         }
 
         gameWords = selectedChain;
         REMAINING_COUNT_MESSAGE.textContent = `残りの単語 (${gameWords.length}枚)`; 
-        CARD_SELECTION_AREA.innerHTML = REMAINING_COUNT_MESSAGE.outerHTML; // 見出しを再挿入
+        CARD_SELECTION_AREA.textContent = REMAINING_COUNT_MESSAGE.outerHTML; // 見出しを再挿入
         
         shuffleArray(selectedChain).forEach(word => {
             const nextChar = getNextChar(word.reading); 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = word.id; // IDを追加
             
             // ★ご要望：カードラベルはwordData.wordをそのまま使用
-            card.innerHTML = `
+            card.textContent = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image" onerror="this.style.display='none'; this.parentNode.querySelector('.card-label').style.display='block';">
                 <div class="card-label">${word.word}</div>
             `;
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(SOUND_CORRECT_PATH);
             
             // マスにカードの内容を埋め込む (カードのHTML構造をコピー)
-            dropTarget.innerHTML = card.innerHTML;
+            dropTarget.textContent = card.textContent;
             dropTarget.querySelector('.card-image').style.display = 'none'; // マス内では画像は表示しない
             dropTarget.querySelector('.card-label').classList.replace('card-label', 'word-text'); // ラベルをword-textに変更
             
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.dataset.firstChar = wordData.reading.charAt(0);
                 card.dataset.id = wordData.id;
 
-                card.innerHTML = `
+                card.textContent = `
                     <img src="assets/images/${wordData.image}" alt="${wordData.word}" class="card-image" onerror="this.style.display='none'; this.parentNode.querySelector('.card-label').style.display='block';">
                     <div class="card-label">${wordData.word}</div>
                 `;

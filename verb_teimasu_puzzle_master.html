@@ -397,9 +397,9 @@
             if (pointAdded) {
                 score++;
                 updateScore();
-                resultMessage.innerHTML = `⭕️ **せいかい！ (+1pt)** <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
+                resultMessage.textContent = `⭕️ **せいかい！ (+1pt)** <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
             } else {
-                resultMessage.innerHTML = `⭕️ **せいかい！** (今日はこの問題のポイント獲得済み) <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
+                resultMessage.textContent = `⭕️ **せいかい！** (今日はこの問題のポイント獲得済み) <span style="font-size:0.9em;">（${constructedSentence}います）</span>`;
             }
             // --- ★ End Point Logic ---
             
@@ -412,7 +412,7 @@
             playBubu();
             constructionArea.classList.add('shaking');
             resultMessage.className = 'incorrect-msg';
-            resultMessage.innerHTML = `❌ **ちがいます...** もう一度ならびかえてみてね！`;
+            resultMessage.textContent = `❌ **ちがいます...** もう一度ならびかえてみてね！`;
             speak("ちがいます");
             setTimeout(() => {
                 constructionArea.classList.remove('shaking'); isChecking = false; checkBtn.disabled = false;
@@ -421,7 +421,7 @@
     }
 
     function showFinalResult() {
-        document.getElementById('main-game-area').innerHTML = `
+        document.getElementById('main-game-area').textContent = `
             <div class="main-card">
                 <h2 style="color:var(--primary-dark);">ゲーム終了！</h2>
                 <p style="font-size:1.5em; font-weight:bold;">${currentQuizData.length}問中 ${score} 点です。</p>

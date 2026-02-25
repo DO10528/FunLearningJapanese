@@ -182,13 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const reading = currentWord.reading;
         const lastChar = getCleanLastChar(reading);
         
-        CURRENT_WORD_DISPLAY.innerHTML = `
+        CURRENT_WORD_DISPLAY.textContent = `
             <span style="font-size:0.8em; color:#666;">よみ: ${reading}</span><br>
             <span class="highlight-char" style="font-size:1.5em;">「${lastChar}」</span>
         `;
 
         // 画像パス: assets/images/フォルダ内を想定
-        IMAGE_AREA.innerHTML = `
+        IMAGE_AREA.textContent = `
             <img src="assets/images/${currentWord.image}" 
                  class="current-image"
                  alt="${currentWord.word || currentWord.reading}"
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.dataset.id = word.id;
         card.onclick = handleAnswer;
 
-        card.innerHTML = `
+        card.textContent = `
             <img src="assets/images/${word.image}" 
                  alt=""
                  class="choice-image"

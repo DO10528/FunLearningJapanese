@@ -382,7 +382,7 @@
         kanjiList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
-            card.innerHTML = `
+            card.textContent = `
                 <div class="kanji-char">${item.kanji}</div>
                 <div class="kanji-meaning">${item.meaning}</div>
             `;
@@ -498,14 +498,14 @@
         }
         
         const btn = document.querySelector('.btn-done');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-star"></i> すごい！';
+        const originalText = btn.textContent;
+        btn.textContent = '<i class="fa-solid fa-star"></i> すごい！';
         btn.style.background = '#ff9800';
         
         setTimeout(() => {
             closeModal();
             setTimeout(() => {
-                btn.innerHTML = originalText;
+                btn.textContent = originalText;
                 btn.style.background = '#4caf50';
             }, 500);
         }, 800);

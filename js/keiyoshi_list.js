@@ -14,7 +14,7 @@ async function loadDataAndGenerateTable() {
         const adjectives = data.adjectives;
         
         if (!adjectives || adjectives.length === 0) {
-            adjectiveTbody.innerHTML = '<tr><td colspan="4">形容詞のデータが見つかりません。</td></tr>';
+            adjectiveTbody.textContent = '<tr><td colspan="4">形容詞のデータが見つかりません。</td></tr>';
             return;
         }
 
@@ -46,7 +46,7 @@ async function loadDataAndGenerateTable() {
 
             // 3. 種類
             let cell3 = row.insertCell();
-            cell3.innerHTML = `<span class="${typeClass}">${typeText}</span>`;
+            cell3.textContent = `<span class="${typeClass}">${typeText}</span>`;
 
             // 4. 意味
             let cell4 = row.insertCell();
@@ -55,7 +55,7 @@ async function loadDataAndGenerateTable() {
         
     } catch (error) {
         console.error("データの読み込み中にエラーが発生しました:", error);
-        adjectiveTbody.innerHTML = '<tr><td colspan="4">データの読み込みに失敗しました。ファイルパスやJSON形式を確認してください。</td></tr>';
+        adjectiveTbody.textContent = '<tr><td colspan="4">データの読み込みに失敗しました。ファイルパスやJSON形式を確認してください。</td></tr>';
     }
 }
 

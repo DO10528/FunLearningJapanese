@@ -774,7 +774,7 @@
         data.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
-            card.innerHTML = `<div class="kanji-char">${item.kanji}</div>`;
+            card.textContent = `<div class="kanji-char">${item.kanji}</div>`;
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
@@ -885,14 +885,14 @@
         if (window.addPoints) window.addPoints(1);
         
         const btn = document.querySelector('.btn-done');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-star"></i> すごい！';
+        const originalText = btn.textContent;
+        btn.textContent = '<i class="fa-solid fa-star"></i> すごい！';
         btn.style.background = '#ff9800';
         
         setTimeout(() => {
             closeModal();
             setTimeout(() => {
-                btn.innerHTML = originalText;
+                btn.textContent = originalText;
                 btn.style.background = '#4caf50';
             }, 500);
         }, 800);

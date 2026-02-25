@@ -259,7 +259,7 @@
         gameLevels.forEach((lv, idx) => {
             const btn = document.createElement('button');
             btn.className = 'level-btn';
-            btn.innerHTML = `グループ ${lv.level}`;
+            btn.textContent = `グループ ${lv.level}`;
             btn.style.backgroundColor = lv.color; 
             btn.onclick = () => startLevel(idx);
             grid.appendChild(btn);

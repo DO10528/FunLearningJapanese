@@ -414,7 +414,7 @@
             
             const fullHtml = `${q.pre}<span style="color:var(--primary);">${q.target}</span>${q.post}`;
             
-            div.innerHTML = `
+            div.textContent = `
                 <button class="play-icon-btn" onclick="playSentence(${idx})"><i class="fa-solid fa-volume-high"></i></button>
                 <div class="item-text">
                     ${fullHtml}
@@ -513,7 +513,7 @@
         // 現在の問題文
         htmlContent += `<div class="current-line">${q.pre}<span id="blank-spot" class="blank-part">(${q.reading})</span>${q.post}</div>`;
         
-        sentenceDisplay.innerHTML = htmlContent;
+        sentenceDisplay.textContent = htmlContent;
         englishDisplay.textContent = q.en;
 
         const choices = [q.target, q.wrong1, q.wrong2];
