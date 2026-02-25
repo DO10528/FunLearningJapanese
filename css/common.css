@@ -1,0 +1,28 @@
+/* Common CSS */
+:root {
+    --primary-color: #fca311;
+    --secondary-color: #14213d;
+    --bg-color: #f8f9fa;
+    --text-color: #333;
+    --accent-color: #e63946;
+}
+body {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0; padding: 0; padding-bottom: 80px;
+    display: flex; flex-direction: column; min-height: 100vh;
+}
+header {
+    background: var(--primary-color);
+    color: white; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: sticky; top: 0; z-index: 100;
+}
+.header-btn {
+    background: rgba(255,255,255,0.2); border: none; padding: 8px 15px;
+    border-radius: 20px; color: white; font-weight: bold; cursor: pointer;
+    text-decoration: none; display: flex; align-items: center; gap: 5px;
+    transition: background 0.2s;
+}
