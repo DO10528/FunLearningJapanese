@@ -31,6 +31,9 @@
         -webkit-tap-highlight-color: transparent;
     }
 
+    ruby { ruby-align: center; }
+    rt { font-size: 0.6em; color: #666; font-weight: 500; }
+
     header {
         background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
         color: white; padding: 15px 20px; width: 100%;
@@ -77,7 +80,7 @@
     .badge-you { background: var(--primary); }
     
     .text-content { flex-grow: 1; }
-    .text-jp { font-weight: bold; font-size: 1.1em; color: #333; }
+    .text-jp { font-weight: bold; font-size: 1.1em; color: #333; line-height: 1.6; }
     .text-en { font-size: 0.9em; color: #888; margin-top: 2px; }
     
     .play-btn-mini {
@@ -115,7 +118,7 @@
     }
     .target-phrase-box { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     .target-label { font-size: 0.8em; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
-    .target-text { font-size: 1.3em; font-weight: 900; color: #333; }
+    .target-text { font-size: 1.3em; font-weight: 900; color: #333; line-height: 1.5; }
     .target-sub { font-size: 0.9em; color: #777; margin-top: 5px; }
 
     /* マイクボタン */
@@ -206,6 +209,11 @@
                 <i class="fa-solid fa-utensils card-icon" style="color:#607d8b;"></i>
                 <span class="card-title">ファミレス</span>
             </div>
+            
+            <div class="scenario-card" onclick="loadScenario('random')" style="border-bottom: 4px solid #9c27b0;">
+                <i class="fa-solid fa-dice card-icon" style="color:#9c27b0;"></i>
+                <span class="card-title">ランダム<br>(応用)</span>
+            </div>
         </div>
     </div>
 
@@ -217,7 +225,7 @@
                 </button>
             </div>
             <h2 id="practice-title" style="margin:5px 0; color:var(--primary);"></h2>
-            <p style="margin:0; font-size:0.9em; color:#777;">会話を練習しましょう！この中から一つがクイズに出ます。</p>
+            <p style="margin:0; font-size:0.9em; color:#777;">会話を練習しましょう！この中からクイズに出ます。</p>
         </div>
         <div id="practice-list" class="practice-list"></div>
     </div>
@@ -235,7 +243,7 @@
         <div class="clerk-area">
             <div class="clerk-icon"><i class="fa-solid fa-user-tie"></i></div>
             <div class="speech-bubble">
-                <div style="font-size:0.8em; color:#999; font-weight:bold; margin-bottom:5px;">店員 / Situation</div>
+                <div id="clerk-role-label" style="font-size:0.85em; color:#999; font-weight:bold; margin-bottom:5px;">店員 / Situation</div>
                 <div id="clerk-text-jp" style="font-size:1.2em; font-weight:bold; margin-bottom:5px;"></div>
                 <div id="clerk-text-en" style="font-size:0.9em; color:#888;"></div>
                 <button onclick="replayClerkVoice()" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-top:10px; font-weight:bold;">
@@ -249,9 +257,6 @@
                 <div class="target-label"><i class="fa-solid fa-bullhorn"></i> こう答えてみよう！(Try saying this)</div>
                 <div id="target-phrase" class="target-text"></div>
                 <div id="target-sub" class="target-sub"></div>
-                <button onclick="playTargetVoice()" style="background:none; border:none; color:#777; cursor:pointer; margin-top:5px;">
-                    <i class="fa-solid fa-circle-play"></i> お手本を聞く
-                </button>
             </div>
 
             <div style="margin-bottom:15px; font-weight:bold; color:#555;">マイクを押して話してください</div>
@@ -329,92 +334,83 @@ document.addEventListener('DOMContentLoaded', () => {
     let recognition = null;
     let isRecording = false;
 
-    // iPad/iPhone対応: ブラウザチェック
     if (!SpeechRecognition) {
         alert("このブラウザは音声認識に対応していません。\niPadの場合はSafariをご利用ください。");
     } else {
-        // インスタンスを事前に作成しておく（iPadでの安定性向上のため）
         try {
             recognition = new SpeechRecognition();
             recognition.lang = 'ja-JP';
-            recognition.interimResults = false; // iPadではfalse推奨
+            recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.continuous = false; // iPadでは都度止める方が安定する
+            recognition.continuous = false;
         } catch (e) {
             console.error("Mic init error:", e);
         }
     }
 
-    // --- 音声合成（読み上げ）の設定 ---
+    // --- 音声合成とルビの除去 ---
     const synth = window.speechSynthesis;
     let voices = [];
     
-    // iOSは非同期でボイスがロードされるための対策
-    const loadVoices = () => {
-        voices = synth.getVoices();
-    };
+    const loadVoices = () => { voices = synth.getVoices(); };
     synth.onvoiceschanged = loadVoices;
-    loadVoices(); // 初回実行
+    loadVoices();
 
-    window.speak = (text) => {
+    function stripRuby(htmlString) {
+        if (!htmlString) return '';
+        let text = htmlString.replace(/<rt>.*?<\/rt>/g, '');
+        return text.replace(/<[^>]*>/g, '');
+    }
+
+    window.speak = (rawText) => {
+        const text = stripRuby(rawText);
         if (!text) return;
-        // マイクが動いていたら止める（競合回避）
+
         if (isRecording && recognition) {
             try { recognition.stop(); } catch(e){}
             isRecording = false;
             updateMicUI('stop');
         }
         
-        // 既存の読み上げをキャンセル
         synth.cancel();
 
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
         utterThis.rate = 1.0;
         
-        // 日本語ボイスを優先的に探す
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
         if(jpVoice) utterThis.voice = jpVoice;
         
         synth.speak(utterThis);
     };
 
-    // --- マイク切り替え機能（iPad対応強化版） ---
     window.toggleRecording = () => {
         const micBtn = document.getElementById('mic-btn');
         const statusText = document.getElementById('recognized-text');
 
         if (!recognition) return;
 
-        // 1. まず読み上げを完全に止める（iPadで必須）
         if (synth.speaking || synth.pending) {
             synth.cancel();
         }
 
-        // 2. 録音中なら止める処理
         if (isRecording) {
-            try {
-                recognition.stop(); 
-            } catch(e) { console.log(e); }
+            try { recognition.stop(); } catch(e) {}
             isRecording = false;
             updateMicUI('stop');
             statusText.textContent = "停止しました";
             return;
         }
 
-        // 3. 録音開始処理
         try {
             statusText.textContent = "マイク起動中...";
             micBtn.classList.add('processing');
-            micBtn.disabled = true; // 連打防止
+            micBtn.disabled = true;
 
-            // iPadは認識開始まで少しラグがあるため、非同期的に開始
             setTimeout(() => {
                 try {
                     recognition.start();
                 } catch (e) {
-                    console.error("Start error:", e);
-                    // すでに開始されているエラーの場合は無視して続行
                     if (e.name !== 'InvalidStateError') {
                         micBtn.disabled = false;
                         micBtn.classList.remove('processing');
@@ -424,24 +420,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
 
         } catch (e) {
-            console.error("Critical Start Error:", e);
             micBtn.disabled = false;
         }
     };
 
-    // --- イベントハンドラの設定 ---
     if (recognition) {
         recognition.onstart = () => {
             isRecording = true;
             updateMicUI('recording');
             document.getElementById('recognized-text').textContent = "聞いています...どうぞ！";
-            document.getElementById('mic-btn').disabled = false; // ロック解除
+            document.getElementById('mic-btn').disabled = false;
         };
 
         recognition.onend = () => {
             isRecording = false;
             updateMicUI('stop');
-            
             const statusText = document.getElementById('recognized-text');
             if (statusText.textContent === "聞いています...どうぞ！") {
                 statusText.textContent = "もう一度押してください";
@@ -455,14 +448,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         recognition.onerror = (event) => {
-            console.error("Speech Error:", event.error);
             isRecording = false;
             updateMicUI('stop');
-            
             const statusText = document.getElementById('recognized-text');
             if (event.error === 'not-allowed') {
                 statusText.textContent = "マイクの使用が許可されていません";
-                alert("iPadの設定でSafariのマイクアクセスを許可してください。\nまたは、アドレスバーの「ぁあ」から「モバイル用Webサイト」に切り替えてください。");
             } else if (event.error === 'no-speech') {
                 statusText.textContent = "声が聞こえませんでした";
             } else if (event.error === 'aborted') {
@@ -473,69 +463,63 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // UI更新用ヘルパー関数
     function updateMicUI(state) {
         const micBtn = document.getElementById('mic-btn');
         if(!micBtn) return;
-        
         micBtn.classList.remove('processing');
         micBtn.disabled = false;
-        
-        if (state === 'recording') {
-            micBtn.classList.add('listening');
-        } else {
-            micBtn.classList.remove('listening');
-        }
+        if (state === 'recording') micBtn.classList.add('listening');
+        else micBtn.classList.remove('listening');
     }
 
-
-    // --- シナリオデータ（大幅増量版） ---
+    // --- シナリオデータ ---
     const scenarios = {
         'konbini': {
             name: "コンビニ (Convenience Store)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。お支払いはどうなさいますか？", en: "How would you like to pay?" },
+                    clerk: { jp: "いらっしゃいませ。お<ruby>支払<rt>しはら</rt></ruby>いはどうなさいますか？", en: "How would you like to pay?" },
                     options: [
-                        { jp: "現金でお願いします。", en: "Cash, please.", correct: true },
-                        { jp: "カードで。", en: "By credit card.", correct: true },
-                        { jp: "PayPayで。", en: "By PayPay.", correct: true }
+                        { jp: "<ruby>現金<rt>げんきん</rt></ruby>でお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Cash, please.", correct: true },
+                        { jp: "クレジットカードで。", en: "By credit card.", correct: true },
+                        { jp: "<ruby>電子<rt>でんし</rt></ruby>マネーで。", en: "By electronic money.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お弁当は温めますか？", en: "Would you like your bento warmed up?" },
+                    clerk: { jp: "お<ruby>弁当<rt>べんとう</rt></ruby>は<ruby>温<rt>あたた</rt></ruby>めますか？", en: "Would you like your bento warmed up?" },
                     options: [
-                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true },
-                        { jp: "いいえ、結構です。", en: "No, thank you.", correct: true }
+                        { jp: "はい、お<ruby>願<rt>ねが</rt></ruby>いします。", en: "Yes, please.", correct: true },
+                        { jp: "いいえ、<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です。", en: "No, thank you.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お箸はお使いになりますか？", en: "Do you need chopsticks?" },
+                    clerk: { jp: "お<ruby>箸<rt>はし</rt></ruby>はお<ruby>使<rt>つか</rt></ruby>いになりますか？", en: "Do you need chopsticks?" },
                     options: [
-                        { jp: "はい、一膳ください。", en: "Yes, one pair please.", correct: true },
+                        { jp: "はい、<ruby>一膳<rt>いちぜん</rt></ruby>ください。", en: "Yes, one pair please.", correct: true },
                         { jp: "スプーンをください。", en: "Spoon, please.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "レジ袋はご利用ですか？", en: "Do you need a plastic bag?" },
+                    clerk: { jp: "レジ<ruby>袋<rt>ぶくろ</rt></ruby>はご<ruby>利用<rt>りよう</rt></ruby>ですか？", en: "Do you need a plastic bag?" },
                     options: [
-                        { jp: "はい、お願いします。", en: "Yes, please.", correct: true },
-                        { jp: "大丈夫です。持っています。", en: "I'm fine. I have one.", correct: true }
+                        { jp: "はい、お<ruby>願<rt>ねが</rt></ruby>いします。", en: "Yes, please.", correct: true },
+                        { jp: "<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です。", en: "I'm fine.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "レシートはご利用ですか？", en: "Do you need a receipt?" },
+                    clerk: { jp: "レシートはご<ruby>利用<rt>りよう</rt></ruby>ですか？", en: "Do you need a receipt?" },
                     options: [
                         { jp: "はい、ください。", en: "Yes, please.", correct: true },
                         { jp: "いりません。", en: "No need.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "（店員に何か質問してみよう）", en: "(Ask the clerk something)" },
+                    clerk: { jp: "（<ruby>店員<rt>てんいん</rt></ruby>に<ruby>何<rt>なに</rt></ruby>か<ruby>質問<rt>しつもん</rt></ruby>してみよう）", en: "(Ask the clerk something)" },
                     options: [
                         { jp: "すみません、トイレはありますか？", en: "Excuse me, is there a toilet?", correct: true },
-                        { jp: "両替はできますか？", en: "Can I exchange money?", correct: true },
-                        { jp: "肉まんはありますか？", en: "Do you have meat buns?", correct: true }
+                        { jp: "<ruby>両替<rt>りょうがえ</rt></ruby>はできますか？", en: "Can I exchange money?", correct: true },
+                        { jp: "<ruby>肉<rt>にく</rt></ruby>まんはありますか？", en: "Do you have meat buns?", correct: true },
+                        { jp: "おしぼりもらえますか？", en: "Can I have a wet towel?", correct: true }
                     ]
                 }
             ]
@@ -544,19 +528,19 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "ハンバーガー (Burger Shop)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。ご注文をお伺いします。", en: "May I take your order?" },
+                    clerk: { jp: "いらっしゃいませ。ご<ruby>注文<rt>ちゅうもん</rt></ruby>をお<ruby>伺<rt>うかが</rt></ruby>いします。", en: "May I take your order?" },
                     options: [
                         { jp: "チーズバーガーをひとつ。", en: "One Cheeseburger.", correct: true },
                         { jp: "てりやきバーガーセットをください。", en: "Teriyaki Burger Set please.", correct: true },
-                        { jp: "フィレオフィッシュをお願いします。", en: "Filet-O-Fish please.", correct: true },
-                        { jp: "ビッグマックを単品で。", en: "Big Mac (item only).", correct: true }
+                        { jp: "フィレオフィッシュをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Filet-O-Fish please.", correct: true },
+                        { jp: "ビッグマックを<ruby>単品<rt>たんぴん</rt></ruby>で。", en: "Big Mac (item only).", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "セットのお飲み物はいかがしますか？", en: "What drink for the set?" },
+                    clerk: { jp: "セットのお<ruby>飲<rt>の</rt></ruby>み<ruby>物<rt>もの</rt></ruby>はいかがしますか？", en: "What drink for the set?" },
                     options: [
                         { jp: "コーラで。", en: "Coke.", correct: true },
-                        { jp: "ウーロン茶で。", en: "Oolong tea.", correct: true },
+                        { jp: "ウーロン<ruby>茶<rt>ちゃ</rt></ruby>で。", en: "Oolong tea.", correct: true },
                         { jp: "オレンジジュースで。", en: "Orange juice.", correct: true },
                         { jp: "アイスティーで。", en: "Iced tea.", correct: true }
                     ]
@@ -570,20 +554,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 },
                 {
-                    clerk: { jp: "ご一緒にサイドメニューはいかがですか？", en: "Any side menu?" },
+                    clerk: { jp: "ご<ruby>一緒<rt>いっしょ</rt></ruby>にサイドメニューはいかがですか？", en: "Any side menu?" },
                     options: [
                         { jp: "ポテトをください。", en: "Fries please.", correct: true },
                         { jp: "チキンナゲットをください。", en: "Chicken nuggets please.", correct: true },
-                        { jp: "アップルパイをお願いします。", en: "Apple pie please.", correct: true },
+                        { jp: "アップルパイをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Apple pie please.", correct: true },
                         { jp: "サラダをください。", en: "Salad please.", correct: true },
-                        { jp: "結構です。", en: "No thank you.", correct: true }
+                        { jp: "<ruby>結構<rt>けっこう</rt></ruby>です。", en: "No thank you.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お召し上がりですか？お持ち帰りですか？", en: "For here or to go?" },
+                    clerk: { jp: "お<ruby>召<rt>め</rt></ruby>し<ruby>上<rt>あ</rt></ruby>がりですか？お<ruby>持<rt>も</rt></ruby>ち<ruby>帰<rt>かえ</rt></ruby>りですか？", en: "For here or to go?" },
                     options: [
-                        { jp: "店内で。", en: "For here.", correct: true },
-                        { jp: "持ち帰りで。", en: "To go.", correct: true }
+                        { jp: "<ruby>店内<rt>てんない</rt></ruby>で。", en: "For here.", correct: true },
+                        { jp: "<ruby>持<rt>も</rt></ruby>ち<ruby>帰<rt>かえ</rt></ruby>りで。", en: "To go.", correct: true }
                     ]
                 }
             ]
@@ -592,13 +576,13 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "カフェ (Cafe)",
             steps: [
                 {
-                    clerk: { jp: "こんにちは。ご注文をどうぞ。", en: "Order please." },
+                    clerk: { jp: "こんにちは。ご<ruby>注文<rt>ちゅうもん</rt></ruby>をどうぞ。", en: "Order please." },
                     options: [
                         { jp: "スターバックスラテをください。", en: "Starbucks Latte please.", correct: true },
-                        { jp: "キャラメルフラペチーノをお願いします。", en: "Caramel Frappuccino please.", correct: true },
+                        { jp: "キャラメルフラペチーノをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Caramel Frappuccino please.", correct: true },
                         { jp: "アイスコーヒーをください。", en: "Iced coffee please.", correct: true },
                         { jp: "カプチーノをください。", en: "Cappuccino please.", correct: true },
-                        { jp: "抹茶ティーラテをお願いします。", en: "Matcha Tea Latte please.", correct: true }
+                        { jp: "<ruby>抹茶<rt>まっちゃ</rt></ruby>ティーラテをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Matcha Tea Latte please.", correct: true }
                     ]
                 },
                 {
@@ -611,19 +595,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 },
                 {
-                    clerk: { jp: "ご一緒にフードはいかがですか？", en: "Any food?" },
+                    clerk: { jp: "ご<ruby>一緒<rt>いっしょ</rt></ruby>にフードはいかがですか？", en: "Any food?" },
                     options: [
                         { jp: "チョコレートスコーンをください。", en: "Chocolate scone please.", correct: true },
-                        { jp: "チーズケーキをお願いします。", en: "Cheesecake please.", correct: true },
+                        { jp: "チーズケーキをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Cheesecake please.", correct: true },
                         { jp: "サンドイッチをください。", en: "Sandwich please.", correct: true },
                         { jp: "ドーナツをひとつ。", en: "One donut.", correct: true },
-                        { jp: "大丈夫です。", en: "I'm fine.", correct: true }
+                        { jp: "<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>です。", en: "I'm fine.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "「キャラメルフラペチーノのお客様！」", en: "(Calling your drink/number)" },
+                    clerk: { jp: "「キャラメルフラペチーノのお<ruby>客様<rt>きゃくさま</rt></ruby>！」", en: "(Calling your drink/number)" },
                     options: [
-                        { jp: "はい、私です。", en: "Yes, that's me.", correct: true },
+                        { jp: "はい、<ruby>私<rt>わたし</rt></ruby>です。", en: "Yes, that's me.", correct: true },
                         { jp: "ありがとうございます。", en: "Thank you.", correct: true }
                     ]
                 }
@@ -633,30 +617,30 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "ラーメン屋 (Ramen Shop)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ！ご注文はお決まりですか？", en: "Ready to order?" },
+                    clerk: { jp: "いらっしゃいませ！ご<ruby>注文<rt>ちゅうもん</rt></ruby>はお<ruby>決<rt>き</rt></ruby>まりですか？", en: "Ready to order?" },
                     options: [
-                        { jp: "醤油ラーメンをください。", en: "Shoyu Ramen.", correct: true },
-                        { jp: "味噌ラーメンをお願いします。", en: "Miso Ramen.", correct: true },
-                        { jp: "豚骨ラーメンをひとつ。", en: "Tonkotsu Ramen.", correct: true },
-                        { jp: "塩ラーメンをください。", en: "Shio Ramen.", correct: true }
+                        { jp: "<ruby>醤油<rt>しょうゆ</rt></ruby>ラーメンをください。", en: "Shoyu Ramen.", correct: true },
+                        { jp: "<ruby>味噌<rt>みそ</rt></ruby>ラーメンをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Miso Ramen.", correct: true },
+                        { jp: "<ruby>豚骨<rt>とんこつ</rt></ruby>ラーメンをひとつ。", en: "Tonkotsu Ramen.", correct: true },
+                        { jp: "<ruby>塩<rt>しお</rt></ruby>ラーメンをください。", en: "Shio Ramen.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "麺の硬さはどうしますか？", en: "Noodle firmness?" },
+                    clerk: { jp: "<ruby>麺<rt>めん</rt></ruby>の<ruby>硬<rt>かた</rt></ruby>さはどうしますか？", en: "Noodle firmness?" },
                     options: [
-                        { jp: "硬めでお願いします。", en: "Firm (Katame).", correct: true },
-                        { jp: "普通で。", en: "Normal (Futsuu).", correct: true },
-                        { jp: "柔らかめで。", en: "Soft (Yawarakame).", correct: true }
+                        { jp: "<ruby>硬<rt>かた</rt></ruby>めでお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Firm (Katame).", correct: true },
+                        { jp: "<ruby>普通<rt>ふつう</rt></ruby>で。", en: "Normal (Futsuu).", correct: true },
+                        { jp: "<ruby>柔<rt>やわ</rt></ruby>らかめで。", en: "Soft (Yawarakame).", correct: true }
                     ]
                 },
                 {
                     clerk: { jp: "トッピングやサイドメニューはいかがですか？", en: "Toppings or sides?" },
                     options: [
-                        { jp: "味玉をトッピングしてください。", en: "Add seasoned egg.", correct: true },
-                        { jp: "チャーシューを追加で。", en: "Extra chashu pork.", correct: true },
-                        { jp: "餃子をください。", en: "Gyoza please.", correct: true },
-                        { jp: "チャーハンをお願いします。", en: "Fried rice please.", correct: true },
-                        { jp: "替え玉をください。", en: "Extra noodles (Kaedama).", correct: true }
+                        { jp: "<ruby>味玉<rt>あじたま</rt></ruby>をトッピングしてください。", en: "Add seasoned egg.", correct: true },
+                        { jp: "チャーシューを<ruby>追加<rt>ついか</rt></ruby>で。", en: "Extra chashu pork.", correct: true },
+                        { jp: "<ruby>餃子<rt>ぎょうざ</rt></ruby>をください。", en: "Gyoza please.", correct: true },
+                        { jp: "チャーハンをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Fried rice please.", correct: true },
+                        { jp: "<ruby>替<rt>か</rt></ruby>え<ruby>玉<rt>だま</rt></ruby>をください。", en: "Extra noodles (Kaedama).", correct: true }
                     ]
                 }
             ]
@@ -667,32 +651,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     clerk: { jp: "いらっしゃいませ。コースになさいますか？", en: "Would you like a course?" },
                     options: [
-                        { jp: "食べ放題コースで。", en: "All-you-can-eat course.", correct: true },
-                        { jp: "単品で注文します。", en: "A la carte.", correct: true }
+                        { jp: "<ruby>食<rt>た</rt></ruby>べ<ruby>放題<rt>ほうだい</rt></ruby>コースで。", en: "All-you-can-eat course.", correct: true },
+                        { jp: "<ruby>単品<rt>たんぴん</rt></ruby>で<ruby>注文<rt>ちゅうもん</rt></ruby>します。", en: "A la carte.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お肉のご注文をどうぞ。", en: "Please order meat." },
+                    clerk: { jp: "お<ruby>肉<rt>にく</rt></ruby>のご<ruby>注文<rt>ちゅうもん</rt></ruby>をどうぞ。", en: "Please order meat." },
                     options: [
                         { jp: "カルビとロースをください。", en: "Kalbi and Loin.", correct: true },
-                        { jp: "牛タンとハラミをお願いします。", en: "Beef tongue and Skirt steak.", correct: true },
+                        { jp: "<ruby>牛<rt>ぎゅう</rt></ruby>タンとハラミをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Beef tongue and Skirt steak.", correct: true },
                         { jp: "ホルモンをください。", en: "Horumon.", correct: true },
-                        { jp: "豚トロをお願いします。", en: "Pork neck.", correct: true }
+                        { jp: "<ruby>豚<rt>とん</rt></ruby>トロをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Pork neck.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お飲み物は？", en: "Drinks?" },
+                    clerk: { jp: "お<ruby>飲<rt>の</rt></ruby>み<ruby>物<rt>もの</rt></ruby>は？", en: "Drinks?" },
                     options: [
-                        { jp: "生ビールをください。", en: "Draft beer.", correct: true },
-                        { jp: "ウーロン茶をお願いします。", en: "Oolong tea.", correct: true },
-                        { jp: "飲み放題にしてください。", en: "All-you-can-drink.", correct: true }
+                        { jp: "<ruby>生<rt>なま</rt></ruby>ビールをください。", en: "Draft beer.", correct: true },
+                        { jp: "ウーロン<ruby>茶<rt>ちゃ</rt></ruby>をお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Oolong tea.", correct: true },
+                        { jp: "<ruby>飲<rt>の</rt></ruby>み<ruby>放題<rt>ほうだい</rt></ruby>にしてください。", en: "All-you-can-drink.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "（網が汚れてきました...）", en: "(The grill net is dirty...)" },
+                    clerk: { jp: "（<ruby>網<rt>あみ</rt></ruby>が<ruby>汚<rt>よご</rt></ruby>れてきました...）", en: "(The grill net is dirty...)" },
                     options: [
-                        { jp: "すみません、網交換をお願いします。", en: "Excuse me, change the net please.", correct: true },
-                        { jp: "お水をもらえますか？", en: "Can I have water?", correct: true }
+                        { jp: "すみません、<ruby>網交換<rt>あみこうかん</rt></ruby>をお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Excuse me, change the net please.", correct: true },
+                        { jp: "お<ruby>水<rt>みず</rt></ruby>をもらえますか？", en: "Can I have water?", correct: true }
                     ]
                 }
             ]
@@ -701,28 +685,28 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "居酒屋 (Izakaya/Pub)",
             steps: [
                 {
-                    clerk: { jp: "何名様ですか？おタバコは吸われますか？", en: "How many? Smoking?" },
+                    clerk: { jp: "<ruby>何名様<rt>なんめいさま</rt></ruby>ですか？おタバコは<ruby>吸<rt>す</rt></ruby>われますか？", en: "How many? Smoking?" },
                     options: [
-                        { jp: "2人です。禁煙席で。", en: "Two. Non-smoking.", correct: true },
-                        { jp: "4人です。喫煙席で。", en: "Four. Smoking.", correct: true },
-                        { jp: "個室は空いていますか？", en: "Is a private room available?", correct: true }
+                        { jp: "2<ruby>人<rt>ふたり</rt></ruby>です。<ruby>禁煙席<rt>きんえんせき</rt></ruby>で。", en: "Two. Non-smoking.", correct: true },
+                        { jp: "4<ruby>人<rt>よにん</rt></ruby>です。<ruby>喫煙席<rt>きつえんせき</rt></ruby>で。", en: "Four. Smoking.", correct: true },
+                        { jp: "<ruby>個室<rt>こしつ</rt></ruby>は<ruby>空<rt>あ</rt></ruby>いていますか？", en: "Is a private room available?", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お飲み物は決まりましたか？", en: "Drinks?" },
+                    clerk: { jp: "お<ruby>飲<rt>の</rt></ruby>み<ruby>物<rt>もの</rt></ruby>は<ruby>決<rt>き</rt></ruby>まりましたか？", en: "Drinks?" },
                     options: [
-                        { jp: "とりあえず生ふたつ。", en: "Two draft beers for now.", correct: true },
+                        { jp: "とりあえず<ruby>生<rt>なま</rt></ruby>ふたつ。", en: "Two draft beers for now.", correct: true },
                         { jp: "ハイボールをください。", en: "Highball please.", correct: true },
-                        { jp: "レモンサワーをお願いします。", en: "Lemon sour please.", correct: true }
+                        { jp: "レモンサワーをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Lemon sour please.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "お食事のご注文をどうぞ。", en: "Food order?" },
+                    clerk: { jp: "お<ruby>食事<rt>しょくじ</rt></ruby>のご<ruby>注文<rt>ちゅうもん</rt></ruby>をどうぞ。", en: "Food order?" },
                     options: [
-                        { jp: "枝豆と唐揚げをください。", en: "Edamame and Fried chicken.", correct: true },
-                        { jp: "焼き鳥の盛り合わせをお願いします。", en: "Yakitori platter.", correct: true },
-                        { jp: "刺身の盛り合わせをください。", en: "Sashimi platter.", correct: true },
-                        { jp: "ポテトサラダをお願いします。", en: "Potato salad.", correct: true }
+                        { jp: "<ruby>枝豆<rt>えだまめ</rt></ruby>と<ruby>唐揚<rt>からあ</rt></ruby>げをください。", en: "Edamame and Fried chicken.", correct: true },
+                        { jp: "<ruby>焼<rt>や</rt></ruby>き<ruby>鳥<rt>とり</rt></ruby>の<ruby>盛<rt>も</rt></ruby>り<ruby>合<rt>あ</rt></ruby>わせをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Yakitori platter.", correct: true },
+                        { jp: "<ruby>刺身<rt>さしみ</rt></ruby>の<ruby>盛<rt>も</rt></ruby>り<ruby>合<rt>あ</rt></ruby>わせをください。", en: "Sashimi platter.", correct: true },
+                        { jp: "ポテトサラダをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Potato salad.", correct: true }
                     ]
                 }
             ]
@@ -731,26 +715,26 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "ピザ屋 (Pizza Shop)",
             steps: [
                 {
-                    clerk: { jp: "ご注文をお伺いします。", en: "Order please." },
+                    clerk: { jp: "ご<ruby>注文<rt>ちゅうもん</rt></ruby>をお<ruby>伺<rt>うかが</rt></ruby>いします。", en: "Order please." },
                     options: [
                         { jp: "マルゲリータをください。", en: "Margherita.", correct: true },
-                        { jp: "シーフードピザをお願いします。", en: "Seafood Pizza.", correct: true },
+                        { jp: "シーフードピザをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Seafood Pizza.", correct: true },
                         { jp: "テリヤキチキンピザをください。", en: "Teriyaki Chicken Pizza.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "サイズと生地はどうしますか？", en: "Size and Crust?" },
+                    clerk: { jp: "サイズと<ruby>生地<rt>きじ</rt></ruby>はどうしますか？", en: "Size and Crust?" },
                     options: [
                         { jp: "Mサイズのクリスピーで。", en: "Medium, Crispy.", correct: true },
                         { jp: "Lサイズのハンドトスで。", en: "Large, Hand-tossed.", correct: true },
-                        { jp: "耳にチーズを入れてください。", en: "Cheese in the crust.", correct: true }
+                        { jp: "<ruby>耳<rt>みみ</rt></ruby>にチーズを<ruby>入<rt>い</rt></ruby>れてください。", en: "Cheese in the crust.", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "配達ですか？お持ち帰りですか？", en: "Delivery or Carry out?" },
+                    clerk: { jp: "<ruby>配達<rt>はいたつ</rt></ruby>ですか？お<ruby>持<rt>も</rt></ruby>ち<ruby>帰<rt>かえ</rt></ruby>りですか？", en: "Delivery or Carry out?" },
                     options: [
-                        { jp: "配達でお願いします。", en: "Delivery please.", correct: true },
-                        { jp: "持ち帰ります。", en: "I'll take it out.", correct: true }
+                        { jp: "<ruby>配達<rt>はいたつ</rt></ruby>でお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Delivery please.", correct: true },
+                        { jp: "<ruby>持<rt>も</rt></ruby>ち<ruby>帰<rt>かえ</rt></ruby>ります。", en: "I'll take it out.", correct: true }
                     ]
                 }
             ]
@@ -759,20 +743,20 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "ファミレス (Family Restaurant)",
             steps: [
                 {
-                    clerk: { jp: "いらっしゃいませ。何名様ですか？", en: "How many people?" },
+                    clerk: { jp: "いらっしゃいませ。<ruby>何名様<rt>なんめいさま</rt></ruby>ですか？", en: "How many people?" },
                     options: [
-                        { jp: "3人です。", en: "Three people.", correct: true },
+                        { jp: "3<ruby>人<rt>さんにん</rt></ruby>です。", en: "Three people.", correct: true },
                         { jp: "ひとりです。", en: "One person.", correct: true },
-                        { jp: "子供用の椅子はありますか？", en: "Do you have a child chair?", correct: true }
+                        { jp: "<ruby>子供用<rt>こどもよう</rt></ruby>の<ruby>椅子<rt>いす</rt></ruby>はありますか？", en: "Do you have a child chair?", correct: true }
                     ]
                 },
                 {
-                    clerk: { jp: "ご注文はお決まりですか？", en: "Ready to order?" },
+                    clerk: { jp: "ご<ruby>注文<rt>ちゅうもん</rt></ruby>はお<ruby>決<rt>き</rt></ruby>まりですか？", en: "Ready to order?" },
                     options: [
                         { jp: "ハンバーグステーキをください。", en: "Hamburg steak.", correct: true },
-                        { jp: "オムライスをお願いします。", en: "Omurice.", correct: true },
+                        { jp: "オムライスをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Omurice.", correct: true },
                         { jp: "カレーライスをください。", en: "Curry rice.", correct: true },
-                        { jp: "お子様ランチをひとつ。", en: "Kid's meal.", correct: true }
+                        { jp: "お<ruby>子様<rt>こさま</rt></ruby>ランチをひとつ。", en: "Kid's meal.", correct: true }
                     ]
                 },
                 {
@@ -784,15 +768,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 },
                 {
-                    clerk: { jp: "（店員を呼びたい...）", en: "(Call the staff)" },
+                    clerk: { jp: "（<ruby>店員<rt>てんいん</rt></ruby>を<ruby>呼<rt>よ</rt></ruby>びたい...）", en: "(Call the staff)" },
                     options: [
-                        { jp: "ピンポンを押します。", en: "(Press the bell)", correct: true },
-                        { jp: "すみません、デザートをお願いします。", en: "Excuse me, dessert please.", correct: true }
+                        { jp: "ピンポンを<ruby>押<rt>お</rt></ruby>します。", en: "(Press the bell)", correct: true },
+                        { jp: "すみません、デザートをお<ruby>願<rt>ねが</rt></ruby>いします。", en: "Excuse me, dessert please.", correct: true }
                     ]
                 }
             ]
         }
     };
+
+    // ランダムモードの表示用に、全stepに店舗名を持たせておく
+    for (const key in scenarios) {
+        scenarios[key].steps.forEach(step => {
+            step.shopName = scenarios[key].name;
+        });
+    }
 
     let currentScenarioId = '';
     let currentData = null;
@@ -803,7 +794,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!text) return "";
         let t = text;
         t = t.replace(/[ 、。！？,.!?]/g, "");
-        // 表記ゆれ吸収
         t = t.replace(/照り焼き|照焼/g, "てりやき");
         t = t.replace(/ビッグマック/g, "ビックマック");
         t = t.replace(/珈琲/g, "コーヒー");
@@ -816,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
         t = t.replace(/ふたり|二人/g, "2人");
         t = t.replace(/ひとり|一人/g, "1人");
         t = t.replace(/さんにん|三人/g, "3人");
+        t = t.replace(/よにん|四人/g, "4人");
         t = t.replace(/ひとつ|一つ/g, "1つ");
         t = t.replace(/ふたつ|二つ/g, "2つ");
         t = t.replace(/みっつ|三つ/g, "3つ");
@@ -861,7 +852,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.loadScenario = (id) => {
         currentScenarioId = id;
-        currentData = scenarios[id];
+        
+        if (id === 'random') {
+            let allSteps = [];
+            for (const key in scenarios) {
+                scenarios[key].steps.forEach(step => {
+                    allSteps.push(step);
+                });
+            }
+            // ランダムに並び替え
+            for (let i = allSteps.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allSteps[i], allSteps[j]] = [allSteps[j], allSteps[i]];
+            }
+            // 5問だけ抽出
+            allSteps = allSteps.slice(0, 5);
+
+            currentData = {
+                name: "ランダムミックス (応用)",
+                steps: allSteps
+            };
+        } else {
+            currentData = scenarios[id];
+        }
+
         const listEl = document.getElementById('practice-list');
         listEl.innerHTML = '';
         document.getElementById('practice-title').textContent = currentData.name;
@@ -869,29 +883,38 @@ document.addEventListener('DOMContentLoaded', () => {
         currentData.steps.forEach((step, idx) => {
             let answersHtml = '';
             step.options.forEach(opt => {
+                const escapedJp = opt.jp.replace(/'/g, "\\'");
                 answersHtml += `
                     <div class="answer-item">
                         <div class="text-content">
                             <div class="text-jp" style="color:var(--primary);">${opt.jp}</div>
                             <div class="text-en">${opt.en}</div>
                         </div>
-                        <button class="play-btn-mini" onclick="speak('${opt.jp}')">
+                        <button class="play-btn-mini" onclick="speak('${escapedJp}')">
                             <i class="fa-solid fa-volume-high"></i>
                         </button>
                     </div>
                 `;
             });
+            const escapedClerkJp = step.clerk.jp.replace(/'/g, "\\'");
+            
+            // どの店舗のシナリオか表示（ランダムモードで特に役立つ）
+            let shopInfo = "";
+            if(id === 'random') {
+                shopInfo = `<span style="color:var(--primary); margin-left:10px; font-weight:bold;">[${step.shopName}]</span>`;
+            }
+
             const div = document.createElement('div');
             div.className = 'practice-item';
             div.innerHTML = `
-                <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
+                <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1} ${shopInfo}</div>
                 <div class="practice-row">
                     <div class="role-badge badge-clerk">店員</div>
                     <div class="text-content">
                         <div class="text-jp">${step.clerk.jp}</div>
                         <div class="text-en">${step.clerk.en}</div>
                     </div>
-                    <button class="play-btn-mini" onclick="speak('${step.clerk.jp}')"><i class="fa-solid fa-volume-high"></i></button>
+                    <button class="play-btn-mini" onclick="speak('${escapedClerkJp}')"><i class="fa-solid fa-volume-high"></i></button>
                 </div>
                 <div class="practice-row" style="align-items: flex-start;">
                     <div class="role-badge badge-you" style="margin-top:8px;">あなた</div>
@@ -914,7 +937,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = currentData.steps[stepIndex];
         document.getElementById('step-count').textContent = stepIndex + 1;
         
-        document.getElementById('clerk-text-jp').textContent = step.clerk.jp;
+        // 店員ラベルに現在の店舗名を表示
+        document.getElementById('clerk-role-label').textContent = `店員 / Situation [${step.shopName}]`;
+
+        document.getElementById('clerk-text-jp').innerHTML = step.clerk.jp;
         document.getElementById('clerk-text-en').textContent = step.clerk.en;
         window.speak(step.clerk.jp);
 
@@ -927,13 +953,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomOpt = correctOpts[Math.floor(Math.random() * correctOpts.length)];
         currentTargetPhrase = randomOpt;
 
-        document.getElementById('target-phrase').textContent = randomOpt.jp;
+        document.getElementById('target-phrase').innerHTML = randomOpt.jp;
         document.getElementById('target-sub').textContent = randomOpt.en;
     }
-
-    window.playTargetVoice = () => {
-        if(currentTargetPhrase) window.speak(currentTargetPhrase.jp);
-    };
 
     window.replayClerkVoice = () => {
         window.speak(currentData.steps[stepIndex].clerk.jp);
@@ -941,7 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function evaluateSpeech(userText) {
         if(!currentTargetPhrase) return;
-        const targetText = currentTargetPhrase.jp;
+        const targetText = stripRuby(currentTargetPhrase.jp);
         const similarity = getSimilarity(userText, targetText);
         const percentage = Math.floor(similarity * 100);
 
