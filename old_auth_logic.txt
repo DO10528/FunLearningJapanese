@@ -1,0 +1,647 @@
+-    if (error.code === 'auth/credential-already-in-use') {
+-      alert("このLINEアカウントは既に他のデータと紐付いています。");
+-    } else if (error.code === 'auth/popup-blocked') {
+-      alert("ポップアップがブロックされました。\niPhoneの設定 > Safari > 「ポップアップブロック」をOFFにするか、Chromeを使用してください。");
+-    } else {
+-      alert("連携エラー: " + error.message);
+-    }
+-  }
+-};
+-
+-window.submitAuth = async () => {
+-  const email = document.getElementById('auth-email').value.trim();
+-  const pass = document.getElementById('auth-pass').value.trim();
+-  const displayName = document.getElementById('auth-display-name').value.trim();
+-  const msg = document.getElementById('modal-msg');
+-  const errs = window.i18nData[window.currentLang];
+-
+-  if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
+-  if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
+-
+-  try {
+-    let user;
+-    // ★重複チェックは削除（権限エラー回避のため、まずは作成を試みる）
+-    if (window.authMode === 'signup') {
+-      if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
+-      // 直接作成を試みる
+-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+-      user = userCredential.user;
+-    } else {
+-      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+-      user = userCredential.user;
+-    }
+-
+-    // ★認証成功したら即座にUIを閉じる
+-    window.closeAuthModal();
+-    sessionStorage.setItem(SESS_KEY, 'authenticated');
+-
+-    // ★DB操作はtry-catchで囲み、失敗してもログイン状態を維持する
+-    try {
+-        const userRef = doc(db, "users", user.uid);
+-        if (window.authMode === 'signup') {
+-             await setDoc(userRef, {
+-                email: email, displayName: displayName, points: 0, streak: 1,
+-                lastLogin: new Date().toISOString(), dailyTracker: {},
+-                isPremium: false
+-            });
+-        } else {
+-            const userSnap = await getDoc(userRef);
+-            if (!userSnap.exists()) {
+-                await setDoc(userRef, {
+-                    email: email, displayName: email.split('@')[0], points: 0, streak: 1,
+-                    lastLogin: new Date().toISOString(), dailyTracker: {},
+-                    isPremium: false
+-                });
+-            } else {
+-                await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+-            }
+-        }
+-    } catch (dbError) {
+-        console.error("Database access failed, but user is logged in.", dbError);
+-    }
+-
+-  } catch (error) {
+-    console.error(error);
+-    let errorMsg = errs.err_generic;
+-    if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
+-    else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
+-    msg.textContent = errorMsg + " (" + error.code + ")";
+-  }
+-};
+-
+-window.logout = async () => {
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  sessionStorage.removeItem(SESS_KEY);
+-  await signOut(auth);
+-  updateUI(null);
+-};
+-
+-window.loginAsGuest = () => {
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  sessionStorage.setItem(SESS_KEY, 'guest');
+-  updateUI('guest');
+-};
+-
+-const checkMonthlyReset = async (user) => {
+-  try {
+-      const userRef = doc(db, "users", user.uid);
+-      const snapshot = await getDoc(userRef);
+-      if (snapshot.exists()) {
+-        const data = snapshot.data();
+-        const now = new Date();
+-        const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+-        if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
+-          await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+-        } else {
+-          await updateDoc(userRef, { lastLogin: now.toISOString() });
+-        }
+-      }
+-  } catch(e) { console.error("Monthly reset check failed", e); }
+-};
+-
+-window.updateStaticCards = (isPremium) => {
+-    const staticSengoku = document.getElementById('static-sengoku-btn');
+-    if (staticSengoku) {
+-        if (!isPremium) {
+-            staticSengoku.classList.add('locked');
+-            staticSengoku.href = "javascript:void(0)";
+-            staticSengoku.onclick = (e) => { 
+-                e.preventDefault(); 
+-                window.openPremiumModal(); 
+-            };
+-        } else {
+-            staticSengoku.classList.remove('locked');
+-            staticSengoku.href = "culture_map.html";
+-            staticSengoku.onclick = null;
+-        }
+-    }
+-};
+-
+-window.updateUI = function(userState) {
+-  const dash = document.getElementById('user-dashboard');
+-  const welcome = document.getElementById('guest-welcome');
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  
+-  if (userState === 'guest') {
+-    window.isUserPremium = false;
+-    window.updateStaticCards(false);
+-    welcome.classList.add('hidden');
+-    dash.classList.remove('hidden');
+-    document.getElementById('user-name').textContent = 'ゲスト';
+-    document.getElementById('user-lvl').textContent = 1;
+-    document.getElementById('level-fill').style.width = '0%';
+-    document.getElementById('streak-val').textContent = 0;
+-    document.getElementById('point-val').textContent = 0;
+-  } else if (userState && userState.uid) {
+-    welcome.classList.add('hidden');
+-    dash.classList.remove('hidden');
+-    const userId = userState.uid;
+-    
+-    // ★権限エラーでもUIが壊れないようにエラーハンドリング追加
+-    currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
+-      if (doc.exists()) {
+-        const data = doc.data();
+-        window.isUserPremium = data.isPremium || false;
+-        window.updateStaticCards(window.isUserPremium);
+-        document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
+-        document.getElementById('streak-val').textContent = data.streak || 0;
+-        document.getElementById('point-val').textContent = data.points || 0;
+-        const pts = data.points || 0;
+-        const level = Math.floor(pts / 100) + 1;
+-        document.getElementById('user-lvl').textContent = level;
+-        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+-      }
+-    }, (error) => {
+-        console.error("Firestore read error:", error);
+-        // DB読込失敗時のフォールバック表示
+-        document.getElementById('user-name').textContent = userState.displayName || userState.email || "ユーザー";
+-        window.isUserPremium = false;
+-        window.updateStaticCards(false);
+-    });
+-  } else {
+--
++    if (error.code === 'auth/credential-already-in-use') {
++      alert("このLINEアカウントは既に他のデータと紐付いています。");
++    } else if (error.code === 'auth/popup-blocked') {
++      alert("ポップアップがブロックされました。\niPhoneの設定 > Safari > 「ポップアップブロック」をOFFにするか、Chromeを使用してください。");
++    } else {
++      alert("連携エラー: " + error.message);
++    }
++  }
++};
++
++window.submitAuth = async () => {
++  const email = document.getElementById('auth-email').value.trim();
++  const pass = document.getElementById('auth-pass').value.trim();
++  const displayName = document.getElementById('auth-display-name').value.trim();
++  const msg = document.getElementById('modal-msg');
++  const errs = window.i18nData[window.currentLang];
++
++  if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
++  if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
++
++  try {
++    if (window.authMode === 'signup') {
++      if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
++      const usersRef = collection(db, "users");
++      const q = query(usersRef, where("displayName", "==", displayName), limit(1));
++      const snap = await getDocs(q);
++      if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
++      
++      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
++      const user = userCredential.user;
++      await setDoc(doc(db, "users", user.uid), {
++        email: email, displayName: displayName, points: 0, streak: 1,
++        lastLogin: new Date().toISOString(), dailyTracker: {},
++        isPremium: false // ★デフォルトは無料会員
++      });
++      sessionStorage.setItem(SESS_KEY, 'authenticated');
++      window.closeAuthModal();
++    } else {
++      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
++      const user = userCredential.user;
++      const userRef = doc(db, "users", user.uid);
++      const userSnap = await getDoc(userRef);
++      if (!userSnap.exists()) {
++        await setDoc(userRef, {
++          email: email, displayName: email.split('@')[0], points: 0, streak: 1,
++          lastLogin: new Date().toISOString(), dailyTracker: {},
++          isPremium: false // ★デフォルトは無料会員
++        });
++      } else {
++        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
++      }
++      sessionStorage.setItem(SESS_KEY, 'authenticated');
++      window.closeAuthModal();
++    }
++  } catch (error) {
++    console.error(error);
++    let errorMsg = errs.err_generic;
++    if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
++    else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
++    msg.textContent = errorMsg;
++  }
++};
++
++window.logout = async () => {
++  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
++  sessionStorage.removeItem(SESS_KEY);
++  await signOut(auth);
++  updateUI(null);
++};
++
++window.loginAsGuest = () => {
++  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
++  sessionStorage.setItem(SESS_KEY, 'guest');
++  updateUI('guest');
++};
++
++const checkMonthlyReset = async (user) => {
++  const userRef = doc(db, "users", user.uid);
++  const snapshot = await getDoc(userRef);
++  if (snapshot.exists()) {
++    const data = snapshot.data();
++    const now = new Date();
++    const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
++    if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
++      await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
++    } else {
++      await updateDoc(userRef, { lastLogin: now.toISOString() });
++    }
++  }
++};
++
++window.updateStaticCards = (isPremium) => {
++    const staticSengoku = document.getElementById('static-sengoku-btn');
++    if (staticSengoku) {
++        if (!isPremium) {
++            staticSengoku.classList.add('locked');
++            staticSengoku.href = "javascript:void(0)";
++            staticSengoku.onclick = (e) => { 
++                e.preventDefault(); 
++                window.openPremiumModal(); 
++            };
++        } else {
++            staticSengoku.classList.remove('locked');
++            staticSengoku.href = "culture_map.html";
++            staticSengoku.onclick = null;
++        }
++    }
++};
++
++window.updateUI = function(userState) {
++  const dash = document.getElementById('user-dashboard');
++  const welcome = document.getElementById('guest-welcome');
++  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
++  
++  if (userState === 'guest') {
++    window.isUserPremium = false; // ゲストは無料
++    window.updateStaticCards(false);
++
++    welcome.classList.add('hidden');
++    dash.classList.remove('hidden');
++    document.getElementById('user-name').textContent = 'ゲスト';
++    document.getElementById('user-lvl').textContent = 1;
++    document.getElementById('level-fill').style.width = '0%';
++    document.getElementById('streak-val').textContent = 0;
++    document.getElementById('point-val').textContent = 0;
++  } else if (userState && userState.uid) {
++    welcome.classList.add('hidden');
++    dash.classList.remove('hidden');
++    const userId = userState.uid;
++    currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
++      if (doc.exists()) {
++        const data = doc.data();
+         window.isUserPremium = data.isPremium || false;
+-        document.getElementById('user-dashboard').classList.remove('hidden');
+-        document.getElementById('guest-welcome').classList.add('hidden');
+-        document.getElementById('user-name').textContent = data.displayName;
+-        document.getElementById('point-val').textContent = data.points;
+-        updateStaticCards(window.isUserPremium);
+-        refreshGameDisplay(); // ★再描画
++        
++        window.updateStaticCards(window.isUserPremium);
++
++        document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
++        document.getElementById('streak-val').textContent = data.streak || 0;
++        document.getElementById('point-val').textContent = data.points || 0;
++        const pts = data.points || 0;
++        const level = Math.floor(pts / 100) + 1;
++        document.getElementById('user-lvl').textContent = level;
++        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+       }
+     });
+   } else {
+-    document.getElementById('user-dashboard').classList.add('hidden');
+-    document.getElementById('guest-welcome').classList.remove('hidden');
+-    updateStaticCards(false);
+-    refreshGameDisplay();
++    window.isUserPremium = false; // 未ログイン
++    window.updateStaticCards(false);
++
++    welcome.classList.remove('hidden');
++    dash.classList.add('hidden');
+--
+-    if (error.code === 'auth/credential-already-in-use') {
+-      alert("このLINEアカウントは既に他のデータと紐付いています。");
+-    } else if (error.code === 'auth/popup-blocked') {
+-      alert("ポップアップがブロックされました。\niPhoneの設定 > Safari > 「ポップアップブロック」をOFFにするか、Chromeを使用してください。");
+-    } else {
+-      alert("連携エラー: " + error.message);
+-    }
+-  }
+-};
+-
+-window.submitAuth = async () => {
+-  const email = document.getElementById('auth-email').value.trim();
+-  const pass = document.getElementById('auth-pass').value.trim();
+-  const displayName = document.getElementById('auth-display-name').value.trim();
+-  const msg = document.getElementById('modal-msg');
+-  const errs = window.i18nData[window.currentLang];
+-
+-  if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
+-  if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
+-
+-  try {
+-    if (window.authMode === 'signup') {
+-      if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
+-      const usersRef = collection(db, "users");
+-      const q = query(usersRef, where("displayName", "==", displayName), limit(1));
+-      const snap = await getDocs(q);
+-      if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
+-      
+-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+-      const user = userCredential.user;
+-      await setDoc(doc(db, "users", user.uid), {
+-        email: email, displayName: displayName, points: 0, streak: 1,
+-        lastLogin: new Date().toISOString(), dailyTracker: {},
+-        isPremium: false // ★デフォルトは無料会員
+-      });
+-      sessionStorage.setItem(SESS_KEY, 'authenticated');
+-      window.closeAuthModal();
+-    } else {
+-      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+-      const user = userCredential.user;
+-      const userRef = doc(db, "users", user.uid);
+-      const userSnap = await getDoc(userRef);
+-      if (!userSnap.exists()) {
+-        await setDoc(userRef, {
+-          email: email, displayName: email.split('@')[0], points: 0, streak: 1,
+-          lastLogin: new Date().toISOString(), dailyTracker: {},
+-          isPremium: false // ★デフォルトは無料会員
+-        });
+-      } else {
+-        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+-      }
+-      sessionStorage.setItem(SESS_KEY, 'authenticated');
+-      window.closeAuthModal();
+-    }
+-  } catch (error) {
+-    console.error(error);
+-    let errorMsg = errs.err_generic;
+-    if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
+-    else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
+-    msg.textContent = errorMsg;
+-  }
+-};
+-
+-window.logout = async () => {
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  sessionStorage.removeItem(SESS_KEY);
+-  await signOut(auth);
+-  updateUI(null);
+-};
+-
+-window.loginAsGuest = () => {
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  sessionStorage.setItem(SESS_KEY, 'guest');
+-  updateUI('guest');
+-};
+-
+-const checkMonthlyReset = async (user) => {
+-  const userRef = doc(db, "users", user.uid);
+-  const snapshot = await getDoc(userRef);
+-  if (snapshot.exists()) {
+-    const data = snapshot.data();
+-    const now = new Date();
+-    const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+-    if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
+-      await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+-    } else {
+-      await updateDoc(userRef, { lastLogin: now.toISOString() });
+-    }
+-  }
+-};
++import { getFirestore, doc, setDoc, updateDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
++import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+ 
+-window.updateStaticCards = (isPremium) => {
+-    const staticSengoku = document.getElementById('static-sengoku-btn');
+-    if (staticSengoku) {
+-        if (!isPremium) {
+-            staticSengoku.classList.add('locked');
+-            staticSengoku.href = "javascript:void(0)";
+-            staticSengoku.onclick = (e) => { 
+-                e.preventDefault(); 
+-                window.openPremiumModal(); 
+-            };
+-        } else {
+-            staticSengoku.classList.remove('locked');
+-            staticSengoku.href = "culture_map.html";
+-            staticSengoku.onclick = null;
+-        }
+-    }
+-};
++const firebaseConfig = { apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls", authDomain: "funlearningjapanese-b8e08.firebaseapp.com", projectId: "funlearningjapanese-b8e08", storageBucket: "funlearningjapanese-b8e08.appspot.com", messagingSenderId: "1055688629268", appId: "1:1055688629268:web:248183b62f15c34a2d5b01" };
++const app = initializeApp(firebaseConfig);
++const db = getFirestore(app);
++const auth = getAuth(app);
+ 
+-window.updateUI = function(userState) {
+-  const dash = document.getElementById('user-dashboard');
+-  const welcome = document.getElementById('guest-welcome');
+-  if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
+-  
+-  if (userState === 'guest') {
+-    window.isUserPremium = false; // ゲストは無料
+-    window.updateStaticCards(false);
++window.isUserPremium = false;
++window.currentCategory = null; // ★追加：現在開いているカテゴリーを保持
+ 
+-    welcome.classList.add('hidden');
+-    dash.classList.remove('hidden');
+-    document.getElementById('user-name').textContent = 'ゲスト';
+-    document.getElementById('user-lvl').textContent = 1;
+-    document.getElementById('level-fill').style.width = '0%';
+-    document.getElementById('streak-val').textContent = 0;
+-    document.getElementById('point-val').textContent = 0;
+-  } else if (userState && userState.uid) {
+-    welcome.classList.add('hidden');
+-    dash.classList.remove('hidden');
+-    const userId = userState.uid;
+-    currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (doc) => {
+-      if (doc.exists()) {
+-        const data = doc.data();
++onAuthStateChanged(auth, (user) => {
++  if (user) {
++    onSnapshot(doc(db, "users", user.uid), (snap) => {
++      if (snap.exists()) {
++        const data = snap.data();
+         window.isUserPremium = data.isPremium || false;
+-        
+-        window.updateStaticCards(window.isUserPremium);
+-
+-        document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
+-        document.getElementById('streak-val').textContent = data.streak || 0;
+-        document.getElementById('point-val').textContent = data.points || 0;
+-        const pts = data.points || 0;
+-        const level = Math.floor(pts / 100) + 1;
+-        document.getElementById('user-lvl').textContent = level;
+-        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
++        document.getElementById('user-dashboard').classList.remove('hidden');
++        document.getElementById('guest-welcome').classList.add('hidden');
++        document.getElementById('user-name').textContent = data.displayName;
++        document.getElementById('point-val').textContent = data.points;
++        updateStaticCards(window.isUserPremium);
+--
++        document.getElementById('modal-title').textContent = mode === 'login' ? 'ログイン' : '新規登録';
++        document.getElementById('modal-msg').textContent = '';
++        document.getElementById('auth-name').value = '';
++        document.getElementById('auth-pass').value = '';
++    };
++
++    window.closeAuthModal = () => {
++        document.getElementById('auth-modal').style.display = 'none';
++    };
++
++    window.submitAuth = async () => {
++        const name = document.getElementById('auth-name').value.trim();
++        const pass = document.getElementById('auth-pass').value.trim();
++        const msg = document.getElementById('modal-msg');
++        
++        if (!name || !pass) { msg.textContent = '名前とパスワードを入力してください'; return; }
++
++        try {
++            const userRef = doc(db, "users", name);
++            const userSnap = await getDoc(userRef);
++
++            if (window.authMode === 'signup') {
++                if (userSnap.exists()) {
++                    msg.textContent = 'その名前はすでに使われています';
++                    return;
++                }
++                // 新規登録 (Firestoreに書き込み)
++                await setDoc(userRef, {
++                    password: pass,
++                    points: 0,
++                    streak: 1,
++                    lastLogin: new Date().toISOString()
++                });
++                sessionStorage.setItem(SESS_KEY, name);
++                window.closeAuthModal();
++                updateUI();
++                alert('登録しました！');
++
++            } else {
++                // ログイン
++                if (!userSnap.exists()) {
++                    msg.textContent = 'ユーザーが見つかりません';
++                    return;
++                }
++                const userData = userSnap.data();
++                if (userData.password !== pass) {
++                    msg.textContent = 'パスワードが違います';
++                    return;
++                }
++                sessionStorage.setItem(SESS_KEY, name);
++                window.closeAuthModal();
++                updateUI();
++            }
++        } catch (e) {
++            console.error(e);
++            msg.textContent = 'エラーが発生しました。インターネット接続を確認してください。';
++        }
++    };
++
++    window.logout = () => {
++        if (currentUserDocUnsubscribe) currentUserDocUnsubscribe(); // リスナー解除
++        sessionStorage.removeItem(SESS_KEY);
++        updateUI();
++    };
++
++    window.loginAsGuest = () => {
++        sessionStorage.setItem(SESS_KEY, 'ゲスト');
++        updateUI();
++    };
++
++    // --- UI更新機能 ---
++    async function updateUI() {
++        const userName = sessionStorage.getItem(SESS_KEY);
++        const dash = document.getElementById('user-dashboard');
++        const welcome = document.getElementById('guest-welcome');
++
++        if (userName) {
++            welcome.classList.add('hidden');
++            dash.classList.remove('hidden');
++            document.getElementById('user-name').textContent = userName;
++
++            if (userName === 'ゲスト') {
++                document.getElementById('streak-val').textContent = 0;
++                document.getElementById('point-val').textContent = 0;
++            } else {
++                // Firestoreのリアルタイム更新をリッスン
++                if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
++                
++                currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userName), (doc) => {
++                    if (doc.exists()) {
++                        const data = doc.data();
++                        document.getElementById('streak-val').textContent = data.streak || 0;
++                        document.getElementById('point-val').textContent = data.points || 0;
++                        
++                        // レベル計算
++                        const pts = data.points || 0;
++                        const level = Math.floor(pts / 100) + 1;
++                        document.getElementById('user-lvl').textContent = level;
++                        document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
++                    }
++                });
++            }
++        } else {
++            welcome.classList.remove('hidden');
++            dash.classList.add('hidden');
++        }
++    }
++
++    // --- ランキング機能 ---
++    window.toggleRanking = async () => {
++        const modal = document.getElementById('ranking-modal');
++        const list = document.getElementById('ranking-list');
++        const loading = document.getElementById('ranking-loading');
++        
++        modal.style.display = 'flex';
++        list.innerHTML = '';
++        loading.style.display = 'block';
++
++        try {
++            // ポイント順に上位5名を取得
++            const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
++            const querySnapshot = await getDocs(q);
++            
++            loading.style.display = 'none';
++            
++            let rank = 1;
++            querySnapshot.forEach((doc) => {
++                const data = doc.data();
++                const name = doc.id;
++                const pt = data.points || 0;
++                
++                const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
++                
++                const li = document.createElement('li');
++                li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
++                li.innerHTML = `<span>${icon} ${name}</span> <span style="color:#f0ad4e;">${pt}pt</span>`;
++                list.appendChild(li);
++                rank++;
++            });
++
++            if (rank === 1) {
++                list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
++            }
++
++        } catch (e) {
++            console.error(e);
++            loading.innerText = '読み込みエラー';
++        }
++    };
++
++    // 初期化
++    updateUI();
++    
++    // イベントリスナー設定 (Moduleスコープ外から呼べるようにwindowに紐付けた関数を使用)
++    document.getElementById('login-btn').onclick = () => window.openAuthModal('login');
++    document.getElementById('signup-btn').onclick = () => window.openAuthModal('signup');
++    document.getElementById('guest-btn').onclick = () => window.loginAsGuest();
++    document.getElementById('logout-btn').onclick = () => window.logout();
++    document.getElementById('modal-close').onclick = () => window.closeAuthModal();
++    document.getElementById('modal-submit').onclick = () => window.submitAuth();
++
