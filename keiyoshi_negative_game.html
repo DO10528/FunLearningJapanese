@@ -171,71 +171,7 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    
-    window.currentUser = null;
-
-    onAuthStateChanged(auth, (user) => {
-        const el = document.getElementById('auth-status');
-        if (user) {
-            window.currentUser = user;
-            el.textContent = "ログイン中";
-        } else {
-            window.currentUser = null;
-            el.textContent = "ゲスト";
-        }
-    });
-
-    // ポイント付与関数 (Global)
-    window.addPuzzlePoints = async (qId, gameName) => {
-        if (!window.currentUser) return false;
-        
-        const today = new Date().toISOString().split('T')[0];
-        const scoreId = `${gameName}_${qId}`;
-
-        try {
-            const userRef = doc(db, "users", window.currentUser.uid);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                const data = userSnap.data();
-                const dailyTracker = data.dailyTracker || {};
-
-                if (dailyTracker[scoreId] === today) {
-                    return false; // すでに獲得済み
-                }
-
-                const newDailyTracker = { ...dailyTracker, [scoreId]: today };
-                await updateDoc(userRef, {
-                    points: increment(1),
-                    dailyTracker: newDailyTracker
-                });
-                return true;
-            }
-            return false;
-        } catch(e) { 
-            console.error("Error updating points:", e); 
-            return false;
-        }
-    };
-</script>
+<script type="module" src="js/firebase-config.js"></script>
 
 <script>
     // 提供されたJSONデータから抽出

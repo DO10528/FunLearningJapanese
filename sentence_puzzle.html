@@ -253,61 +253,7 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-          authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-          projectId: "funlearningjapanese-b8e08",
-          storageBucket: "funlearningjapanese-b8e08.appspot.com",
-          messagingSenderId: "1055688629268",
-          appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-          measurementId: "G-LCMXVLPS81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        window.currentUserId = null;
-        const authStatusEl = document.getElementById('auth-status-sentence');
-        
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.currentUserId = user.uid;
-                const userDocRef = doc(db, "users", window.currentUserId);
-                const userDocSnap = await getDoc(userDocRef);
-                let displayName = 'ユーザー';
-                if (userDocSnap.exists()) {
-                    displayName = userDocSnap.data().displayName || 'ユーザー';
-                }
-                authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
-            } else {
-                window.currentUserId = null;
-                authStatusEl.textContent = '❌ ゲストモード (ポイントはつきません)';
-            }
-        });
-
-        // ポイント加算関数
-        window.addPointsToUser = async function(points, templateId) { 
-            if (!window.currentUserId || points <= 0) return false;
-            try {
-                const userRef = doc(db, "users", window.currentUserId);
-                // 文法パズル用ID。英数字以外が含まれる可能性があるため、簡易的なハッシュや置換が望ましいが、
-                // 今回はそのまま利用するか、'sent_xxx' のように記録
-                const logId = `sentence_${templateId}`; 
-                await updateDoc(userRef, { points: increment(points) });
-                console.log(`+${points}pt (Template: ${templateId})`);
-                return true;
-            } catch (e) {
-                console.error("ポイントエラー:", e);
-                return false;
-            }
-        }
-    </script>
+    <script type="module" src="js/firebase-config.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

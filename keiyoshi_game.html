@@ -183,45 +183,7 @@
 
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, updateDoc, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.appspot.com",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    window.db = db;
-
-    onAuthStateChanged(auth, (user) => {
-        const el = document.getElementById('auth-status');
-        if (user) {
-            window.currentUser = user;
-            el.textContent = "ログイン中";
-        } else {
-            window.currentUser = null;
-            el.textContent = "ゲスト";
-        }
-    });
-
-    window.addPoints = async (id) => {
-        if(!window.currentUser) return;
-        try {
-            const userRef = doc(db, "users", window.currentUser.uid);
-            await updateDoc(userRef, { points: increment(1) });
-        } catch(e) { console.error(e); }
-    };
-</script>
+<script type="module" src="js/firebase-config.js"></script>
 
 <script>
     // --- ゲームデータ ---

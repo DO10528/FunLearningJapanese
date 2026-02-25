@@ -214,40 +214,7 @@
     </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-    authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-    projectId: "funlearningjapanese-b8e08",
-    storageBucket: "funlearningjapanese-b8e08.appspot.com",
-    messagingSenderId: "1055688629268",
-    appId: "1:1055688629268:web:248183b62f15c34a2d5b01"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-let currentUser = null;
-onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-});
-
-window.addPoints = async (amount) => {
-    if (!currentUser) return;
-    try {
-        const userRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userRef, { points: increment(amount) });
-        console.log(`Added ${amount} points.`);
-    } catch (e) {
-        console.error("Error adding points: ", e);
-    }
-};
-</script>
+<script type="module" src="js/firebase-config.js"></script>
 
 <script>
 // --- データ（Geminiが生成したダミー画像リンク付き） ---

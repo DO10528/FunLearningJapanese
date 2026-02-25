@@ -213,56 +213,7 @@
     <audio id="tc-sound-correct" src="assets/sounds/seikai.mp3" preload="auto"></audio>
     <audio id="tc-sound-incorrect" src="assets/sounds/bubu.mp3" preload="auto"></audio>
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getFirestore, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-          authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-          projectId: "funlearningjapanese-b8e08",
-          storageBucket: "funlearningjapanese-b8e08.appspot.com",
-          messagingSenderId: "1055688629268",
-          appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-          measurementId: "G-LCMXVLPS81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        window.currentUserId = null;
-        const authStatusEl = document.getElementById('auth-status-tc');
-        
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.currentUserId = user.uid;
-                const userDocRef = doc(db, "users", window.currentUserId);
-                const userDocSnap = await getDoc(userDocRef);
-                let displayName = 'ユーザー';
-                if (userDocSnap.exists()) {
-                    displayName = userDocSnap.data().displayName || 'ユーザー';
-                }
-                authStatusEl.textContent = `✅ ログイン中: ${displayName}`;
-            } else {
-                window.currentUserId = null;
-                authStatusEl.textContent = '❌ ゲストモード (ポイントは記録されません)';
-            }
-        });
-
-        window.addPointsToUser = async function(points, hourId) { 
-            if (!window.currentUserId || points <= 0) return false;
-            try {
-                const userRef = doc(db, "users", window.currentUserId);
-                await updateDoc(userRef, { points: increment(points) });
-                return true;
-            } catch (e) {
-                console.error("ポイント更新エラー:", e);
-                return false;
-            }
-        }
-    </script>
+    <script type="module" src="js/firebase-config.js"></script>
     
     <script>
         // AI音声（SpeechSynthesis）の準備

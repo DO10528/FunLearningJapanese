@@ -156,32 +156,7 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
-      authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
-      projectId: "funlearningjapanese-b8e08",
-      storageBucket: "funlearningjapanese-b8e08.firebaseapp.com",
-      messagingSenderId: "1055688629268",
-      appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
-      measurementId: "G-LCMXVLPS81"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    
-    onAuthStateChanged(auth, (user) => {
-        const el = document.getElementById('auth-status');
-        if (user) {
-            el.textContent = "ログイン中";
-        } else {
-            el.textContent = "ゲスト";
-        }
-    });
-</script>
+<script type="module" src="js/firebase-config.js"></script>
 
 <script>
     // 提供されたJSONデータ

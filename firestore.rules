@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ユーザーコレクションのルール
+    match /users/{userId} {
+      // 誰でも作成可能にする（LINEログイン後のドキュメント生成などのため）
+      allow create: if true;
+      // 読み書きは本人のみ可能（ゲストユーザーが更新できないようにリクエストを保護）
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false; // ユーザー削除は通常クライアントからは許可しない
+    }
+    
+    // その他はとりあえず読み取り専用にするか保護するか検討用
+    // （既存機能で共通ランキングなどを表示しているなら、特定フィールドのみ公開が必要）
+    match /users/{userId} {
+       // ランキング取得のため、特定条件でリードを許可する場合 (簡易設定)
+       // ※ 本番運用ではさらに厳格化推奨
+       allow read: if true;
+    }
+  }
+}
