@@ -1,0 +1,175 @@
+/* --- 共通設定 (メインコード準拠) --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --sticker-red: #d32f2f; /* 半額シールなどの赤 */
+        --sticker-yellow: #fdd835;
+        --card-bg: #ffffff;
+        --display-border: #1565c0; /* 濃い青 */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+        display: flex; flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    
+    /* 画面コンテナ */
+    .screen { display: none; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+    }
+
+    /* --- 1. 学習ページ (Practice) --- */
+    .learning-card {
+        background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+    }
+    .learning-title { font-weight: 900; font-size: 1.2em; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .sticker-example {
+        display: inline-block; background: var(--sticker-red); color: white;
+        padding: 5px 10px; border-radius: 50%; font-weight: 900; transform: rotate(-10deg);
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2); border: 2px solid white;
+    }
+    .sticker-yellow { background: var(--sticker-yellow); color: #d32f2f; }
+    
+    .example-list {
+        background:#f9f9f9; padding:15px; border-radius:10px; 
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .example-item {
+        display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 5px; font-weight: bold;
+    }
+    .example-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* --- 2. レベル選択 (Level Select) --- */
+    .level-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
+    }
+    .level-btn {
+        background: white; border-radius: 20px; padding: 20px; text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 3px solid transparent;
+        cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .level-btn:active { transform: scale(0.95); }
+    .level-icon { font-size: 2.5em; margin-bottom: 10px; display: block; }
+    .level-badge {
+        position: absolute; top: 0; right: 0; background: var(--accent);
+        color: #d35400; font-size: 0.7em; padding: 3px 10px; border-radius: 0 0 0 10px; font-weight: bold;
+    }
+
+    /* --- 3. ゲーム画面 (3D Product Card) --- */
+    .game-area {
+        display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
+    }
+    
+    /* 商品カード (3D表現) */
+    .product-card-container {
+        perspective: 1000px; width: 100%; max-width: 300px; margin: 20px auto;
+    }
+    .product-card {
+        background: white; border-radius: 20px; padding: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+        position: relative; text-align: center;
+        transform-style: preserve-3d;
+        transform: rotateX(5deg); /* 少し上向き */
+        border: 1px solid #eee;
+    }
+    .product-img { font-size: 4em; margin-bottom: 10px; display: block; text-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+    .product-name { font-weight: bold; font-size: 1.2em; color: #555; margin-bottom: 5px; }
+    
+    /* 値札 */
+    .price-tag {
+        font-size: 1.5em; font-weight: 900; color: #333;
+        text-decoration: line-through; decoration-thickness: 3px; text-decoration-color: #aaa;
+    }
+
+    /* 割引シール (リアルな表現) */
+    .discount-sticker {
+        position: absolute; bottom: 10px; right: -10px;
+        width: 90px; height: 90px;
+        background: radial-gradient(circle at 30% 30%, #ff5252, #d32f2f);
+        color: white; border-radius: 50%;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        font-weight: 900; box-shadow: 2px 5px 10px rgba(0,0,0,0.3);
+        border: 3px solid white;
+        transform: rotate(-15deg) translateZ(20px); /* 浮き上がらせる */
+        z-index: 10;
+        animation: stickOn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes stickOn { from { transform: rotate(-15deg) scale(2); opacity: 0; } to { transform: rotate(-15deg) scale(1); opacity: 1; } }
+    
+    .sticker-text-main { font-size: 1.6em; line-height: 1; text-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+    .sticker-text-sub { font-size: 0.7em; }
+
+    /* 電卓キーパッド (デザイン修正：白抜き・青枠・中央寄せ) */
+    .calc-display {
+        background: #fff; /* 白抜き */
+        color: #333; /* 文字は黒 */
+        border: 3px solid var(--display-border); /* 濃いめの青枠 */
+        font-family: 'Courier New', monospace;
+        font-size: 2em; padding: 10px 20px; border-radius: 10px; 
+        width: 100%; max-width: 320px;
+        text-align: right; margin: 0 auto 20px auto; /* 中央寄せ */
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        height: 60px; display: flex; align-items: center; justify-content: flex-end;
+    }
+    
+    .numpad {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        width: 100%; max-width: 320px; margin: 0 auto;
+    }
+    .num-btn {
+        background: white; border: none; padding: 15px; border-radius: 15px;
+        font-size: 1.5em; font-weight: bold; color: #555;
+        box-shadow: 0 4px 0 #ddd; cursor: pointer;
+        touch-action: manipulation;
+    }
+    .num-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #ddd; }
+    .btn-clear { background: #ef5350; color: white; box-shadow: 0 4px 0 #c62828; }
+    .btn-enter { background: var(--primary); color: white; box-shadow: 0 4px 0 #3949ab; grid-column: span 3; }
+
+    /* プログレスバー */
+    .progress-container { width: 100%; background: #eee; height: 10px; border-radius: 5px; margin-bottom: 10px; }
+    .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; border-radius: 5px; }
+
+    /* 固定フッター (スタートボタン) */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 200;
+    }
+    .btn-start {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; font-size: 1.2em;
+        width: 100%; max-width: 300px; cursor: pointer; box-shadow: 0 4px 0 #3949ab;
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+    /* 結果画面 */
+    .result-score { font-size: 3em; color: var(--primary); font-weight: 900; }
+    .result-msg { font-size: 1.2em; margin-bottom: 20px; }

@@ -1,0 +1,154 @@
+:root {
+        --primary: #4caf50; /* マナー＝グリーンのイメージ */
+        --accent: #ffeb3b;
+        --bg-color: #e8f5e9;
+        --text-color: #333;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px; /* 下部ボタン用スペース */
+        min-height: 100vh;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+        color: white; padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0; z-index: 100;
+    }
+    .home-link { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; color: white; text-decoration: none; font-size: 0.8em; }
+
+    /* メインコンテナ */
+    #main-container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .screen { display: none; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 練習カード */
+    .learning-card {
+        background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        border-left: 6px solid var(--primary);
+    }
+    .cat-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: #2e7d32; }
+    
+    /* 学習アイテム（画像＋テキスト） */
+    .manner-item {
+        display: flex; flex-direction: column; /* スマホ向けに縦積みに */
+        gap: 10px;
+        padding: 15px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .manner-item:last-child { border-bottom: none; }
+    
+    .manner-img-box {
+        width: 100%;
+        text-align: center;
+        background: #f1f8e9;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px solid #c8e6c9; /* 画像枠を追加 */
+    }
+    .manner-img {
+        width: 100%;
+        height: 180px; /* 高さを固定で見やすく */
+        object-fit: cover;
+        display: block;
+    }
+    .manner-text {
+        display: flex; gap: 10px; align-items: flex-start;
+        font-size: 1.05em;
+        line-height: 1.5;
+        padding: 5px;
+    }
+    .check-icon { color: var(--primary); margin-top: 4px; flex-shrink: 0; }
+
+
+    /* ゲーム選択ボタン */
+    .cat-select-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+    }
+    .cat-btn {
+        background: white; border: none; padding: 20px; border-radius: 15px;
+        box-shadow: 0 4px 0 #ddd; cursor: pointer; text-align: center;
+        font-family: inherit; color: #555; transition: transform 0.1s;
+    }
+    .cat-btn:active { transform: translateY(4px); box-shadow: none; }
+    .cat-btn i { font-size: 2em; display: block; margin-bottom: 10px; color: var(--primary); }
+    .cat-btn span { font-weight: bold; font-size: 1.1em; }
+
+    /* クイズ画面 */
+    .quiz-box {
+        background: white; border-radius: 20px; padding: 20px;
+        text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+    .question-text { font-size: 1.2em; font-weight: bold; margin: 20px 0; }
+    
+    .options-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+    .option-btn {
+        background: #f1f8e9; border: 2px solid #c8e6c9; padding: 15px;
+        border-radius: 12px; font-size: 1.0em; font-weight: bold; color: #333;
+        cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px;
+        transition: background 0.2s;
+    }
+    .option-btn:active { background: #dcedc8; transform: scale(0.98); }
+    .option-tag {
+        background: var(--primary); color: white; width: 30px; height: 30px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        flex-shrink: 0; font-weight: bold;
+    }
+
+    /* フィードバックモーダル */
+    .feedback-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8); display: none; /* 背景を少し濃く */
+        justify-content: center; align-items: center; z-index: 1000;
+    }
+    .feedback-box {
+        background: white; padding: 40px 30px; border-radius: 25px; text-align: center; width: 85%; max-width: 400px;
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex; flex-direction: column; align-items: center; /* 中身を中央揃え */
+    }
+    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .fb-icon { font-size: 5em; margin-bottom: 15px; }
+    .fb-correct { color: #4caf50; }
+    .fb-wrong { color: #f44336; }
+    
+    /* フィードバック画面専用の「次へ」ボタン */
+    .fb-action-btn {
+        background: #ff9800; color: white; border: none;
+        padding: 15px 40px; border-radius: 30px; font-size: 1.2em; font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+        margin-top: 25px; /* 上に余白 */
+        display: block; /* ブロック要素にして中央揃えを効かせる */
+        width: auto; /* 幅はなりゆき、または固定 */
+        min-width: 200px;
+        transition: transform 0.1s;
+    }
+    .fb-action-btn:active { transform: translateY(4px); box-shadow: none; }
+
+
+    /* 下部固定ボタン（練習画面用） */
+    .fixed-bottom-btn {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        width: 90%; max-width: 400px;
+        background: #ff9800; color: white; border: none;
+        padding: 15px; border-radius: 30px; font-size: 1.2em; font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+        z-index: 90; display: flex; justify-content: center; align-items: center; gap: 10px;
+        transition: transform 0.1s;
+    }
+    .fixed-bottom-btn:active { transform: translateX(-50%) translateY(4px); }

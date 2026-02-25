@@ -1,0 +1,140 @@
+:root {
+            --primary: #ab47bc; /* 形容詞カラー */
+            --accent: #ffca28;
+            --bg-color: #f3e5f5;
+            --text-color: #333;
+            --card-bg: white;
+            --correct: #66bb6a;
+            --incorrect: #ef5350;
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%);
+            color: white; padding: 15px 20px; width: 100%;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 5px 12px; border-radius: 20px; text-decoration: none;
+            font-size: 0.9em; font-weight: bold;
+        }
+        #auth-status { font-size: 0.8em; }
+
+        /* --- ゲームエリア --- */
+        .game-container {
+            max-width: 600px; width: 95%;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        /* 質問カード */
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px; /* 間隔を少し広げる */
+            position: relative;
+            overflow: hidden;
+            border: 4px solid white;
+        }
+        
+        .question-word {
+            font-size: 3em;
+            color: var(--primary);
+            font-weight: 900;
+            margin: 10px 0;
+            line-height: 1.2;
+        }
+        .question-reading {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .speaker-btn {
+            background: var(--accent);
+            border: none; width: 50px; height: 50px; border-radius: 50%;
+            color: white; font-size: 1.5em; cursor: pointer;
+            box-shadow: 0 4px 0 #ff6f00; transition: transform 0.1s;
+        }
+        .speaker-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 選択肢エリア (左右2択) */
+        .choices-container {
+            display: flex;
+            gap: 20px; /* 間隔を少し広げる */
+            justify-content: center;
+        }
+
+        .choice-card {
+            background: white;
+            border-radius: 20px;
+            
+            /* ★修正: 枠を小さく調整 */
+            width: 40%; 
+            max-width: 160px; /* 最大幅を制限 */
+            aspect-ratio: 1 / 1; /* 正方形にする */
+            
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            border: 4px solid transparent;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .choice-card:active { transform: scale(0.95); }
+        
+        .choice-img {
+            font-size: 4rem; /* 絵文字も少し小さく調整 */
+            line-height: 1;
+        }
+
+        /* 正解・不正解アニメーション */
+        .correct-anim { border-color: var(--correct); background-color: #e8f5e9; }
+        .incorrect-anim { border-color: var(--incorrect); background-color: #ffebee; }
+        
+        .mark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; font-weight: bold; opacity: 0; pointer-events: none; z-index: 10;
+        }
+        .mark.show { animation: popMark 0.5s forwards; }
+        
+        @keyframes popMark { 
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+        }
+
+        /* スコアバー */
+        .score-board {
+            display: flex; justify-content: space-between;
+            background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 50px;
+            margin-bottom: 15px; font-weight: bold; color: #555;
+        }
+        .streak-counter { color: #ff9800; }
+
+        /* 次へボタン */
+        #next-btn {
+            background: var(--primary); color: white;
+            border: none; padding: 12px 30px; font-size: 1.1em; font-weight: bold;
+            border-radius: 50px; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 4px 0 #7b1fa2; display: none;
+        }
+        #next-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* ポイントアニメーション */
+        @keyframes pointGet { 0% { opacity:0; transform:translateY(0); } 50% { opacity:1; transform:translateY(-20px); } 100% { opacity:0; transform:translateY(-40px); } }
+        .point-anim { position: absolute; color: #ffca28; font-weight: 900; font-size: 1.5em; pointer-events: none; animation: pointGet 1s ease-out forwards; z-index: 20; }

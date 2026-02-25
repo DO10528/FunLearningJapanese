@@ -1,0 +1,168 @@
+:root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct: #4caf50;
+        --wrong: #ef5350;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 80px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
+    .home-link { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; color: white; text-decoration: none; font-size: 0.9em; }
+
+    /* --- コンテナ --- */
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .screen { display: none; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- 共通パーツ --- */
+    h2 { color: var(--primary); text-align: center; border-bottom: 2px dashed #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+    
+    .btn-back {
+        background: #90a4ae; color: white; border: none; padding: 8px 15px;
+        border-radius: 20px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-block;
+    }
+
+    .audio-btn { 
+        background: #e3f2fd; color: var(--primary); border: none; 
+        border-radius: 50%; cursor: pointer; display: inline-flex; justify-content: center; align-items: center;
+    }
+    .audio-btn:active { background: var(--primary); color: white; }
+
+    /* --- 練習モード --- */
+    .practice-group { background: white; border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 1px solid #eee; }
+    .group-header { 
+        display: flex; align-items: center; gap: 10px; 
+        border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 10px;
+    }
+    .group-title { font-size: 1.4em; font-weight: 900; color: var(--primary); }
+    .group-desc { font-size: 0.85em; color: #666; }
+
+    /* 1-10の表 */
+    .count-grid {
+        display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+        background: #fafafa; padding: 10px; border-radius: 10px; margin-bottom: 15px;
+    }
+    .count-cell {
+        background: white; border: 1px solid #ddd; border-radius: 5px;
+        text-align: center; padding: 5px 2px; font-size: 0.8em; cursor: pointer;
+        transition: background 0.2s;
+    }
+    .count-cell:active { background: var(--accent); color: white; border-color: var(--accent); }
+    .count-num { font-weight: bold; display: block; color: var(--primary); margin-bottom: 2px; }
+
+    /* イラストリスト */
+    .item-scroll { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 5px; }
+    .item-card {
+        min-width: 90px; background: #fff; border: 1px solid #eee; border-radius: 10px;
+        padding: 10px; text-align: center; flex-shrink: 0;
+    }
+    .item-emoji { font-size: 2em; margin-bottom: 5px; }
+    .item-name { font-size: 0.8em; font-weight: bold; margin-bottom: 5px; height: 2.4em; display: flex; align-items: center; justify-content: center; }
+
+    /* ゲームへボタン */
+    .start-game-btn {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: linear-gradient(135deg, #ffcc5c, #ff6f61);
+        color: white; font-weight: 900; font-size: 1.2em;
+        padding: 15px 40px; border-radius: 50px; border: none;
+        box-shadow: 0 4px 15px rgba(255, 111, 97, 0.4);
+        cursor: pointer; z-index: 200; animation: bounce 2s infinite;
+        white-space: nowrap;
+    }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-10px);} 60% {transform: translateX(-50%) translateY(-5px);} }
+
+    /* --- メニュー画面 --- */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .menu-card {
+        background: white; border-radius: 20px; padding: 20px; text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s;
+        border: 2px solid transparent;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; height: 150px;
+    }
+    .menu-card:active { transform: scale(0.98); }
+    .menu-icon { font-size: 2.5em; margin-bottom: 10px; color: var(--primary); }
+    .menu-title { font-weight: bold; font-size: 1.1em; }
+    .level-badge { background: var(--accent); color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-bottom: 5px; }
+
+    /* --- Level 1 (仕分け) --- */
+    .lvl1-container { text-align: center; margin-top: 20px; }
+    .quiz-image { font-size: 5em; margin: 20px 0; animation: popIn 0.5s; }
+    .quiz-word { font-size: 1.5em; font-weight: bold; margin-bottom: 30px; }
+    .choice-area { display: flex; gap: 20px; justify-content: center; }
+    .choice-btn {
+        background: white; border: 3px solid var(--primary); color: var(--primary);
+        padding: 20px; border-radius: 15px; font-size: 1.5em; font-weight: bold;
+        width: 120px; cursor: pointer; transition: all 0.2s;
+    }
+    .choice-btn:active { background: var(--primary); color: white; }
+
+    /* --- Level 2 (音声) --- */
+    .mic-container { text-align: center; margin-top: 20px; background: white; padding: 30px; border-radius: 20px; }
+    .mic-btn {
+        width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white;
+        font-size: 2em; border: none; cursor: pointer; margin: 20px auto; display: block;
+        box-shadow: 0 4px 10px rgba(92, 122, 255, 0.4);
+    }
+    .mic-btn.listening { background: #ef5350; animation: pulse 1.5s infinite; }
+    .quiz-question-box {
+        font-size: 3em; font-weight: 900; color: #333; 
+        background: #fdfdfd; padding: 20px; border-radius: 15px; border: 2px solid #eee;
+        display: inline-block; margin-bottom: 10px;
+    }
+    
+    /* --- Level 3 (カテゴリ分け) --- */
+    /* 修正：justify-content: center; を追加して中央揃えに */
+    .lvl3-header { 
+        display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px;
+        justify-content: center; 
+    }
+    .category-box {
+        min-width: 80px; background: #e3f2fd; border: 2px dashed var(--primary); border-radius: 10px;
+        padding: 10px; text-align: center; font-weight: bold; cursor: pointer;
+        transition: background 0.2s;
+    }
+    .category-box.selected { background: var(--primary); color: white; border-style: solid; }
+    
+    .item-pool { 
+        display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; 
+        background: white; padding: 15px; border-radius: 15px; min-height: 150px;
+    }
+    .game-item {
+        background: white; border: 2px solid #ddd; border-radius: 10px; padding: 10px;
+        font-size: 1.5em; cursor: pointer; user-select: none;
+        width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
+        position: relative;
+    }
+    .game-item.active { border-color: var(--accent); background: #fff8e1; transform: scale(1.1); }
+    .game-item.solved { opacity: 0.3; pointer-events: none; border-color: var(--correct); background: #e8f5e9; }
+
+    /* フィードバック */
+    .feedback-overlay {
+        position: fixed; top:0; left:0; width:100%; height:100%;
+        display: none; justify-content: center; align-items: center;
+        background: rgba(0,0,0,0.5); z-index: 200;
+    }
+    .feedback-icon { font-size: 8em; animation: popIn 0.3s; }
+    .fa-circle-check { color: var(--correct); background: white; border-radius: 50%; }
+    .fa-circle-xmark { color: var(--wrong); background: white; border-radius: 50%; }
+
+    @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }

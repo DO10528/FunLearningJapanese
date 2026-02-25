@@ -1,0 +1,158 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #42a5f5;
+        --primary-dark: #1565c0;
+        --accent: #ffca28;
+        --bg-color: #f0f4f8;
+        --text-color: #333;
+        --correct: #4caf50;
+        --wrong: #f44336;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 80px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+        color: white; padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; gap: 10px; align-items: center; color: white; text-decoration: none; }
+    .btn-home {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer;
+        font-size: 0.9em; font-weight: bold; text-decoration: none;
+    }
+
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.8em; margin: 10px 0; font-weight: bold; color: var(--primary-dark);
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; padding: 20px; max-width: 800px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- 1. 文章一覧リスト --- */
+    .list-header { text-align: center; margin-bottom: 20px; }
+    .list-title { font-size: 1.5em; font-weight: 900; color: var(--primary-dark); margin: 0; }
+    .list-desc { color: #666; font-size: 0.9em; }
+
+    .sentence-list { display: flex; flex-direction: column; gap: 15px; }
+    .list-item {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: flex-start; gap: 15px;
+        border-left: 5px solid var(--primary);
+    }
+    .play-icon-btn {
+        background: #e3f2fd; color: var(--primary); border: none; width: 40px; height: 40px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        cursor: pointer; font-size: 1.2em; flex-shrink: 0;
+    }
+    .play-icon-btn:active { background: var(--primary); color: white; }
+    .item-text { flex-grow: 1; font-weight: bold; font-size: 1.1em; line-height: 1.6; }
+    .item-en { display: block; font-size: 0.8em; color: #888; font-weight: normal; margin-top: 5px; }
+    
+    ruby { ruby-position: over; }
+    rt { font-size: 0.6em; color: #999; }
+
+    /* --- 固定フッター --- */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px 20px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+        display: flex; justify-content: center; z-index: 200;
+    }
+    .btn-start-game {
+        background: linear-gradient(135deg, #ffca28 0%, #ff6f00 100%);
+        color: white; border: none; padding: 15px 60px;
+        border-radius: 50px; font-size: 1.4em; font-weight: 900;
+        cursor: pointer; box-shadow: 0 4px 15px rgba(255, 111, 0, 0.4);
+        width: 100%; max-width: 400px;
+        transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start-game:active { transform: scale(0.98); }
+
+    /* --- 2. レベル選択 --- */
+    .level-grid { display: grid; gap: 20px; padding: 20px 0; }
+    .level-card {
+        background: white; border-radius: 20px; padding: 20px;
+        display: flex; align-items: center; gap: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;
+        transition: transform 0.2s; border: 2px solid transparent;
+    }
+    .level-card:active { transform: scale(0.98); background: #fafafa; }
+    .lvl-badge {
+        background: var(--primary); color: white; width: 60px; height: 60px;
+        border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        font-weight: 900; line-height: 1;
+    }
+    .lvl-badge span:first-child { font-size: 0.8em; }
+    .lvl-badge span:last-child { font-size: 1.8em; }
+    .lvl-info h3 { margin: 0; font-size: 1.3em; color: #444; }
+    .lvl-info p { margin: 5px 0 0; color: #777; font-size: 0.9em; }
+
+    /* --- 3. ゲーム画面 --- */
+    .progress-area {
+        margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #555;
+    }
+    .progress-bar {
+        flex-grow: 1; height: 10px; background: #bbdefb; margin: 0 15px; border-radius: 5px; overflow: hidden;
+    }
+    .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+
+    .question-card {
+        background: white; border-radius: 20px; padding: 30px 20px;
+        text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px; position: relative; min-height: 200px; display: flex; flex-direction: column; justify-content: center;
+    }
+    .sentence-box { font-size: 1.4em; line-height: 1.8; font-weight: bold; color: #444; text-align: left; }
+    
+    .context-line { color: #888; font-size: 0.9em; margin-bottom: 10px; border-left: 3px solid #ddd; padding-left: 10px; }
+    .current-line { color: #333; font-weight: 900; }
+
+    .blank-part {
+        display: inline-block; padding: 0 5px; border-bottom: 3px solid var(--primary);
+        color: var(--primary); min-width: 60px; text-align: center; transition: all 0.3s;
+    }
+    .blank-part.solved { border-bottom-color: var(--correct); color: var(--correct); transform: scale(1.1); }
+    .english-hint { font-size: 0.9em; color: #888; margin-top: 15px; font-weight: normal; border-top: 1px dashed #eee; padding-top: 10px; }
+
+    .choices-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .choice-btn {
+        background: white; border: 2px solid #ddd; border-radius: 15px;
+        padding: 15px 5px; font-size: 2em; font-weight: 900; color: #555;
+        cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: transform 0.1s;
+    }
+    .choice-btn:active { transform: translateY(4px); box-shadow: none; }
+    .choice-btn.correct { background: var(--correct); color: white; border-color: var(--correct); box-shadow: 0 4px 0 #2e7d32; }
+    .choice-btn.wrong { background: var(--wrong); color: white; border-color: var(--wrong); box-shadow: 0 4px 0 #c62828; opacity: 0.6; }
+
+    .feedback-overlay {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        font-size: 8em; font-weight: 900; opacity: 0; pointer-events: none;
+        text-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 10;
+    }
+    @keyframes popMark { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1); } }
+
+    /* --- 4. 結果画面 --- */
+    .result-content { text-align: center; background: white; border-radius: 20px; padding: 40px 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .score-large { font-size: 4em; color: var(--primary); font-weight: 900; }
+    .btn-restart {
+        background: var(--primary); color: white; border: none; padding: 15px 40px;
+        border-radius: 30px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px;
+        box-shadow: 0 4px 0 #1565c0;
+    }

@@ -1,0 +1,160 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #00bcd4;
+        --accent: #ff4081;
+        --bg-color: #f0f8ff;
+        --text-color: #333;
+        
+        /* グループカラー */
+        --grp1-color: #f48fb1; /* Group I (Pink) */
+        --grp2-color: #80deea; /* Group II (Cyan) */
+        --grp3-color: #9575cd; /* Group III (Purple) */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        touch-action: manipulation;
+    }
+
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%; max-width: 1000px; margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center; margin-bottom: 20px;
+    }
+    .page-title { font-size: 1.8em; color: var(--primary); margin: 0; font-weight: 900; }
+    .page-desc { color: #666; margin-top: 5px; font-size: 0.9em; }
+
+    /* --- ★横スクロール対応タブ --- */
+    .tab-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 10px; /* スクロールバーの干渉を防ぐ */
+        margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        justify-content: flex-start; /* 左詰めスタート */
+        gap: 10px;
+    }
+    /* PCなど幅があるときは中央寄せ */
+    @media (min-width: 700px) {
+        .tab-scroll-container { justify-content: center; }
+    }
+
+    .tab-btn {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        flex-shrink: 0; /* 縮まないようにする */
+    }
+    .tab-btn:active { transform: translateY(2px); box-shadow: none; }
+    
+    .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4);
+        transform: scale(1.05);
+        border-color: var(--primary);
+    }
+
+    /* --- リスト表示エリア --- */
+    /* 切り替え時にフェードインさせる */
+    .groups-wrapper {
+        animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- グループカラムレイアウト --- */
+    .groups-container {
+        display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start;
+    }
+    .group-column {
+        flex: 1; min-width: 300px; background: white; border-radius: 20px; padding: 0 0 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; border-top: 5px solid;
+    }
+    .group-header-bar {
+        padding: 12px; text-align: center; font-size: 1.2em; font-weight: 900; background: #fafafa; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    }
+    .verb-list-area { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* カード */
+    .verb-card {
+        background: white; border-radius: 12px; padding: 10px 15px;
+        display: flex; align-items: center; justify-content: space-between;
+        cursor: pointer; border: 2px solid #f5f5f5; transition: all 0.1s;
+    }
+    .verb-card:active { transform: scale(0.98); background: #f9f9f9; }
+    .verb-card:hover { border-color: #ddd; }
+    .verb-info { display: flex; align-items: center; gap: 12px; width: 100%; }
+    .verb-icon { 
+        font-size: 1.4em; width: 36px; height: 36px; 
+        display: flex; justify-content: center; align-items: center;
+        background: #eef; border-radius: 50%; color: #555; flex-shrink: 0;
+    }
+    .verb-text-box { text-align: left; }
+    .verb-jp { font-family: 'Klee One', cursive; font-size: 1.15em; font-weight: 800; color: #333; line-height: 1.2; }
+    .verb-en { font-size: 0.75em; color: #888; margin-top: 2px; }
+    
+    .check-btn {
+        color: #ddd; font-size: 1.2em; width: 34px; height: 34px;
+        display: flex; justify-content: center; align-items: center;
+        border-radius: 50%; border: 2px solid #eee; transition: all 0.2s;
+        margin-left: 10px; flex-shrink: 0;
+    }
+    .verb-card.learned .check-btn { background: #4caf50; border-color: #4caf50; color: white; }
+    .verb-card.learned .verb-jp, .verb-card.learned .verb-icon { opacity: 0.5; }
+
+    /* Divider */
+    .divider-label {
+        font-size: 0.8em; color: #999; text-align: center; margin: 15px 0 5px; font-weight: bold; position: relative;
+    }
+    .divider-label::before, .divider-label::after {
+        content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: #eee;
+    }
+    .divider-label::before { left: 10px; }
+    .divider-label::after { right: 10px; }
+
+    /* フッター */
+    .footer-area { text-align: center; margin-top: 40px; padding-bottom: 40px; width: 100%; }
+    .home-btn-large {
+        background-color: #546e7a; color: white; border: none; padding: 15px 40px; border-radius: 50px;
+        font-weight: bold; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 0 #37474f;
+        text-decoration: none; display: inline-block;
+    }
+    .home-btn-large:active { transform: translateY(4px); box-shadow: none; }
+
+    @media (max-width: 700px) {
+        .groups-container { flex-direction: column; }
+        .group-column { width: 100%; }
+    }

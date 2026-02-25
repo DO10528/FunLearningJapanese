@@ -1,0 +1,118 @@
+/* --- 共通設定 (オレンジテーマ: 提案・親切) --- */
+        :root {
+            --primary: #fb8c00; /* オレンジ */
+            --primary-light: #ffe0b2;
+            --primary-dark: #e65100;
+            --accent: #ffeb3b; /* 黄色 */
+            --bg-color: #fff8e1; /* 薄い黄色背景 */
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --offer-color: #ff9800; /* お手伝い（オレンジ） */
+            --invite-color: #fdd835; /* お誘い（黄色） */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(230, 81, 0, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+            text-decoration: none; font-weight: bold;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        .mode-title {
+            font-size: 1.6em; font-weight: 900; margin-top: 40px; margin-bottom: 15px;
+            padding: 10px 20px; border-bottom: 4px solid; display: inline-block;
+        }
+        #offer-title { border-color: var(--offer-color); color: var(--offer-color); }
+        #invite-title { border-color: var(--invite-color); color: #fbc02d; }
+
+        /* --- 練習カードグリッド (縦2列) --- */
+        .practice-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg); border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid;
+            transition: transform 0.2s; position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .verb-forms-container { 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 10px; 
+        }
+        
+        .masu-box {
+            background: var(--primary-light); padding: 8px 12px;
+            border-radius: 8px; color: var(--primary-dark);
+            font-weight: 900; font-size: 1.1em; flex-shrink: 0; text-align: center;
+        }
+        
+        .mashouka-box {
+            font-size: 1.5em; font-weight: 900; color: var(--text-color); white-space: nowrap;
+        }
+        .mashouka-box span { font-size: 0.7em; font-weight: 700; }
+        
+        /* 例文スタイル */
+        .example-sentence {
+            background: #fff3e0; padding: 10px; border-radius: 8px;
+            font-size: 1.1em; font-weight: 700; color: #555;
+            margin-top: 15px; border-left: 5px solid var(--offer-color);
+        }
+        .verb-card.invite-type .example-sentence { border-left-color: var(--invite-color); background: #fffde7; }
+
+        .simple-meaning {
+            font-size: 0.9em; color: #777; margin-top: 10px;
+            border-top: 1px dashed #eee; padding-top: 10px;
+        }
+        .english-meaning { font-size: 1.1em; color: #ff9800; font-weight: bold; }
+
+        .sound-btn {
+            background: var(--accent); color: #e65100; border: none;
+            width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1em; box-shadow: 0 3px 0 #fbc02d;
+            transition: all 0.1s; position: absolute; top: 15px; right: 15px; 
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        /* ゲーム開始ボタン */
+        .start-game-area { text-align: center; margin: 50px 0; }
+        #start-game-btn {
+            background: #e65100; /* 濃いオレンジ */
+            color: white; border: 4px solid var(--accent);
+            padding: 18px 45px; font-size: 1.6em; font-weight: 900;
+            border-radius: 12px; box-shadow: 0 6px 0 #bf360c;
+            cursor: pointer; transition: transform 0.1s; text-transform: uppercase;
+        }
+        #start-game-btn:active { transform: translateY(6px); box-shadow: none; }
+
+        @media (max-width: 768px) {
+            .practice-grid { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+        }

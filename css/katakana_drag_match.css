@@ -1,0 +1,248 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; }
+    .home-icon { color: white; font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:hover { transform: scale(1.1); }
+
+    /* --- メインコンテナ --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 900px; 
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* --- カードデザイン --- */
+    .game-card {
+        background: white;
+        border-radius: 25px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        border: 4px solid white;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    /* --- レベル選択画面 --- */
+    .menu-icon { font-size: 4em; color: #5c7aff; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 1.8em; color: var(--primary); margin: 0 0 10px 0; }
+    
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* カラフルなレベルボタン */
+    .level-btn {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px 10px;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        transition: all 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+    .level-btn:nth-child(5n+1) { background-color: #ff6b6b; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #48dbfb; }
+    .level-btn:nth-child(5n+4) { background-color: #1dd1a1; }
+    .level-btn:nth-child(5n+5) { background-color: #ff9f43; }
+
+    .level-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+    .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
+
+    /* --- ゲームエリア --- */
+    .game-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; font-weight: bold; color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    /* レイアウト (左右高さ揃え・中央寄せ) */
+    .match-container {
+        display: flex;
+        flex-direction: row;
+        gap: 30px; 
+        align-items: stretch; 
+        justify-content: center; 
+    }
+
+    /* 左側：イラストプール */
+    .illust-box {
+        flex: 1; 
+        background: #f0f4f8;
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px dashed #ccc;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+    }
+    
+    /* 右側：単語リスト */
+    .word-box {
+        flex: 1; 
+        background: transparent; 
+        border-radius: 15px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: center;
+    }
+
+    .area-title {
+        font-size: 1em; color: #888; margin-bottom: 15px; font-weight: bold;
+        text-align: center; width: 100%;
+    }
+
+    /* イラストプール (縦一列) */
+    .illust-pool {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /* ドラッグアイテム (イラスト) */
+    .drag-item {
+        width: 85px; height: 85px;
+        background: white;
+        border: 3px solid #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        cursor: grab;
+        display: flex; justify-content: center; align-items: center;
+        touch-action: none; 
+        z-index: 10;
+        transition: all 0.2s;
+    }
+    .drag-item img { width: 90%; height: 90%; object-fit: contain; pointer-events: none; }
+    .drag-item:active { cursor: grabbing; transform: scale(1.05); }
+
+    /* 配置済みアイテム (ピッタリ) */
+    .drag-item.placed {
+        width: 100% !important; height: 100% !important; margin: 0 !important;
+        border: none !important; box-shadow: none !important; border-radius: 8px;
+        cursor: pointer; background: transparent;
+    }
+    .drag-item.placed img { width: 95%; height: 95%; }
+
+
+    /* ドロップターゲットの行 */
+    .word-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        box-shadow: 0 4px 0 #f0f0f0;
+        width: 90%;
+        max-width: 350px;
+    }
+    .drop-target {
+        width: 85px; height: 85px;
+        background: #e3f2fd;
+        border: 3px dashed #90caf9;
+        border-radius: 12px;
+        margin-right: 20px;
+        display: flex; justify-content: center; align-items: center;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+        flex-shrink: 0; 
+    }
+    .drop-target.drag-over { background: #bbdefb; border-style: solid; transform: scale(1.05); }
+    .drop-target.correct { background: #e8f5e9; border: 3px solid var(--correct-color); border-style: solid; }
+    
+    .word-label { font-size: 1.6em; font-weight: 900; color: #444; flex-grow: 1; text-align: center; }
+
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .match-container {
+            flex-direction: column-reverse; 
+            gap: 20px;
+            align-items: center;
+        }
+        .illust-box, .word-box {
+            width: 100%;
+            flex: none;
+            min-height: auto;
+            padding: 15px;
+        }
+        .illust-pool {
+            flex-direction: row; 
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .word-row {
+            width: 100%;
+            padding: 8px 15px;
+        }
+        .drop-target { margin-right: 15px; }
+        .word-label { font-size: 1.5em; text-align: left; }
+    }
+
+    /* フィードバック */
+    .feedback-msg { font-weight: bold; font-size: 1.2em; margin-top: 15px; min-height: 1.5em; }
+    .feedback-msg.success { color: var(--correct-color); }
+    .feedback-msg.error { color: var(--incorrect-color); }
+
+    /* アニメーション */
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* ゴースト */
+    .ghost-item { position: fixed; pointer-events: none; opacity: 0.8; z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }

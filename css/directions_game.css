@@ -1,0 +1,134 @@
+:root {
+        --primary: #1565c0;
+        --accent: #ffca28;
+        --bg-color: #e3f2fd;
+        --road-color: #78909c;
+        --block-color: #c8e6c9;
+        --water-color: #81d4fa;
+        --bridge-color: #d7ccc8;
+        --text: #333;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text);
+        margin: 0; padding: 0;
+        height: 100dvh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    header {
+        background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+        color: white; padding: 8px 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        display: flex; justify-content: space-between; align-items: center;
+        flex-shrink: 0; z-index: 100;
+    }
+    .logo { font-size: 1.0em; font-weight: 900; color: white; text-decoration: none; }
+    .home-link { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; color: white; text-decoration: none; font-size: 0.8em; }
+
+    #main-container {
+        flex-grow: 1; position: relative; overflow-y: auto;
+        padding: 10px; display: flex; flex-direction: column; align-items: center;
+    }
+
+    .screen { display: none; width: 100%; max-width: 700px; flex-direction: column; align-items: center; padding-bottom: 60px; }
+    .screen.active { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* メニュー */
+    .menu-btn {
+        background: white; color: var(--primary); border: 2px solid var(--primary);
+        padding: 15px; width: 100%; margin-bottom: 10px; border-radius: 12px;
+        font-weight: bold; font-size: 1.0em; cursor: pointer;
+        display: flex; align-items: center; gap: 15px;
+        box-shadow: 0 4px 0 #bbdefb;
+    }
+    .menu-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bbdefb; }
+    .menu-icon { font-size: 1.5em; width: 40px; text-align: center; }
+
+    /* 単語練習 */
+    .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .vocab-card {
+        background: white; border-radius: 10px; padding: 10px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 2px 0 #ddd; border: 1px solid #eee;
+    }
+
+    /* マップエリア (横長 9x5) */
+    #map-wrapper {
+        width: 98vw; aspect-ratio: 9/5; max-width: 600px;
+        background: var(--block-color); 
+        border: 4px solid #fff; border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        position: relative; margin: 10px 0;
+        display: grid; 
+        grid-template-columns: repeat(9, 1fr); 
+        grid-template-rows: repeat(5, 1fr);
+    }
+
+    .cell { position: relative; display: flex; justify-content: center; align-items: center; overflow: visible; }
+    
+    .road { background-color: var(--road-color); }
+    .road::after { content: ''; position: absolute; background: rgba(255,255,255,0.4); }
+    .road.v-road::after { width: 2px; height: 100%; top: 0; left: 50%; transform: translateX(-50%); }
+    .road.h-road::after { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+    .road.cross::after { width: 6px; height: 6px; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+    .water { background-color: var(--water-color); }
+    .bridge { 
+        background-color: var(--bridge-color); 
+        background-image: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px);
+        z-index: 1;
+    }
+    
+    .block { background-color: #a5d6a7; border: 1px solid rgba(0,0,0,0.05); }
+    .building-icon { 
+        font-size: 1.5em; z-index: 5; 
+        filter: drop-shadow(0 2px 0 rgba(255,255,255,0.9));
+        pointer-events: none;
+    }
+
+    #player {
+        position: absolute; width: 30%; height: 30%;
+        background: #f44336; border: 2px solid white; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center; color: white;
+        z-index: 20; transition: top 0.3s linear, left 0.3s linear;
+        box-shadow: 0 4px 5px rgba(0,0,0,0.4); font-size: 0.8em;
+        pointer-events: none;
+    }
+
+    /* コントローラー */
+    .d-pad { display: grid; grid-template-columns: 60px 60px 60px; gap: 5px; margin-bottom: 10px; }
+    .d-btn {
+        width: 60px; height: 60px; background: #eceff1; border: none; border-radius: 12px;
+        font-size: 1.5em; color: #546e7a; cursor: pointer; box-shadow: 0 4px 0 #cfd8dc;
+    }
+    .d-btn:active { transform: translateY(4px); box-shadow: none; background: #cfd8dc; }
+    .d-up { grid-column: 2; } .d-left { grid-column: 1; } .d-right { grid-column: 3; } .d-down { grid-column: 2; }
+
+    .speech-box {
+        background: white; padding: 15px; border-radius: 15px; width: 100%;
+        text-align: center; margin-bottom: 10px; border-left: 5px solid var(--accent);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .mic-btn {
+        width: 60px; height: 60px; border-radius: 50%; border: none;
+        background: var(--primary); color: white; font-size: 1.5em;
+        cursor: pointer; box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.2);
+        margin: 10px auto; display: block;
+    }
+    .mic-btn.listening { background: #f44336; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); } 100% { box-shadow: 0 0 0 20px rgba(244, 67, 54, 0); } }
+
+    .action-btn {
+        background: #43a047; color: white; width: 100%; padding: 12px;
+        border: none; border-radius: 25px; font-weight: bold; font-size: 1.1em;
+        box-shadow: 0 4px 0 #2e7d32; cursor: pointer;
+    }
+    .action-btn:active { transform: translateY(4px); box-shadow: none; }
+    .nav-btn { background: #90a4ae; font-size: 0.9em; padding: 10px 20px; color: white; border: none; border-radius: 20px; margin-top: 20px; }

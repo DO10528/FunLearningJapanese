@@ -1,0 +1,147 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #ec407a; /* ポップなピンク */
+        --accent: #ffeb3b;
+        --bg-color: #fdf2f8;
+        --text-color: #333;
+        --comic-font: 'Reggae One', cursive; /* マンガっぽいフォント */
+        --base-font: 'Zen Maru Gothic', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: var(--base-font);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        -webkit-tap-highlight-color: transparent;
+        /* マンガっぽい背景パターン */
+        background-image: radial-gradient(#ddd 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #ec407a 0%, #f48fb1 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(236, 64, 122, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    
+    /* 画面コンテナ */
+    .screen { display: none; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+    }
+
+    /* --- 1. 練習リスト (Dictionary) --- */
+    .practice-header {
+        text-align: center; margin-bottom: 20px; background: white; padding: 15px;
+        border-radius: 15px; border: 4px solid #333; box-shadow: 5px 5px 0 #333;
+    }
+    
+    .word-list {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;
+    }
+
+    .word-card {
+        background: white; border-radius: 12px; padding: 15px;
+        text-align: center; cursor: pointer; position: relative;
+        box-shadow: 0 4px 0 #ddd; border: 2px solid #eee;
+        transition: transform 0.1s;
+    }
+    .word-card:active { transform: translateY(3px); box-shadow: 0 1px 0 #ddd; }
+    
+    .word-jp {
+        font-family: var(--comic-font); font-size: 1.4em; color: #333;
+        margin-bottom: 5px; word-break: break-all; line-height: 1.1;
+    }
+    .word-en { font-size: 0.85em; color: #666; font-weight: bold; }
+    .play-icon { font-size: 0.8em; color: var(--primary); margin-top: 5px; }
+
+    /* --- 2. レベル選択 --- */
+    .level-list { display: flex; flex-direction: column; gap: 15px; }
+    .level-card {
+        background: white; border-radius: 15px; padding: 20px;
+        display: flex; align-items: center; gap: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
+        border-left: 8px solid #ccc; transition: transform 0.1s;
+    }
+    .level-card:active { transform: scale(0.98); }
+    .lvl-icon { font-size: 2em; width: 50px; text-align: center; }
+    .lvl-info h3 { margin: 0; font-size: 1.2em; font-family: var(--comic-font); }
+    .lvl-info p { margin: 5px 0 0; font-size: 0.85em; color: #777; }
+
+    /* --- 3. ゲーム画面 (Manga Style) --- */
+    .manga-panel {
+        background: white; border: 4px solid #333; border-radius: 5px;
+        height: 250px; position: relative; overflow: hidden;
+        display: flex; justify-content: center; align-items: center;
+        margin-bottom: 20px; box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+    }
+    
+    /* 集中線（背景） */
+    .focus-lines {
+        position: absolute; width: 200%; height: 200%;
+        background: repeating-conic-gradient(from 0deg, transparent 0deg 10deg, rgba(236, 64, 122, 0.1) 10deg 20deg);
+        animation: spin 20s linear infinite; z-index: 0;
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* オノマトペ文字 */
+    .question-word {
+        font-family: var(--comic-font); font-size: 3.5em;
+        color: #333; z-index: 10; position: relative;
+        text-shadow: 3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 0 rgba(0,0,0,0.2);
+        transform: rotate(-5deg); animation: popWord 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popWord { from { transform: scale(0) rotate(0deg); } to { transform: scale(1) rotate(-5deg); } }
+
+    .speaker-btn {
+        position: absolute; bottom: 10px; right: 10px; z-index: 20;
+        background: var(--accent); width: 50px; height: 50px; border-radius: 50%;
+        border: 3px solid #333; display: flex; justify-content: center; align-items: center;
+        font-size: 1.5em; cursor: pointer; box-shadow: 2px 2px 0 #333;
+    }
+    .speaker-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    /* 選択肢 */
+    .choice-container { display: flex; flex-direction: column; gap: 12px; }
+    .choice-btn {
+        background: white; border: 2px solid #333; padding: 15px;
+        border-radius: 50px 20px 30px 40px / 40px 30px 50px 20px; /* 吹き出し風の歪み */
+        font-size: 1.2em; font-weight: bold; color: #333;
+        cursor: pointer; text-align: center;
+        box-shadow: 3px 3px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+    }
+    .choice-btn:active { transform: scale(0.98); }
+    .choice-btn.correct { background: #c8e6c9; border-color: #2e7d32; color: #2e7d32; }
+    .choice-btn.incorrect { background: #ffcdd2; border-color: #c62828; color: #c62828; }
+
+    /* 固定フッター */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 200;
+    }
+    .btn-start {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; font-size: 1.2em;
+        width: 100%; max-width: 300px; cursor: pointer; box-shadow: 0 4px 0 #ad1457;
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+    /* 結果画面 */
+    .result-score { font-size: 5em; color: var(--primary); font-family: var(--comic-font); margin: 10px 0; }
+    .result-msg { font-weight: bold; font-size: 1.2em; }

@@ -1,0 +1,91 @@
+/* --- 共通デザイン --- */
+    :root {
+        --primary: #00bcd4;
+        --bg-color: #f0f8ff;
+        --text-color: #333;
+        --grp1-color: #f48fb1;
+        --grp2-color: #80deea;
+        --grp3-color: #9575cd;
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; min-height: 100vh;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    header {
+        width: 100%; background: #FFF; border-bottom: 3px solid var(--primary);
+        padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; color: var(--primary); text-decoration: none; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .container { width: 100%; max-width: 600px; padding: 20px; text-align: center; flex-grow: 1; }
+
+    /* メニュー画面 */
+    #menu-screen { animation: fadeIn 0.5s; }
+    .title { font-size: 1.8em; color: var(--primary); margin-bottom: 10px; }
+    .desc { color: #666; margin-bottom: 30px; }
+
+    .group-btn {
+        display: block; width: 100%; max-width: 300px; margin: 15px auto;
+        padding: 20px; border-radius: 20px; border: none;
+        color: white; font-size: 1.3em; font-weight: 900; cursor: pointer;
+        box-shadow: 0 5px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
+    }
+    .group-btn:active { transform: translateY(4px); box-shadow: none; }
+    
+    .btn-g1 { background: var(--grp1-color); }
+    .btn-g2 { background: var(--grp2-color); }
+    .btn-g3 { background: var(--grp3-color); }
+
+    /* ゲーム画面 */
+    #game-screen { display: none; width: 100%; }
+    
+    .question-card {
+        background: white; border-radius: 20px; padding: 40px 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-bottom: 30px;
+        border: 4px solid var(--primary);
+    }
+    .q-word { font-size: 2.5em; font-weight: bold; color: #555; margin-bottom: 10px; }
+    .q-sub { font-size: 1em; color: #999; }
+
+    /* 入力エリア */
+    .input-area { position: relative; width: 100%; max-width: 300px; margin: 0 auto; }
+    input[type="text"] {
+        width: 100%; padding: 15px; font-size: 1.5em; text-align: center;
+        border: 3px solid #ccc; border-radius: 15px; outline: none;
+        font-family: 'Klee One', cursive;
+    }
+    input[type="text"]:focus { border-color: var(--primary); background: #e0f7fa; }
+
+    .feedback-msg {
+        height: 30px; margin-top: 10px; font-weight: bold; font-size: 1.2em;
+    }
+
+    /* プログレスバー */
+    .progress-container {
+        width: 100%; height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+    }
+    .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+
+    /* アニメーション */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .shake { animation: shake 0.4s; border-color: #ff5252 !important; background: #ffebee !important; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+    /* ボタン */
+    .submit-btn {
+        margin-top: 20px; background: var(--primary); color: white; border: none;
+        padding: 12px 40px; border-radius: 50px; font-size: 1.2em; font-weight: bold;
+        cursor: pointer; box-shadow: 0 4px 0 #0097a7;
+    }
+    .submit-btn:active { transform: translateY(3px); box-shadow: none; }
+    
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
+    }

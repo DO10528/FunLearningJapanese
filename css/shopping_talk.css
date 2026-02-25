@@ -1,0 +1,153 @@
+/* --- デザイン設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; 
+        padding-bottom: 100px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    ruby { ruby-align: center; }
+    rt { font-size: 0.6em; color: #666; font-weight: 500; }
+
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 900px; margin: 0 auto;
+        display: flex; flex-direction: column;
+    }
+
+    #auth-status { text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary); }
+
+    .screen { display: none; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* メニューグリッド */
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+    .scenario-card {
+        background: white; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 10px; height: 160px; justify-content: center;
+    }
+    .scenario-card:hover { transform: translateY(-3px); }
+    .scenario-card:active { transform: scale(0.98); }
+    .card-icon { font-size: 2.5em; margin-bottom: 5px; }
+    .card-title { font-weight: 800; font-size: 1.0em; color: #555; }
+
+    /* 練習リスト */
+    .practice-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    .practice-item {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
+    }
+    .practice-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .role-badge { font-size: 0.7em; padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; width: 60px; text-align: center; flex-shrink: 0; }
+    .badge-clerk { background: #90a4ae; }
+    .badge-you { background: var(--primary); }
+    
+    .text-content { flex-grow: 1; }
+    .text-jp { font-weight: bold; font-size: 1.1em; color: #333; line-height: 1.6; }
+    .text-en { font-size: 0.9em; color: #888; margin-top: 2px; }
+    
+    .play-btn-mini {
+        background: none; border: 1px solid #ddd; color: var(--primary);
+        width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
+        display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+    }
+    .play-btn-mini:hover { background: #e3f2fd; }
+
+    .answer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .answer-item { display: flex; align-items: center; gap: 10px; padding: 5px; border-bottom: 1px dashed #eee; }
+    .answer-item:last-child { border-bottom: none; }
+
+    /* シミュレーション画面 */
+    .sim-header {
+        text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.8);
+        padding: 10px; border-radius: 15px; position: relative;
+    }
+    
+    .clerk-area { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 20px; }
+    .clerk-icon {
+        width: 70px; height: 70px; background: white; border-radius: 50%;
+        border: 3px solid var(--accent); display: flex; justify-content: center; align-items: center;
+        font-size: 2em; color: var(--accent); flex-shrink: 0;
+    }
+    .speech-bubble {
+        background: white; padding: 20px; border-radius: 20px; border-top-left-radius: 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; flex-grow: 1;
+    }
+    
+    .user-area {
+        background: white; padding: 20px; border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center;
+        margin-top: 10px; border: 3px solid #eee;
+    }
+    .target-phrase-box { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+    .target-label { font-size: 0.8em; color: var(--primary); font-weight: bold; margin-bottom: 5px; }
+    .target-text { font-size: 1.3em; font-weight: 900; color: #333; line-height: 1.5; }
+    .target-sub { font-size: 0.9em; color: #777; margin-top: 5px; }
+
+    /* マイクボタン */
+    .mic-btn {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--primary); color: white; border: none; font-size: 2em;
+        cursor: pointer; box-shadow: 0 4px 10px rgba(92, 122, 255, 0.4);
+        transition: all 0.2s; position: relative;
+    }
+    .mic-btn:active { transform: scale(0.95); }
+    .mic-btn.listening { background: #ef5350; animation: pulse 1.5s infinite; }
+    .mic-btn.processing { background: #ffd54f; }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(239, 83, 80, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 83, 80, 0); }
+    }
+
+    .result-display { margin-top: 20px; min-height: 60px; }
+    .recognized-text { font-size: 1.1em; color: #555; margin-bottom: 5px; font-weight: bold; }
+    .score-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white; }
+    .score-high { background: var(--correct-color); }
+    .score-low { background: var(--incorrect-color); }
+
+    .action-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 12px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1em;
+        cursor: pointer; box-shadow: 0 4px 0 #3949ab; width: 100%; max-width: 300px;
+        display: block; text-align: center; margin: 0 auto;
+    }
+    .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    .btn-secondary { background: #90a4ae; box-shadow: 0 4px 0 #546e7a; }
+    .btn-small { padding: 5px 15px; font-size: 0.9em; width: auto; display: inline-block; margin: 0; }
+
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        text-align: center; z-index: 900; display: none;
+    }
+    #practice-screen.active ~ .fixed-footer-practice { display: block; }
+    .top-controls { display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px; }

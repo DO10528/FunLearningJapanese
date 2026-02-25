@@ -1,0 +1,172 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #3f51b5; /* ビジネスライクな濃い青 */
+        --accent: #00bcd4;  /* 明るい青 */
+        --bg-color: #e8eaf6;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #f44336;
+        --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 50px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+    /* メインコンテナ */
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column;
+    }
+
+    /* 認証ステータス */
+    #auth-status {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--primary);
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- メニューグリッド --- */
+    .menu-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    .scenario-card {
+        background: white; border-radius: 20px; padding: 25px 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        border-bottom: 5px solid #ccc; /* 下線で色分け */
+        transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .scenario-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+    .scenario-card:active { transform: scale(0.98); }
+    
+    .card-icon-box {
+        width: 60px; height: 60px; border-radius: 50%;
+        background: #f5f5f5; display: flex; justify-content: center; align-items: center;
+        margin-bottom: 5px; font-size: 1.8em;
+    }
+    .card-title { font-weight: 800; font-size: 1.2em; color: #444; }
+    .card-desc { font-size: 0.85em; color: #777; }
+
+    /* --- 練習リスト --- */
+    .practice-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    .practice-item {
+        background: white; border-radius: 15px; padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--primary);
+    }
+    
+    .phrase-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .phrase-content { flex-grow: 1; }
+    .phrase-jp { font-weight: bold; font-size: 1.2em; color: #333; margin-bottom: 3px; }
+    .phrase-en { font-size: 0.9em; color: #888; }
+    
+    .play-btn-mini {
+        background: #e3f2fd; border: none; color: var(--primary);
+        width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+        display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+        transition: background 0.2s;
+    }
+    .play-btn-mini:hover { background: #bbdefb; }
+
+    /* --- シミュレーション画面 --- */
+    .sim-header {
+        text-align: center; margin-bottom: 20px;
+        background: white; padding: 15px; border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .step-indicator {
+        display: inline-block; background: #e8eaf6; color: var(--primary);
+        padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;
+    }
+    .sim-situation { font-weight: bold; color: #555; font-size: 1.1em; }
+
+    /* キャラクターエリア */
+    .char-area {
+        display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
+        animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .char-icon {
+        font-size: 4em; color: #5c6bc0; margin-bottom: 10px;
+        background: white; width: 100px; height: 100px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        border: 4px solid #c5cae9; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .speech-bubble {
+        background: white; padding: 20px; border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative;
+        width: 100%; text-align: center; border: 2px solid #e8eaf6;
+    }
+    .speech-bubble::after {
+        content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+        border-width: 10px; border-style: solid;
+        border-color: transparent transparent #e8eaf6 transparent;
+    }
+    .question-text { font-size: 1.3em; font-weight: bold; color: #333; margin: 10px 0; }
+    
+    /* 選択肢 */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; width: 100%; }
+    .option-btn {
+        width: 100%; padding: 18px;
+        background: white; border: 2px solid #e0e0e0; border-radius: 15px;
+        font-size: 1.1em; font-weight: bold; color: #555;
+        cursor: pointer; text-align: left; transition: all 0.2s;
+        box-shadow: 0 4px 0 #eee; position: relative;
+    }
+    .option-btn:active { transform: translateY(3px); box-shadow: none; }
+    .option-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    .option-btn.correct { background: #e8f5e9; border-color: var(--correct-color); color: var(--correct-color); }
+    .option-btn.incorrect { background: #ffebee; border-color: var(--incorrect-color); color: var(--incorrect-color); }
+
+    /* フィードバック */
+    .feedback-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); display: none; z-index: 1000;
+        justify-content: center; align-items: center; padding: 20px;
+        backdrop-filter: blur(3px);
+    }
+    .fb-content {
+        background: white; width: 100%; max-width: 400px;
+        border-radius: 20px; padding: 30px; text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: popIn 0.3s;
+    }
+    .fb-icon { font-size: 4em; margin-bottom: 15px; }
+    .fb-title { font-size: 1.8em; font-weight: 900; margin-bottom: 10px; }
+    .fb-text { font-size: 1.1em; color: #666; margin-bottom: 20px; line-height: 1.5; }
+
+    /* ボタン */
+    .action-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2em;
+        cursor: pointer; box-shadow: 0 5px 0 #303f9f; width: 100%; max-width: 300px;
+        margin: 10px auto; display: block; text-align: center; transition: transform 0.1s;
+    }
+    .action-btn:active { transform: translateY(3px); box-shadow: none; }
+    .btn-secondary { background: #78909c; box-shadow: 0 5px 0 #546e7a; }

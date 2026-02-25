@@ -1,0 +1,184 @@
+/* --- 共通設定 (V2デザイン - 動詞テーマ) --- */
+        :root {
+            --primary: #ab47bc; /* 動詞カテゴリの紫 */
+            --primary-light: #d1c4e9;
+            --primary-dark: #8e24aa;
+            --accent: #ffcc5c; /* 黄色 (ゲームボタン) */
+            --bg-color: #f8f1f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --request-color: #42a5f5; /* お願い（青） */
+            --instruction-color: #66bb6a; /* 指示（緑） */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(171, 71, 188, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+        
+        .mode-title {
+            font-size: 1.6em;
+            font-weight: 900;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            border-bottom: 4px solid;
+            display: inline-block;
+        }
+        #request-title { border-color: var(--request-color); color: var(--request-color); }
+        #instruction-title { border-color: var(--instruction-color); color: var(--instruction-color); }
+
+
+        /* --- 練習カードグリッド --- */
+        .practice-grid {
+            /* ★修正1: 縦2列に変更 */
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px;
+        }
+
+        .verb-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .verb-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        /* カード内容 */
+        .verb-forms-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 10px; 
+            /* justify-content: space-between; */
+        }
+        
+        .masu-box {
+            background: var(--primary-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--primary-dark);
+            font-weight: 900;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        
+        /* ★修正2: Te形+くださいを1行表示 */
+        .tekudasai-box {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: var(--text-color);
+            white-space: nowrap; /* 1行に保つ */
+        }
+        .tekudasai-box span {
+            font-size: 0.7em;
+            font-weight: 700;
+        }
+        
+        /* 例文スタイル */
+        .example-sentence {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #555;
+            margin-top: 15px;
+            border-left: 5px solid var(--request-color); /* 依頼は青 */
+        }
+        .verb-card.instruction-type .example-sentence {
+            border-left: 5px solid var(--instruction-color); /* 指示は緑 */
+        }
+
+        .simple-meaning {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
+        }
+        .english-meaning {
+            font-size: 1.1em;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* 音声ボタン */
+        .sound-btn {
+            background: var(--accent);
+            color: white; border: none;
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1em;
+            box-shadow: 0 3px 0 #ffb300;
+            transition: all 0.1s;
+            position: absolute; top: 15px; right: 15px; 
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        /* ゲーム開始ボタン */
+        .start-game-area {
+            text-align: center;
+            margin: 50px 0;
+        }
+        #start-game-btn {
+            background: #cc564c; /* 濃い赤紫 */
+            color: white;
+            border: 4px solid var(--accent); /* 黄色の枠線 */
+            padding: 18px 45px;
+            font-size: 1.6em; 
+            font-weight: 900;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 var(--primary); 
+            cursor: pointer;
+            transition: transform 0.1s;
+            text-transform: uppercase;
+        }
+        #start-game-btn:active { 
+            transform: translateY(6px); 
+            box-shadow: none; 
+        }
+
+        /* レスポンシブ対応 (モバイル向け) */
+        @media (max-width: 768px) {
+            .practice-grid {
+                grid-template-columns: 1fr; /* 1列にする */
+            }
+            .container {
+                padding: 10px;
+            }
+        }

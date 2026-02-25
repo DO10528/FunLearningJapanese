@@ -1,0 +1,194 @@
+/* --- 共通デザイン --- */
+    :root {
+        --primary: #42a5f5; /* 漢字テーマ色 (青系) */
+        --accent: #ffcc5c;
+        --bg-color: #f0f4f8;
+        --text-color: #333;
+        --canvas-bg: #fff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        touch-action: pan-y; /* スクロールは許可、ズーム等は抑制 */
+    }
+
+    /* --- ヘッダー --- */
+    header {
+        background: linear-gradient(135deg, #42a5f5 0%, #4facfe 100%);
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; text-shadow: 1px 1px 0 rgba(0,0,0,0.1); }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 1000px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* --- 認証ステータス --- */
+    #auth-status { font-size: 0.9em; color: #666; margin-bottom: 15px; background: white; padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+    /* --- 漢字グリッド --- */
+    .kanji-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 15px; width: 100%;
+        padding-bottom: 40px;
+    }
+
+    .kanji-card {
+        background: white;
+        border-radius: 15px;
+        aspect-ratio: 1;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        transition: transform 0.1s;
+        border: 2px solid transparent;
+    }
+    .kanji-card:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.1); }
+    .kanji-card:active { transform: translateY(2px); box-shadow: none; }
+    
+    .kanji-char {
+        font-family: 'Klee One', cursive; /* 教科書体 */
+        font-size: 2.5em;
+        color: #333;
+        line-height: 1;
+    }
+    .kanji-meaning {
+        font-size: 0.7em;
+        color: #888;
+        margin-top: 5px;
+        text-align: center;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 90%;
+    }
+
+    /* --- 練習モーダル --- */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(5px);
+        display: none; justify-content: center; align-items: center;
+        z-index: 1000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+
+    .modal-content {
+        background: white;
+        width: 100%; max-width: 800px;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex; flex-direction: column;
+        max-height: 90vh;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* ヘッダー */
+    .modal-header {
+        background: var(--bg-color); padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 2px solid #ddd;
+    }
+    .modal-title { font-weight: bold; font-size: 1.2em; color: #555; }
+    .close-btn {
+        background: #ddd; border: none; width: 36px; height: 36px; border-radius: 50%;
+        font-size: 1.2em; color: #666; cursor: pointer;
+    }
+
+    /* メインエリア（左右分割） */
+    .modal-body {
+        display: flex; flex-direction: row;
+        overflow-y: auto; flex-grow: 1;
+        padding: 20px; gap: 20px;
+        justify-content: center; align-items: flex-start;
+    }
+
+    /* 左：情報エリア */
+    .info-panel {
+        flex: 1; max-width: 300px;
+        display: flex; flex-direction: column; gap: 15px;
+    }
+    .info-box {
+        background: #f9f9f9; padding: 15px; border-radius: 12px;
+        border-left: 5px solid var(--primary);
+    }
+    .info-label { font-size: 0.8em; color: #888; font-weight: bold; margin-bottom: 5px; }
+    .info-text { font-size: 1.1em; font-weight: bold; color: #333; line-height: 1.4; }
+
+    /* 右：練習エリア */
+    .practice-panel {
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    
+    .canvas-container {
+        position: relative;
+        width: 300px; height: 300px;
+        background: white;
+        border: 4px solid #42a5f5; border-radius: 15px;
+        cursor: crosshair;
+        touch-action: none; /* キャンバス内のスクロール無効化 */
+    }
+    
+    /* ガイド用背景文字 */
+    .canvas-guide {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Klee One', cursive;
+        font-size: 220px;
+        color: #e0e0e0; /* 薄いグレー */
+        pointer-events: none; /* タッチイベントを通す */
+        user-select: none;
+    }
+    /* 十字リーダー */
+    .canvas-lines {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+    }
+    .line-v { position: absolute; left: 50%; top: 10%; bottom: 10%; width: 0; border-left: 1px dashed #ccc; }
+    .line-h { position: absolute; top: 50%; left: 10%; right: 10%; height: 0; border-top: 1px dashed #ccc; }
+
+    canvas {
+        position: absolute; top: 0; left: 0;
+        z-index: 10;
+    }
+
+    /* コントロール */
+    .controls {
+        display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 10px; flex-wrap: wrap;
+    }
+    .btn {
+        padding: 10px 20px; border-radius: 30px; border: none;
+        font-weight: bold; font-family: 'Zen Maru Gothic', sans-serif;
+        cursor: pointer; font-size: 1em; display: flex; align-items: center; gap: 8px;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    }
+    .btn:active { transform: translateY(3px); box-shadow: none; }
+    
+    .btn-audio { background: #ff9800; color: white; box-shadow: 0 4px 0 #e65100; }
+    .btn-clear { background: #f44336; color: white; box-shadow: 0 4px 0 #d32f2f; }
+    .btn-done { background: #4caf50; color: white; box-shadow: 0 4px 0 #388e3c; font-size: 1.2em; padding: 12px 40px; }
+
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .modal-body { flex-direction: column; align-items: center; padding: 10px; }
+        .info-panel { width: 100%; max-width: 100%; order: 2; }
+        .practice-panel { width: 100%; order: 1; }
+        .canvas-container { width: 280px; height: 280px; }
+        .canvas-guide { font-size: 200px; }
+        .kanji-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

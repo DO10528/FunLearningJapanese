@@ -1,0 +1,163 @@
+/* --- 共通設定 (青・白基調) --- */
+    :root {
+        --primary: #00bcd4;
+        --secondary: #0097a7;
+        --accent: #ff4081;
+        --bg-color: #e0f7fa;
+        --text-color: #333;
+        --shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .game-container {
+        flex-grow: 1;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+    }
+
+    /* --- クイズエリア --- */
+    .quiz-card {
+        background: white;
+        border-radius: 25px;
+        padding: 30px 20px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: var(--shadow);
+        border: 2px solid var(--primary);
+        text-align: center;
+        margin-top: 20px;
+        animation: popIn 0.4s;
+    }
+
+    .question-title {
+        font-size: 1.2em; color: #666; margin-bottom: 20px; font-weight: bold;
+    }
+
+    /* 文全体 */
+    .sentence-display {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        font-size: 1.5em; /* スマホでは調整 */
+        font-weight: bold;
+        min-height: 80px;
+    }
+
+    /* 文中の単語ブロック */
+    .word-block {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #f0f4f8;
+        font-family: 'Klee One', cursive;
+    }
+
+    /* ドロップターゲット（穴） */
+    .drop-target {
+        width: 60px; height: 60px;
+        background: #e1f5fe;
+        border: 3px dashed var(--primary);
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: center; align-items: center;
+        vertical-align: middle;
+        transition: all 0.2s;
+    }
+    .drop-target.drag-over {
+        background: #b2ebf2; transform: scale(1.1); border-style: solid;
+    }
+    .drop-target.filled {
+        border-style: solid; background: #fff;
+    }
+
+    /* --- 選択肢エリア --- */
+    .choices-area {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* 助詞チップ */
+    .particle-chip {
+        width: 60px; height: 60px;
+        background: #fff;
+        border: 2px solid var(--secondary);
+        border-radius: 50%; /* 丸くする */
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Klee One', cursive;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: var(--secondary);
+        cursor: grab;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        transition: transform 0.1s;
+        touch-action: none;
+        z-index: 10;
+    }
+    .particle-chip:active {
+        transform: scale(1.1); cursor: grabbing; z-index: 100;
+    }
+
+    /* 正解・不正解アニメーション */
+    .correct-anim { animation: pulseGreen 0.5s; background: #c8e6c9 !important; border-color: #4caf50 !important; color: #2e7d32 !important; }
+    .incorrect-anim { animation: shakeRed 0.4s; background: #ffcdd2 !important; border-color: #f44336 !important; color: #c62828 !important; }
+
+    @keyframes pulseGreen { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    @keyframes shakeRed { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ゴースト */
+    .ghost { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* 次へボタン */
+    .next-btn {
+        margin-top: 30px;
+        background: var(--primary); color: white; border: none;
+        border-bottom: 4px solid var(--secondary);
+        padding: 12px 40px; border-radius: 50px;
+        font-size: 1.2em; font-weight: bold;
+        cursor: pointer; display: none; /* 最初は隠す */
+        font-family: 'Zen Maru Gothic', sans-serif;
+    }
+    .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
+    
+    /* 認証ステータス */
+    #auth-status-particle {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--secondary);
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 500px) {
+        .sentence-display { font-size: 1.2em; gap: 5px; }
+        .drop-target { width: 50px; height: 50px; }
+        .particle-chip { width: 50px; height: 50px; font-size: 1.3em; }
+    }

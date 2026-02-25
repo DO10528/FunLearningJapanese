@@ -1,259 +1,395 @@
-document.addEventListener('DOMContentLoaded', () => {
+// --- データセット ---
+        const kanjiDatabase = {
+            "n5": [
+                { "kanji": "一", "kun": "ひと", "on": "いち", "meaning": "One" }, { "kanji": "二", "kun": "ふた", "on": "に", "meaning": "Two" },
+                { "kanji": "三", "kun": "み", "on": "さん", "meaning": "Three" }, { "kanji": "四", "kun": "よ・よん", "on": "し", "meaning": "Four" },
+                { "kanji": "五", "kun": "いつ", "on": "ご", "meaning": "Five" }, { "kanji": "六", "kun": "む", "on": "ろく", "meaning": "Six" },
+                { "kanji": "七", "kun": "なな", "on": "しち", "meaning": "Seven" }, { "kanji": "八", "kun": "や", "on": "はち", "meaning": "Eight" },
+                { "kanji": "九", "kun": "ここの", "on": "く", "meaning": "Nine" }, { "kanji": "十", "kun": "とお", "on": "じゅう", "meaning": "Ten" },
+                { "kanji": "百", "kun": "もも", "on": "ひゃく", "meaning": "Hundred" }, { "kanji": "千", "kun": "ち", "on": "せん", "meaning": "Thousand" },
+                { "kanji": "万", "kun": "よろず", "on": "まん", "meaning": "10 Thousand" }, { "kanji": "円", "kun": "まる", "on": "えん", "meaning": "Yen/Circle" },
+                { "kanji": "時", "kun": "とき", "on": "じ", "meaning": "Time" }, { "kanji": "年", "kun": "とし", "on": "ねん", "meaning": "Year" },
+                { "kanji": "月", "kun": "つき", "on": "げつ", "meaning": "Month/Moon" }, { "kanji": "日", "kun": "ひ", "on": "にち", "meaning": "Day/Sun" },
+                { "kanji": "上", "kun": "うえ", "on": "じょう", "meaning": "Up" }, { "kanji": "下", "kun": "した", "on": "か", "meaning": "Down" },
+                { "kanji": "右", "kun": "みぎ", "on": "う", "meaning": "Right" }, { "kanji": "左", "kun": "ひだり", "on": "さ", "meaning": "Left" },
+                { "kanji": "中", "kun": "なか", "on": "ちゅう", "meaning": "Middle" }, { "kanji": "北", "kun": "きた", "on": "ほく", "meaning": "North" },
+                { "kanji": "南", "kun": "みなみ", "on": "なん", "meaning": "South" }, { "kanji": "東", "kun": "ひがし", "on": "とう", "meaning": "East" },
+                { "kanji": "西", "kun": "にし", "on": "せい", "meaning": "West" }, { "kanji": "人", "kun": "ひと", "on": "じん", "meaning": "Person" },
+                { "kanji": "今", "kun": "いま", "on": "こん", "meaning": "Now" }, { "kanji": "休", "kun": "やす", "on": "きゅう", "meaning": "Rest" },
+                { "kanji": "会", "kun": "あ", "on": "かい", "meaning": "Meet" }, { "kanji": "何", "kun": "なに", "on": "か", "meaning": "What" },
+                { "kanji": "先", "kun": "さき", "on": "せん", "meaning": "Previous" }, { "kanji": "入", "kun": "はい", "on": "にゅう", "meaning": "Enter" },
+                { "kanji": "出", "kun": "で", "on": "しゅつ", "meaning": "Exit" }, { "kanji": "分", "kun": "わ", "on": "ふん", "meaning": "Minute/Part" },
+                { "kanji": "前", "kun": "まえ", "on": "ぜん", "meaning": "Before" }, { "kanji": "午", "kun": "なし", "on": "ご", "meaning": "Noon" },
+                { "kanji": "半", "kun": "なか", "on": "はん", "meaning": "Half" }, { "kanji": "友", "kun": "とも", "on": "ゆう", "meaning": "Friend" },
+                { "kanji": "口", "kun": "くち", "on": "こう", "meaning": "Mouth" }, { "kanji": "古", "kun": "ふる", "on": "こ", "meaning": "Old" },
+                { "kanji": "名", "kun": "な", "on": "めい", "meaning": "Name" }, { "kanji": "国", "kun": "くに", "on": "こく", "meaning": "Country" },
+                { "kanji": "土", "kun": "つち", "on": "ど", "meaning": "Soil/Earth" }, { "kanji": "外", "kun": "そと", "on": "がい", "meaning": "Outside" },
+                { "kanji": "多", "kun": "おお", "on": "た", "meaning": "Many" }, { "kanji": "大", "kun": "おお", "on": "だい", "meaning": "Big" },
+                { "kanji": "天", "kun": "あま", "on": "てん", "meaning": "Heaven" }, { "kanji": "女", "kun": "おんな", "on": "じょ", "meaning": "Woman" },
+                { "kanji": "子", "kun": "こ", "on": "し", "meaning": "Child" }, { "kanji": "学", "kun": "まな", "on": "がく", "meaning": "Study" },
+                { "kanji": "安", "kun": "やす", "on": "あん", "meaning": "Cheap/Safe" }, { "kanji": "小", "kun": "ちい", "on": "しょう", "meaning": "Small" },
+                { "kanji": "少", "kun": "すく", "on": "しょう", "meaning": "Few" }, { "kanji": "山", "kun": "やま", "on": "さん", "meaning": "Mountain" },
+                { "kanji": "川", "kun": "かわ", "on": "せん", "meaning": "River" }, { "kanji": "店", "kun": "みせ", "on": "てん", "meaning": "Shop" },
+                { "kanji": "後", "kun": "あと", "on": "ご", "meaning": "After" }, { "kanji": "手", "kun": "て", "on": "しゅ", "meaning": "Hand" },
+                { "kanji": "新", "kun": "あたら", "on": "しん", "meaning": "New" }, { "kanji": "書", "kun": "か", "on": "しょ", "meaning": "Write" },
+                { "kanji": "木", "kun": "き", "on": "もく", "meaning": "Tree" }, { "kanji": "本", "kun": "もと", "on": "ほん", "meaning": "Book" },
+                { "kanji": "来", "kun": "く", "on": "らい", "meaning": "Come" }, { "kanji": "校", "kun": "なし", "on": "こう", "meaning": "School" },
+                { "kanji": "母", "kun": "はは", "on": "ぼ", "meaning": "Mother" }, { "kanji": "毎", "kun": "なし", "on": "まい", "meaning": "Every" },
+                { "kanji": "気", "kun": "なし", "on": "き", "meaning": "Spirit" }, { "kanji": "水", "kun": "みず", "on": "すい", "meaning": "Water" },
+                { "kanji": "火", "kun": "ひ", "on": "か", "meaning": "Fire" }, { "kanji": "父", "kun": "ちち", "on": "ふ", "meaning": "Father" },
+                { "kanji": "生", "kun": "い", "on": "せい", "meaning": "Life" }, { "kanji": "男", "kun": "おとこ", "on": "だん", "meaning": "Man" },
+                { "kanji": "白", "kun": "しろ", "on": "はく", "meaning": "White" }, { "kanji": "目", "kun": "め", "on": "もく", "meaning": "Eye" },
+                { "kanji": "社", "kun": "やしろ", "on": "しゃ", "meaning": "Company" }, { "kanji": "空", "kun": "そら", "on": "くう", "meaning": "Sky" },
+                { "kanji": "立", "kun": "た", "on": "りつ", "meaning": "Stand" }, { "kanji": "耳", "kun": "みみ", "on": "じ", "meaning": "Ear" },
+                { "kanji": "聞", "kun": "き", "on": "ぶん", "meaning": "Listen" }, { "kanji": "花", "kun": "はな", "on": "か", "meaning": "Flower" },
+                { "kanji": "行", "kun": "い", "on": "こう", "meaning": "Go" }, { "kanji": "見", "kun": "み", "on": "けん", "meaning": "See" },
+                { "kanji": "言", "kun": "い", "on": "げん", "meaning": "Say" }, { "kanji": "話", "kun": "はなし", "on": "わ", "meaning": "Talk" },
+                { "kanji": "語", "kun": "かた", "on": "ご", "meaning": "Language" }, { "kanji": "読", "kun": "よ", "on": "どく", "meaning": "Read" },
+                { "kanji": "買", "kun": "か", "on": "ばい", "meaning": "Buy" }, { "kanji": "足", "kun": "あし", "on": "そく", "meaning": "Foot/Leg" },
+                { "kanji": "車", "kun": "くるま", "on": "しゃ", "meaning": "Car" }, { "kanji": "週", "kun": "なし", "on": "しゅう", "meaning": "Week" },
+                { "kanji": "道", "kun": "みち", "on": "どう", "meaning": "Road" }, { "kanji": "金", "kun": "かね", "on": "きん", "meaning": "Gold" },
+                { "kanji": "長", "kun": "なが", "on": "ちょう", "meaning": "Long" }, { "kanji": "間", "kun": "あいだ", "on": "かん", "meaning": "Between" },
+                { "kanji": "雨", "kun": "あめ", "on": "う", "meaning": "Rain" }, { "kanji": "電", "kun": "なし", "on": "でん", "meaning": "Electricity" },
+                { "kanji": "食", "kun": "た", "on": "しょく", "meaning": "Eat" }, { "kanji": "飲", "kun": "の", "on": "いん", "meaning": "Drink" },
+                { "kanji": "駅", "kun": "なし", "on": "えき", "meaning": "Station" }, { "kanji": "高", "kun": "たか", "on": "こう", "meaning": "High" },
+                { "kanji": "魚", "kun": "さかな", "on": "ぎょ", "meaning": "Fish" }
+            ],
+            "n4": [
+                { "kanji": "不", "kun": "", "on": "ふ", "meaning": "negative" }, { "kanji": "世", "kun": "よ", "on": "せ", "meaning": "world" },
+                { "kanji": "主", "kun": "おも", "on": "しゅ", "meaning": "master" }, { "kanji": "乗", "kun": "の", "on": "じょう", "meaning": "ride" },
+                { "kanji": "事", "kun": "こと", "on": "じ", "meaning": "matter" }, { "kanji": "京", "kun": "", "on": "きょう", "meaning": "capital" },
+                { "kanji": "仕", "kun": "つか", "on": "し", "meaning": "serve" }, { "kanji": "代", "kun": "か", "on": "だい", "meaning": "substitute" },
+                { "kanji": "以", "kun": "", "on": "い", "meaning": "by means of" }, { "kanji": "低", "kun": "ひく", "on": "てい", "meaning": "low" },
+                { "kanji": "住", "kun": "す", "on": "じゅう", "meaning": "dwell" }, { "kanji": "体", "kun": "からだ", "on": "たい", "meaning": "body" },
+                { "kanji": "作", "kun": "つく", "on": "さく", "meaning": "make" }, { "kanji": "使", "kun": "つか", "on": "し", "meaning": "use" },
+                { "kanji": "借", "kun": "か", "on": "しゃく", "meaning": "borrow" }, { "kanji": "働", "kun": "はたら", "on": "どう", "meaning": "work" },
+                { "kanji": "元", "kun": "もと", "on": "げん", "meaning": "origin" }, { "kanji": "兄", "kun": "あに", "on": "きょう", "meaning": "older brother" },
+                { "kanji": "光", "kun": "ひかり", "on": "こう", "meaning": "light" }, { "kanji": "写", "kun": "うつ", "on": "しゃ", "meaning": "copy" },
+                { "kanji": "冬", "kun": "ふゆ", "on": "とう", "meaning": "winter" }, { "kanji": "切", "kun": "き", "on": "せつ", "meaning": "cut" },
+                { "kanji": "別", "kun": "わか", "on": "べつ", "meaning": "separate" }, { "kanji": "力", "kun": "ちから", "on": "りょく", "meaning": "power" },
+                { "kanji": "勉", "kun": "つと", "on": "べん", "meaning": "exertion" }, { "kanji": "動", "kun": "うご", "on": "どう", "meaning": "move" },
+                { "kanji": "医", "kun": "", "on": "い", "meaning": "doctor" }, { "kanji": "去", "kun": "さ", "on": "きょ", "meaning": "leave" },
+                { "kanji": "合", "kun": "あ", "on": "ごう", "meaning": "fit" }, { "kanji": "同", "kun": "おな", "on": "どう", "meaning": "same" },
+                { "kanji": "味", "kun": "あじ", "on": "み", "meaning": "taste" }, { "kanji": "品", "kun": "しな", "on": "ひん", "meaning": "goods" },
+                { "kanji": "問", "kun": "と", "on": "もん", "meaning": "question" }, { "kanji": "回", "kun": "まわ", "on": "かい", "meaning": "turn" },
+                { "kanji": "図", "kun": "", "on": "ず", "meaning": "map" }, { "kanji": "地", "kun": "", "on": "ち", "meaning": "ground" },
+                { "kanji": "場", "kun": "ば", "on": "じょう", "meaning": "place" }, { "kanji": "声", "kun": "こえ", "on": "せい", "meaning": "voice" },
+                { "kanji": "売", "kun": "う", "on": "ばい", "meaning": "sell" }, { "kanji": "夏", "kun": "なつ", "on": "か", "meaning": "summer" },
+                { "kanji": "夕", "kun": "ゆう", "on": "せき", "meaning": "evening" }, { "kanji": "夜", "kun": "よる", "on": "や", "meaning": "night" },
+                { "kanji": "太", "kun": "ふと", "on": "たい", "meaning": "fat" }, { "kanji": "好", "kun": "す", "on": "こう", "meaning": "like" },
+                { "kanji": "妹", "kun": "いもうと", "on": "まい", "meaning": "younger sister" }, { "kanji": "姉", "kun": "あね", "on": "し", "meaning": "older sister" },
+                { "kanji": "始", "kun": "はじ", "on": "し", "meaning": "begin" }, { "kanji": "字", "kun": "", "on": "じ", "meaning": "character" },
+                { "kanji": "室", "kun": "むろ", "on": "しつ", "meaning": "room" }, { "kanji": "家", "kun": "いえ", "on": "か", "meaning": "house" },
+                { "kanji": "寒", "kun": "さむ", "on": "かん", "meaning": "cold" }, { "kanji": "屋", "kun": "や", "on": "おく", "meaning": "roof/shop" },
+                { "kanji": "市", "kun": "いち", "on": "し", "meaning": "city" }, { "kanji": "帰", "kun": "かえ", "on": "き", "meaning": "return" },
+                { "kanji": "広", "kun": "ひろ", "on": "こう", "meaning": "wide" }, { "kanji": "度", "kun": "たび", "on": "ど", "meaning": "degree" },
+                { "kanji": "建", "kun": "た", "on": "けん", "meaning": "build" }, { "kanji": "引", "kun": "ひ", "on": "いん", "meaning": "pull" },
+                { "kanji": "弟", "kun": "おとうと", "on": "だい", "meaning": "younger brother" }, { "kanji": "弱", "kun": "よわ", "on": "じゃく", "meaning": "weak" },
+                { "kanji": "強", "kun": "つよ", "on": "きょう", "meaning": "strong" }, { "kanji": "待", "kun": "ま", "on": "たい", "meaning": "wait" },
+                { "kanji": "心", "kun": "こころ", "on": "しん", "meaning": "heart" }, { "kanji": "思", "kun": "おも", "on": "し", "meaning": "think" },
+                { "kanji": "急", "kun": "いそ", "on": "きゅう", "meaning": "hurry" }, { "kanji": "悪", "kun": "わる", "on": "あく", "meaning": "bad" },
+                { "kanji": "意", "kun": "", "on": "い", "meaning": "mind" }, { "kanji": "所", "kun": "ところ", "on": "しょ", "meaning": "place" },
+                { "kanji": "持", "kun": "も", "on": "じ", "meaning": "hold" }, { "kanji": "教", "kun": "おし", "on": "きょう", "meaning": "teach" },
+                { "kanji": "文", "kun": "ふみ", "on": "ぶん", "meaning": "sentence" }, { "kanji": "料", "kun": "", "on": "りょう", "meaning": "fee" },
+                { "kanji": "方", "kun": "かた", "on": "ほう", "meaning": "direction" }, { "kanji": "旅", "kun": "たび", "on": "りょ", "meaning": "travel" },
+                { "kanji": "早", "kun": "はや", "on": "そう", "meaning": "early" }, { "kanji": "明", "kun": "あか", "on": "めい", "meaning": "bright" },
+                { "kanji": "映", "kun": "うつ", "on": "えい", "meaning": "reflect" }, { "kanji": "春", "kun": "はる", "on": "しゅん", "meaning": "spring" },
+                { "kanji": "昼", "kun": "ひる", "on": "ちゅう", "meaning": "noon" }, { "kanji": "暑", "kun": "あつ", "on": "しょ", "meaning": "hot" },
+                { "kanji": "暗", "kun": "くら", "on": "あん", "meaning": "dark" }, { "kanji": "有", "kun": "あ", "on": "ゆう", "meaning": "have" },
+                { "kanji": "服", "kun": "", "on": "ふく", "meaning": "clothes" }, { "kanji": "朝", "kun": "あさ", "on": "ちょう", "meaning": "morning" },
+                { "kanji": "村", "kun": "むら", "on": "そん", "meaning": "village" }, { "kanji": "林", "kun": "はやし", "on": "りん", "meaning": "grove" },
+                { "kanji": "森", "kun": "もり", "on": "しん", "meaning": "forest" }, { "kanji": "楽", "kun": "たの", "on": "らく", "meaning": "comfort" },
+                { "kanji": "歌", "kun": "うた", "on": "か", "meaning": "song" }, { "kanji": "止", "kun": "と", "on": "し", "meaning": "stop" },
+                { "kanji": "正", "kun": "ただ", "on": "せい", "meaning": "correct" }, { "kanji": "歩", "kun": "ある", "on": "ほ", "meaning": "walk" },
+                { "kanji": "死", "kun": "し", "on": "し", "meaning": "death" }, { "kanji": "民", "kun": "たみ", "on": "みん", "meaning": "people" },
+                { "kanji": "池", "kun": "いけ", "on": "ち", "meaning": "pond" }, { "kanji": "注", "kun": "そそ", "on": "ちゅう", "meaning": "pour" },
+                { "kanji": "洋", "kun": "", "on": "よう", "meaning": "ocean" }, { "kanji": "洗", "kun": "あら", "on": "せん", "meaning": "wash" },
+                { "kanji": "海", "kun": "うみ", "on": "かい", "meaning": "sea" }, { "kanji": "漢", "kun": "", "on": "かん", "meaning": "China" },
+                { "kanji": "牛", "kun": "うし", "on": "ぎゅう", "meaning": "cow" }, { "kanji": "物", "kun": "もの", "on": "ぶつ", "meaning": "thing" },
+                { "kanji": "特", "kun": "", "on": "とく", "meaning": "special" }, { "kanji": "犬", "kun": "いぬ", "on": "けん", "meaning": "dog" },
+                { "kanji": "理", "kun": "", "on": "り", "meaning": "reason" }, { "kanji": "産", "kun": "う", "on": "さん", "meaning": "product" },
+                { "kanji": "用", "kun": "もち", "on": "よう", "meaning": "use" }, { "kanji": "田", "kun": "た", "on": "でん", "meaning": "rice field" },
+                { "kanji": "町", "kun": "まち", "on": "ちょう", "meaning": "town" }, { "kanji": "画", "kun": "", "on": "が", "meaning": "picture" },
+                { "kanji": "界", "kun": "", "on": "かい", "meaning": "world" }, { "kanji": "病", "kun": "やまい", "on": "びょう", "meaning": "sick" },
+                { "kanji": "発", "kun": "", "on": "はつ", "meaning": "departure" }, { "kanji": "県", "kun": "", "on": "けん", "meaning": "prefecture" },
+                { "kanji": "真", "kun": "ま", "on": "しん", "meaning": "true" }, { "kanji": "着", "kun": "き", "on": "ちゃく", "meaning": "wear" },
+                { "kanji": "知", "kun": "し", "on": "ち", "meaning": "know" }, { "kanji": "短", "kun": "みじか", "on": "たん", "meaning": "short" },
+                { "kanji": "研", "kun": "と", "on": "けん", "meaning": "sharpen" }, { "kanji": "私", "kun": "わたし", "on": "し", "meaning": "I" },
+                { "kanji": "秋", "kun": "あき", "on": "しゅう", "meaning": "autumn" }, { "kanji": "究", "kun": "きわ", "on": "きゅう", "meaning": "research" },
+                { "kanji": "答", "kun": "こた", "on": "とう", "meaning": "answer" }, { "kanji": "紙", "kun": "かみ", "on": "し", "meaning": "paper" },
+                { "kanji": "終", "kun": "お", "on": "しゅう", "meaning": "end" }, { "kanji": "習", "kun": "なら", "on": "しゅう", "meaning": "learn" },
+                { "kanji": "考", "kun": "かんが", "on": "こう", "meaning": "think" }, { "kanji": "者", "kun": "もの", "on": "しゃ", "meaning": "person" },
+                { "kanji": "肉", "kun": "", "on": "にく", "meaning": "meat" }, { "kanji": "自", "kun": "みずか", "on": "じ", "meaning": "self" },
+                { "kanji": "色", "kun": "いろ", "on": "しょく", "meaning": "color" }, { "kanji": "英", "kun": "", "on": "えい", "meaning": "England" },
+                { "kanji": "茶", "kun": "", "on": "ちゃ", "meaning": "tea" }, { "kanji": "菜", "kun": "な", "on": "さい", "meaning": "vegetable" },
+                { "kanji": "薬", "kun": "くすり", "on": "やく", "meaning": "medicine" }, { "kanji": "親", "kun": "おや", "on": "しん", "meaning": "parent" },
+                { "kanji": "計", "kun": "はか", "on": "けい", "meaning": "measure" }, { "kanji": "試", "kun": "ため", "on": "し", "meaning": "test" },
+                { "kanji": "説", "kun": "と", "on": "せつ", "meaning": "explain" }, { "kanji": "貸", "kun": "か", "on": "たい", "meaning": "lend" },
+                { "kanji": "質", "kun": "", "on": "しつ", "meaning": "quality" }, { "kanji": "赤", "kun": "あか", "on": "せき", "meaning": "red" },
+                { "kanji": "走", "kun": "はし", "on": "そう", "meaning": "run" }, { "kanji": "起", "kun": "お", "on": "き", "meaning": "wake up" },
+                { "kanji": "転", "kun": "ころ", "on": "てん", "meaning": "revolve" }, { "kanji": "軽", "kun": "かる", "on": "けい", "meaning": "light" },
+                { "kanji": "近", "kun": "ちか", "on": "きん", "meaning": "near" }, { "kanji": "送", "kun": "おく", "on": "そう", "meaning": "send" },
+                { "kanji": "通", "kun": "とお", "on": "つう", "meaning": "pass" }, { "kanji": "進", "kun": "すす", "on": "しん", "meaning": "advance" },
+                { "kanji": "運", "kun": "はこ", "on": "うん", "meaning": "carry" }, { "kanji": "遠", "kun": "とお", "on": "えん", "meaning": "far" },
+                { "kanji": "都", "kun": "みやこ", "on": "と", "meaning": "metropolis" }, { "kanji": "重", "kun": "おも", "on": "じゅう", "meaning": "heavy" },
+                { "kanji": "野", "kun": "の", "on": "や", "meaning": "field" }, { "kanji": "銀", "kun": "", "on": "ぎん", "meaning": "silver" },
+                { "kanji": "門", "kun": "かど", "on": "もん", "meaning": "gate" }, { "kanji": "開", "kun": "あ", "on": "かい", "meaning": "open" },
+                { "kanji": "院", "kun": "", "on": "いん", "meaning": "institution" }, { "kanji": "集", "kun": "あつ", "on": "しゅう", "meaning": "gather" },
+                { "kanji": "青", "kun": "あお", "on": "せい", "meaning": "blue" }, { "kanji": "音", "kun": "おと", "on": "おん", "meaning": "sound" },
+                { "kanji": "頭", "kun": "あたま", "on": "とう", "meaning": "head" }, { "kanji": "題", "kun": "", "on": "だい", "meaning": "topic" },
+                { "kanji": "顔", "kun": "かお", "on": "がん", "meaning": "face" }, { "kanji": "風", "kun": "かぜ", "on": "ふう", "meaning": "wind" },
+                { "kanji": "飯", "kun": "めし", "on": "はん", "meaning": "meal" }, { "kanji": "館", "kun": "", "on": "かん", "meaning": "building" },
+                { "kanji": "首", "kun": "くび", "on": "しゅ", "meaning": "neck" }, { "kanji": "験", "kun": "", "on": "けん", "meaning": "verification" },
+                { "kanji": "鳥", "kun": "とり", "on": "ちょう", "meaning": "bird" }, { "kanji": "黒", "kun": "くろ", "on": "こく", "meaning": "black" }
+            ],
+            "n3": [
+                { "kanji": "与", "kun": "あた", "on": "よ", "meaning": "give" }, { "kanji": "両", "kun": "", "on": "りょう", "meaning": "both" },
+                { "kanji": "予", "kun": "あらかじ", "on": "よ", "meaning": "beforehand" }, { "kanji": "争", "kun": "あらそ", "on": "そう", "meaning": "contend" },
+                { "kanji": "互", "kun": "たが", "on": "ご", "meaning": "mutually" }, { "kanji": "亡", "kun": "な", "on": "ぼう", "meaning": "deceased" },
+                { "kanji": "交", "kun": "まじ", "on": "こう", "meaning": "mingle" }, { "kanji": "他", "kun": "ほか", "on": "た", "meaning": "other" },
+                { "kanji": "付", "kun": "つ", "on": "ふ", "meaning": "attach" }, { "kanji": "件", "kun": "", "on": "けん", "meaning": "affair" },
+                { "kanji": "任", "kun": "まか", "on": "にん", "meaning": "responsibility" }, { "kanji": "伝", "kun": "つた", "on": "でん", "meaning": "transmit" },
+                { "kanji": "似", "kun": "に", "on": "じ", "meaning": "resemble" }, { "kanji": "位", "kun": "くらい", "on": "い", "meaning": "rank" },
+                { "kanji": "余", "kun": "あま", "on": "よ", "meaning": "surplus" }, { "kanji": "例", "kun": "たと", "on": "れい", "meaning": "example" },
+                { "kanji": "供", "kun": "とも", "on": "きょう", "meaning": "offer" }, { "kanji": "係", "kun": "かか", "on": "けい", "meaning": "person in charge" },
+                { "kanji": "信", "kun": "", "on": "しん", "meaning": "faith" }, { "kanji": "倒", "kun": "たお", "on": "とう", "meaning": "fall" },
+                { "kanji": "値", "kun": "ね", "on": "ち", "meaning": "price" }, { "kanji": "偉", "kun": "えら", "on": "い", "meaning": "greatness" },
+                { "kanji": "側", "kun": "がわ", "on": "そく", "meaning": "side" }, { "kanji": "備", "kun": "そな", "on": "び", "meaning": "equip" },
+                { "kanji": "優", "kun": "やさ", "on": "ゆう", "meaning": "tenderness" }, { "kanji": "全", "kun": "すべ", "on": "ぜん", "meaning": "whole" },
+                { "kanji": "共", "kun": "とも", "on": "きょう", "meaning": "together" }, { "kanji": "具", "kun": "", "on": "ぐ", "meaning": "tool" },
+                { "kanji": "内", "kun": "うち", "on": "ない", "meaning": "inside" }, { "kanji": "最", "kun": "もっと", "on": "さい", "meaning": "utmost" },
+                { "kanji": "冷", "kun": "つめ", "on": "れい", "meaning": "cool" }, { "kanji": "処", "kun": "", "on": "しょ", "meaning": "dispose" },
+                { "kanji": "初", "kun": "はじ", "on": "しょ", "meaning": "first" }, { "kanji": "利", "kun": "き", "on": "り", "meaning": "profit" },
+                { "kanji": "制", "kun": "", "on": "せい", "meaning": "system" }, { "kanji": "刻", "kun": "きざ", "on": "こく", "meaning": "engrave" },
+                { "kanji": "割", "kun": "わ", "on": "かつ", "meaning": "divide" }, { "kanji": "加", "kun": "くわ", "on": "か", "meaning": "add" },
+                { "kanji": "助", "kun": "たす", "on": "じょ", "meaning": "help" }, { "kanji": "努", "kun": "つと", "on": "ど", "meaning": "toil" },
+                { "kanji": "務", "kun": "つと", "on": "む", "meaning": "duty" }, { "kanji": "勝", "kun": "か", "on": "しょう", "meaning": "win" },
+                { "kanji": "勤", "kun": "つと", "on": "きん", "meaning": "employed" }, { "kanji": "化", "kun": "ば", "on": "か", "meaning": "change" },
+                { "kanji": "単", "kun": "", "on": "たん", "meaning": "simple" }, { "kanji": "危", "kun": "あぶ", "on": "き", "meaning": "dangerous" },
+                { "kanji": "原", "kun": "はら", "on": "げん", "meaning": "original" }, { "kanji": "参", "kun": "まい", "on": "さん", "meaning": "visit" },
+                { "kanji": "反", "kun": "そ", "on": "はん", "meaning": "anti-" }, { "kanji": "収", "kun": "おさ", "on": "しゅう", "meaning": "income" },
+                { "kanji": "取", "kun": "と", "on": "しゅ", "meaning": "take" }, { "kanji": "受", "kun": "う", "on": "じゅ", "meaning": "accept" },
+                { "kanji": "号", "kun": "", "on": "ごう", "meaning": "number" }, { "kanji": "向", "kun": "む", "on": "こう", "meaning": "facing" },
+                { "kanji": "君", "kun": "きみ", "on": "くん", "meaning": "you" }, { "kanji": "否", "kun": "いな", "on": "ひ", "meaning": "negate" },
+                { "kanji": "吸", "kun": "す", "on": "きゅう", "meaning": "suck" }, { "kanji": "吹", "kun": "ふ", "on": "すい", "meaning": "blow" },
+                { "kanji": "告", "kun": "つ", "on": "こく", "meaning": "inform" }, { "kanji": "呼", "kun": "よ", "on": "こ", "meaning": "call" },
+                { "kanji": "命", "kun": "いのち", "on": "めい", "meaning": "life" }, { "kanji": "和", "kun": "やわ", "on": "わ", "meaning": "peace" },
+                { "kanji": "商", "kun": "あきな", "on": "しょう", "meaning": "merchant" }, { "kanji": "喜", "kun": "よろこ", "on": "き", "meaning": "rejoice" },
+                { "kanji": "因", "kun": "よ", "on": "いん", "meaning": "cause" }, { "kanji": "困", "kun": "こま", "on": "こん", "meaning": "trouble" },
+                { "kanji": "園", "kun": "その", "on": "えん", "meaning": "park" }, { "kanji": "在", "kun": "あ", "on": "ざい", "meaning": "exist" },
+                { "kanji": "報", "kun": "むく", "on": "ほう", "meaning": "report" }, { "kanji": "増", "kun": "ふ", "on": "ぞう", "meaning": "increase" },
+                { "kanji": "変", "kun": "か", "on": "へん", "meaning": "change" }, { "kanji": "夢", "kun": "ゆめ", "on": "む", "meaning": "dream" },
+                { "kanji": "夫", "kun": "おっと", "on": "ふ", "meaning": "husband" }, { "kanji": "失", "kun": "うしな", "on": "しつ", "meaning": "lose" },
+                { "kanji": "妻", "kun": "つま", "on": "さい", "meaning": "wife" }, { "kanji": "娘", "kun": "むすめ", "on": "じょう", "meaning": "daughter" },
+                { "kanji": "守", "kun": "まも", "on": "しゅ", "meaning": "protect" }, { "kanji": "定", "kun": "さだ", "on": "てい", "meaning": "determine" },
+                { "kanji": "実", "kun": "み", "on": "じつ", "meaning": "reality" }, { "kanji": "宿", "kun": "やど", "on": "しゅく", "meaning": "inn" },
+                { "kanji": "寄", "kun": "よ", "on": "き", "meaning": "draw near" }, { "kanji": "富", "kun": "とみ", "on": "ふ", "meaning": "wealth" },
+                { "kanji": "寝", "kun": "ね", "on": "しん", "meaning": "sleep" }, { "kanji": "居", "kun": "い", "on": "きょ", "meaning": "reside" },
+                { "kanji": "差", "kun": "さ", "on": "さ", "meaning": "difference" }, { "kanji": "常", "kun": "つね", "on": "じょう", "meaning": "usual" },
+                { "kanji": "平", "kun": "たい", "on": "へい", "meaning": "flat" }, { "kanji": "幸", "kun": "さち", "on": "こう", "meaning": "happiness" },
+                { "kanji": "座", "kun": "すわ", "on": "ざ", "meaning": "sit" }, { "kanji": "庭", "kun": "にわ", "on": "てい", "meaning": "garden" },
+                { "kanji": "当", "kun": "あ", "on": "とう", "meaning": "hit" }, { "kanji": "形", "kun": "かたち", "on": "けい", "meaning": "shape" },
+                { "kanji": "彼", "kun": "かれ", "on": "ひ", "meaning": "he" }, { "kanji": "得", "kun": "え", "on": "とく", "meaning": "gain" },
+                { "kanji": "御", "kun": "おん", "on": "ぎょ", "meaning": "honorable" }, { "kanji": "必", "kun": "かなら", "on": "ひつ", "meaning": "certain" },
+                { "kanji": "忘", "kun": "わす", "on": "ぼう", "meaning": "forget" }, { "kanji": "忙", "kun": "いそが", "on": "ぼう", "meaning": "busy" },
+                { "kanji": "怒", "kun": "おこ", "on": "ど", "meaning": "angry" }, { "kanji": "怖", "kun": "こわ", "on": "ふ", "meaning": "scary" },
+                { "kanji": "恐", "kun": "おそ", "on": "きょう", "meaning": "fear" }, { "kanji": "恥", "kun": "は", "on": "ち", "meaning": "shame" },
+                { "kanji": "息", "kun": "いき", "on": "そく", "meaning": "breath" }, { "kanji": "悲", "kun": "かな", "on": "ひ", "meaning": "sad" },
+                { "kanji": "情", "kun": "なさ", "on": "じょう", "meaning": "feelings" }, { "kanji": "慣", "kun": "な", "on": "かん", "meaning": "accustomed" },
+                { "kanji": "成", "kun": "な", "on": "せい", "meaning": "become" }, { "kanji": "戦", "kun": "たたか", "on": "せん", "meaning": "war" },
+                { "kanji": "戻", "kun": "もど", "on": "れい", "meaning": "return" }, { "kanji": "打", "kun": "う", "on": "だ", "meaning": "strike" },
+                { "kanji": "払", "kun": "はら", "on": "ふつ", "meaning": "pay" }, { "kanji": "投", "kun": "な", "on": "とう", "meaning": "throw" },
+                { "kanji": "折", "kun": "お", "on": "せつ", "meaning": "fold" }, { "kanji": "抜", "kun": "ぬ", "on": "ばつ", "meaning": "pull out" },
+                { "kanji": "抱", "kun": "だ", "on": "ほう", "meaning": "embrace" }, { "kanji": "押", "kun": "お", "on": "おう", "meaning": "push" },
+                { "kanji": "招", "kun": "まね", "on": "しょう", "meaning": "invite" }, { "kanji": "指", "kun": "ゆび", "on": "し", "meaning": "finger" },
+                { "kanji": "捕", "kun": "と", "on": "ほ", "meaning": "catch" }, { "kanji": "掛", "kun": "か", "on": "かい", "meaning": "hang" },
+                { "kanji": "探", "kun": "さが", "on": "たん", "meaning": "search" }, { "kanji": "支", "kun": "ささ", "on": "し", "meaning": "support" },
+                { "kanji": "放", "kun": "はな", "on": "ほう", "meaning": "release" }, { "kanji": "政", "kun": "まつりごと", "on": "せい", "meaning": "politics" },
+                { "kanji": "敗", "kun": "やぶ", "on": "はい", "meaning": "defeat" }, { "kanji": "散", "kun": "ち", "on": "さん", "meaning": "scatter" },
+                { "kanji": "数", "kun": "かず", "on": "すう", "meaning": "number" }, { "kanji": "断", "kun": "ことわ", "on": "だん", "meaning": "decline" },
+                { "kanji": "易", "kun": "やさ", "on": "えき", "meaning": "easy" }, { "kanji": "昔", "kun": "むかし", "on": "せき", "meaning": "old times" },
+                { "kanji": "晴", "kun": "は", "on": "せい", "meaning": "sunny" }, { "kanji": "暮", "kun": "く", "on": "ぼ", "meaning": "livelihood" },
+                { "kanji": "曲", "kun": "ま", "on": "きょく", "meaning": "curve" }, { "kanji": "更", "kun": "さら", "on": "こう", "meaning": "further" },
+                { "kanji": "望", "kun": "のぞ", "on": "ぼう", "meaning": "hope" }, { "kanji": "末", "kun": "すえ", "on": "まつ", "meaning": "end" },
+                { "kanji": "束", "kun": "たば", "on": "そく", "meaning": "bundle" }, { "kanji": "杯", "kun": "さかずき", "on": "はい", "meaning": "cup" },
+                { "kanji": "果", "kun": "は", "on": "か", "meaning": "fruit" }, { "kanji": "構", "kun": "かま", "on": "こう", "meaning": "build" },
+                { "kanji": "様", "kun": "さま", "on": "よう", "meaning": "appearance" }, { "kanji": "横", "kun": "よこ", "on": "おう", "meaning": "side" },
+                { "kanji": "機", "kun": "はた", "on": "き", "meaning": "machine" }, { "kanji": "欠", "kun": "か", "on": "けつ", "meaning": "lack" },
+                { "kanji": "次", "kun": "つぎ", "on": "じ", "meaning": "next" }, { "kanji": "欲", "kun": "ほっ", "on": "よく", "meaning": "want" },
+                { "kanji": "歯", "kun": "は", "on": "し", "meaning": "tooth" }, { "kanji": "残", "kun": "のこ", "on": "ざん", "meaning": "remain" },
+                { "kanji": "殺", "kun": "ころ", "on": "さつ", "meaning": "kill" }, { "kanji": "求", "kun": "もと", "on": "きゅう", "meaning": "request" },
+                { "kanji": "決", "kun": "き", "on": "けつ", "meaning": "decide" }
+            ]
+        };
 
-    // --- 設定 ---
-    const DATA_URL = 'data/kanji.json'; // JSONファイルがある場合
-    const POINTS_PER_QUESTION = 1;
-    const MAX_QUESTIONS = 10;
-    const CHOICES_COUNT = 3;
+        // --- ゲーム管理変数 ---
+        let currentLevel = 'n5';
+        let currentMode = 'kun';
+        let questions = []; // 全問（10問）の漢字データを格納（選択肢は都度生成）
+        let currentIndex = 0;
+        let score = 0;
+        const totalQuestions = 10;
+        let isAnswering = false;
 
-    // --- 要素 ---
-    const kanjiDisplay = document.getElementById('kanji-display');
-    const choicesContainer = document.getElementById('choices-container');
-    const qNumEl = document.getElementById('q-num');
-    const resultMsg = document.getElementById('result-message');
-    const modeRadios = document.querySelectorAll('input[name="mode"]');
-    const scoreArea = document.getElementById('score-area');
-    const quizArea = document.getElementById('quiz-area');
-    const scoreText = document.getElementById('score-text');
-    const restartBtn = document.getElementById('btn-restart');
-    const ingameNav = document.getElementById('ingame-nav');
-    
-    const soundCorrect = document.getElementById('seikai-sound');
-    const soundIncorrect = document.getElementById('bubu-sound');
+        // --- 画面切り替え ---
+        const views = {
+            level: document.getElementById('level-select-view'),
+            quiz: document.getElementById('quiz-view')
+        };
 
-    // --- 変数 ---
-    let kanjiData = [];
-    let currentQuestions = [];
-    let currentIndex = 0;
-    let score = 0;
-    let currentMode = 'kun';
-    let isAnswering = false; 
+        // --- クイズ開始処理 ---
+        window.startQuiz = (level) => {
+            currentLevel = level;
+            // リセット
+            score = 0;
+            currentIndex = 0;
+            // デフォルトは訓読み
+            currentMode = 'kun';
+            document.getElementById('mode-kun').checked = true;
 
-    // Firebaseダミー (エラー防止)
-    if (typeof window.addPointsToUser !== 'function') {
-        window.addPointsToUser = async () => false;
-    }
-
-    // --- 初期化 ---
-    async function init() {
-        // もしHTML側に直接 KANJI_DATA が書かれていればそれを使う
-        if (typeof KANJI_DATA !== 'undefined') {
-            kanjiData = KANJI_DATA;
-            startQuiz();
-            return;
-        }
-
-        // なければJSONを読みに行く
-        try {
-            const response = await fetch(DATA_URL);
-            const data = await response.json();
+            const rawData = kanjiDatabase[level];
             
-            if (data.kanji_list) {
-                kanjiData = data.kanji_list;
-            } else if (Array.isArray(data)) {
-                kanjiData = data;
+            // 【重要】切り替え可能なように、音読み・訓読みの両方が有効な漢字のみを抽出
+            // （どちらかが欠けていると、切り替えたときに答えがなくなるため）
+            const validData = rawData.filter(item => {
+                const hasKun = (item.kun && item.kun !== "" && item.kun !== "-" && item.kun !== "なし");
+                const hasOn = (item.on && item.on !== "" && item.on !== "-" && item.on !== "なし");
+                return hasKun && hasOn;
+            });
+
+            if (validData.length < 10) {
+                // データが足りない場合は警告（通常はデータ充実により起きない想定）
+                console.warn("両方の読みがある漢字が10個未満です");
+            }
+
+            // ランダムに10問選出（足りない場合はあるだけ）
+            const count = Math.min(validData.length, totalQuestions);
+            const shuffled = [...validData].sort(() => 0.5 - Math.random());
+            questions = shuffled.slice(0, count);
+
+            // 画面表示
+            document.getElementById('score-area').style.display = 'none';
+            document.getElementById('ingame-nav').style.display = 'block';
+            document.getElementById('quiz-area').style.display = 'block';
+            document.getElementById('level-label').textContent = level.toUpperCase();
+            
+            // 遷移
+            views.level.style.display = 'none';
+            views.quiz.classList.add('active');
+            
+            showQuestion();
+        };
+
+        // --- モード切り替え（クイズ中） ---
+        window.toggleMode = (mode) => {
+            if (currentMode === mode) return;
+            currentMode = mode;
+            // 問題は変えずに、表示（正解・選択肢）だけ更新
+            showQuestion();
+        };
+
+        // --- 問題表示 ---
+        function showQuestion() {
+            // ゲーム終了後や配列外アクセス防止
+            if (currentIndex >= questions.length) return;
+
+            isAnswering = true;
+            const qData = questions[currentIndex];
+            const correctReading = qData[currentMode];
+            
+            document.getElementById('q-num').textContent = currentIndex + 1;
+            document.getElementById('kanji-display').textContent = qData.kanji;
+            document.getElementById('result-message').textContent = "";
+
+            // 選択肢生成（正解1 + 不正解2）
+            // 不正解の候補は「同じレベル」かつ「現在のモード」の読みから選ぶ
+            const allCandidates = kanjiDatabase[currentLevel].filter(item => {
+                const r = item[currentMode];
+                return r && r !== "" && r !== "-" && r !== "なし" && r !== correctReading;
+            });
+
+            // 不正解を2つ選ぶ
+            let distractors = [];
+            if (allCandidates.length >= 2) {
+                const shuffledCandidates = allCandidates.sort(() => 0.5 - Math.random());
+                distractors = shuffledCandidates.slice(0, 2).map(item => item[currentMode]);
             } else {
-                throw new Error("データ形式エラー");
+                // 万が一候補が足りない場合のダミー
+                distractors = ["?", "??"];
             }
-            startQuiz();
-        } catch (error) {
-            console.error('読み込みエラー:', error);
-            // データがない場合のフォールバック（テスト用データ）
-            if (kanjiData.length === 0) {
-                 kanjiDisplay.textContent = "Error";
-                 resultMsg.textContent = "データを読み込めませんでした。";
+
+            const choices = [correctReading, ...distractors];
+            // シャッフル
+            for (let i = choices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [choices[i], choices[j]] = [choices[j], choices[i]];
             }
-        }
-    }
 
-    // --- クイズ開始（リセット） ---
-    function startQuiz() {
-        // 現在のモードを取得
-        modeRadios.forEach(r => { if(r.checked) currentMode = r.value; });
+            // ボタン配置
+            const container = document.getElementById('choices-container');
+            container.textContent = "";
+            container.className = "choices-grid"; // 1列グリッド
 
-        // データチェック
-        if (!kanjiData || kanjiData.length < CHOICES_COUNT) {
-            resultMsg.textContent = "問題データが足りません。";
-            return;
-        }
-
-        // ★ここで問題をシャッフル（ゲーム開始時のみ）
-        currentQuestions = shuffleArray(kanjiData).slice(0, MAX_QUESTIONS);
-        
-        currentIndex = 0;
-        score = 0;
-
-        quizArea.style.display = 'block';
-        scoreArea.style.display = 'none';
-        ingameNav.style.display = 'flex';
-        
-        loadQuestion();
-    }
-
-    // --- ★修正箇所：モード切替（リセットしない） ---
-    function switchMode(e) {
-        // 正解演出中は切り替えない（バグ防止）
-        if (isAnswering) {
-            e.preventDefault(); 
-            // ラジオボタンの見た目を元に戻す処理が必要ならここで行うが、
-            // 複雑になるので今回は「演出が終わるまで待ってね」とするか、そのまま切り替える
-            // ここでは「即時切り替え」を実装します。
-        }
-
-        // 新しいモードをセット
-        currentMode = e.target.value;
-        
-        // ★重要：currentIndex（今の問題番号）や score（点数）はリセットせず、
-        // 今の画面を再描画するだけにする
-        loadQuestion();
-    }
-
-    // --- 問題表示 ---
-    function loadQuestion() {
-        if (currentIndex >= currentQuestions.length) {
-            endGame();
-            return;
-        }
-
-        const question = currentQuestions[currentIndex];
-        
-        // 回答中フラグをリセット（モード切替時などに必要）
-        // ただし、「正解！」と出ている最中にモードを変えた場合は
-        // 次の問題に進む処理が待機しているので、無理にリセットしないほうが良いが
-        // シンプルにするため、モードを変えたら「回答待ち」状態に戻します
-        if (!isAnswering) {
-             resultMsg.textContent = '';
-        }
-
-        qNumEl.textContent = currentIndex + 1;
-        kanjiDisplay.textContent = question.kanji || question.char; // プロパティ名の揺らぎ対応
-
-        // 正解の読み方
-        const rawReading = currentMode === 'kun' ? question.kun : question.on;
-        const correctAnswer = formatReading(rawReading);
-
-        // --- 選択肢の生成 ---
-        
-        // ダミー選択肢作成（自分以外の漢字から、今のモードの読みを取得）
-        let pool = [];
-        kanjiData.forEach(item => {
-            const itemChar = item.kanji || item.char;
-            const qChar = question.kanji || question.char;
+            // 3択にするため、スタイル調整が必要ならここで行うが、
+            // CSSの grid-template-columns: 1fr なので縦に3つ並ぶ
             
-            // 自分自身は除外
-            if (itemChar === qChar) return;
-
-            const rRaw = currentMode === 'kun' ? item.kun : item.on;
-            // 「なし」や空文字を除外
-            if (rRaw && rRaw !== "なし" && rRaw.trim() !== "") {
-                const rClean = formatReading(rRaw);
-                // 重複してなければ追加
-                if (rClean && rClean !== correctAnswer && !pool.includes(rClean)) {
-                    pool.push(rClean);
-                }
-            }
-        });
-
-        // もしダミー候補が足りなければ、固定のダミーを追加（エラー防止）
-        while (pool.length < CHOICES_COUNT - 1) {
-            pool.push("---");
-        }
-
-        // プールからランダムに選ぶ
-        const wrongAnswers = shuffleArray(pool).slice(0, CHOICES_COUNT - 1);
-        
-        // 正解と混ぜる
-        const options = shuffleArray([correctAnswer, ...wrongAnswers]);
-
-        // ボタン配置
-        choicesContainer.textContent = '';
-        
-        // ★もし正解演出中ならメッセージは消さない、そうでなければ消す
-        if (!isAnswering) {
-            resultMsg.textContent = '';
-        }
-        
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.textContent = opt;
-            if (opt === "---" || opt === "") btn.disabled = true;
-            
-            // もし正解演出中にモードを変えた場合、ボタンは押せないようにしておく
-            if (isAnswering) btn.disabled = true;
-
-            btn.onclick = () => checkAnswer(btn, opt, correctAnswer, (question.kanji || question.char));
-            choicesContainer.appendChild(btn);
-        });
-    }
-
-    // 読み方の整形 (例: "うえ・あ" -> "うえ")
-    function formatReading(str) {
-        if (!str) return "";
-        // 全角・半角スペース削除
-        let s = str.replace(/[\s　]+/g, '');
-        // ・で分割して最初だけ使う
-        return s.split('・')[0].trim();
-    }
-
-    // --- 答え合わせ ---
-    async function checkAnswer(btn, selected, correct, kanjiId) {
-        if (isAnswering) return;
-        isAnswering = true;
-
-        const allBtns = choicesContainer.querySelectorAll('button');
-        allBtns.forEach(b => b.disabled = true);
-
-        if (selected === correct) {
-            btn.classList.add('correct');
-            resultMsg.textContent = "せいかい！";
-            resultMsg.style.color = "var(--correct-color)";
-            if(soundCorrect) { soundCorrect.currentTime = 0; soundCorrect.play(); }
-            score++;
-            // ポイント加算
-            await window.addPointsToUser(POINTS_PER_QUESTION, kanjiId);
-        } else {
-            btn.classList.add('incorrect');
-            resultMsg.textContent = `ざんねん… せいかいは「${correct}」`;
-            resultMsg.style.color = "var(--incorrect-color)";
-            if(soundIncorrect) { soundIncorrect.currentTime = 0; soundIncorrect.play(); }
-            // 正解を表示
-            allBtns.forEach(b => {
-                if(b.textContent === correct) b.classList.add('correct');
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => checkAnswer(btn, choice, correctReading);
+                container.appendChild(btn);
             });
         }
 
-        setTimeout(() => {
-            isAnswering = false; // フラグ解除
-            currentIndex++;
-            loadQuestion();
-        }, 1500);
-    }
+        async function checkAnswer(btn, selected, correct) {
+            if (!isAnswering) return;
+            isAnswering = false;
 
-    // --- 終了 ---
-    function endGame() {
-        quizArea.style.display = 'none';
-        ingameNav.style.display = 'none';
-        scoreArea.style.display = 'block';
-        scoreText.textContent = score;
-    }
+            const isCorrect = (selected === correct);
+            const buttons = document.querySelectorAll('.choice-btn');
 
-    function shuffleArray(arr) {
-        const newArr = [...arr];
-        for (let i = newArr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            if (isCorrect) {
+                btn.classList.add('correct');
+                document.getElementById('result-message').textContent = "せいかい！";
+                document.getElementById('result-message').style.color = "var(--correct-color)";
+                document.getElementById('seikai-sound').currentTime = 0;
+                document.getElementById('seikai-sound').play();
+                score += 10;
+                
+                if(window.addPointsToUser) window.addPointsToUser(1);
+            } else {
+                btn.classList.add('incorrect');
+                document.getElementById('result-message').textContent = `ざんねん... せいかいは「${correct}」`;
+                document.getElementById('result-message').style.color = "var(--incorrect-color)";
+                document.getElementById('bubu-sound').currentTime = 0;
+                document.getElementById('bubu-sound').play();
+                
+                // 正解を教える
+                buttons.forEach(b => {
+                    if (b.textContent === correct) b.classList.add('correct');
+                });
+            }
+
+            // 次へ進む
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1500);
         }
-        return newArr;
-    }
 
-    // --- イベントリスナー設定 ---
-    
-    // ★修正: startQuizではなく、switchModeを呼ぶように変更
-    modeRadios.forEach(r => r.addEventListener('change', switchMode));
-    
-    restartBtn.addEventListener('click', startQuiz);
-    
-    // 開始
-    init();
-});
+        function showResult() {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('ingame-nav').style.display = 'none';
+            document.getElementById('score-area').style.display = 'block';
+            document.getElementById('score-text').textContent = score;
+        }
+
+        window.backToLevelSelect = () => {
+            views.quiz.classList.remove('active');
+            views.level.style.display = 'block';
+        };

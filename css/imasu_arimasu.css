@@ -1,0 +1,203 @@
+/* --- 共通デザイン --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f0f4f8;
+        --text-color: #333;
+        --imasu-color: #ff6f61;  /* 生き物カラー */
+        --arimasu-color: #42a5f5; /* 物カラー */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        user-select: none;
+    }
+
+    header {
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(161, 140, 209, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-shrink: 0;
+        position: sticky; top: 0;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; color: white; text-decoration: none; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 900px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+        padding-bottom: 120px; /* 下部ボタン用スペース */
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: fadeIn 0.4s; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- スタート画面（単語リスト左右分割） --- */
+    .lists-row {
+        display: flex; flex-direction: row;
+        justify-content: center; align-items: flex-start;
+        gap: 15px; width: 100%;
+    }
+    
+    .list-col {
+        flex: 1;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    .section-title {
+        font-size: 1.1em; font-weight: bold; color: white;
+        padding: 8px 15px; border-radius: 20px; margin-bottom: 15px;
+        display: inline-block; width: 100%; text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .word-grid {
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 10px; width: 100%;
+    }
+    
+    .word-card {
+        background: white; border-radius: 12px; padding: 10px 5px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer;
+        border: 2px solid transparent; transition: transform 0.1s;
+        height: 110px; width: 100%;
+    }
+    .word-card:active { transform: scale(0.95); }
+    .word-card.imasu { border-bottom: 4px solid var(--imasu-color); }
+    .word-card.arimasu { border-bottom: 4px solid var(--arimasu-color); }
+    
+    .word-icon { font-size: 2em; margin-bottom: 8px; }
+    .word-text { font-size: 0.9em; font-weight: bold; text-align: center; line-height: 1.2; }
+
+    /* 固定ボタンエリア */
+    .start-btn-area {
+        position: fixed; 
+        bottom: 30px; 
+        left: 0; right: 0;
+        display: flex; justify-content: center;
+        z-index: 500;
+        pointer-events: none;
+    }
+    .big-start-btn {
+        pointer-events: auto;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        color: white; border: none; padding: 15px 50px;
+        border-radius: 50px; font-size: 1.5em; font-weight: 900;
+        box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        cursor: pointer; transition: transform 0.2s;
+        border: 4px solid white;
+    }
+    .big-start-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    /* --- メニュー --- */
+    .menu-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
+    }
+    .game-btn {
+        background: white; border-radius: 15px; padding: 20px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 4px 0 #ddd; border: 2px solid transparent;
+        transition: transform 0.1s;
+    }
+    .game-btn:active { transform: translateY(4px); box-shadow: none; }
+    .game-btn h3 { margin: 10px 0 5px; color: var(--primary); }
+
+    /* --- Level 1: ドラッグ&ドロップ --- */
+    .drag-area {
+        display: flex; width: 100%; height: 350px; gap: 10px; margin-top: 20px; position: relative;
+        touch-action: none; 
+    }
+    .drop-zone {
+        flex: 1; border-radius: 20px;
+        display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+        padding: 20px; font-weight: 900; font-size: 1.5em; color: white;
+        transition: all 0.2s;
+    }
+    .zone-imasu { background-color: var(--imasu-color); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+    .zone-arimasu { background-color: var(--arimasu-color); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+    
+    .center-piece {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 110px; height: 110px; background: white;
+        border-radius: 50%; 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.2em; font-weight: 900; cursor: grab; z-index: 10;
+        border: 5px solid var(--accent);
+        text-align: center; padding: 5px;
+        touch-action: none; user-select: none;
+    }
+    
+    .drag-ghost {
+        position: fixed; pointer-events: none; z-index: 9999;
+        width: 110px; height: 110px; background: white;
+        border-radius: 50%; 
+        border: 5px solid var(--accent);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.2em; font-weight: 900; color: var(--text-color);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        transform: translate(-50%, -50%);
+        text-align: center; opacity: 0.9;
+    }
+
+    /* --- Level 2-4: クイズ形式 --- */
+    .quiz-container {
+        background: white; width: 100%; max-width: 500px;
+        border-radius: 20px; padding: 20px; text-align: center;
+        box-shadow: 0 8px 0 #eee;
+    }
+    
+    .quiz-img-area {
+        width: 100%; height: 180px; background: #f9f9f9;
+        border-radius: 15px; margin-bottom: 15px;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 3em; color: #555; border: 2px dashed #ddd;
+        position: relative; overflow: hidden;
+    }
+    .quiz-img-area.small-img i, .quiz-img-area.small-img img {
+        font-size: 2.5em; width: 60px; height: 60px;
+    }
+    
+    .quiz-question { font-size: 1.3em; font-weight: bold; margin-bottom: 20px; line-height: 1.4; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } 
+    
+    .option-btn {
+        background: #f0f4f8; border: 2px solid #ddd; border-radius: 12px;
+        padding: 15px 5px; font-size: 1.0em; font-weight: bold; cursor: pointer;
+        transition: all 0.1s; min-height: 60px; display: flex; align-items: center; justify-content: center;
+    }
+    .option-btn:active { transform: translateY(3px); background: #e3f2fd; }
+    .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+    .option-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+    /* --- 確認モーダル --- */
+    .feedback-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7); display: none;
+        justify-content: center; align-items: center; z-index: 200;
+    }
+    .feedback-box {
+        background: white; padding: 30px; border-radius: 20px; text-align: center;
+        width: 90%; max-width: 350px; animation: popIn 0.3s;
+    }
+    .next-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 12px 30px; border-radius: 30px; font-size: 1.1em; font-weight: bold;
+        cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 #3949ab;
+    }
+    .next-btn:active { transform: translateY(3px); box-shadow: none; }
+
+    @keyframes popIn { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }

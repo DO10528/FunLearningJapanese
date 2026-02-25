@@ -1,0 +1,129 @@
+/* --- index.html と共通のデザイン設定 --- */
+    :root {
+        --primary: #ffa726; /* カタカナなのでテーマカラーをオレンジに変更（任意） */
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --accent: #ffcc5c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        display: flex; flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+        touch-action: manipulation;
+    }
+
+    header {
+        /* ヘッダーもカタカナテーマ（オレンジ系）に合わせるか、青のままにするか選べます。
+           ここは統一感のため青グラデーションのままにします */
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        width: 100%;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; gap: 10px; align-items: center; }
+    .home-icon { color: white; font-size: 1.5em; }
+
+    /* --- メインエリア --- */
+    .main-container {
+        flex-grow: 1;
+        padding: 20px;
+        width: 100%; max-width: 600px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    .dojo-card {
+        background: white; border-radius: 25px;
+        padding: 20px; width: 100%;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    h1 { color: var(--primary); margin-bottom: 10px; font-size: 1.8em; }
+    .sub-text { color: #666; margin-bottom: 20px; }
+
+    /* --- キャンバスエリア --- */
+    .canvas-wrapper {
+        position: relative;
+        width: 300px; height: 300px;
+        margin: 0 auto 20px auto;
+        border: 4px dashed #ccc;
+        border-radius: 20px;
+        background-color: #fff;
+        overflow: hidden;
+        /* 田の字グリッド */
+        background-image: 
+            linear-gradient(to right, #eee 1px, transparent 1px),
+            linear-gradient(to bottom, #eee 1px, transparent 1px);
+        background-size: 150px 150px;
+        background-position: center;
+    }
+
+    /* ガイド文字（Klee Oneを使用） */
+    .guide-text {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -54%);
+        font-size: 240px;
+        
+        /* ★重要な変更点：教科書体風フォント★ */
+        font-family: 'Klee One', cursive;
+        font-weight: 600;
+        
+        color: #e0e0e0; /* 薄いグレー */
+        pointer-events: none;
+        user-select: none;
+        z-index: 1;
+    }
+
+    /* 描画用キャンバス */
+    canvas {
+        position: absolute; top: 0; left: 0;
+        z-index: 2;
+        cursor: crosshair;
+        touch-action: none;
+    }
+
+    /* --- コントロールボタン --- */
+    .controls {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+        width: 100%;
+    }
+
+    .btn {
+        border: none; border-radius: 50px; padding: 12px 24px;
+        font-size: 1.1em; font-weight: bold; color: white;
+        cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        transition: transform 0.1s; min-width: 120px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none; }
+
+    .btn-clear { background-color: #ef5350; }
+    .btn-next { background-color: var(--primary); }
+    .btn-back { background-color: #90a4ae; color: white; text-decoration: none; display: inline-block; margin-top: 20px; padding: 10px 30px; border-radius: 20px; font-weight: bold; }
+
+    /* 色変えパレット */
+    .color-palette {
+        display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+    }
+    .color-dot {
+        width: 35px; height: 35px; border-radius: 50%;
+        cursor: pointer; border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
+    }
+    .color-dot.active { transform: scale(1.2); border-color: #333; }
+
+    @media (max-width: 400px) {
+        .canvas-wrapper { width: 280px; height: 280px; }
+        .guide-text { font-size: 220px; }
+    }

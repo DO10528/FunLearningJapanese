@@ -1,0 +1,124 @@
+/* --- メインページ共通スタイル --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 80px;
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { 
+        font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white;
+    }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+        text-decoration: none; display: flex; align-items: center; gap: 5px;
+    }
+    .btn-back-nav:hover { background: rgba(255,255,255,0.3); }
+
+    /* ヒーローセクション */
+    .hero-section {
+        background: white; text-align: center; padding: 25px 20px;
+        width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .hero-section h1 { margin: 0; color: var(--primary); font-size: 1.5em; display: flex; justify-content: center; align-items: center; gap: 10px; }
+
+    /* --- 動画リストグリッド --- */
+    .container {
+        max-width: 1000px; margin: 0 auto; padding: 0 20px;
+    }
+
+    .video-grid {
+        display: grid;
+        gap: 15px;
+    }
+
+    /* カードスタイル */
+    .video-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 15px;
+        text-decoration: none;
+        color: var(--text-color);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border: 2px solid transparent;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+
+    .video-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(92, 122, 255, 0.15);
+        border-color: var(--primary);
+    }
+
+    .video-icon {
+        color: var(--primary);
+        background: #e0e7ff;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        flex-shrink: 0;
+    }
+    .video-icon i { font-size: 1.2em; } /* アイコンサイズ小さめ */
+
+    .video-info {
+        display: flex; flex-direction: column;
+    }
+    .video-title { font-weight: 900; font-size: 1.1em; line-height: 1.2; }
+    .video-sub { font-size: 0.8em; color: #777; margin-top: 3px; }
+
+    /* --- レスポンシブレイアウト --- */
+    
+    /* PC・タブレット (横並び 5列) */
+    @media (min-width: 768px) {
+        .video-grid {
+            grid-template-columns: repeat(5, 1fr); /* 5つ並び */
+        }
+        .video-card {
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            height: 140px;
+            gap: 10px;
+        }
+        .video-info { align-items: center; }
+    }
+
+    /* スマホ (縦並び 1列) */
+    @media (max-width: 767px) {
+        .video-grid {
+            grid-template-columns: 1fr; /* 1つ並び */
+        }
+        .video-card {
+            flex-direction: row;
+            justify-content: flex-start;
+            text-align: left;
+            padding: 15px 20px;
+            gap: 15px;
+        }
+    }

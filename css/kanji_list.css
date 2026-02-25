@@ -1,0 +1,169 @@
+/* --- 共通設定 --- */
+        :root {
+            --primary: #42a5f5;
+            --accent: #ffcc5c;
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            
+            /* 画像に合わせたレベルカラー */
+            --c-n5: #e57373; /* Pink/Red for N5 image */
+            --c-n4: #d32f2f; /* Red for N4 image */
+            --c-n3: #f57c00; /* Orange for N3 image */
+            --c-n2: #7b1fa2; /* Purple (仮) */
+            --c-n1: #1976d2; /* Blue (仮) */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #42a5f5 0%, #4facfe 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            text-decoration: none; font-weight: bold;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary);
+            margin-bottom: 20px; font-size: 1.8em;
+        }
+
+        /* --- 画面切り替え用アニメーション --- */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 1. レベル選択画面 --- */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-bottom: 6px solid #ddd;
+            position: relative; overflow: hidden;
+        }
+        .level-card:active { transform: translateY(3px); border-bottom-width: 3px; }
+        .level-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        .level-badge {
+            display: inline-block; padding: 5px 15px; border-radius: 15px;
+            color: white; font-weight: bold; margin-bottom: 10px;
+            font-size: 0.9em; letter-spacing: 1px;
+        }
+        
+        .level-title { font-size: 3em; font-weight: 900; line-height: 1; margin-bottom: 5px; font-family: 'Klee One', cursive; color: #444; }
+        .level-desc { font-size: 0.85em; color: #888; font-weight: bold; }
+        
+        /* レベルごとの配色 */
+        .lv-n5 .level-badge { background-color: var(--c-n5); }
+        .lv-n5 { border-bottom-color: var(--c-n5); }
+        
+        .lv-n4 .level-badge { background-color: var(--c-n4); }
+        .lv-n4 { border-bottom-color: var(--c-n4); }
+        
+        .lv-n3 .level-badge { background-color: var(--c-n3); }
+        .lv-n3 { border-bottom-color: var(--c-n3); }
+        
+        .lv-locked { opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-bottom-color: #ccc; }
+        .lv-locked .level-badge { background-color: #999; }
+
+        /* --- 2. 漢字リスト画面 --- */
+        .list-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+        }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: white; color: #555;
+            padding: 10px 20px; border-radius: 25px;
+            text-decoration: none; font-weight: bold;
+            cursor: pointer; border: 2px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #f5f5f5; transform: translateX(-3px); }
+
+        #search-input {
+            padding: 12px 20px; border-radius: 25px; border: 2px solid #ddd;
+            width: 100%; max-width: 400px; font-size: 1em; outline: none;
+            transition: border-color 0.3s;
+        }
+        #search-input:focus { border-color: var(--primary); }
+
+        .kanji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .kanji-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            display: flex; flex-direction: row;
+            align-items: center; gap: 15px;
+            border-left: 6px solid #ccc;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kanji-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+
+        .char-box {
+            background: #f7f7f7; color: #333;
+            width: 70px; height: 70px; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Klee One', cursive; font-size: 2.8em;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+
+        .info-box { flex-grow: 1; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+        .meaning { font-weight: 900; font-size: 1em; color: #444; border-bottom: 1px dashed #ddd; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reading-row { font-size: 0.8em; display: flex; align-items: baseline; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .label { font-size: 0.7em; color: #999; background:#eee; padding:1px 4px; border-radius:4px; }
+        .kun { color: #1e88e5; font-weight: bold; }
+        .on  { color: #e53935; font-weight: bold; }
+
+        .sound-btn {
+            background: var(--accent); color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 1.1em; box-shadow: 0 3px 0 #ffb300; transition: all 0.1s; flex-shrink: 0;
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        @media (max-width: 600px) {
+            .kanji-grid { grid-template-columns: 1fr; }
+            .level-grid { grid-template-columns: 1fr 1fr; }
+            .level-title { font-size: 2.2em; }
+        }

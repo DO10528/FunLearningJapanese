@@ -1,0 +1,148 @@
+/* --- 厳密なA4印刷設定 --- */
+    @page {
+        size: A4 portrait; /* A4 縦向き */
+        margin: 0; /* 余白なし */
+    }
+
+    @media print {
+        html, body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            padding: 0;
+            background: white;
+            -webkit-print-color-adjust: exact; /* 背景色を強制印刷 */
+        }
+        
+        .no-print { display: none !important; }
+
+        .sheet {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 !important;
+            padding: 15mm !important; /* 印刷時の内側余白 */
+            box-shadow: none !important;
+            page-break-after: always;
+            box-sizing: border-box;
+            border: none !important; /* 画面表示用の枠線を消す */
+            border-radius: 0 !important;
+            overflow: hidden; /* はみ出し防止 */
+        }
+    }
+
+    /* --- 画面表示用 (プレビュー) --- */
+    body {
+        background: #525659; /* PDFビューアっぽい背景色 */
+        font-family: 'Zen Maru Gothic', sans-serif;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 40px 0; margin: 0;
+        color: #333;
+    }
+
+    .sheet {
+        background: white;
+        width: 210mm;
+        height: 297mm; /* A4サイズ固定 */
+        padding: 15mm;
+        box-sizing: border-box;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    /* --- コンテンツデザイン --- */
+    
+    /* 1. 表紙 */
+    .cover-frame {
+        border: 8px solid #ffcc5c;
+        height: 100%; border-radius: 30px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: radial-gradient(circle, #fffdf5 0%, #fff 100%);
+        position: relative;
+    }
+    .cover-title {
+        font-size: 5em; color: #5c7aff; margin: 0;
+        text-shadow: 4px 4px 0px #dbeafe; letter-spacing: 5px;
+        line-height: 1.2;
+    }
+    .cover-sub { font-size: 1.8em; color: #ffa726; margin-top: 10px; font-weight: bold; }
+    .name-area {
+        margin-top: 80px; width: 80%; border: 3px dashed #ccc;
+        padding: 20px; border-radius: 20px; background: white;
+    }
+    .name-line { border-bottom: 2px solid #333; height: 40px; margin-top: 10px; }
+    
+    .deco-icon { position: absolute; font-size: 4em; opacity: 0.2; }
+    .d-1 { top: 50px; left: 40px; color: #ffab91; transform: rotate(-15deg); }
+    .d-2 { bottom: 50px; right: 40px; color: #81d4fa; transform: rotate(15deg); }
+    .d-3 { top: 150px; right: 60px; color: #ffd54f; }
+    .d-4 { bottom: 150px; left: 60px; color: #a5d6a7; }
+
+    /* 2. 各ページ */
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 3px solid #eee; padding-bottom: 10px; margin-bottom: 15px;
+        height: 50px; /* ヘッダー高さ固定 */
+    }
+    .ph-title { font-size: 1.8em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .ph-date { font-size: 1.2em; color: #aaa; border: 1px solid #ddd; padding: 5px 20px; border-radius: 20px; }
+
+    /* グリッド調整 (A4に収めるため計算) */
+    .item-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        grid-template-rows: repeat(5, 1fr); 
+        gap: 12px;
+        /* (297mm - 30mmパディング - 50mmヘッダー - 余白) ÷ 5行 */
+        height: calc(100% - 70px); 
+    }
+
+    .item-card {
+        border: 2px dashed; 
+        border-radius: 15px;
+        padding: 5px 12px;
+        display: flex; flex-direction: column;
+        background: #fff;
+    }
+
+    /* 上部のチェックエリア（言葉指定なし） */
+    .card-header {
+        display: flex; justify-content: flex-end; align-items: center;
+        margin-bottom: 2px; height: 20px;
+    }
+    .check-circle { 
+        width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; 
+    }
+
+    /* お絵かきスペース */
+    .draw-space {
+        flex-grow: 1;
+        background: #fafafa; border-radius: 8px;
+        display: flex; justify-content: center; align-items: center;
+        color: #eee; font-size: 1.2em; margin-bottom: 5px;
+        border: 1px solid #f0f0f0;
+        position: relative;
+    }
+    /* ガイド用アイコン（うっすら表示） */
+    .draw-icon { opacity: 0.3; color: #ddd; font-size: 2em; }
+    
+    /* 書き込みスペース（自由記入） */
+    .write-space {
+        height: 35px;
+        border-bottom: 2px solid #aaa;
+        display: flex; align-items: flex-end;
+    }
+    .write-guide { font-size: 0.8em; color: #999; margin-right: 5px; margin-bottom: 2px; }
+    .write-line { flex-grow: 1; } /* 空白行 */
+
+    /* --- ボタン --- */
+    .fab {
+        position: fixed; bottom: 30px; right: 30px;
+        background: #333; color: white; padding: 15px 30px;
+        border-radius: 50px; font-weight: bold; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: none;
+        font-size: 1.2em; display: flex; align-items: center; gap: 10px;
+        z-index: 1000;
+    }
+    .fab:hover { transform: scale(1.05); }

@@ -1,191 +1,276 @@
-/* ======================================== */
-/* しりとり2 専用スタイル */
-/* ======================================== */
-header {
-background-color: white;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-padding: 10px 20px;
-margin-bottom: 20px;
-}
+/* --- 共通設定 (V2デザイン) --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --correct-color: #4caf50;
+        --incorrect-color: #ef5350;
+    }
 
-.header-container {
-max-width: 1200px;
-margin: 0 auto;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        touch-action: manipulation;
+    }
 
-.header-container h1 {
-margin: 0;
-font-size: 1.5em;
-border-bottom: none;
-color: #333;
-}
+    /* --- ヘッダー（V2統一デザイン） --- */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white;
+        padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        z-index: 100;
+    }
+    .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-container h1 {
+        margin: 0;
+        font-size: 1.4em;
+        color: white;
+    }
+    .back-button {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
 
-.back-button {
-text-decoration: none;
-color: #3f51b5;
-font-weight: bold;
-padding: 8px 15px;
-border: 1px solid #3f51b5;
-border-radius: 5px;
-transition: background-color 0.2s;
-}
+    /* --- メインコンテンツ/メニュー --- */
+    .shiritori2-main {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
 
-.back-button:hover {
-background-color: #e0e7ff;
-}
+    /* --- メニューカード --- */
+    #shiritori2-menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+    .menu-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+    }
+    .menu-card h2 {
+        color: var(--primary);
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    .menu-card p {
+        color: #666;
+        margin: 10px 0 30px;
+    }
+    .start-btn {
+        background: linear-gradient(to bottom, var(--primary), #4b63cc);
+        color: white; font-size: 1.4em; font-weight: 900;
+        padding: 15px 40px; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 6px 0 #3f51b5;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3f51b5; }
 
-/* --- しりとり2：レイアウト（左右配置） --- */
-.shiritori2-container {
-display: flex;
-justify-content: center;
-align-items: flex-start;
-gap: 20px; /* ギャップを調整 */
-flex-wrap: nowrap;
-max-width: 1000px; /* 最大幅を少し調整 */
-margin: 20px auto;
-}
 
-/* --- 左側：カードリストエリア（ドラッグ元） --- */
-.card-area {
-flex: 1; /* リストエリアは柔軟に幅を取る */
-min-width: 250px;
-max-height: 500px; /* グリッドに高さを合わせる */
-overflow-y: auto;
-border: 2px solid #ccc;
-border-radius: 10px;
-padding: 10px;
-background-color: #fafafa;
-text-align: center;
-}
+    /* --- ゲームエリア (左右配置) --- */
+    #shiritori2-game-area {
+        padding: 20px 0;
+    }
+    .shiritori2-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 25px; 
+        flex-wrap: nowrap;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-/* --- 右側：グリッドエリア（ドロップ先） --- */
-.grid-area {
-flex: 2; /* グリッドエリアはリストエリアより広く取る */
-text-align: center;
-padding: 10px;
-border: 2px solid #3f51b5;
-border-radius: 10px;
-background-color: #eef2f8;
-}
+    /* --- 左側：カードリストエリア (高さ修正) --- */
+    .card-area {
+        flex: 1; 
+        min-width: 250px;
+        border: 3px solid var(--accent);
+        border-radius: 15px;
+        padding: 15px;
+        background-color: #fff8e1; 
+        text-align: center;
+        
+        /* ★修正: 高さをコンテンツに合わせる */
+        align-self: flex-start; 
+        /* min-height: 400px; を削除 */
+        
+        overflow-y: auto;
+    }
+    .card-area h3 {
+        color: #5d4037;
+        margin-top: 0;
+    }
 
-/* --- 4x4のグリッド設定 --- */
-.shiritori-grid {
-display: grid;
-grid-template-columns: repeat(4, 1fr); /* 4列に均等分割 */
-gap: 8px;
-padding: 10px;
-background: #f5f5f5;
-border-radius: 12px;
-margin: 10px auto;
-max-width: 480px; /* グリッドの最大幅を制限して中央に寄せる */
-}
+    /* --- 右側：グリッドエリア (高さ修正) --- */
+    .grid-area {
+        flex: 2; 
+        text-align: center;
+        padding: 20px;
+        border: 3px solid var(--primary); 
+        border-radius: 15px;
+        background-color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        
+        /* ★修正: 高さをコンテンツに合わせる */
+        align-self: flex-start;
+        /* min-height: 400px; を削除 */
+    }
+    .grid-area h3 {
+        color: var(--primary);
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
 
-/* スクロールバーを非表示（横並びで使っていた名残を削除） */
-.shiritori-grid::-webkit-scrollbar {
-display: none;
-}
+    /* --- 4x4のグリッド設定 --- */
+    .shiritori-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 10px;
+        background: #f0f4f8;
+        border-radius: 12px;
+        margin: 10px auto;
+        max-width: 500px;
+    }
 
-/* --- 1マス（セル）の設定 --- */
-.grid-cell {
-/* width/heightの絶対指定を削除し、グリッドに任せる */
-aspect-ratio: 1 / 1; /* 正方形を維持 */
-border: 2px dashed #3f51b5;
-border-radius: 10px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-background-color: white;
-transition: border 0.3s, background-color 0.2s;
-overflow: hidden;
-padding: 2px;
-}
+    /* --- 1マス（セル）の設定 --- */
+    .grid-cell {
+        aspect-ratio: 1 / 1; 
+        border: 2px dashed var(--primary);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        transition: border 0.3s, background-color 0.2s;
+        overflow: hidden;
+        font-size: 0.9em;
+        padding: 5px;
+    }
 
-.grid-cell.filled {
-border: 2px solid #4CAF50;
-background-color: #e8f5e9;
-}
+    .grid-cell.filled {
+        border: 2px solid var(--correct-color);
+        background-color: #e8f5e9;
+    }
 
-.grid-cell:hover:not(.filled) {
-background-color: #e0e7ff;
-border-color: #3f51b5;
-}
+    .grid-cell.drag-over {
+        background-color: #e0e7ff;
+        border-color: #3f51b5;
+    }
 
-/* マス内の単語 */
-.word-text {
-font-size: 1.2em;
-font-weight: bold;
-white-space: nowrap; /* 1行表示を維持 */
-}
+    /* マス内の単語 */
+    .word-text {
+        font-size: 1em;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+    }
 
-/* しりとり開始マス */
-.shiritori-start {
-background-color: #fffae6;
-border: 2px solid #ffb74d;
-}
+    /* しりとり開始マス */
+    .shiritori-start {
+        background-color: #ccff90;
+        border: 2px solid var(--correct-color);
+    }
 
-/* --- 残り単語カード --- */
-.word-card {
-display: flex;
-align-items: center;
-border: 1px solid #ffcc5c;
-border-radius: 8px;
-margin-bottom: 10px;
-padding: 5px;
-background-color: white;
-cursor: grab;
-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-transition: transform 0.2s, opacity 0.3s;
-}
+    /* --- 残り単語カード --- */
+    .word-card {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: white;
+        cursor: grab;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s, opacity 0.3s;
+        min-height: 50px;
+    }
 
-.word-card:hover {
-transform: translateY(-2px);
-}
+    .word-card:hover {
+        transform: translateY(-2px);
+    }
 
-.word-card.dragging {
-opacity: 0.5;
-}
+    .card-image {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        border-radius: 4px;
+        margin-right: 8px;
+    }
 
-.card-image {
-width: 45px;
-height: 45px;
-object-fit: contain;
-border-radius: 4px;
-margin-right: 8px;
-}
+    .card-label {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
 
-.card-label {
-font-size: 1.1em;
-font-weight: bold;
-}
-
-/* ======================================== */
-/* メッセージとボタン配置 */
-/* ======================================== */
-.feedback-message {
-margin-top: 15px;
-font-weight: bold;
-color: #3f51b5;
-}
-
-#return-card-area {
-margin-top: 10px;
-text-align: center;
-}
-
-#returnCardButton {
-background-color: #f0a000;
-}
-
-/* ======================================== */
-/* 下部ボタン（リセット・メニュー） */
-/* ======================================== */
-.game-controls-area {
-margin-top: 25px;
-display: flex;
-justify-content: center;
-gap: 20px;
-}
+    /* --- 下部コントロール --- */
+    .game-controls-area {
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+    .control-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .control-button:hover {
+        opacity: 0.9;
+    }
+    
+    /* スマホ対応 */
+    @media (max-width: 700px) {
+        .shiritori2-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        .card-area {
+            min-height: 150px;
+            max-height: none;
+            width: 100%;
+            order: 2; 
+        }
+        .grid-area {
+            width: 100%;
+            order: 1; 
+        }
+    }

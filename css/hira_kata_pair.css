@@ -1,0 +1,292 @@
+/* --- 共通設定 (青・白基調) --- */
+    :root {
+        --primary: #00bcd4; /* シアン */
+        --secondary: #0097a7; /* 濃いシアン (影用) */
+        --accent: #ff4081; /* ピンク */
+        --bg-color: #e0f7fa; /* 薄い水色 */
+        --text-color: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    /* ヘッダー */
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; transition: transform 0.2s; }
+    .home-icon:active { transform: scale(0.9); }
+
+    /* メインエリア */
+    .game-container {
+        flex-grow: 1;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+    }
+
+    /* --- レベル選択画面 --- */
+    .menu-card {
+        background: white;
+        border-radius: 25px;
+        padding: 40px 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+        animation: popIn 0.4s;
+    }
+
+    .menu-icon { font-size: 4em; color: #5c7aff; margin-bottom: 15px; animation: bounce 2s infinite; }
+    .menu-title { font-size: 1.8em; color: var(--primary); margin: 0 0 10px 0; font-weight: 900; }
+    
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+        margin-top: 20px;
+    }
+
+    .level-btn {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px 10px;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        transition: all 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+    .level-btn:nth-child(5n+1) { background-color: #ff6b6b; }
+    .level-btn:nth-child(5n+2) { background-color: #feca57; }
+    .level-btn:nth-child(5n+3) { background-color: #48dbfb; }
+    .level-btn:nth-child(5n+4) { background-color: #1dd1a1; }
+    .level-btn:nth-child(5n+5) { background-color: #ff9f43; }
+
+    .level-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+    .level-btn:active { transform: translateY(2px); box-shadow: none; }
+
+    .home-btn-back {
+        background: #90a4ae; color: white; border: none;
+        border-bottom: 4px solid #607d8b;
+        padding: 10px 30px; border-radius: 50px; font-weight: bold;
+        text-decoration: none; display: inline-block; cursor: pointer;
+    }
+    .home-btn-back:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+
+    /* --- ゲームプレイエリア --- */
+    #game-play-area {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game-header-info {
+        display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;
+    }
+    .level-display {
+        font-size: 1.2em; font-weight: bold; color: var(--primary);
+        background: white; padding: 5px 15px; border-radius: 15px;
+        box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+    }
+    .back-to-menu {
+        background: #e0e0e0; color: #666; border: none;
+        padding: 5px 15px; border-radius: 15px; font-weight: bold; cursor: pointer;
+    }
+
+    /* --- ゲーム盤面レイアウト --- */
+    .board {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        gap: 15px;
+        margin-bottom: 20px;
+        align-items: stretch;
+    }
+
+    /* 左右のプール (3D風デザインに変更) */
+    .pool-column {
+        display: flex; flex-direction: column;
+        width: 95px;
+        align-items: center;
+        background: #FFF;
+        /* 立体的なボーダーと影 */
+        border: 3px solid #80deea; /* 明るい色で光沢感 */
+        border-bottom-color: var(--secondary); /* 暗い色で影 */
+        border-right-color: var(--secondary);
+        border-radius: 15px;
+        padding: 0;
+        min-height: 350px;
+        /* 深い影で浮き上がりを表現 */
+        box-shadow: 0 6px 0 var(--secondary), 0 8px 10px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+    .pool-header {
+        background: var(--primary);
+        color: #FFF;
+        font-weight: 900;
+        padding: 8px 0;
+        text-align: center;
+        width: 100%;
+        /* ヘッダーの下に少し影 */
+        box-shadow: 0 2px 0 var(--secondary);
+    }
+    .pool-area { 
+        margin-top: 0; padding: 15px 10px; width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: center; flex-grow: 1;
+    }
+
+    /* 中央のペアリングエリア */
+    .center-area {
+        flex-grow: 1;
+        max-width: 280px;
+        display: flex; flex-direction: column;
+        gap: 12px;
+        padding: 10px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 20px;
+        border: 2px dashed var(--primary);
+    }
+
+    /* ペアを作る行 */
+    .pair-row {
+        display: flex;
+        justify-content: center; align-items: center;
+        background: #FFF;
+        border-radius: 12px;
+        padding: 5px;
+        border: 2px solid var(--secondary);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        gap: 10px;
+        height: 70px;
+    }
+
+    .pair-divider {
+        color: var(--secondary); font-size: 1.5em; font-weight: bold;
+    }
+
+    /* --- アイテムとスロット --- */
+    .slot {
+        width: 55px; height: 55px;
+        background: #F5F5F5;
+        border: 2px dashed #CCC;
+        border-radius: 10px;
+        display: flex; justify-content: center; align-items: center;
+        transition: all 0.2s;
+    }
+    .slot.drag-over { background: #b2ebf2; border-color: var(--primary); border-style: solid; transform: scale(1.05); }
+    .pool-slot { border: none; background: transparent; }
+
+    /* ドラッグする文字チップ (3D風デザインに変更) */
+    .char-chip {
+        width: 55px; height: 55px;
+        background: #FFF;
+        border-radius: 10px;
+        /* 立体的なボーダー */
+        border: 3px solid;
+        /* 下と右に厚みのある影 */
+        box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        display: flex; justify-content: center; align-items: center;
+        font-family: 'Klee One', cursive; 
+        font-size: 2rem;
+        font-weight: 600;
+        cursor: grab;
+        touch-action: none; z-index: 10;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+    
+    /* ひらがな：赤系3D */
+    .char-hira { 
+        color: #d81b60; 
+        border-color: #f8bbd0; /* 明るい色 */
+        border-bottom-color: #c2185b; /* 暗い色 */
+        border-right-color: #c2185b;
+    } 
+    /* カタカナ：青系3D */
+    .char-kata { 
+        color: #1565c0; 
+        border-color: #bbdefb; /* 明るい色 */
+        border-bottom-color: #1976d2; /* 暗い色 */
+        border-right-color: #1976d2;
+    } 
+
+    /* 押したときの凹み表現 */
+    .char-chip:active { 
+        transform: translateY(2px); 
+        box-shadow: 0 0 0 rgba(0,0,0,0.1);
+        cursor: grabbing; z-index: 100; 
+    }
+
+    /* ゴースト */
+    .ghost { position: fixed; pointer-events: none; z-index: 1000; opacity: 0.8; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* --- ボタンエリア --- */
+    .controls { width: 100%; text-align: center; margin-top: auto; padding-bottom: 20px; }
+    .check-btn {
+        background-color: var(--primary); color: white; border: none;
+        border-bottom: 4px solid var(--secondary); padding: 12px 40px;
+        border-radius: 50px; font-size: 1.6em; font-weight: 900;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.1s;
+    }
+    .check-btn:active { transform: translateY(3px); border-bottom-width: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+    /* モーダル */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        display: none; justify-content: center; align-items: center; z-index: 2000;
+    }
+    .modal-content {
+        background: #FFF; padding: 40px; border-radius: 25px;
+        text-align: center; animation: popIn 0.3s;
+        border: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .modal-content h2 { color: var(--primary); font-size: 2.2em; margin: 0 0 20px 0; font-weight: 900; }
+    .next-btn {
+        background: var(--primary); color: white; border: none; 
+        border-bottom: 4px solid var(--secondary); padding: 12px 35px;
+        font-size: 1.3em; font-weight: bold; border-radius: 12px; cursor: pointer;
+        font-family: 'Zen Maru Gothic', sans-serif;
+    }
+    .next-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
+    
+    .point-feedback {
+        font-size: 1em; color: var(--correct-color); font-weight: bold; margin-top: 10px;
+    }
+
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+
+    @media (max-width: 500px) {
+        .board { gap: 10px; }
+        .pool-column { width: 85px; }
+        .center-area { max-width: 230px; } 
+        .slot, .char-chip { width: 50px; height: 50px; font-size: 1.6rem; border-width: 2px; }
+        .pair-row { height: 60px; gap: 5px; border-width: 2px; }
+        .check-btn { font-size: 1.4em; padding: 10px 30px; border-bottom-width: 3px; }
+        
+        .level-grid { grid-template-columns: repeat(3, 1fr); }
+    }

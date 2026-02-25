@@ -1,0 +1,206 @@
+/* --- 共通設定 (青・白基調) --- */
+    :root {
+        --primary: #00bcd4;
+        --secondary: #0097a7;
+        --accent: #ff4081;
+        --bg-color: #e0f7fa;
+        --text-color: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        overflow-x: hidden;
+        user-select: none;
+        touch-action: manipulation;
+    }
+
+    header {
+        background: #FFF;
+        border-bottom: 3px solid var(--primary);
+        padding: 10px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; gap: 8px; align-items: center; }
+    .home-icon { color: var(--primary); font-size: 1.5em; }
+
+    .game-container {
+        flex-grow: 1;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+    }
+
+    /* --- メニュー画面 --- */
+    #menu-screen {
+        width: 100%; max-width: 600px;
+        text-align: center;
+        animation: popIn 0.4s;
+    }
+
+    .menu-title { font-size: 1.8em; color: var(--secondary); margin-bottom: 30px; font-weight: 900; }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 20px;
+    }
+
+    .cat-btn {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        padding: 20px;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: var(--text-color);
+        cursor: pointer;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+        border: 2px solid var(--primary);
+        transition: all 0.1s;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .cat-btn i { font-size: 2em; color: var(--accent); }
+    .cat-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.1); }
+    
+    .cat-desc { font-size: 0.8em; color: #666; font-weight: normal; margin-top: 5px; }
+
+    /* --- ゲーム画面 --- */
+    #game-screen {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    .game-header {
+        width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px;
+    }
+    .progress-badge {
+        background: white; padding: 5px 15px; border-radius: 15px;
+        font-weight: bold; color: var(--primary);
+        box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+    .back-btn {
+        background: #b0bec5; color: white; border: none; padding: 5px 15px;
+        border-radius: 15px; font-weight: bold; cursor: pointer;
+    }
+
+    /* 左右のバスケットエリア */
+    .bins-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .bin {
+        flex: 1;
+        background: #fff;
+        border: 4px solid var(--secondary);
+        border-radius: 20px;
+        height: 180px;
+        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+        padding-top: 15px;
+        position: relative;
+        transition: all 0.2s;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+    }
+    .bin.drag-over {
+        background: #e0f7fa; transform: scale(1.05); border-color: var(--accent);
+    }
+
+    .bin-label {
+        font-size: 3em;
+        font-family: 'Klee One', cursive;
+        font-weight: 900;
+        color: var(--secondary);
+    }
+    .bin-sub {
+        font-size: 0.9em; font-weight: bold; color: #888;
+        margin-top: -5px;
+    }
+
+    /* 中央のカードエリア */
+    .card-area {
+        flex-grow: 1;
+        display: flex; justify-content: center; align-items: center;
+        width: 100%;
+        position: relative;
+        min-height: 200px;
+    }
+
+    /* 問題カード */
+    .question-card {
+        background: white;
+        width: 280px;
+        height: 160px;
+        border-radius: 20px;
+        border: 3px solid var(--primary);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        cursor: grab;
+        position: absolute;
+        transition: transform 0.2s, opacity 0.2s;
+        touch-action: none;
+        font-family: 'Klee One', cursive;
+    }
+    .question-card:active { cursor: grabbing; transform: scale(1.05); }
+
+    .q-text { font-size: 1.8em; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .q-sub { font-size: 1em; color: #999; }
+    
+    /* 穴埋め部分のスタイル */
+    .blank-box {
+        display: inline-block;
+        width: 50px; height: 50px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        vertical-align: middle;
+        margin: 0 5px;
+        background: #f9f9f9;
+    }
+
+    /* フィードバック */
+    .feedback-overlay {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        font-size: 5em; font-weight: 900; opacity: 0; pointer-events: none;
+        z-index: 1000; text-shadow: 2px 2px 0 #fff;
+    }
+    .fb-correct { color: #4caf50; animation: popFeedback 0.6s; }
+    .fb-wrong { color: #f44336; animation: popFeedback 0.6s; }
+
+    @keyframes popFeedback { 
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1); } 
+    }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ゴースト */
+    .ghost { position: fixed; pointer-events: none; z-index: 2000; opacity: 0.9; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+
+    /* スマホ対応 */
+    @media (max-width: 500px) {
+        .bin { height: 140px; }
+        .bin-label { font-size: 2.5em; }
+        .question-card { width: 240px; height: 140px; }
+        .q-text { font-size: 1.5em; }
+    }
+    
+    /* 認証ステータス */
+    #auth-status-sort {
+        text-align: center; font-size: 0.9em; margin-bottom: 15px; font-weight: bold; color: var(--secondary);
+    }

@@ -1,0 +1,152 @@
+/* --- 共通デザイン --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+        /* Android対策: dvh (Dynamic Viewport Height) を使用してアドレスバーの影響を回避 */
+        height: 100dvh; 
+    }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        /* 全画面確保 */
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        overflow-y: auto; 
+        -webkit-overflow-scrolling: touch;
+        /* Androidでのタップハイライトを消す */
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-shrink: 0;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 1000px;
+        margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+        overflow: visible; 
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+    @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- レベル選択 --- */
+    .level-grid {
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px; 
+        width: 100%; 
+        padding: 10px 0 60px 0; 
+    }
+
+    .level-btn {
+        background: white; 
+        border: 4px solid transparent;
+        border-radius: 20px; 
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 140px;
+        text-decoration: none;
+        color: var(--text-color);
+        touch-action: manipulation;
+    }
+    .level-btn:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
+
+    .level-char-icon { font-size: 2.5em; margin-bottom: 10px; font-weight: 900; }
+    .level-title { font-weight: 800; font-size: 1.1em; color: #555; margin-bottom: 5px; }
+    .level-tag { font-size: 0.8em; color: white; background: #999; padding: 2px 10px; border-radius: 10px; font-weight: bold; }
+
+    /* --- 練習モード --- */
+    .practice-row { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+    .practice-block {
+        width: 70px; height: 70px; background: white; border: 4px solid var(--primary);
+        border-radius: 15px; font-size: 2em; font-weight: 900;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 5px 0 #ccc; cursor: pointer; color: var(--primary);
+    }
+    .practice-block:active { transform: translateY(5px); box-shadow: none; background: #e3f2fd; }
+
+    /* --- ゲーム画面 --- */
+    .game-board {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; margin-top: 20px; align-items: center;
+        max-width: 600px; padding-bottom: 50px;
+    }
+    .col { display: flex; flex-direction: column; gap: 15px; align-items: center; min-height: 300px; }
+
+    .block {
+        width: 100%; aspect-ratio: 1; max-width: 80px; max-height: 80px;
+        border-radius: 15px; display: flex; justify-content: center; align-items: center;
+        font-size: 1.8em; font-weight: 900; position: relative;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
+    }
+
+    .char-source {
+        background: white; border: 3px solid #ff9800; color: #ff9800; cursor: grab; z-index: 10;
+        touch-action: none; /* 重要: Androidでドラッグ操作をスムーズにする */
+    }
+    .char-source:active { cursor: grabbing; transform: scale(1.1); z-index: 100; }
+    .char-source.placeholder { opacity: 0.2; pointer-events: none; }
+
+    .target-slot {
+        background: #eceff1; border: 3px dashed #b0bec5; color: #333; position: relative;
+    }
+    .target-slot .filled-char {
+        width: 100%; height: 100%; background: white; border-radius: 12px;
+        display: flex; justify-content: center; align-items: center;
+        border: 3px solid #4caf50; color: #4caf50; cursor: pointer;
+    }
+
+    .audio-btn {
+        background: var(--primary); color: white; border: none; cursor: pointer;
+        box-shadow: 0 4px 0 #3949ab;
+    }
+    .audio-btn:active { transform: translateY(4px); box-shadow: none; }
+
+    .drag-ghost {
+        position: fixed; pointer-events: none; z-index: 9999;
+        width: 70px; height: 70px; background: rgba(255, 152, 0, 0.9);
+        border: 2px solid white; border-radius: 15px;
+        color: white; font-size: 2em; font-weight: bold;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: translate(-50%, -50%);
+    }
+
+    .action-btn {
+        background: #333; color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 1.2em;
+        margin-top: 30px; cursor: pointer; box-shadow: 0 5px 0 black;
+    }
+    .action-btn:active { transform: translateY(5px); box-shadow: none; }
+
+    #auth-status { font-size: 0.8em; color: #666; margin-bottom: 10px; }
+    
+    @media (max-width: 400px) {
+        .level-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .level-btn { height: 120px; padding: 10px; }
+    }

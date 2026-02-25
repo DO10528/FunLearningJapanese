@@ -1,0 +1,32 @@
+body { font-family: 'Zen Maru Gothic', sans-serif; background-color: #f0f8ff; margin: 0; padding: 20px; color: #333; }
+        .worksheet { background: white; max-width: 800px; margin: 0 auto; padding: 40px; border: 3px solid #5c7aff; border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #5c7aff; text-align: center; font-size: 28px; border-bottom: 2px dashed #5c7aff; padding-bottom: 10px; margin-bottom: 30px; }
+        .info-box { display: flex; justify-content: space-between; margin-bottom: 30px; font-weight: bold; }
+        .input-line { border-bottom: 1px solid #999; display: inline-block; min-width: 150px; margin-left: 5px; font-size: 0.9em; }
+        
+        .section { margin-bottom: 30px; background: #eef6ff; padding: 15px 20px; border-radius: 10px; }
+        .section-title { font-weight: 900; color: #1e3a8a; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.3em; }
+        .thai-hint { font-size: 0.8em; color: #666; font-weight: normal; margin-left: 5px; }
+        
+        .question-box { background: white; border: 1px solid #d0e0f0; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
+        .question-box i { font-size: 1.5em; color: #5c7aff; flex-shrink: 0; margin-top: 3px; }
+        .question-content { flex-grow: 1; }
+        .question-text { font-weight: bold; margin-bottom: 5px; }
+        .answer-line { border-bottom: 1px solid #bbb; display: block; width: 90%; min-height: 25px; margin-top: 5px; margin-left: auto; margin-right: auto; }
+        .choice-list { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 8px; }
+        .choice { display: flex; align-items: center; gap: 5px; font-size: 0.95em; }
+        .checkbox { width: 18px; height: 18px; border: 2px solid #5c7aff; border-radius: 3px; flex-shrink: 0; }
+        
+        .note-area { height: 120px; border: 1px solid #ccc; background: white; border-radius: 5px; margin-top: 10px; width: 100%; }
+
+        @media print { 
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; color-adjust: exact; } 
+            .worksheet { border: 1px solid #000; box-shadow: none; padding: 30px; } 
+            h1 { font-size: 24px; border-bottom-color: #aaa; }
+            .section { background: #eef6ff !important; border: none; }
+            .section-title { color: #1e3a8a !important; font-size: 1.2em; }
+            .question-box { border: 1px solid #e0e0e0; }
+            .question-box i { color: #5c7aff !important; }
+            .input-line, .answer-line { border-bottom-color: #666; }
+            .checkbox { border-color: #5c7aff !important; }
+        }

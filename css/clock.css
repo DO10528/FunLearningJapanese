@@ -1,0 +1,148 @@
+body {
+            font-family: 'M PLUS Rounded 1c', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #006064;
+        }
+
+        #tc-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px; 
+            background-color: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 96, 100, 0.15); 
+            border-radius: 20px; 
+            border: 3px solid #80deea;
+        }
+        
+        .tc-screen { display: none; animation: fadeIn 0.3s ease; }
+        .tc-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2 { text-align: center; color: #00838f; }
+        h1 { font-size: 2.2em; margin-bottom: 20px; }
+        h2 { font-size: 1.8em; margin-bottom: 20px; }
+        p { text-align: center; font-size: 1.1em; }
+
+        /* --- ボタン共通 --- */
+        .tc-button {
+            display: block; width: 90%; margin: 15px auto;
+            padding: 20px; font-size: 1.5em; font-weight: 700;
+            color: #fff; background-color: #00bcd4; border: none;
+            border-radius: 15px; cursor: pointer;
+            box-shadow: 0 5px 0 #00838f;
+            transition: all 0.1s ease-out; position: relative; top: 0;
+            text-decoration: none;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .tc-button:hover { opacity: 0.9; }
+        .tc-button:active { top: 3px; box-shadow: 0 2px 0 #00838f; }
+        .tc-button-secondary {
+             background-color: #90a4ae;
+             box-shadow: 0 5px 0 #546e7a;
+        }
+        .tc-button-secondary:active {
+             top: 3px;
+             box-shadow: 0 2px 0 #546e7a;
+        }
+
+        /* モード選択ボタンの色分け */
+        .btn-game1 { background-color: #ff9f43; box-shadow: 0 5px 0 #d35400; }
+        .btn-game1:active { box-shadow: 0 2px 0 #d35400; }
+        .btn-game2 { background-color: #1dd1a1; box-shadow: 0 5px 0 #01a3a4; }
+        .btn-game2:active { box-shadow: 0 2px 0 #01a3a4; }
+        .btn-game3 { background-color: #ff6b81; box-shadow: 0 5px 0 #c0392b; }
+        .btn-game3:active { box-shadow: 0 2px 0 #c0392b; }
+
+        /* --- フィードバック --- */
+        #tc-feedback {
+            text-align: center; font-size: 1.5em; font-weight: bold;
+            margin-top: 20px; min-height: 1.5em; color: #d9534f;
+            transform: scale(0); opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #tc-feedback.show { transform: scale(1); opacity: 1; }
+        #tc-feedback.success { color: #00bcd4; }
+
+        /* --- 1. 勉強スクリーン --- */
+        #tc-study-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .tc-study-item {
+            border: 2px solid #b2ebf2; border-radius: 10px;
+            text-align: center; padding: 10px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .tc-study-item:hover { background-color: #e0f7fa; }
+        .tc-study-item img {
+            width: 100%; max-width: 80px; height: 80px; object-fit: contain;
+        }
+        .tc-study-item p {
+            font-size: 1.2em; font-weight: bold; margin: 5px 0 0 0; color: #00838f;
+        }
+        .tc-study-item.irregular p { color: #d9534f; font-weight: 800; }
+
+        /* --- クイズスクリーン --- */
+        #tc-quiz-prompt-area {
+            min-height: 150px; display: flex;
+            justify-content: center; align-items: center;
+            margin-bottom: 20px; flex-direction: column;
+        }
+        #tc-quiz-image { width: 150px; height: 150px; object-fit: contain; }
+
+        #tc-quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .tc-option-image-card {
+            border: 4px solid #b2ebf2; border-radius: 10px; padding: 10px;
+            cursor: pointer; transition: all 0.2s ease; background: white;
+        }
+        .tc-option-image-card img {
+            width: 100%; height: 100px; object-fit: contain;
+        }
+        .tc-option-image-card:hover { background-color: #e0f7fa; transform: scale(1.05); }
+        .tc-option-text-button { padding: 20px; font-size: 1.4em; }
+        
+        .tc-option.correct {
+            border-color: #00bcd4; background-color: #e0f7fa;
+            transform: scale(1.05); box-shadow: 0 0 15px #00bcd4;
+        }
+        .tc-option.incorrect {
+            border-color: #d9534f; background-color: #fbe9e7;
+            opacity: 0.6;
+        }
+        .tc-option.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* ゲーム3用マイクUI */
+        .mic-btn {
+            width: 90px; height: 90px; border-radius: 50%; border: none;
+            background: #ff6b81; color: white; font-size: 2.5em;
+            box-shadow: 0 6px 0 #c0392b; cursor: pointer; transition: 0.1s;
+            margin: 10px auto; display: flex; justify-content: center; align-items: center;
+        }
+        .mic-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .mic-btn.listening { animation: pulse 1s infinite; background: #ff4757; box-shadow: none; transform: translateY(6px); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
+
+        /* 認証ステータスのスタイル */
+        #auth-status-tc {
+            text-align: center; font-size: 0.9em; margin-bottom: 10px; font-weight: bold; color: #00838f;
+        }
+
+        @media (max-width: 400px) {
+            #tc-study-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            .tc-button { font-size: 1.2em; }
+        }

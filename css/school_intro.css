@@ -1,0 +1,117 @@
+:root {
+            --primary: #4a69bd;
+            --secondary: #60a3bc;
+            --accent: #f6b93b;
+            --bg: #f8f9fa;
+            --text: #2d3436;
+            --success: #78e08f;
+            --danger: #e55039;
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 0; padding-bottom: 100px;
+            overflow-x: hidden; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ruby { ruby-align: center; }
+        rt { font-size: 0.6em; color: #666; font-weight: 500; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 15px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { font-weight: 900; font-size: 1.2em; }
+        .nav-btn {
+            border: none; background: rgba(255,255,255,0.25); padding: 8px 15px;
+            border-radius: 20px; cursor: pointer; font-weight: bold; color: white;
+        }
+
+        #main-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .screen { display: none; animation: fadeIn 0.3s ease-out; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 練習画面 */
+        .section-title {
+            color: var(--primary); font-size: 1.2em; border-bottom: 2px dashed #ccc;
+            padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;
+        }
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .vocab-card {
+            background: white; border: 2px solid #e1e8f0; border-radius: 12px; padding: 10px 5px;
+            text-align: center; cursor: pointer; transition: 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .vocab-card:active { transform: scale(0.95); background: #f0f4f8; }
+        .vocab-card img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 5px; }
+        .vocab-card span { display: block; font-size: 0.8em; font-weight: bold; }
+        .type-imasu { border-color: #ff9ff3; }
+        .type-arimasu { border-color: #48dbfb; }
+
+        /* クイズ画面 */
+        .game-card {
+            background: white; border-radius: 25px; padding: 20px; text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid var(--primary);
+            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .mission-text { font-size: 1.2em; color: #555; font-weight: bold; margin-bottom: 15px; }
+        
+        .image-combo { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .combo-item { display: flex; flex-direction: column; align-items: center; }
+        .combo-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 10px; background: #f8f9fa; padding: 5px; border: 2px solid #eee; }
+        .plus-icon { font-size: 1.5em; color: #ccc; }
+
+        /* ゲーム1 選択肢 */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .option-btn {
+            background: white; border: 3px solid #e1e8f0; border-radius: 15px; padding: 15px 5px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            transition: 0.2s; box-shadow: 0 4px 0 #e1e8f0;
+        }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        .option-btn.correct { border-color: var(--success); background: #f1fcf5; box-shadow: 0 4px 0 var(--success); }
+        .option-btn.incorrect { border-color: var(--danger); background: #fdf0ed; box-shadow: 0 4px 0 var(--danger); }
+        .opt-images { display: flex; gap: 5px; }
+        .opt-images img { width: 50px; height: 50px; object-fit: contain; }
+
+        /* マイク */
+        .mic-btn {
+            width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--danger);
+            color: white; font-size: 2.5em; box-shadow: 0 6px 0 #c0392b; cursor: pointer; transition: 0.1s;
+            margin: 10px auto; display: flex; justify-content: center; align-items: center;
+        }
+        .mic-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .mic-btn.listening { animation: pulse 1s infinite; background: #ff7675; box-shadow: none; transform: translateY(6px); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(214, 48, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0); } }
+
+        .feedback-text { font-size: 1.2em; font-weight: bold; margin-top: 15px; min-height: 1.5em; }
+        .user-transcript { font-size: 0.9em; color: #888; margin-top: 5px; font-weight: bold; }
+
+        /* モード選択ボタン */
+        .mode-btn {
+            width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 15px; border: none;
+            font-size: 1.1em; font-weight: bold; color: white; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: flex-start; gap: 15px; cursor: pointer;
+        }
+        .mode-btn:active { transform: translateY(4px); box-shadow: none; }
+        .m1 { background: #ff9ff3; } .m2 { background: #feca57; } .m3 { background: #48dbfb; } .m4 { background: #1dd1a1; }
+
+        /* 常に下部に表示するスタートボタン */
+        .fixed-bottom-btn {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: var(--accent); color: #d35400; border: none;
+            padding: 15px; border-radius: 30px; font-size: 1.2em; font-weight: 900;
+            box-shadow: 0 6px 0 #e67e22, 0 10px 20px rgba(0,0,0,0.2); cursor: pointer; z-index: 90;
+            display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.1s;
+        }
+        .fixed-bottom-btn:active { transform: translate(-50%, 6px); box-shadow: 0 0 0 transparent, 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-mode-return { background: #b2bec3; color: white; box-shadow: 0 6px 0 #636e72, 0 10px 20px rgba(0,0,0,0.2); }
+
+        .hidden { display: none !important; }
+        .status-icon { position: absolute; font-size: 3em; color: var(--danger); font-weight: 900; z-index: 10; text-shadow: 2px 2px 0 white; }

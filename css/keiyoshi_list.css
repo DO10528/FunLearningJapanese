@@ -1,0 +1,147 @@
+/* --- 共通設定 (V2デザイン - 形容詞用グリーン) --- */
+        :root {
+            --primary: #66bb6a; /* Green */
+            --primary-dark: #388e3c;
+            --accent: #ffcc5c;
+            --bg-color: #f1f8e9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            
+            --tag-i: #42a5f5; /* い形容詞用カラー */
+            --tag-na: #ef5350; /* な形容詞用カラー */
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: white; padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .home-link {
+            background: rgba(255,255,255,0.2); color: white;
+            text-decoration: none; font-weight: bold;
+            padding: 8px 15px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .home-link:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1000px; margin: 0 auto; padding: 20px;
+        }
+
+        h1 {
+            text-align: center; color: var(--primary-dark);
+            margin-bottom: 30px; font-size: 1.8em;
+        }
+
+        /* --- グリッド (カードデザイン) --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .word-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; flex-direction: row;
+            align-items: center; gap: 15px;
+            border-left: 6px solid var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .word-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* 左側：単語ボックス */
+        .word-box {
+            background: #e8f5e9;
+            color: #1b5e20;
+            min-width: 100px; 
+            height: 80px;
+            padding: 0 10px;
+            border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Klee One', cursive; /* 教科書体 */
+            font-weight: 600;
+            font-size: 1.8em; 
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        /* 中央：情報 */
+        .info-box {
+            flex-grow: 1;
+            display: flex; flex-direction: column; gap: 4px;
+            min-width: 0; /* フレックスアイテムの縮小許可 */
+        }
+        .meaning {
+            font-weight: bold; font-size: 1.1em; color: #555;
+            border-bottom: 2px solid #eee; padding-bottom: 2px; margin-bottom: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .reading { 
+            font-size: 0.9em; color: #777; 
+        }
+
+        /* 形容詞タイプバッジ */
+        .type-badge {
+            display: inline-block;
+            font-size: 0.75em; padding: 2px 8px; border-radius: 10px;
+            color: white; font-weight: bold; margin-top: 3px;
+            align-self: flex-start;
+        }
+        .type-i { background-color: var(--tag-i); }
+        .type-na { background-color: var(--tag-na); }
+
+        /* 右側：音声ボタン */
+        .sound-btn {
+            background: var(--accent);
+            color: white; border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em;
+            box-shadow: 0 3px 0 #ffb300;
+            transition: all 0.1s;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .sound-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        /* 検索バー */
+        .search-area {
+            margin-bottom: 30px; text-align: center;
+        }
+        #search-input {
+            padding: 12px 20px; border-radius: 25px; border: 2px solid #ddd;
+            width: 90%; max-width: 400px; font-size: 1em; outline: none;
+            transition: border-color 0.2s;
+        }
+        #search-input:focus { border-color: var(--primary); }
+
+        @media (max-width: 500px) {
+            .grid-container { grid-template-columns: 1fr; } 
+            .word-card { padding: 15px; }
+            .word-box { min-width: 80px; height: 70px; font-size: 1.5em; }
+        }

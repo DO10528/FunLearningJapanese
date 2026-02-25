@@ -1,0 +1,155 @@
+:root {
+        --primary: #1565c0;
+        --border: #ccc;
+        --trace-color: #e0e0e0;
+    }
+
+    body {
+        background: #eee;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+    }
+
+    /* A4用紙のシミュレーション */
+    .sheet {
+        background: white;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        padding: 15mm;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    /* 印刷時の設定 */
+    @media print {
+        body { background: white; padding: 0; }
+        .sheet { width: 100%; box-shadow: none; margin: 0; padding: 10mm; }
+        .no-print { display: none !important; }
+    }
+
+    /* ヘッダー */
+    header {
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+    }
+    h1 { font-size: 1.5em; margin: 0; color: var(--primary); }
+    .name-box {
+        border: 1px solid #333;
+        width: 200px;
+        padding: 5px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .name-label { font-size: 0.8em; }
+
+    /* セクション */
+    .section-title {
+        background: var(--primary);
+        color: white;
+        padding: 5px 10px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    /* グリッドレイアウト */
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .word-row {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px dashed #ccc;
+        padding: 8px 0;
+    }
+
+    .icon-box {
+        width: 40px;
+        text-align: center;
+        font-size: 1.5em;
+        color: #555;
+        margin-right: 10px;
+    }
+
+    /* 書き取りエリア */
+    .practice-area {
+        flex-grow: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* 見本, なぞり, 空欄 */
+        gap: 10px;
+        align-items: center;
+    }
+
+    .model-text {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    .sub-text {
+        font-size: 0.6em;
+        color: #777;
+        display: block;
+    }
+
+    /* なぞり書き用 */
+    .trace-text {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        color: #ccc; /* 薄いグレー */
+        font-size: 1.1em;
+        border: 1px solid #eee;
+        padding: 5px;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    /* 書き込み用ボックス */
+    .write-box {
+        border: 1px solid #333;
+        height: 35px;
+        border-radius: 4px;
+    }
+
+    /* 文法・フレーズ */
+    .phrase-box {
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    .phrase-row {
+        margin-bottom: 15px;
+    }
+    .phrase-line {
+        border-bottom: 1px solid #333;
+        display: inline-block;
+        width: 150px;
+    }
+
+    /* 印刷ボタン */
+    .fab-print {
+        position: fixed;
+        bottom: 20px; right: 20px;
+        background: #4caf50;
+        color: white;
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 24px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+        border: none;
+        z-index: 100;
+    }
+    .fab-print:hover { transform: scale(1.1); }

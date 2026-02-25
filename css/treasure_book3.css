@@ -1,0 +1,147 @@
+/* --- 印刷設定 --- */
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        background: #eee;
+        font-family: 'Zen Maru Gothic', sans-serif;
+    }
+
+    /* --- A4シートの共通スタイル --- */
+    .sheet {
+        width: 210mm;
+        height: 296mm;
+        background: white;
+        margin: 20px auto;
+        padding: 15mm;
+        box-sizing: border-box;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media print {
+        body { background: white; }
+        .sheet {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 10mm;
+            box-shadow: none;
+            page-break-after: always;
+        }
+    }
+
+    /* --- 表紙 (Cover) --- */
+    .cover-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 5px dashed #5c7aff;
+        border-radius: 20px;
+    }
+    .main-title {
+        font-size: 60px;
+        font-weight: 900;
+        color: #5c7aff;
+        margin-bottom: 20px;
+        letter-spacing: 5px;
+    }
+    .sub-title {
+        font-size: 24px;
+        color: #666;
+        margin-bottom: 100px;
+    }
+    .name-box {
+        width: 80%;
+        border-bottom: 3px solid #333;
+        padding: 10px;
+        text-align: left;
+        font-size: 30px;
+        margin-top: 50px;
+    }
+    .name-label {
+        font-size: 20px;
+        color: #555;
+    }
+
+    /* --- 問題ページ (Topic Page) --- */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #ccc;
+        padding-bottom: 10px;
+    }
+    .topic-title {
+        font-size: 32px;
+        font-weight: 900;
+        padding: 5px 20px;
+        border-radius: 15px;
+        color: white;
+    }
+    .page-number {
+        font-size: 18px;
+        color: #888;
+    }
+
+    /* 2x2 グリッド */
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 20px;
+        flex: 1;
+    }
+
+    .card {
+        border-radius: 20px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    /* 名前記入欄 */
+    .word-section {
+        height: 60px;
+        display: flex;
+        align-items: center; /* 垂直中央揃え */
+        margin-bottom: 10px;
+    }
+    .name-label-text {
+        font-size: 18px;
+        color: #555;
+        font-weight: bold;
+        margin-right: 10px;
+        white-space: nowrap; /* 改行しない */
+    }
+    .write-line {
+        flex: 1; /* 残りの幅いっぱい */
+        height: 40px;
+        border-bottom: 2px solid #333; /* 下線 */
+    }
+
+    /* 絵を描く欄 */
+    .draw-section {
+        flex: 1;
+        border: 2px dashed #ddd; /* 絵を描くところは破線で優しく */
+        border-radius: 15px;
+        background: #fdfdfd;
+        position: relative;
+    }
+    .draw-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 14px;
+        color: #aaa;
+        font-weight: bold;
+    }

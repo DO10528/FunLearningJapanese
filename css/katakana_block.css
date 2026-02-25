@@ -1,0 +1,134 @@
+/* --- 共通デザイン --- */
+    :root {
+        --primary: #ffa726; /* カタカナ用カラー (オレンジ系に変更) */
+        --accent: #ffcc5c;
+        --bg-color: #fff8e1; /* 背景も少し暖色系に */
+        --text-color: #333;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        user-select: none;
+        touch-action: none;
+    }
+
+    header {
+        background: linear-gradient(135deg, #ffa726 0%, #ff5722 100%); /* カタカナカラー */
+        color: white; padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3); z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .logo { font-size: 1.4em; font-weight: 900; color: white; text-decoration: none; text-shadow: 1px 1px 0 rgba(0,0,0,0.1); }
+    .home-link { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; }
+
+    .container {
+        flex-grow: 1; padding: 20px;
+        width: 100%; max-width: 800px; margin: 0 auto;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* --- 画面切り替え --- */
+    .screen { display: none; width: 100%; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+    /* --- レベル選択 --- */
+    .level-grid {
+        display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 10px 0;
+    }
+    .level-btn {
+        background: white; border: none; border-radius: 12px; padding: 10px 2px;
+        font-size: 1.2em; font-weight: 900; color: white; cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: transform 0.1s;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        aspect-ratio: 1; height: 100%;
+    }
+    .level-btn:active { transform: translateY(4px); box-shadow: none; }
+    .level-num { font-size: 0.7em; opacity: 0.8; margin-bottom: 2px; }
+    .level-char { font-size: 1.4em; }
+
+    /* レベル色定義 (ひらがなと同じ) */
+    .lvl-1 { background: #ff5252; box-shadow: 0 4px 0 #b71c1c; }
+    .lvl-2 { background: #ff9800; box-shadow: 0 4px 0 #e65100; }
+    .lvl-3 { background: #ffeb3b; color: #555; text-shadow:none; box-shadow: 0 4px 0 #fbc02d; }
+    .lvl-4 { background: #4caf50; box-shadow: 0 4px 0 #1b5e20; }
+    .lvl-5 { background: #2196f3; box-shadow: 0 4px 0 #0d47a1; }
+    .lvl-6 { background: #9c27b0; box-shadow: 0 4px 0 #4a148c; }
+    .lvl-7 { background: #e91e63; box-shadow: 0 4px 0 #880e4f; }
+    .lvl-8 { background: #00bcd4; box-shadow: 0 4px 0 #006064; }
+    .lvl-9 { background: #795548; box-shadow: 0 4px 0 #3e2723; }
+    .lvl-10 { background: #607d8b; box-shadow: 0 4px 0 #263238; }
+
+    /* --- 練習モード --- */
+    .practice-row { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+    .practice-block {
+        width: 70px; height: 70px; background: white; border: 4px solid var(--primary);
+        border-radius: 15px; font-size: 2em; font-weight: 900;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 5px 0 #ccc; cursor: pointer; color: var(--primary);
+    }
+    .practice-block:active { transform: translateY(5px); box-shadow: none; background: #ffe0b2; }
+
+    /* --- ゲーム画面 (ドラッグ&ドロップ) --- */
+    .game-board {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; margin-top: 20px; align-items: center;
+    }
+    .col { display: flex; flex-direction: column; gap: 15px; align-items: center; min-height: 300px; }
+
+    .block {
+        width: 100%; aspect-ratio: 1; max-width: 80px; max-height: 80px;
+        border-radius: 15px; display: flex; justify-content: center; align-items: center;
+        font-size: 1.8em; font-weight: 900; position: relative;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); touch-action: none;
+    }
+
+    /* 左: ドラッグ元 */
+    .char-source {
+        background: white; border: 3px solid #ff9800; color: #ff9800; cursor: grab; z-index: 10;
+    }
+    .char-source:active { cursor: grabbing; transform: scale(1.1); z-index: 100; }
+    .char-source.placeholder { opacity: 0.2; pointer-events: none; }
+
+    /* 中: ターゲット */
+    .target-slot {
+        background: #eceff1; border: 3px dashed #b0bec5; color: #333; position: relative;
+    }
+    .target-slot .filled-char {
+        width: 100%; height: 100%; background: white; border-radius: 12px;
+        display: flex; justify-content: center; align-items: center;
+        border: 3px solid #4caf50; color: #4caf50; cursor: pointer;
+    }
+
+    /* 右: 音声ボタン */
+    .audio-btn {
+        background: var(--primary); color: white; border: none; cursor: pointer;
+        box-shadow: 0 4px 0 #e65100;
+    }
+    .audio-btn:active { transform: translateY(4px); box-shadow: none; }
+
+    /* ドラッグ中のゴースト要素 */
+    .drag-ghost {
+        position: fixed; pointer-events: none; z-index: 9999;
+        width: 70px; height: 70px; background: rgba(255, 152, 0, 0.9);
+        border: 2px solid white; border-radius: 15px;
+        color: white; font-size: 2em; font-weight: bold;
+        display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: translate(-50%, -50%);
+    }
+
+    .action-btn {
+        background: #333; color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 1.2em;
+        margin-top: 30px; cursor: pointer; box-shadow: 0 5px 0 black;
+    }
+    .action-btn:active { transform: translateY(5px); box-shadow: none; }
+
+    #auth-status { font-size: 0.8em; color: #666; margin-bottom: 10px; }

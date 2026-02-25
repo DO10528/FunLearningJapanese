@@ -1,0 +1,189 @@
+/* --- デザイン設定 --- */
+        :root {
+            --primary: #5c7aff;
+            --bg-color: #f4f7fc;
+            --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #ef5350;
+            --card-bg: #ffffff;
+            
+            /* レベルカラー */
+            --c-n5: #e57373; 
+            --c-n4: #d32f2f; 
+            --c-n3: #f57c00;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; /* 全体を中央寄せ */
+            user-select: none;
+            touch-action: pan-y;
+        }
+
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+            color: white; padding: 10px 15px;
+            box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-container {
+            max-width: 600px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-container h1 { margin: 0; font-size: 1.1em; }
+        .home-link { 
+            color: white; text-decoration: none; font-weight: bold; 
+            background: rgba(255,255,255,0.2); padding: 4px 10px; 
+            border-radius: 20px; font-size: 0.8em;
+        }
+
+        .container {
+            flex-grow: 1; padding: 15px;
+            width: 100%; max-width: 600px; /* 全体の幅を少し小さく */
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- レベル選択画面 (修正: Flexboxで中央寄せ) --- */
+        .level-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* 常に中央揃え */
+            gap: 15px; 
+            width: 100%; 
+            padding: 5px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .level-card {
+            /* スマホで2列になるように調整 */
+            width: calc(50% - 15px);
+            min-width: 130px;
+            max-width: 180px;
+            
+            background: white; border-radius: 15px; padding: 20px 10px;
+            text-align: center; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            border-bottom: 5px solid #ddd;
+        }
+        .level-card:active { transform: translateY(3px); border-bottom-width: 2px; }
+        
+        .level-badge {
+            display: inline-block; padding: 3px 8px; border-radius: 12px;
+            color: white; font-weight: bold; margin-bottom: 8px; font-size: 0.7em;
+        }
+        .level-title { 
+            font-size: 2em; /* サイズ縮小 */
+            font-weight: 900; line-height: 1; margin-bottom: 5px; 
+            font-family: 'Klee One', cursive; color: #444; 
+        }
+        .level-desc { font-size: 0.75em; color: #888; font-weight: bold; }
+
+        .lv-n5 .level-badge { background-color: var(--c-n5); } .lv-n5 { border-bottom-color: var(--c-n5); }
+        .lv-n4 .level-badge { background-color: var(--c-n4); } .lv-n4 { border-bottom-color: var(--c-n4); }
+        .lv-n3 .level-badge { background-color: var(--c-n3); } .lv-n3 { border-bottom-color: var(--c-n3); }
+        .lv-locked { opacity: 0.6; cursor: not-allowed; background: #f9f9f9; border-bottom-color: #ccc; }
+        .lv-locked .level-badge { background-color: #999; }
+
+        /* --- クイズ画面 (修正: サイズ縮小と中央寄せ強化) --- */
+        .quiz-card {
+            background-color: var(--card-bg);
+            width: 100%; max-width: 420px; /* カードの幅を狭くする */
+            padding: 20px; /* パディングを減らす */
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 3px solid white; text-align: center; margin-top: 5px;
+            display: none;
+            margin-left: auto; margin-right: auto; /* 強制中央寄せ */
+        }
+        .quiz-card.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* スイッチデザイン */
+        .switch-container {
+            display: inline-flex;
+            background: #e0e0e0;
+            border-radius: 30px;
+            padding: 3px;
+            position: relative;
+            margin-bottom: 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            transform: scale(0.9); /* 少し小さく */
+        }
+        .switch-container input { display: none; }
+        .switch-label {
+            padding: 6px 15px;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #777;
+            z-index: 2;
+            transition: color 0.3s;
+            font-size: 0.85em;
+        }
+        .switch-bg {
+            position: absolute;
+            top: 3px; bottom: 3px;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: left 0.3s, width 0.3s;
+            z-index: 1;
+        }
+        #mode-kun:checked ~ .bg-indicator { left: 3px; width: 50%; }
+        #mode-kun:checked ~ label[for="mode-kun"] { color: var(--primary); }
+        #mode-on:checked ~ .bg-indicator { left: 50%; width: 48%; }
+        #mode-on:checked ~ label[for="mode-on"] { color: var(--primary); }
+
+
+        .kanji-display {
+            font-size: 5rem; /* 8remから縮小 */
+            font-weight: 900; color: #333;
+            line-height: 1.1; margin: 5px 0 20px 0;
+            text-shadow: 2px 2px 0px #eee;
+            background-color: #fafafa;
+            border-radius: 15px; padding: 15px;
+            border: 2px dashed #ddd; font-family: 'Klee One', cursive;
+        }
+
+        .choices-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        
+        .choice-btn {
+            background-color: #fff; border: 2px solid #e0e0e0; border-radius: 40px;
+            padding: 10px; /* 余白縮小 */
+            font-size: 1.1em; /* 文字サイズ縮小 */
+            font-weight: bold; color: var(--text-color);
+            cursor: pointer; transition: all 0.2s; font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 3px 0 #ccc;
+        }
+        .choice-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        .choice-btn.correct { background-color: var(--correct-color); color: white; border-color: var(--correct-color); box-shadow: 0 3px 0 #388e3c; }
+        .choice-btn.incorrect { background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); box-shadow: 0 3px 0 #d32f2f; }
+        
+        #result-message { margin-top: 15px; font-size: 1.2em; font-weight: bold; min-height: 1.5em; }
+
+        .nav-buttons { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
+        .nav-btn {
+            padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; font-size: 0.9em;
+            cursor: pointer; color: white; text-decoration: none; display: inline-block;
+        }
+        .btn-restart { background-color: #ffb74d; box-shadow: 0 3px 0 #f57c00; }
+        .btn-home { background-color: #90a4ae; box-shadow: 0 3px 0 #546e7a; }
+        .btn-back { background-color: #fff; color: #555; border: 2px solid #eee; box-shadow: 0 3px 0 #ddd; }
+        .btn-restart:active, .btn-home:active, .btn-back:active { transform: translateY(3px); box-shadow: none; }
+
+        #auth-status-kanji { font-size: 0.8em; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
+
+        @media (max-width: 400px) { 
+            .kanji-display { font-size: 4rem; padding: 10px; } 
+            .quiz-card { padding: 15px; }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

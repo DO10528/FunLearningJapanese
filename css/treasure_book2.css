@@ -1,0 +1,113 @@
+/* --- A4印刷設定 --- */
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+        body { background: white; -webkit-print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        .sheet {
+            width: 210mm; height: 297mm;
+            margin: 0 !important; padding: 15mm !important;
+            page-break-after: always; box-shadow: none !important;
+            border: none !important;
+        }
+    }
+
+    /* --- 画面表示用 --- */
+    body {
+        background: #525659;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        display: flex; flex-direction: column; align-items: center;
+        margin: 0; padding: 40px 0; color: #333;
+    }
+    .sheet {
+        background: white; width: 210mm; height: 297mm;
+        padding: 15mm; box-sizing: border-box;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        margin-bottom: 30px; position: relative; overflow: hidden;
+    }
+
+    /* --- 表紙デザイン --- */
+    .cover-frame {
+        border: 10px solid #ffcc5c; border-radius: 40px;
+        height: 100%; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: radial-gradient(circle, #fffdf5 0%, #fff 100%);
+        position: relative;
+    }
+    .cover-title {
+        font-size: 5.5em; color: #5c7aff; margin: 0;
+        text-shadow: 5px 5px 0px #dbeafe; letter-spacing: 5px; line-height: 1.2;
+    }
+    .cover-sub { font-size: 2em; color: #ffa726; margin-top: 20px; font-weight: bold; }
+    .name-area {
+        margin-top: 100px; width: 70%; border: 4px dashed #ccc;
+        padding: 30px; border-radius: 30px; background: white; text-align: left;
+    }
+    .name-line { border-bottom: 3px solid #333; height: 60px; margin-top: 10px; }
+    .deco { position: absolute; opacity: 0.2; font-size: 6em; }
+
+    /* --- ページレイアウト --- */
+    .page-header {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        border-bottom: 4px solid #eee; padding-bottom: 10px; margin-bottom: 20px;
+        height: 60px;
+    }
+    .ph-title { font-size: 2.2em; font-weight: 900; display: flex; align-items: center; gap: 15px; }
+    .page-num { font-size: 1.2em; color: white; background: #ccc; padding: 5px 15px; border-radius: 20px; margin-left: 10px; }
+
+    /* 大きな4マスのグリッド */
+    .big-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 25px;
+        height: calc(100% - 80px);
+    }
+
+    .big-card {
+        border: 4px dashed;
+        border-radius: 25px;
+        padding: 15px;
+        display: flex; flex-direction: column;
+        background: #fff;
+    }
+
+    .card-top { display: flex; justify-content: flex-end; height: 30px; }
+    .check-box { 
+        width: 25px; height: 25px; border: 3px solid #ddd; border-radius: 50%; 
+    }
+
+    /* お絵かき・写真エリア */
+    .art-area {
+        flex-grow: 1;
+        background: #fafafa; border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        /* 中央寄せを解除し、相対配置へ変更 */
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    /* ★修正点：カメラアイコンを左上に配置 */
+    .camera-icon { 
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        font-size: 3em; 
+        color: #eee; 
+    }
+
+    /* 文字を書くエリア */
+    .text-area {
+        height: 50px;
+        border-bottom: 3px solid #aaa;
+        display: flex; align-items: flex-end;
+    }
+    .label { font-size: 1.1em; color: #888; margin-right: 10px; font-weight: bold; margin-bottom: 5px; }
+
+    /* --- FABボタン --- */
+    .fab {
+        position: fixed; bottom: 30px; right: 30px;
+        background: #333; color: white; padding: 20px 40px;
+        border-radius: 50px; font-weight: bold; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: none;
+        font-size: 1.4em; z-index: 100;
+    }

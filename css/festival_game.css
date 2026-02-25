@@ -1,0 +1,143 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #9c27b0; /* 紫：高貴・文化的なイメージ */
+        --accent: #ffeb3b;
+        --bg-color: #f3e5f5;
+        --text-color: #333;
+        
+        /* 季節の色 */
+        --spring: #fce4ec; /* Pink */
+        --summer: #e3f2fd; /* Blue */
+        --autumn: #fbe9e7; /* Orange */
+        --winter: #f5f5f5; /* Grey/White */
+        --spring-txt: #e91e63;
+        --summer-txt: #2196f3;
+        --autumn-txt: #ff5722;
+        --winter-txt: #607d8b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        transition: background-color 0.5s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #ab47bc 0%, #7b1fa2 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    
+    /* 画面コンテナ */
+    .screen { display: none; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+    }
+
+    /* --- 1. カレンダー図鑑 (List) --- */
+    .calendar-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;
+    }
+    .event-card {
+        background: white; border-radius: 15px; padding: 15px;
+        text-align: center; position: relative; overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid transparent;
+    }
+    .event-emoji { font-size: 3em; margin-bottom: 5px; display: block; }
+    .event-month {
+        position: absolute; top: 0; left: 0;
+        background: #333; color: white; padding: 3px 10px;
+        font-size: 0.8em; border-bottom-right-radius: 10px; font-weight: bold;
+    }
+    .event-name { font-weight: 900; font-size: 1.1em; margin-bottom: 5px; color: #444; }
+    .event-en { font-size: 0.8em; color: #888; margin-bottom: 5px; }
+    .event-desc { font-size: 0.75em; color: #666; background: #f9f9f9; padding: 5px; border-radius: 8px; }
+
+    /* 季節ごとのカード色 */
+    .season-spring { border-color: var(--spring-txt); background: #fff0f5; }
+    .season-summer { border-color: var(--summer-txt); background: #f0f8ff; }
+    .season-autumn { border-color: var(--autumn-txt); background: #fffaf0; }
+    .season-winter { border-color: var(--winter-txt); background: #fafafa; }
+
+    /* --- 2. レベル選択 --- */
+    .level-list { display: flex; flex-direction: column; gap: 15px; }
+    .level-card {
+        background: white; border-radius: 15px; padding: 20px;
+        display: flex; align-items: center; gap: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
+        border-left: 8px solid #ccc; transition: transform 0.1s;
+    }
+    .level-card:active { transform: scale(0.98); }
+    .lvl-icon { font-size: 2em; width: 50px; text-align: center; }
+    .lvl-info h3 { margin: 0; font-size: 1.2em; }
+    .lvl-info p { margin: 5px 0 0; font-size: 0.85em; color: #777; }
+
+    /* --- 3. ゲーム画面 --- */
+    .quiz-display {
+        background: white; border-radius: 20px; padding: 30px 20px;
+        text-align: center; margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        position: relative; overflow: hidden;
+    }
+    .q-image { font-size: 5em; margin-bottom: 10px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+    
+    .q-text { font-size: 1.5em; font-weight: 900; margin-bottom: 5px; }
+    .q-sub { font-size: 1em; color: #666; }
+
+    .choice-container { display: grid; gap: 15px; grid-template-columns: 1fr 1fr; }
+    .btn-choice {
+        background: white; border: none; padding: 15px; border-radius: 12px;
+        font-size: 1.1em; font-weight: bold; color: #444;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: 80px; transition: transform 0.1s;
+    }
+    .btn-choice:active { transform: translateY(3px); box-shadow: none; }
+    .btn-choice.full-width { grid-column: span 2; } /* 横長ボタン */
+
+    /* 季節仕分け用ボタン */
+    .season-btn { color: white; text-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+    .season-btn.sp { background: #f06292; }
+    .season-btn.su { background: #42a5f5; }
+    .season-btn.au { background: #ff7043; }
+    .season-btn.wi { background: #90a4ae; }
+
+    /* 固定フッター */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 200;
+    }
+    .btn-start {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; font-size: 1.2em;
+        width: 100%; max-width: 300px; cursor: pointer; box-shadow: 0 4px 0 #7b1fa2;
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+    /* 結果画面 */
+    .result-score { font-size: 4em; color: var(--primary); font-weight: 900; margin: 10px 0; }
+    .feedback-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 8em; font-weight: 900; opacity: 0; pointer-events: none; z-index: 50;
+    }
+    @keyframes popFeedback { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1); } }

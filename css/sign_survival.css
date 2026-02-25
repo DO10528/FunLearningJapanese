@@ -1,0 +1,169 @@
+/* --- 共通設定 --- */
+    :root {
+        --primary: #5c7aff;
+        --accent: #ffcc5c;
+        --bg-color: #f4f7fc;
+        --text-color: #333;
+        --danger-color: #ef5350;
+        --timer-color: #ff9800;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 0; padding-bottom: 100px;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ヘッダー */
+    header {
+        background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+        color: white; padding: 15px 20px; width: 100%;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1.2em; font-weight: 900; display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+    
+    /* 画面コンテナ */
+    .screen { display: none; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 戻るボタン */
+    .btn-back-nav {
+        background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+        color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+    }
+
+    /* --- 看板・標識デザイン (CSSで再現) --- */
+    .sign-display-area {
+        height: 220px; display: flex; justify-content: center; align-items: center;
+        background: #e0e0e0; border-radius: 20px; margin-bottom: 20px;
+        position: relative; overflow: hidden; border: 4px solid #fff; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    /* 1. 止まれ (逆三角形) */
+    .sign-stop {
+        width: 0; height: 0;
+        border-left: 70px solid transparent;
+        border-right: 70px solid transparent;
+        border-top: 120px solid #d32f2f;
+        position: relative; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+    }
+    .sign-stop::after {
+        content: "止まれ"; position: absolute; top: -110px; left: -50px;
+        width: 100px; text-align: center; color: white; font-weight: 900; font-size: 1.8em;
+    }
+    
+    /* 2. 非常口 (緑の長方形) */
+    .sign-exit {
+        width: 200px; height: 100px; background: #007934;
+        display: flex; align-items: center; justify-content: space-between; padding: 10px;
+        color: white; font-weight: bold; border-radius: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .sign-exit i { font-size: 3em; margin-right: 10px; }
+    .sign-exit span { font-size: 1.5em; writing-mode: vertical-rl; }
+
+    /* 3. トイレ (ピクトグラム) */
+    .sign-toilet {
+        background: white; padding: 10px 30px; border: 2px solid #333; border-radius: 10px;
+        display: flex; gap: 20px; font-size: 4em; box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* 4. 立入禁止 (黄色と黒) */
+    .sign-danger {
+        background: repeating-linear-gradient(45deg, #fdd835, #fdd835 15px, #212121 15px, #212121 30px);
+        padding: 15px; border: 4px solid #212121; width: 220px; text-align: center;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+    .sign-danger-inner {
+        background: white; padding: 10px; font-weight: 900; font-size: 1.5em; color: #d32f2f; border: 2px solid #212121;
+    }
+
+    /* 5. 準備中/営業中 (木の看板風) */
+    .sign-wood {
+        background: #8d6e63; color: white; padding: 20px 10px; width: 120px; height: 180px;
+        writing-mode: vertical-rl; font-size: 2em; font-weight: 900; border-radius: 10px;
+        border: 4px solid #5d4037; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        display: flex; align-items: center; justify-content: center; font-family: "Zen Maru Gothic";
+    }
+
+    /* 6. その他汎用 */
+    .sign-generic {
+        background: white; border: 5px solid #d32f2f; color: #d32f2f;
+        width: 150px; height: 150px; border-radius: 50%; display: flex;
+        justify-content: center; align-items: center; font-size: 4em;
+        position: relative; box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .sign-generic.blue { border-color: #1976d2; color: #1976d2; }
+    .sign-generic.square { border-radius: 10px; width: 200px; height: auto; padding: 20px; font-size: 2em; font-weight: 900; }
+
+    /* --- 練習リスト --- */
+    .practice-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;
+    }
+    .practice-item {
+        background: white; border-radius: 10px; padding: 10px; text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .practice-label { font-size: 1.1em; font-weight: bold; color: #333; margin-top: 5px; }
+    
+    /* --- ゲーム UI --- */
+    .timer-container {
+        width: 100%; height: 15px; background: #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+    }
+    .timer-bar {
+        height: 100%; width: 100%; background: var(--timer-color); transition: width 0.1s linear;
+    }
+    .timer-bar.danger { background: var(--danger-color); }
+
+    .choice-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+    }
+    .btn-choice {
+        background: white; border: none; padding: 15px; border-radius: 15px;
+        font-size: 1.1em; font-weight: 900; color: #444; /* 英語のみなので少し強調 */
+        box-shadow: 0 5px 0 #ddd; cursor: pointer; transition: transform 0.1s;
+        min-height: 80px; display: flex; justify-content: center; align-items: center;
+        text-align: center; line-height: 1.2;
+    }
+    .btn-choice:active { transform: translateY(4px); box-shadow: 0 1px 0 #ddd; }
+
+    /* --- レベル選択 --- */
+    .level-list { display: flex; flex-direction: column; gap: 15px; }
+    .level-card {
+        background: white; border-radius: 15px; padding: 20px; display: flex; align-items: center; gap: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s;
+        border-left: 6px solid #ccc;
+    }
+    .level-card:active { transform: scale(0.98); }
+    .lvl-info h3 { margin: 0; font-size: 1.1em; }
+    .lvl-info p { margin: 5px 0 0; font-size: 0.85em; color: #777; }
+
+    /* 固定フッター */
+    .fixed-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 200;
+    }
+    .btn-start {
+        background: var(--primary); color: white; border: none;
+        padding: 15px 40px; border-radius: 50px; font-weight: 900; font-size: 1.2em;
+        width: 100%; max-width: 300px; cursor: pointer; box-shadow: 0 4px 0 #3949ab;
+    }
+    .btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+    /* 結果画面 */
+    .result-score { font-size: 4em; color: var(--primary); font-weight: 900; margin: 10px 0; }
+    .feedback-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 8em; font-weight: 900; opacity: 0; pointer-events: none; z-index: 50;
+    }
+    @keyframes popFeedback { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1); } }
