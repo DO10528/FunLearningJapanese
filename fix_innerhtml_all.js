@@ -26,25 +26,20 @@ for (const file of targetFiles) {
     if (!fs.existsSync(file)) continue;
     let content = fs.readFileSync(file, 'utf8');
     let original = content;
-
-    // We will do a manual regex to find all .innerHTML = ... and change to .textContent = ...
-    // Exception: If the assigned string contains a < tag, we use DOMParser or insertAdjacentHTML or just leave it for manual check.
-    // By tracking how many files had changes, we can pinpoint issues.
     
-    // Convert to textContent if no "<" or ">" is detected in the line
+    // Split into lines for analysis
     const lines = content.split('\n');
     let newLines = [];
+    
     for(let i=0; i<lines.length; i++) {
         let line = lines[i];
-        if (line.includes('.innerHTML') && line.includes('=')) {
-           if (!line.includes('<') && !line.includes('>')) {
-               line = line.replace(/\.innerHTML/g, '.textContent');
-           }
-        } else if (line.includes('.innerHTML = ""))') {
-           line = line.replace(/\.innerHTML/g, '.textContent');
-        } else if (line.includes('.innerHTML = \'\'')) {
-           line = line.replace(/\.innerHTML/g, '.textContent');
+        
+        // Skip some specific lines that need to build HTML (like in loops creating buttons)
+        if (line.includes('.innerHTML') && !line.includes('+=') && !line.includes('`<') && !line.includes('`\n<') && !line.includes('"<') && !line.includes('\'<') ) {
+            // Usually safe to switch to textContent
+            line = line.replace(/\.innerHTML/g, '.textContent');
         }
+        
         newLines.push(line);
     }
     
