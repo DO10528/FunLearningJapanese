@@ -993,7 +993,7 @@
 
     window.setLanguage = (lang) => {
       window.currentLang = lang;
-      document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if (window.i18nData[lang][key]) el.textContent = window.i18nData[lang][key]; });
+      document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if (window.i18nData[lang][key]) el.innerHTML = window.i18nData[lang][key]; });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.dataset.i18nPlaceholder; if (window.i18nData[lang][key]) el.placeholder = window.i18nData[lang][key]; });
       document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
       document.getElementById('lang-en').classList.toggle('active', lang === 'en');
