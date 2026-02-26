@@ -495,10 +495,10 @@ const cssVars = {
             <p style="font-size:2em; margin:10px 0;">あなたのスコアは <span style="color:var(--accent);">${score}</span> / ${maxQuestions} 点です。</p>`;
         
         if (score >= maxQuestions * 0.7) { 
-            document.getElementById('score-text').textContent += 
+            document.getElementById('score-text').innerHTML += 
                 `<p style="color:var(--accent); font-weight:900;">🎉 素晴らしい！ポイント獲得チャンスを活かしました！ 🎉</p>`;
         } else {
-            document.getElementById('score-text').textContent += 
+            document.getElementById('score-text').innerHTML += 
                 `<p style="font-weight:700;">もう一度チャレンジして、ポイントを獲得しましょう！</p>`;
         }
     }
