@@ -241,29 +241,58 @@
                 if (!recognition) return alert("お使いのブラウザは音声認識に対応していません。");
                 if (isListening) { recognition.stop(); return; }
 
+                // 【高速化の秘訣1】iPadは直前の音声が残っているとマイクの起動が遅れるため、強制リセット
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+                if (typeof synth !== 'undefined' && synth.speaking) {
+                    synth.cancel();
+                }
+
                 isListening = true;
                 const btn = document.getElementById('tc-mic-btn');
+                const transcriptEl = document.getElementById('quiz3-transcript');
+                
                 btn.classList.add('listening');
-                document.getElementById('quiz3-transcript').textContent = "きいています...";
+                transcriptEl.textContent = "きいています...";
 
-                if (synth.speaking) synth.cancel();
+                // 【高速化の秘訣2】連続認識をオフにし、最軽量化
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
 
-                try { recognition.start(); } catch(e){}
+                try { recognition.start(); } catch(e){ console.error(e); }
+
+                // 【高速化の秘訣3】話し終わったと検知した瞬間に、待機時間をカットして強制終了
+                recognition.onspeechend = () => {
+                    recognition.stop();
+                };
 
                 recognition.onresult = (event) => {
+                    // 【高速化の秘訣4】結果が出たらすぐにマイクを完全にオフにする
+                    recognition.stop();
+
                     const transcript = event.results[0][0].transcript;
-                    document.getElementById('quiz3-transcript').textContent = `「${transcript}」`;
+                    transcriptEl.textContent = `「${transcript}」`;
                     handleSpeechResult(transcript);
                 };
 
                 recognition.onend = () => {
                     isListening = false;
                     btn.classList.remove('listening');
+                    
+                    // 何も聞き取れずに終了した場合のフォロー
+                    if (transcriptEl.textContent === "きいています...") {
+                        transcriptEl.textContent = "もういちど マイクをおしてね";
+                    }
                 };
-                recognition.onerror = () => {
+                
+                recognition.onerror = (event) => {
                     isListening = false;
                     btn.classList.remove('listening');
-                    document.getElementById('quiz3-transcript').textContent = "うまくききとれませんでした";
+                    if (event.error !== 'aborted') {
+                        transcriptEl.textContent = "うまくききとれませんでした";
+                    }
                 };
             }
 
@@ -273,7 +302,11 @@
                 if (quiz3Step === 1) {
                     // 質問フェーズ
                     if (cleanSpeech.includes('何時') || cleanSpeech.includes('なんじ') || cleanSpeech.includes('いまなんじ')) {
-                        playSound(soundCorrect);
+                        // 音声の頭出しをしてから再生（連続再生対策）
+                        if (typeof soundCorrect !== 'undefined') {
+                            soundCorrect.currentTime = 0;
+                            playSound(soundCorrect);
+                        }
                         quiz3Step = 2;
                         
                         // ★ 指示テキストの変更
@@ -286,7 +319,10 @@
                         quizPromptArea.textContent = '';
                         quizPromptArea.appendChild(img);
                     } else {
-                        playSound(soundIncorrect);
+                        if (typeof soundIncorrect !== 'undefined') {
+                            soundIncorrect.currentTime = 0;
+                            playSound(soundIncorrect);
+                        }
                         document.getElementById('quiz3-transcript').textContent += " (もういちど！)";
                     }
                 } else if (quiz3Step === 2) {
@@ -306,8 +342,15 @@
                     });
 
                     if (maxSim >= 80) {
-                        playSound(soundCorrect);
-                        const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                        if (typeof soundCorrect !== 'undefined') {
+                            soundCorrect.currentTime = 0;
+                            playSound(soundCorrect);
+                        }
+                        // ポイント加算処理（関数が存在する場合のみ実行）
+                        let success = false;
+                        if (window.addPointsToUser) {
+                            success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                        }
                         
                         feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
                         feedback.className = 'success show';
@@ -315,7 +358,10 @@
                         
                         setTimeout(() => startSpecificQuiz(3), 2000);
                     } else {
-                        playSound(soundIncorrect);
+                        if (typeof soundIncorrect !== 'undefined') {
+                            soundIncorrect.currentTime = 0;
+                            playSound(soundIncorrect);
+                        }
                         feedback.textContent = 'ちがうよ、もういちど！';
                         feedback.className = 'show';
                     }
