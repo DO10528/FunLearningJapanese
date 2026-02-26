@@ -148,7 +148,17 @@
             alert("お使いのブラウザは音声認識に対応していません。");
             return;
         }
-        if (isListening) return;
+
+        // すでに録音中の場合は停止する（マイクのトグル機能）
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+
+        // 【高速化の秘訣1】iPadは直前の音声(TTSなど)が残っているとマイクの起動が遅れるため、強制リセット
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
 
         isListening = true;
         const btn = document.getElementById('mic-btn');
@@ -158,9 +168,27 @@
         resText.textContent = "きいています...";
         resText.className = "result-text";
 
-        recognition.start();
+        // 【高速化の秘訣2】連続認識をオフにし、選択肢も1つに絞ってサーバー通信を最軽量化
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error("マイク起動エラー:", e);
+        }
+
+        // 【高速化の秘訣3】iPad特有の「話し終わってからの長い沈黙(2〜3秒)」をカット！
+        // ユーザーが話し終わったと検知した瞬間に、強制的に音声認識を終了させて結果を急がせます。
+        recognition.onspeechend = () => {
+            recognition.stop();
+        };
 
         recognition.onresult = (event) => {
+            // 【高速化の秘訣4】結果が出たらすぐにマイクを完全にオフにする
+            recognition.stop();
+            
             const transcript = event.results[0][0].transcript;
             document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
             checkPronunciation(transcript);
@@ -169,12 +197,22 @@
         recognition.onend = () => {
             isListening = false;
             btn.classList.remove('listening');
+            
+            // 何も聞き取れずに終了した場合のフォロー（iPadでよく起こる現象の対策）
+            if (resText.textContent === "きいています...") {
+                resText.textContent = "もういちど マイクをおしてね";
+                resText.className = "result-text retry";
+            }
         };
 
-        recognition.onerror = () => {
+        recognition.onerror = (event) => {
             isListening = false;
             btn.classList.remove('listening');
-            resText.textContent = "うまくききとれませんでした。";
+            // ユーザーが意図的に中断した時以外のエラーを表示
+            if (event.error !== 'aborted') {
+                resText.textContent = "うまくききとれませんでした。";
+                resText.className = "result-text retry";
+            }
         };
     }
 
@@ -200,8 +238,10 @@
             resText.className = "result-text success";
             
             // 正解の音を鳴らす (連続再生対策で currentTime を 0 にする)
-            SOUND_CORRECT.currentTime = 0;
-            SOUND_CORRECT.play();
+            if(typeof SOUND_CORRECT !== 'undefined') {
+                SOUND_CORRECT.currentTime = 0;
+                SOUND_CORRECT.play();
+            }
             
             setTimeout(() => {
                 nextStep();
@@ -211,8 +251,10 @@
             resText.className = "result-text retry";
             
             // 不正解の音を鳴らす
-            SOUND_INCORRECT.currentTime = 0;
-            SOUND_INCORRECT.play();
+            if(typeof SOUND_INCORRECT !== 'undefined') {
+                SOUND_INCORRECT.currentTime = 0;
+                SOUND_INCORRECT.play();
+            }
         }
     }
 
