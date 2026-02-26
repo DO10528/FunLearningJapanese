@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 安全策: onclick属性ではなくJSでイベント設定
             btn.addEventListener('click', () => initPractice(level));
             
-            btn.textContent = `
+            btn.innerHTML = `
                 <div class="level-char-icon" style="color:${level.color}">${level.label}</div>
                 <div class="level-title">${level.label}行</div>
                 <div class="level-tag" style="background:${level.color}">Level ${level.id}</div>

@@ -65,7 +65,7 @@ const level1Data = [
         level1Data.forEach((q, i) => {
             const div = document.createElement('div');
             div.className = 'question-item';
-            div.textContent = `
+            div.innerHTML = `
                 <div class="sentence">${i+1}. ${q.pre}<span class="blank">（${q.reading}）</span>${q.post}</div>
                 <div class="choices">
                     ${q.choices.map(c => `<div class="choice">${c}</div>`).join('')}
@@ -84,7 +84,7 @@ const level1Data = [
             group.forEach(q => {
                 const div = document.createElement('div');
                 div.className = 'question-item';
-                div.textContent = `
+                div.innerHTML = `
                     <div class="sentence"><span class="role-badge">${q.role}</span> ${q.pre}<span class="blank">（${q.reading}）</span>${q.post}</div>
                     <div class="choices">
                         ${q.choices.map(c => `<div class="choice">${c}</div>`).join('')}

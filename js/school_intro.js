@@ -74,7 +74,7 @@
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = `vocab-card ${extraClass}`;
-            card.textContent = `
+            card.innerHTML = `
                 <img src="${IMG_PATH}${item.word}.png" onerror="this.src='https://placehold.co/80?text=img'" alt="${item.word}">
                 <span>${item.kanji}</span>
             `;
@@ -185,7 +185,7 @@
         options.forEach(opt => {
             const btn = document.createElement('div');
             btn.className = 'option-btn';
-            btn.textContent = `
+            btn.innerHTML = `
                 <div class="opt-images">
                     <img src="${IMG_PATH}${opt.place.word}.png" onerror="this.src='https://placehold.co/50'">
                     <i class="fa-solid fa-plus" style="margin:auto; color:#ccc;"></i>
@@ -296,7 +296,7 @@
 
         // 画像描画
         const imgArea = document.getElementById('image-area');
-        imgArea.textContent = `
+        imgArea.innerHTML = `
             <div class="combo-item">
                 <img src="${IMG_PATH}${base.word}.png" onerror="this.src='https://placehold.co/80'">
             </div>
@@ -368,7 +368,7 @@
 
     function drawComboImage(img1, img2, showCross = false) {
         const imgArea = document.getElementById('image-area');
-        imgArea.textContent = `
+        imgArea.innerHTML = `
             <div class="combo-item">
                 <img src="${IMG_PATH}${img1}.png" onerror="this.src='https://placehold.co/80'">
             </div>

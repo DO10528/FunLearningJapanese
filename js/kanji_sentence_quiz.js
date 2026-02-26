@@ -149,7 +149,7 @@ const synth = window.speechSynthesis;
             
             const fullHtml = `${q.pre}<span style="color:var(--primary);">${q.target}</span>${q.post}`;
             
-            div.textContent = `
+            div.innerHTML = `
                 <button class="play-icon-btn" onclick="playSentence(${idx})"><i class="fa-solid fa-volume-high"></i></button>
                 <div class="item-text">
                     ${fullHtml}

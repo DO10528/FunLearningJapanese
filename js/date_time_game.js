@@ -491,8 +491,7 @@ const cssVars = {
         const scoreboard = document.getElementById('scoreboard');
         scoreboard.style.display = 'block';
 
-        document.getElementById('score-text').textContent = 
-            `<p>お疲れ様でした！</p>
+        document.getElementById('score-text').innerHTML = `<p>お疲れ様でした！</p>
             <p style="font-size:2em; margin:10px 0;">あなたのスコアは <span style="color:var(--accent);">${score}</span> / ${maxQuestions} 点です。</p>`;
         
         if (score >= maxQuestions * 0.7) { 

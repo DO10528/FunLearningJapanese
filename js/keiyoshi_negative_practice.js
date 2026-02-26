@@ -73,7 +73,7 @@
             const card = document.createElement('div');
             card.className = `card ${item.type}-type`;
             
-            card.textContent = `
+            card.innerHTML = `
                 <div class="card-label">${item.type === 'i' ? 'い-Adj' : 'な-Adj'}</div>
                 <button class="audio-btn" onclick="speak('${negForm}')"><i class="fa-solid fa-volume-high"></i></button>
                 

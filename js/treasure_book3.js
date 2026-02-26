@@ -59,7 +59,7 @@
     // -------------------------------------------
     const coverSheet = document.createElement('div');
     coverSheet.className = 'sheet';
-    coverSheet.textContent = `
+    coverSheet.innerHTML = `
         <div class="cover-container">
             <div class="main-title">たからさがし</div>
             <div class="sub-title">おうちにあるものを さがして えをかこう！</div>
@@ -120,7 +120,7 @@
                 // ★修正点: 単語名を削除し、「（なまえ）」ラベルと記入線を表示
                 const wordSection = document.createElement('div');
                 wordSection.className = 'word-section';
-                wordSection.textContent = `
+                wordSection.innerHTML = `
                     <div class="name-label-text">（なまえ）</div>
                     <div class="write-line" style="border-color: ${topic.color}"></div>
                 `;

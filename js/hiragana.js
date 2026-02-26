@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 画像が見つからない時にエラーで止まらないよう onerror を設定
         // assets/images/ のパスを付与
         if (IMAGE_AREA) {
-            IMAGE_AREA.textContent = `
+            IMAGE_AREA.innerHTML = `
                 <img src="assets/images/${word.image}" 
                      alt="${word.word}" 
                      onerror="this.style.display='none'; this.parentNode.innerHTML='<p style=\\'font-size:2em\\'>🖼️</p><p>(${word.image}が見つかりません)</p>'">

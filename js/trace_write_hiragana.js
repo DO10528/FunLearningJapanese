@@ -51,7 +51,7 @@
             const btn = document.createElement('div');
             btn.className = 'level-btn';
             btn.style.borderColor = level.color;
-            btn.textContent = `
+            btn.innerHTML = `
                 <div class="level-char-icon" style="color:${level.color}">${level.label}</div>
                 <div class="level-title">${level.label}行</div>
                 <div class="level-tag" style="background:${level.color}">Level ${level.id}</div>

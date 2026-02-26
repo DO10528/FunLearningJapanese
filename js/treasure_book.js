@@ -39,7 +39,7 @@
     function renderCover() {
         const sheet = document.createElement('div');
         sheet.className = 'sheet';
-        sheet.textContent = `
+        sheet.innerHTML = `
             <div class="cover-frame">
                 <i class="fa-solid fa-star deco-icon d-1"></i>
                 <i class="fa-solid fa-shapes deco-icon d-2"></i>

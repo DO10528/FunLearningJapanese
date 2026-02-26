@@ -60,7 +60,7 @@
         placesList.forEach(place => {
             const card = document.createElement('div');
             card.className = 'vocab-card';
-            card.textContent = `
+            card.innerHTML = `
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
             `;

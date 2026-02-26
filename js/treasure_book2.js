@@ -15,7 +15,7 @@
     function createCover() {
         const sheet = document.createElement('div');
         sheet.className = 'sheet';
-        sheet.textContent = `
+        sheet.innerHTML = `
             <div class="cover-frame">
                 <i class="fa-solid fa-camera deco" style="top:50px; left:50px; color:#ffab91;"></i>
                 <i class="fa-solid fa-star deco" style="bottom:50px; right:50px; color:#ffd54f;"></i>

@@ -121,7 +121,7 @@
         // 穴埋め表示
         const htmlText = currentQ.text.replace('[ ]', '<span class="blank-box"></span>');
         
-        card.textContent = `
+        card.innerHTML = `
             <div class="q-text">${htmlText}</div>
             <div class="q-sub">${currentQ.sub}</div>
         `;

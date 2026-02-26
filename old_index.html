@@ -662,7 +662,7 @@ function renderGameList(category) {
         const gameTitle = window.i18nData[window.currentLang][game.titleKey] || game.title;
         let badgeHtml = game.isPremium ? '<div class="premium-badge"><i class="fa-solid fa-crown"></i> PRO</div>' : '';
 
-        card.textContent = `
+        card.innerHTML = `
         ${badgeHtml}
         <i class="${game.icon} card-icon" style="color:${category.color}"></i>
         <span class="card-title">${gameTitle}</span>`;

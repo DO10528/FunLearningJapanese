@@ -64,7 +64,7 @@
             card.className = 'verb-card ' + (isOffer ? 'offer-type' : 'invite-type');
             card.style.borderColor = cardColor;
             
-            card.textContent = `
+            card.innerHTML = `
                 <div class="verb-forms-container">
                     <div class="masu-box">${item.masu}</div>
                     <i class="fa-solid fa-arrow-right" style="color:#999;"></i>

@@ -170,7 +170,7 @@
             card.dataset.kana = item.kana; // 検索用
             card.dataset.en = item.en.toLowerCase();
             
-            card.textContent = `
+            card.innerHTML = `
                 <div class="word-jp">${item.jp}</div>
                 <div class="word-en">${item.en}</div>
                 <div class="play-icon"><i class="fa-solid fa-volume-high"></i></div>

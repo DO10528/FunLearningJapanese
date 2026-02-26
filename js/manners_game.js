@@ -124,7 +124,7 @@ function renderLearning() {
                 </li>`;
         });
 
-        card.textContent = `
+        card.innerHTML = `
             <div class="cat-title"><i class="fa-solid ${data.icon}"></i> ${data.title}</div>
             <ul class="manner-list">${listHtml}</ul>
         `;

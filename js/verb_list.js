@@ -213,7 +213,7 @@
             // 現在のフォームのテキストを取得
             const displayText = item[currentForm];
 
-            card.textContent = `
+            card.innerHTML = `
                 <div class="verb-info">
                     <div class="verb-icon"><i class="${item.icon}"></i></div>
                     <div class="verb-text-box">

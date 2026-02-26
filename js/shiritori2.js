@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = word.id; // IDを追加
             
             // ★ご要望：カードラベルはwordData.wordをそのまま使用
-            card.textContent = `
+            card.innerHTML = `
                 <img src="assets/images/${word.image}" alt="${word.word}" class="card-image" onerror="this.style.display='none'; this.parentNode.querySelector('.card-label').style.display='block';">
                 <div class="card-label">${word.word}</div>
             `;
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.dataset.firstChar = wordData.reading.charAt(0);
                 card.dataset.id = wordData.id;
 
-                card.textContent = `
+                card.innerHTML = `
                     <img src="assets/images/${wordData.image}" alt="${wordData.word}" class="card-image" onerror="this.style.display='none'; this.parentNode.querySelector('.card-label').style.display='block';">
                     <div class="card-label">${wordData.word}</div>
                 `;

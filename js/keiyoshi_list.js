@@ -50,7 +50,7 @@
                     const typeLabel = item.type === 'i' ? 'い-adj' : 'な-adj';
                     const typeClass = item.type === 'i' ? 'type-i' : 'type-na';
 
-                    card.textContent = `
+                    card.innerHTML = `
                         <div class="word-box" style="font-size: ${fontSize}">${item.kanji}</div>
                         <div class="info-box">
                             <div class="meaning">${item.meaning}</div>

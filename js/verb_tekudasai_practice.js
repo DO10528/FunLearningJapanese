@@ -121,7 +121,7 @@
             card.className = 'verb-card ' + (isRequest ? 'request-type' : 'instruction-type');
             card.style.borderColor = cardColor;
             
-            card.textContent = `
+            card.innerHTML = `
                 
                 <div class="verb-forms-container">
                     <div class="masu-box">

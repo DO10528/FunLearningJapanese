@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const div = document.createElement('div');
             div.className = 'practice-item';
-            div.textContent = `
+            div.innerHTML = `
                 <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
                 <div class="practice-row">
                     <div class="role-badge badge-clerk">店員</div>

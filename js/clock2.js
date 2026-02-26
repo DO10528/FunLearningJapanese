@@ -110,7 +110,7 @@
 
             // アナログ時計の描画共通処理
             function drawAnalogClock(hour, minute) {
-                quizPromptArea.textContent = `
+                quizPromptArea.innerHTML = `
                     <div class="tc-clock-face">
                         <div id="tc-hour-hand" class="tc-hand tc-hour-hand"></div>
                         <div id="tc-minute-hand" class="tc-hand tc-minute-hand"></div>

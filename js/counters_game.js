@@ -174,7 +174,7 @@ function startPractice() {
 
         const div = document.createElement('div');
         div.className = 'practice-group';
-        div.textContent = `
+        div.innerHTML = `
             <div class="group-header">
                 <div class="group-title">${c.label} (${c.read})</div>
                 <div class="group-desc">${c.usage}</div>

@@ -189,7 +189,7 @@ function renderLearning() {
                 </div>`;
         });
 
-        section.textContent = `
+        section.innerHTML = `
             <div class="cat-title"><i class="fa-solid ${cat.icon}"></i> ${cat.title}</div>
             <div>${phrasesHtml}</div>
         `;

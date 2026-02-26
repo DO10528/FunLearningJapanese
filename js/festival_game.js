@@ -71,7 +71,7 @@
             else if(ev.season === 3) card.classList.add('season-autumn');
             else card.classList.add('season-winter');
 
-            card.textContent = `
+            card.innerHTML = `
                 <div class="event-month">${ev.month}月</div>
                 <span class="event-emoji">${ev.icon}</span>
                 <div class="event-name">${ev.name}</div>

@@ -76,7 +76,7 @@ const data = {
             
             card.setAttribute('onclick', `speak('${textToSpeak}')`);
             
-            card.textContent = `
+            card.innerHTML = `
                 <div class="visual-cue">${item.cue}</div>
                 <span class="word-kanji">${item.kanji}</span>
                 <span class="word-kana">${item.kana}</span>

@@ -59,7 +59,7 @@
             signsData[l].forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'practice-item';
-                div.textContent = `
+                div.innerHTML = `
                     <div style="height:100px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
                         <div style="transform:scale(0.5);">${item.html}</div>
                     </div>

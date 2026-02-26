@@ -85,7 +85,7 @@
     function createCard(content, isCorrect) {
         const div = document.createElement('div');
         div.className = 'choice-card';
-        div.textContent = `
+        div.innerHTML = `
             <div class="choice-img">${content}</div>
             <div class="mark" style="color:${isCorrect ? '#4caf50' : '#ef5350'}">
                 ${isCorrect ? '<i class="fa-regular fa-circle"></i>' : '<i class="fa-solid fa-xmark"></i>'}

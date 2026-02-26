@@ -108,7 +108,7 @@ const synth = window.speechSynthesis;
         kanjiList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
-            card.textContent = `
+            card.innerHTML = `
                 <div class="kanji-char">${item.kanji}</div>
                 <div class="kanji-meaning">${item.meaning}</div>
             `;

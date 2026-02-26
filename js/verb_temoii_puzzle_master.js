@@ -256,7 +256,7 @@
     }
 
     function showFinalResult() {
-        document.getElementById('main-game-area').textContent = `
+        document.getElementById('main-game-area').innerHTML = `
             <div class="main-card">
                 <h2 style="color:var(--primary-dark);">ゲーム終了！</h2>
                 <p style="font-size:1.5em; font-weight:bold;">${currentQuizData.length}問中 ${score} 点です。</p>

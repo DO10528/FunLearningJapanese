@@ -508,7 +508,7 @@
                 const kunDisplay = (item.kun && item.kun !== "") ? item.kun : "-";
                 const onDisplay  = (item.on && item.on !== "") ? item.on : "-";
 
-                card.textContent = `
+                card.innerHTML = `
                     <div class="char-box">${item.kanji}</div>
                     <div class="info-box">
                         <div class="meaning">${item.meaning}</div>
