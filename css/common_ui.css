@@ -1,0 +1,53 @@
+/* global back button UI */
+.global-back-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: var(--primary, #6200ea);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    z-index: 99999;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, box-shadow 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.global-back-btn:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.global-back-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.global-back-btn i {
+    pointer-events: none;
+}
+
+/* Hide legacy back buttons if they exist */
+.back-btn,
+.btn-back,
+#header-back-btn,
+.sc-back-to-topic,
+.back-to-practice {
+    display: none !important;
+}
+
+/* Add padding to body or headers to prevent overlap if necessary */
+body.has-global-back-btn {
+    /* If some pages need it, this can be dynamically added */
+}
