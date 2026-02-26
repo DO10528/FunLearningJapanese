@@ -1033,15 +1033,17 @@
 
     // ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
     window.setLanguage('ja');
-    // ★初期ロード時にも静的カードをロックする
-    window.updateStaticCards(false);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'ranking') {
-      setTimeout(() => {
-        window.toggleRanking();
-      }, 800);
-    }
+    // ★モジュール読み込み完了を待機してから静的カードをロックする
+    window.addEventListener('load', () => {
+      if (window.updateStaticCards) window.updateStaticCards(false);
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('mode') === 'ranking') {
+        setTimeout(() => {
+          if (window.toggleRanking) window.toggleRanking();
+        }, 800);
+      }
+    });
   </script>
 </body>
 
