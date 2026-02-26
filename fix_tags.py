@@ -12,14 +12,15 @@ def fix_text_content(dir_path):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Handle single-line textContent with HTML
                 lines = content.split('\n')
                 modified = False
                 for i in range(len(lines)):
-                    if '.textContent =' in lines[i]:
-                        rhs = lines[i].split('.textContent =', 1)[1]
-                        if re.search(r'<[a-z/]+[^>]*>', rhs):
-                            lines[i] = lines[i].replace('.textContent =', '.innerHTML =')
+                    if '.textContent' in lines[i]:
+                        parts = lines[i].split('.textContent', 1)
+                        rhs = parts[1]
+                        # Check if RHS has HTML tags. Skip if it's just < or > without a tag structure
+                        if re.search(r'<[a-zA-Z/][^>]*>', rhs):
+                            lines[i] = parts[0] + '.innerHTML' + rhs
                             modified = True
                 
                 if modified:

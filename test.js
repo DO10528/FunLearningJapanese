@@ -1,3 +1,3 @@
 const el = document.getElementById('test');
-el.textContent = `<i class="fa-solid fa-check"></i>`;
-el.textContent = '<br>';
+el.innerHTML = `<i class="fa-solid fa-check"></i>`;
+el.innerHTML = '<br>';

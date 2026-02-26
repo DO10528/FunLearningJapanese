@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 残りのマス目を生成
         for (let i = 1; i <= MAX_WORDS; i++) {
-            SHIRITORI_GRID.textContent += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}" data-word-id=""></div>`;
+            SHIRITORI_GRID.innerHTML += `<div id="cell-${i}" class="grid-cell drop-target" data-cell-index="${i}" data-word-id=""></div>`;
         }
         
         RETURN_CARD_BUTTON.style.display = 'none';

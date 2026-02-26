@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
             IMAGE_AREA.textContent = `
                 <img src="assets/images/${word.image}" 
                      alt="${word.word}" 
-                     onerror="this.style.display='none'; this.parentNode.textContent='<p style=\\'font-size:2em\\'>🖼️</p><p>(${word.image}が見つかりません)</p>'">
+                     onerror="this.style.display='none'; this.parentNode.innerHTML='<p style=\\'font-size:2em\\'>🖼️</p><p>(${word.image}が見つかりません)</p>'">
             `;
         }
         
