@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 音声合成とルビの除去 ---
     const synth = window.speechSynthesis;
     let voices = [];
-    
+
     const loadVoices = () => { voices = synth.getVoices(); };
     synth.onvoiceschanged = loadVoices;
     loadVoices();
@@ -38,20 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!text) return;
 
         if (isRecording && recognition) {
-            try { recognition.stop(); } catch(e){}
+            try { recognition.stop(); } catch (e) { }
             isRecording = false;
             updateMicUI('stop');
         }
-        
+
         synth.cancel();
 
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
         utterThis.rate = 1.0;
-        
+
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
-        if(jpVoice) utterThis.voice = jpVoice;
-        
+        if (jpVoice) utterThis.voice = jpVoice;
+
         synth.speak(utterThis);
     };
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isRecording) {
-            try { recognition.stop(); } catch(e) {}
+            try { recognition.stop(); } catch (e) { }
             isRecording = false;
             updateMicUI('stop');
             statusText.textContent = "停止しました";
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateMicUI(state) {
         const micBtn = document.getElementById('mic-btn');
-        if(!micBtn) return;
+        if (!micBtn) return;
         micBtn.classList.remove('processing');
         micBtn.disabled = false;
         if (state === 'recording') micBtn.classList.add('listening');
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTargetPhrase = null;
 
     function normalizeText(text) {
-        if(!text) return "";
+        if (!text) return "";
         let t = text;
         t = t.replace(/[ 、。！？,.!?]/g, "");
         t = t.replace(/照り焼き|照焼/g, "てりやき");
@@ -444,16 +444,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        window.scrollTo(0,0);
-        
+        window.scrollTo(0, 0);
+
         const footer = document.getElementById('fixed-footer-practice');
-        if(id === 'practice-screen') footer.style.display = 'block';
+        if (id === 'practice-screen') footer.style.display = 'block';
         else footer.style.display = 'none';
     };
 
     window.loadScenario = (id) => {
         currentScenarioId = id;
-        
+
         if (id === 'random') {
             let allSteps = [];
             for (const key in scenarios) {
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: "ランダムミックス (応用)",
                 steps: allSteps
             };
-            
+
             // ★ ランダムモードの場合は練習画面を作らず、直ちにテスト開始
             startSimulation();
             return;
@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'practice-item';
             div.innerHTML = `
-                <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx+1}</div>
+                <div style="font-size:0.8em; color:#999; margin-bottom:5px;">Step ${idx + 1}</div>
                 <div class="practice-row">
                     <div class="role-badge badge-clerk">店員</div>
                     <div class="text-content">
@@ -544,11 +544,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadStep() {
         const step = currentData.steps[stepIndex];
         document.getElementById('step-count').textContent = stepIndex + 1;
-        
+
         // 店員ラベルに現在の店舗名を表示
         document.getElementById('clerk-role-label').textContent = `店員 / Situation [${step.shopName}]`;
 
-        document.getElementById('clerk-text-jp').textContent = step.clerk.jp;
+        document.getElementById('clerk-text-jp').innerHTML = step.clerk.jp;
         document.getElementById('clerk-text-en').textContent = step.clerk.en;
         window.speak(step.clerk.jp);
 
@@ -556,12 +556,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('recognized-text').textContent = '...';
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('mic-btn').disabled = false;
-        
+
         const correctOpts = step.options.filter(o => o.correct);
         const randomOpt = correctOpts[Math.floor(Math.random() * correctOpts.length)];
         currentTargetPhrase = randomOpt;
 
-        document.getElementById('target-phrase').textContent = randomOpt.jp;
+        document.getElementById('target-phrase').innerHTML = randomOpt.jp;
         document.getElementById('target-sub').textContent = randomOpt.en;
     }
 
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function evaluateSpeech(userText) {
-        if(!currentTargetPhrase) return;
+        if (!currentTargetPhrase) return;
         const targetText = stripRuby(currentTargetPhrase.jp);
         const similarity = getSimilarity(userText, targetText);
         const percentage = Math.floor(similarity * 100);
@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (percentage >= 60) {
             resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
             document.getElementById('mic-btn').disabled = true;
-            if(window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
+            if (window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
             nextBtn.style.display = 'block';
             nextBtn.textContent = '次へ';
             nextBtn.onclick = nextStep;
