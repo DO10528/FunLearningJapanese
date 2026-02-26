@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (selectedChain.length < chainLength) {
             GAME_STATUS_MESSAGE.textContent = 'エラー：連鎖が構築できませんでした。リセットして再試行してください。';
-            CARD_SELECTION_AREA.textContent = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
+            CARD_SELECTION_AREA.innerHTML = `<h3>残りの単語 (0枚)</h3><p style="color:red;">連鎖できる単語が見つかりませんでした。</p>`;
             return;
         }
 

@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     katakanaData.forEach(level => {
         const btn = document.createElement('button');
         btn.className = `level-btn lvl-${level.id}`;
-        btn.textContent = `<div class="level-num">Level ${level.id}</div><div class="level-char">${level.label}</div>`;
+        btn.innerHTML = `<div class="level-num">Level ${level.id}</div><div class="level-char">${level.label}</div>`;
         btn.onclick = () => initPractice(level);
         levelGrid.appendChild(btn);
     });
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 右: 音声
             const audioBtn = document.createElement('button');
             audioBtn.className = 'block audio-btn';
-            audioBtn.textContent = '<i class="fa-solid fa-volume-high"></i>';
+            audioBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
             audioBtn.onclick = () => speak(pair.char);
             colRight.appendChild(audioBtn);
         });

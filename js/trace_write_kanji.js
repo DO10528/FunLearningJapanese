@@ -225,7 +225,7 @@ const synth = window.speechSynthesis;
         
         const btn = document.querySelector('.btn-done');
         const originalText = btn.textContent;
-        btn.textContent = '<i class="fa-solid fa-star"></i> すごい！';
+        btn.innerHTML = '<i class="fa-solid fa-star"></i> すごい！';
         btn.style.background = '#ff9800';
         
         setTimeout(() => {

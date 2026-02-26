@@ -134,7 +134,7 @@
             document.getElementById('g1-q').innerText = "Clear! よくできました！";
             document.getElementById('g1-choices').textContent = "";
             document.getElementById('g1-next').style.display = 'none';
-            document.getElementById('g1-result').textContent = '<button class="next-btn" style="display:block" onclick="location.reload()">もういちど</button>';
+            document.getElementById('g1-result').innerHTML = '<button class="next-btn" style="display:block" onclick="location.reload()">もういちど</button>';
             return;
         }
 
@@ -166,10 +166,10 @@
             const added = await window.addPuzzlePoints(g1CurrentIndex, `kei_neg_g1_${g1CurrentType}`);
             const ptText = added ? ' <span class="point-get">(+1pt)</span>' : '';
             
-            document.getElementById('g1-result').textContent = `<span class="correct"><i class="fa-regular fa-circle"></i> せいかい！${ptText}</span>`;
+            document.getElementById('g1-result').innerHTML = `<span class="correct"><i class="fa-regular fa-circle"></i> せいかい！${ptText}</span>`;
         } else {
             btn.classList.add('selected-wrong');
-            document.getElementById('g1-result').textContent = '<span class="wrong"><i class="fa-solid fa-xmark"></i> ざんねん...</span>';
+            document.getElementById('g1-result').innerHTML = '<span class="wrong"><i class="fa-solid fa-xmark"></i> ざんねん...</span>';
         }
         document.getElementById('g1-next').style.display = 'block';
     }
@@ -182,7 +182,7 @@
     // --- Game 2 Logic ---
     function loadG2() {
         if (g2CurrentIndex >= g2Data.length) {
-            document.getElementById('game2').textContent = '<h2>Clear! 全問正解！</h2><button class="next-btn" style="display:block" onclick="location.reload()">もういちど</button>';
+            document.getElementById('game2').innerHTML = '<h2>Clear! 全問正解！</h2><button class="next-btn" style="display:block" onclick="location.reload()">もういちど</button>';
             return;
         }
         const data = g2Data[g2CurrentIndex];
@@ -237,10 +237,10 @@
             const added = await window.addPuzzlePoints(g2CurrentIndex, 'kei_neg_g2');
             const ptText = added ? ' <span class="point-get">(+1pt)</span>' : '';
 
-            document.getElementById('g2-result').textContent = `<span class="correct">Great! せいかい！${ptText}</span>`;
+            document.getElementById('g2-result').innerHTML = `<span class="correct">Great! せいかい！${ptText}</span>`;
             document.getElementById('g2-next').style.display = 'block';
         } else {
-            document.getElementById('g2-result').textContent = '<span class="wrong">Try again...</span>';
+            document.getElementById('g2-result').innerHTML = '<span class="wrong">Try again...</span>';
         }
     }
 
@@ -252,7 +252,7 @@
     // --- Game 3 Logic ---
     function loadG3() {
         if (g3CurrentIndex >= g3Data.length) {
-            document.getElementById('game3').textContent = '<h2>Congratulations!</h2><button class="next-btn" style="display:block" onclick="location.reload()">最初から</button>';
+            document.getElementById('game3').innerHTML = '<h2>Congratulations!</h2><button class="next-btn" style="display:block" onclick="location.reload()">最初から</button>';
             return;
         }
         const data = g3Data[g3CurrentIndex];
@@ -273,7 +273,7 @@
     function createImgCard(text, iconClass, isCorrect) {
         const div = document.createElement('div');
         div.className = 'img-card';
-        div.textContent = `<i class="fa-solid ${iconClass}"></i><div>${text}</div>`;
+        div.innerHTML = `<i class="fa-solid ${iconClass}"></i><div>${text}</div>`;
         div.onclick = async () => {
              if (document.getElementById('g3-next').style.display === 'block') return;
 
@@ -281,10 +281,10 @@
                  div.classList.add('correct-ans');
                  const added = await window.addPuzzlePoints(g3CurrentIndex, 'kei_neg_g3');
                  const ptText = added ? ' <span class="point-get">(+1pt)</span>' : '';
-                 document.getElementById('g3-result').textContent = `<span class="correct">せいかい！${ptText}</span>`;
+                 document.getElementById('g3-result').innerHTML = `<span class="correct">せいかい！${ptText}</span>`;
              } else {
                  div.classList.add('wrong-ans');
-                 document.getElementById('g3-result').textContent = '<span class="wrong">ちがいます...</span>';
+                 document.getElementById('g3-result').innerHTML = '<span class="wrong">ちがいます...</span>';
              }
              document.getElementById('g3-next').style.display = 'block';
         };

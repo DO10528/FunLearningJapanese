@@ -127,12 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const card = document.createElement('div');
                     card.className = 'dv-game1-option-card';
                     // Use FontAwesome Icon instead of Image
-                    card.textContent = `<i class="${v.icon}"></i>`;
+                    card.innerHTML = `<i class="${v.icon}"></i>`;
                     
                     card.onclick = () => {
                         if (v.id === game1Target.id) {
                             card.style.background = '#dcedc8';
-                            card.textContent = `<i class="${v.icon} ${v.animation}"></i>`; // Add animation
+                            card.innerHTML = `<i class="${v.icon} ${v.animation}"></i>`; // Add animation
                             feedback.textContent = 'せいかい！';
                             feedback.className = 'dv-feedback show success';
                             speakFeedback(true);
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.className = 'dv-game3-card';
                 el.dataset.id = data.id;
                 el.dataset.type = data.type;
-                el.textContent = `<i class="${data.icon}"></i> ${data.text}`;
+                el.innerHTML = `<i class="${data.icon}"></i> ${data.text}`;
                 
                 el.onclick = () => {
                     // Move logic

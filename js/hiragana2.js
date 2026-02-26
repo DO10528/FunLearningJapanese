@@ -157,9 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 画像
         // ★修正: word.imageが存在することを前提とする
         if (word.image) {
-             IMAGE_AREA.textContent = `<img src="assets/images/${word.image}" alt="${word.word}" onerror="this.style.display='none'">`;
+             IMAGE_AREA.innerHTML = `<img src="assets/images/${word.image}" alt="${word.word}" onerror="this.style.display='none'">`;
         } else {
-             IMAGE_AREA.textContent = `<div style="padding: 20px; color: #999;">画像なし</div>`;
+             IMAGE_AREA.innerHTML = `<div style="padding: 20px; color: #999;">画像なし</div>`;
         }
         
         // 文字のシャッフル

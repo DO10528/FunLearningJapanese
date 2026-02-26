@@ -151,7 +151,7 @@
         } else if (currentStep === 2) {
             missionText.textContent = "道を聞いてみよう！";
             imgEl.classList.remove('hidden');
-            phraseEl.textContent = `すみません、${rubyHtml}は<br>どこですか？`;
+            phraseEl.innerHTML = `すみません、${rubyHtml}は<br>どこですか？`;
             
         } else if (currentStep === 3) {
             // STEP 3: マップ探索をスキップし、そのまま返答の練習へ進む

@@ -28,14 +28,14 @@
                 renderList(adjectiveData);
             } catch (e) {
                 console.error("Error loading data/keiyoshi.json:", e);
-                container.textContent = '<p style="text-align:center; color:red;">データの読み込みに失敗しました。</p>';
+                container.innerHTML = '<p style="text-align:center; color:red;">データの読み込みに失敗しました。</p>';
             }
 
             // 2. リスト描画関数
             function renderList(list) {
                 container.textContent = '';
                 if (list.length === 0) {
-                    container.textContent = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
+                    container.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1;">みつかりませんでした。</p>';
                     return;
                 }
 

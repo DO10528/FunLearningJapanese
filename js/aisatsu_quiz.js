@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function endGame() {
-                finalScoreEl.textContent = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
+                finalScoreEl.innerHTML = `おわり！<br>10もんちゅう ${score} もん せいかい！`;
                 finalScoreEl.style.display = 'block';
                 
                 questionNumberEl.textContent = 'おつかれさま';

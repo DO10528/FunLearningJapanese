@@ -629,7 +629,7 @@ div.className = 'game-card';
 div.style.borderColor = cat.color;
 div.onclick = () => renderGameList(cat);
 const title = window.i18nData[window.currentLang][cat.titleKey] || cat.titleKey;
-div.textContent = `<i class="${cat.icon} card-icon" style="color:${cat.color}"></i><span class="card-title">${title}</span><span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>`;
+div.innerHTML = `<i class="${cat.icon} card-icon" style="color:${cat.color}"></i><span class="card-title">${title}</span><span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>`;
 gameGrid.appendChild(div);
 });
 gameGrid.classList.remove('fade-in');

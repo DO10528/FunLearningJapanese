@@ -243,9 +243,9 @@
             if (pointAdded) {
                 score++;
                 updateScore();
-                resultMessage.textContent = `⭕️ **せいかい！ (+1pt)** <span style="font-size:0.9em;">（${constructedSentence}ましょうか）</span>`;
+                resultMessage.innerHTML = `⭕️ **せいかい！ (+1pt)** <span style="font-size:0.9em;">（${constructedSentence}ましょうか）</span>`;
             } else {
-                resultMessage.textContent = `⭕️ **せいかい！** (今日はこの問題のポイント獲得済み) <span style="font-size:0.9em;">（${constructedSentence}ましょうか）</span>`;
+                resultMessage.innerHTML = `⭕️ **せいかい！** (今日はこの問題のポイント獲得済み) <span style="font-size:0.9em;">（${constructedSentence}ましょうか）</span>`;
             }
             // --- ★ End Point Logic ---
 

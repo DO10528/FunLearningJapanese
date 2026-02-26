@@ -41,7 +41,7 @@
             
             const el = document.createElement('div');
             el.className = `money ${m.class} ${m.type}`;
-            el.textContent = `<span class="money-label">${m.label}</span>`;
+            el.innerHTML = `<span class="money-label">${m.label}</span>`;
             el.onclick = () => speakPrice(m.val);
 
             const p = document.createElement('div');
@@ -75,7 +75,7 @@
         currentLv1Target = patterns[Math.floor(Math.random() * patterns.length)];
         
         document.getElementById('lv1-target').textContent = `${currentLv1Target}円`;
-        document.getElementById('tray-area').textContent = '<div style="position:absolute; color:#ccc; font-weight:bold;">ここにおかねをおく</div>';
+        document.getElementById('tray-area').innerHTML = '<div style="position:absolute; color:#ccc; font-weight:bold;">ここにおかねをおく</div>';
         trayTotal = 0;
         updateTraySum();
         
@@ -94,7 +94,7 @@
     function createMoneyElement(m) {
         const el = document.createElement('div');
         el.className = `money ${m.class} ${m.type}`;
-        el.textContent = `<span class="money-label">${m.label}</span>`;
+        el.innerHTML = `<span class="money-label">${m.label}</span>`;
         return el;
     }
 
@@ -255,10 +255,10 @@
         sub.textContent = msg;
         
         if (isCorrect) {
-            icon.textContent = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
+            icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
             speak("せいかい！");
         } else {
-            icon.textContent = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
+            icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
             speak("ちがいます");
         }
 

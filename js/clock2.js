@@ -131,13 +131,13 @@
                 minuteData.forEach(min => {
                     const item = document.createElement('div');
                     item.className = `tc-study-item type-${min.type}`;
-                    item.textContent = `<span>${min.min}</span><p>${min.text}</p>`;
+                    item.innerHTML = `<span>${min.min}</span><p>${min.text}</p>`;
                     item.onclick = () => speakText(min.text);
                     studyGrid.appendChild(item);
                 });
                 const hanItem = document.createElement('div');
                 hanItem.className = 'tc-study-item type-han';
-                hanItem.textContent = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
+                hanItem.innerHTML = `<span>30</span><p>「${hanData.text}」 (さんじゅっぷん と おなじ)</p>`;
                 hanItem.onclick = () => speakText(hanData.text);
                 studyGrid.appendChild(hanItem);
             }
@@ -181,7 +181,7 @@
                 // 再生ボタン
                 const soundButton = document.createElement('button');
                 soundButton.className = 'tc-button btn-game1';
-                soundButton.textContent = '<i class="fa-solid fa-volume-high"></i>';
+                soundButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
                 soundButton.style.fontSize = '3em';
                 soundButton.style.width = '100px';
                 soundButton.style.height = '100px';

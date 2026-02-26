@@ -79,7 +79,7 @@
         dataList.forEach(item => {
             const div = document.createElement('div');
             div.className = 'card';
-            div.textContent = `<div class="emoji-img">${item.emoji}</div><span>${item.name}</span>`;
+            div.innerHTML = `<div class="emoji-img">${item.emoji}</div><span>${item.name}</span>`;
             div.onclick = () => speak(item.name);
             container.appendChild(div);
         });

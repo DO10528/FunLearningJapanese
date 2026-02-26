@@ -137,7 +137,7 @@
                 
                 const soundButton = document.createElement('button');
                 soundButton.className = 'tc-button btn-game1';
-                soundButton.textContent = '<i class="fa-solid fa-volume-high"></i>';
+                soundButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
                 soundButton.style.fontSize = '3em';
                 soundButton.style.width = '100px';
                 soundButton.style.height = '100px';

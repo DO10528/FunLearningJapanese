@@ -104,13 +104,13 @@
         
         if (currentScreen === 'screen-learning') {
             btn.className = 'fixed-bottom-btn';
-            btn.textContent = '<i class="fa-solid fa-play"></i> <span id="fixed-btn-text">ゲームスタート！</span>';
+            btn.innerHTML = '<i class="fa-solid fa-play"></i> <span id="fixed-btn-text">ゲームスタート！</span>';
         } else if (currentScreen === 'screen-modes') {
             btn.className = 'fixed-bottom-btn btn-mode-return';
-            btn.textContent = '<i class="fa-solid fa-book"></i> <span id="fixed-btn-text">れんしゅう に もどる</span>';
+            btn.innerHTML = '<i class="fa-solid fa-book"></i> <span id="fixed-btn-text">れんしゅう に もどる</span>';
         } else {
             btn.className = 'fixed-bottom-btn btn-mode-return';
-            btn.textContent = '<i class="fa-solid fa-list"></i> <span id="fixed-btn-text">ゲームを えらぶ</span>';
+            btn.innerHTML = '<i class="fa-solid fa-list"></i> <span id="fixed-btn-text">ゲームを えらぶ</span>';
         }
     }
 
@@ -204,7 +204,7 @@
         const playBtn = document.createElement('button');
         playBtn.className = 'mic-btn';
         playBtn.style.background = '#4a69bd'; playBtn.style.boxShadow = '0 6px 0 #1e3799';
-        playBtn.textContent = '<i class="fa-solid fa-volume-high"></i>';
+        playBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
         playBtn.onclick = () => speakText(correctSentence);
         imgArea.appendChild(playBtn);
 

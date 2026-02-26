@@ -238,7 +238,7 @@
         if (constructedSentence === correctSentence) {
             playSeikai(); score++; updateScore();
             resultMessage.className = 'correct-msg';
-            resultMessage.textContent = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}${currentQ.fixed_suffix}）</span>`;
+            resultMessage.innerHTML = `⭕️ **せいかい！** <span style="font-size:0.9em;">（${correctSentence}${currentQ.fixed_suffix}）</span>`;
             speak("せいかい！"); 
             currentQIndex++;
             setTimeout(() => { 

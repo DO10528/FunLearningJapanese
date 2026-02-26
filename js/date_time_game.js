@@ -195,7 +195,7 @@ const cssVars = {
 
         // ヘッダーボタンの更新
         const btn = document.getElementById('header-back-btn');
-        if(btn) btn.textContent = '<i class="fa-solid fa-arrow-left"></i> 練習に戻る';
+        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 練習に戻る';
     }
 
 
@@ -214,7 +214,7 @@ const cssVars = {
 
         // ヘッダーボタンの更新
         const btn = document.getElementById('header-back-btn');
-        if(btn) btn.textContent = '<i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ';
+        if(btn) btn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> ゲームを選ぶ';
 
         let sourceData;
         if (mode === 1) {

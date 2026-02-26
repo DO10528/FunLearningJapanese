@@ -97,7 +97,7 @@
         wordsData.forEach(w => {
             const div = document.createElement('div');
             div.className = `word-card ${w.type === 1 ? 'imasu' : 'arimasu'}`;
-            div.textContent = `<i class="fa-solid ${w.icon} word-icon" style="color:${w.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i><div class="word-text">${w.text}</div>`;
+            div.innerHTML = `<i class="fa-solid ${w.icon} word-icon" style="color:${w.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i><div class="word-text">${w.text}</div>`;
             div.onclick = () => speak(w.text);
             if (w.type === 1) iList.appendChild(div);
             else aList.appendChild(div);
@@ -343,7 +343,7 @@
         const iconColor = (quizNow.targetWord && quizNow.targetWord.type === 1) ? 'var(--imasu-color)' : 
                           (quizNow.targetWord && quizNow.targetWord.type === 0) ? 'var(--arimasu-color)' : '#555';
         
-        imgArea.textContent = `<i class="fa-solid ${quizNow.icon}" style="color:${iconColor}"></i>`;
+        imgArea.innerHTML = `<i class="fa-solid ${quizNow.icon}" style="color:${iconColor}"></i>`;
         
         document.getElementById('quiz-question').textContent = quizNow.text;
 
@@ -389,7 +389,7 @@
         const icon = document.getElementById('fb-icon');
         const wText = document.getElementById('fb-word');
         const msg = document.getElementById('fb-msg');
-        icon.textContent = `<i class="fa-solid ${word.icon}" style="color:${word.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i>`;
+        icon.innerHTML = `<i class="fa-solid ${word.icon}" style="color:${word.type===1?'var(--imasu-color)':'var(--arimasu-color)'}"></i>`;
         wText.textContent = word.text;
         if (isCorrect) {
             msg.textContent = "せいかい！ (Correct!)";

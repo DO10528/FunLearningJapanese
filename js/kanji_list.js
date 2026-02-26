@@ -495,7 +495,7 @@
             kanjiContainer.textContent = '';
             
             if (list.length === 0) {
-                kanjiContainer.textContent = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';
+                kanjiContainer.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">みつかりませんでした。</p>';
                 return;
             }
 

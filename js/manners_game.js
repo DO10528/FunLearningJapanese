@@ -140,7 +140,7 @@ function renderCategoryButtons() {
         const data = mannersData[key];
         const btn = document.createElement('button');
         btn.className = 'cat-btn';
-        btn.textContent = `<i class="fa-solid ${data.icon}"></i><span>${data.title}</span>`;
+        btn.innerHTML = `<i class="fa-solid ${data.icon}"></i><span>${data.title}</span>`;
         btn.onclick = () => startGame(key);
         grid.appendChild(btn);
     });
@@ -175,7 +175,7 @@ function loadQuiz() {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         const label = idx === 0 ? "A" : idx === 1 ? "B" : "C";
-        btn.textContent = `<span class="option-tag">${label}</span> <span>${opt.t}</span>`;
+        btn.innerHTML = `<span class="option-tag">${label}</span> <span>${opt.t}</span>`;
         btn.onclick = () => checkAnswer(opt.c, opt.t);
         optionsDiv.appendChild(btn);
     });
@@ -203,14 +203,14 @@ window.checkAnswer = (isCorrect, text) => {
 
     if (isCorrect) {
         currentScore++;
-        icon.textContent = '<i class="fa-regular fa-circle fb-correct"></i>';
+        icon.innerHTML = '<i class="fa-regular fa-circle fb-correct"></i>';
         title.textContent = "正解！";
         title.style.color = "#4caf50";
         detail.textContent = "すばらしい！そのとおりです。";
         // ポイント加算（1問正解で10pt）
         if(window.addPoints) window.addPoints(10);
     } else {
-        icon.textContent = '<i class="fa-solid fa-xmark fb-wrong"></i>';
+        icon.innerHTML = '<i class="fa-solid fa-xmark fb-wrong"></i>';
         title.textContent = "残念...";
         title.style.color = "#f44336";
         detail.textContent = "正しいのは... 他の答えです。";

@@ -136,7 +136,7 @@ function setupGameBoard(level) {
 
         const audioBtn = document.createElement('button');
         audioBtn.className = 'block audio-btn';
-        audioBtn.textContent = '<i class="fa-solid fa-volume-high"></i>';
+        audioBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
         audioBtn.onclick = () => window.speak(pair.char);
         colRight.appendChild(audioBtn);
     });

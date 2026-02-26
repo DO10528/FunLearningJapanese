@@ -465,7 +465,7 @@ const kanjiDatabase = {
         data.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'kanji-card';
-            card.textContent = `<div class="kanji-char">${item.kanji}</div>`;
+            card.innerHTML = `<div class="kanji-char">${item.kanji}</div>`;
             card.onclick = () => openModal(item);
             grid.appendChild(card);
         });
@@ -577,7 +577,7 @@ const kanjiDatabase = {
         
         const btn = document.querySelector('.btn-done');
         const originalText = btn.textContent;
-        btn.textContent = '<i class="fa-solid fa-star"></i> すごい！';
+        btn.innerHTML = '<i class="fa-solid fa-star"></i> すごい！';
         btn.style.background = '#ff9800';
         
         setTimeout(() => {

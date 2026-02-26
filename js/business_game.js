@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('question-text').textContent = q.question;
         
         const iconEl = document.getElementById('char-icon');
-        iconEl.textContent = `<i class="fa-solid ${q.icon}"></i>`;
+        iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
 
         const container = document.getElementById('options-container');
         container.textContent = '';
@@ -290,14 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if(opt.correct) {
             btn.classList.add('correct');
-            icon.textContent = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
+            icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
             title.textContent = "正解！";
             title.style.color = "#4caf50";
             score += 1;
             if(window.addPoints) window.addPoints(1);
         } else {
             btn.classList.add('incorrect');
-            icon.textContent = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
+            icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
             title.textContent = "おしい！";
             title.style.color = "#f44336";
         }

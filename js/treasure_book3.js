@@ -128,7 +128,7 @@
                 // 絵を描く欄
                 const drawSection = document.createElement('div');
                 drawSection.className = 'draw-section';
-                drawSection.textContent = `<span class="draw-label">えをかこう</span>`;
+                drawSection.innerHTML = `<span class="draw-label">えをかこう</span>`;
 
                 card.appendChild(wordSection);
                 card.appendChild(drawSection);
