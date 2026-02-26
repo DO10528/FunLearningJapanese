@@ -1,662 +1,964 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="assets/images/favicon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon.png">
-<link rel="icon" sizes="192x192" href="assets/images/icon.png">
-<link rel="icon" sizes="512x512" href="assets/images/icon.png">
-<link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title data-i18n="main_title">Fun Learning Japanese - Next Gen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon.png">
+  <link rel="icon" sizes="192x192" href="assets/images/icon.png">
+  <link rel="icon" sizes="512x512" href="assets/images/icon.png">
+  <link rel="manifest" href="manifest.json">
 
-<style>
-/* --- 基本設定 --- */
-:root {
-  --primary: #5c7aff;
-  --accent: #ffcc5c;
-  --bg-color: #f4f7fc;
-  --text-color: #333;
-  --line-green: #06c755;
-}
+  <style>
+    /* --- 基本設定 --- */
+    :root {
+      --primary: #5c7aff;
+      --accent: #ffcc5c;
+      --bg-color: #f4f7fc;
+      --text-color: #333;
+      --line-green: #06c755;
+    }
 
-*, *::before, *::after { box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
-body {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  margin: 0; padding: 0; padding-bottom: 80px;
-  overflow-x: hidden; 
-  min-height: 100vh;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
-}
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+      min-height: 100vh;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* --- ヘッダー --- */
-header {
-  background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
-  color: white; padding: 15px 20px; width: 100%;
-  display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
-  position: sticky; top: 0; z-index: 100;
-}
+    /* --- ヘッダー --- */
+    header {
+      background: linear-gradient(135deg, #5c7aff 0%, #4facfe 100%);
+      color: white;
+      padding: 15px 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(92, 122, 255, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-/* ロゴ設定 */
-.logo { 
-  font-size: 1.4em; font-weight: 900; 
-  display: flex; align-items: center; gap: 5px; 
-  pointer-events: none; /* ロゴ自体はクリック判定を消す */
-  white-space: nowrap; 
-  overflow: hidden;
-  max-width: 60%; /* 右側のボタンエリアを侵害しないように制限 */
-}
+    /* ロゴ設定 */
+    .logo {
+      font-size: 1.4em;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: none;
+      /* ロゴ自体はクリック判定を消す */
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 60%;
+      /* 右側のボタンエリアを侵害しないように制限 */
+    }
 
-/* バージョン表記のスタイル */
-.logo .ver-text {
-  font-size: 0.6em; margin-left: 5px; opacity: 0.9;
-}
+    /* バージョン表記のスタイル */
+    .logo .ver-text {
+      font-size: 0.6em;
+      margin-left: 5px;
+      opacity: 0.9;
+    }
 
-.header-right { 
-  display: flex; align-items: center; gap: 10px; 
-  position: relative; z-index: 200; /* ロゴより確実に上へ */
-  flex-shrink: 0; /* 幅が狭くなっても潰れないようにする */
-}
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 200;
+      /* ロゴより確実に上へ */
+      flex-shrink: 0;
+      /* 幅が狭くなっても潰れないようにする */
+    }
 
-.lang-switch {
-  display: flex; gap: 5px;
-}
+    .lang-switch {
+      display: flex;
+      gap: 5px;
+    }
 
-.lang-switch button {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8em;
-  touch-action: manipulation;
-  pointer-events: auto; /* クリックを確実に有効化 */
-}
-.lang-switch button.active { background: white; color: var(--primary); font-weight: bold; }
+    .lang-switch button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8em;
+      touch-action: manipulation;
+      pointer-events: auto;
+      /* クリックを確実に有効化 */
+    }
 
-.settings-trigger {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-  color: white; width: 34px; height: 34px; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center; cursor: pointer;
-  font-size: 1.1em; transition: background 0.2s;
-  touch-action: manipulation;
-  pointer-events: auto;
-}
-.settings-trigger:active { background: rgba(255,255,255,0.4); }
+    .lang-switch button.active {
+      background: white;
+      color: var(--primary);
+      font-weight: bold;
+    }
 
-/* --- ヒーロー --- */
-.hero-section {
-  background: white; text-align: center; padding: 30px 20px;
-  width: 100%; border-radius: 0 0 30px 30px; margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  position: relative; z-index: 1;
-}
-.hero-section h1 { margin: 0; color: var(--primary); font-size: 1.6em; }
+    .settings-trigger {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.1em;
+      transition: background 0.2s;
+      touch-action: manipulation;
+      pointer-events: auto;
+    }
 
-/* --- ダッシュボード --- */
-.dashboard-card {
-  background: white; margin: 20px; padding: 20px;
-  border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  display: flex; align-items: center; gap: 15px;
-}
-.avatar-circle {
-  width: 60px; height: 60px; border-radius: 50%;
-  display: flex; justify-content: center; align-items: center;
-  font-size: 1.8em; background: #e0e7ff; color: var(--primary);
-  flex-shrink: 0;
-}
-.user-meta { flex-grow: 1; }
-.level-bar-container {
-  background: #eee; height: 10px; border-radius: 5px; margin-top: 8px; overflow: hidden;
-}
-.level-bar-fill {
-  background: linear-gradient(90deg, #ffcc5c, #ff6f61); height: 100%; width: 0%; transition: width 0.5s ease;
-}
-.status-badges { display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; font-weight: bold; }
-.badge-streak { color: #ff6f61; }
-.badge-points { color: #f0ad4e; }
+    .settings-trigger:active {
+      background: rgba(255, 255, 255, 0.4);
+    }
 
-/* --- 認証ボタン --- */
-.auth-action-area { 
-  display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; 
-  position: relative; z-index: 10;
-}
-.btn-auth {
-  padding: 10px 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: transform 0.1s;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
-}
-.btn-auth:active { transform: translateY(4px); box-shadow: none; }
-.btn-login { background: #4caf50; color: white; }
-.btn-signup { background: var(--primary); color: white; }
-.btn-guest { background: #90a4ae; color: white; }
+    /* --- ヒーロー --- */
+    .hero-section {
+      background: white;
+      text-align: center;
+      padding: 30px 20px;
+      width: 100%;
+      border-radius: 0 0 30px 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      position: relative;
+      z-index: 1;
+    }
 
-/* --- グリッドレイアウト --- */
-.section-header {
-  padding: 0 20px; margin-bottom: 15px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.section-title { font-size: 1.2em; color: #444; display: flex; align-items: center; gap: 8px; margin: 0; }
-.section-title i { color: var(--primary); }
-.btn-back {
-  background: #eee; border: none; padding: 5px 15px; border-radius: 20px;
-  font-size: 0.9em; font-weight: bold; color: #666; cursor: pointer;
-  display: none;
-  touch-action: manipulation;
-}
-.btn-back:hover { background: #ddd; }
+    .hero-section h1 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 1.6em;
+    }
 
-.grid-container {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px; padding: 0 20px 40px 20px;
-  max-width: 1000px; margin: 0 auto;
-}
+    /* --- ダッシュボード --- */
+    .dashboard-card {
+      background: white;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-.game-card {
-  background: white; border-radius: 20px; padding: 20px;
-  text-align: center; text-decoration: none; color: var(--text-color);
-  border: 4px solid transparent;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-  transition: all 0.2s; cursor: pointer;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  height: 140px; position: relative; overflow: hidden;
-  touch-action: manipulation;
-  -webkit-user-select: none; user-select: none;
-}
-.game-card:active { transform: scale(0.98); box-shadow: 0 4px 5px rgba(0,0,0,0.05); }
+    .avatar-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8em;
+      background: #e0e7ff;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
 
-.card-icon { font-size: 2.5em; margin-bottom: 10px; }
-.card-title { font-weight: 800; font-size: 1.1em; line-height: 1.3; color: #555; }
+    .user-meta {
+      flex-grow: 1;
+    }
 
-/* --- モーダル --- */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
-  display: none; justify-content: center; align-items: center; z-index: 1000;
-}
-.modal-box {
-  background: white; width: 90%; max-width: 400px; padding: 30px;
-  border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center;
-}
-.modal-box input {
-  width: 100%; padding: 12px; margin: 10px 0;
-  border: 2px solid #eee; border-radius: 10px; box-sizing: border-box;
-}
-.setting-row {
-  display: flex; justify-content: space-between; align-items: center;
-  background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px;
-  border: 1px solid #e0e0e0; text-align: left;
-}
+    .level-bar-container {
+      background: #eee;
+      height: 10px;
+      border-radius: 5px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
 
-.btn-setting-action {
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: #555;
-  touch-action: manipulation;
-  transition: background 0.1s, transform 0.1s;
-}
-.btn-setting-action:active {
-  background: #eee;
-  transform: translateY(2px);
-}
+    .level-bar-fill {
+      background: linear-gradient(90deg, #ffcc5c, #ff6f61);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
 
-/* LINEボタン */
-.line-btn {
-  background-color: var(--line-green); color: white; border: none;
-  padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
-  display: flex; align-items: center; gap: 8px; font-size: 0.9em;
-  touch-action: manipulation;
-  justify-content: center;
-  text-decoration: none; /* リンクの下線を消す */
-}
-.line-btn:active { transform: translateY(2px); opacity: 0.9; }
+    .status-badges {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
 
-/* モーダル内のLINEボタン（大きめ） */
-.btn-line-login {
-  background-color: #06c755;
-  color: white;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1em;
-  box-shadow: 0 4px 0 #05a546;
-  transition: transform 0.1s;
-}
-.btn-line-login:active {
-  transform: translateY(4px);
-  box-shadow: none;
-}
+    .badge-streak {
+      color: #ff6f61;
+    }
 
-.ranking-fab {
-  position: fixed; bottom: 20px; right: 20px;
-  background: #ffcc5c; color: #d35400; width: 60px; height: 60px;
-  border-radius: 50%; display: flex; justify-content: center; align-items: center;
-  font-size: 1.5em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer; z-index: 90; border: 3px solid white;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
+    .badge-points {
+      color: #f0ad4e;
+    }
 
-.hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.3s ease-in; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* --- 認証ボタン --- */
+    .auth-action-area {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 10;
+    }
 
-@media (max-width: 480px) {
-  .logo .ver-text { display: none; }
-  .logo { font-size: 1.2em; }
-  .grid-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .game-card { height: 120px; padding: 10px; }
-  .card-icon { font-size: 2em; }
-}
+    .btn-auth {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+      transition: transform 0.1s;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
 
-.game-card.locked {
-  position: relative;
-  opacity: 0.8;
-  background: #f9f9f9;
-  cursor: not-allowed;
-}
-.game-card.locked::after {
-  content: '\f023'; /* 鍵アイコン */
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3em;
-  color: #555;
-  opacity: 0.7;
-  z-index: 2;
-  pointer-events: none;
-}
-.premium-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: linear-gradient(45deg, #ffd700, #ffaa00);
-  color: white;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 0.7em;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  z-index: 3;
-}
-</style>
+    .btn-auth:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .btn-login {
+      background: #4caf50;
+      color: white;
+    }
+
+    .btn-signup {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-guest {
+      background: #90a4ae;
+      color: white;
+    }
+
+    /* --- グリッドレイアウト --- */
+    .section-header {
+      padding: 0 20px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 1.2em;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    .btn-back {
+      background: #eee;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+      display: none;
+      touch-action: manipulation;
+    }
+
+    .btn-back:hover {
+      background: #ddd;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+      padding: 0 20px 40px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-color);
+      border: 4px solid transparent;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 140px;
+      position: relative;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .game-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-icon {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-weight: 800;
+      font-size: 1.1em;
+      line-height: 1.3;
+      color: #555;
+    }
+
+    /* --- モーダル --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-box {
+      background: white;
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .modal-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+    }
+
+    .btn-setting-action {
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #555;
+      touch-action: manipulation;
+      transition: background 0.1s, transform 0.1s;
+    }
+
+    .btn-setting-action:active {
+      background: #eee;
+      transform: translateY(2px);
+    }
+
+    /* LINEボタン */
+    .line-btn {
+      background-color: var(--line-green);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+      touch-action: manipulation;
+      justify-content: center;
+      text-decoration: none;
+      /* リンクの下線を消す */
+    }
+
+    .line-btn:active {
+      transform: translateY(2px);
+      opacity: 0.9;
+    }
+
+    /* モーダル内のLINEボタン（大きめ） */
+    .btn-line-login {
+      background-color: #06c755;
+      color: white;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 1em;
+      box-shadow: 0 4px 0 #05a546;
+      transition: transform 0.1s;
+    }
+
+    .btn-line-login:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .ranking-fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ffcc5c;
+      color: #d35400;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 90;
+      border: 3px solid white;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo .ver-text {
+        display: none;
+      }
+
+      .logo {
+        font-size: 1.2em;
+      }
+
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .game-card {
+        height: 120px;
+        padding: 10px;
+      }
+
+      .card-icon {
+        font-size: 2em;
+      }
+    }
+
+    .game-card.locked {
+      position: relative;
+      opacity: 0.8;
+      background: #f9f9f9;
+      cursor: not-allowed;
+    }
+
+    .game-card.locked::after {
+      content: '\f023';
+      /* 鍵アイコン */
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      color: #555;
+      opacity: 0.7;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .premium-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(45deg, #ffd700, #ffaa00);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7em;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 3;
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-<div class="logo">
-  <i class="fa-solid fa-shapes"></i> FunLearnJP
-</div>
-<div class="header-right">
-  <button class="settings-trigger" onclick="openSettingsModal()">
-    <i class="fa-solid fa-gear"></i>
-  </button>
+  <header>
+    <div class="logo">
+      <i class="fa-solid fa-shapes"></i> FunLearnJP
+    </div>
+    <div class="header-right">
+      <button class="settings-trigger" onclick="openSettingsModal()">
+        <i class="fa-solid fa-gear"></i>
+      </button>
 
-  <div class="lang-switch">
-    <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
-    <button id="lang-en" onclick="setLanguage('en')">EN</button>
-  </div>
-</div>
-</header>
+      <div class="lang-switch">
+        <button id="lang-ja" onclick="setLanguage('ja')" class="active">JP</button>
+        <button id="lang-en" onclick="setLanguage('en')">EN</button>
+      </div>
+    </div>
+  </header>
 
-<div class="hero-section">
-<h1 data-i18n="main_title">楽しく日本語を学ぼう！</h1>
-</div>
-
-<div id="guest-welcome" class="auth-action-area">
-  <button id="login-btn" class="btn-auth btn-login" onclick="openAuthModal('login')">
-    <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span>
-  </button>
-  <button id="signup-btn" class="btn-auth btn-signup" onclick="openAuthModal('signup')">
-    <i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span>
-  </button>
-  <button id="guest-btn" class="btn-auth btn-guest" onclick="loginAsGuest()">
-    <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span>
-  </button>
-</div>
-
-<div id="user-dashboard" class="dashboard-card hidden">
-<div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
-<div class="user-meta">
-<div style="display:flex; justify-content:space-between;">
-  <span id="user-name" style="font-weight:bold; font-size:1.1em;">Loading...</span>
-  <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
-</div>
-<div class="level-bar-container"><div id="level-fill" class="level-bar-fill"></div></div>
-<div class="status-badges">
-  <span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
-  <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
-</div>
-</div>
-<button id="logout-btn" onclick="logout()" style="background:none; border:none; color:#999; cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i></button>
-</div>
-
-<div class="section-header">
-<h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> <span id="game-section-title" data-i18n="group_learning">学習メニュー</span></h3>
-<button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i> もどる</button>
-</div>
-
-<div id="game-grid" class="grid-container fade-in"></div>
-
-<div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
-<h3 class="section-title"><i class="fa-solid fa-book-open"></i> <span data-i18n="group_kiso">基礎・単語</span></h3>
-</div>
-<div class="grid-container">
-<a href="kiso.html" class="game-card" style="border-color:#ff6f61;">
-  <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
-  <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
-</a>
-<a href="hiragana_video_list.html" class="game-card" style="border-color:#ffa726;">
-  <i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
-  <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
-</a>
-<a href="verb_list.html" class="game-card" style="border-color:#ab47bc;">
-  <i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
-  <span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
-</a>
-<a href="keiyoshi_list.html" class="game-card" style="border-color:#66bb6a;">
-  <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
-  <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
-</a>
-<a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
-  <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
-  <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
-</a>
-</div>
-
-<div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
-<h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
-</div>
-<div class="grid-container">
-<a href="culture_map.html" id="static-sengoku-btn" class="game-card" style="border-color:#b71c1c;">
-  <div class="premium-badge"><i class="fa-solid fa-crown"></i> PRO</div>
-  <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
-  <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
-</a>
-</div>
-
-<div id="fab-ranking" class="ranking-fab" onclick="toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
-
-<div id="ranking-modal" class="modal-overlay">
-<div class="modal-box" style="text-align:left;">
-  <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
-  <div id="ranking-loading" style="text-align:center;">読み込み中...</div>
-  <ul id="ranking-list" style="list-style:none; padding:0; max-height: 300px; overflow-y: auto;"></ul>
-  <button onclick="document.getElementById('ranking-modal').style.display='none'" style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
-</div>
-</div>
-
-<div id="auth-modal" class="modal-overlay">
-<div class="modal-box">
-  <h2 id="modal-title"></h2> 
-  <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
-
-  <button class="btn-line-login" onclick="loginWithLine()">
-    <i class="fa-brands fa-line" style="font-size:1.5em;"></i> LINEでログイン
-  </button>
-
-  <div style="display:flex; align-items:center; margin:10px 0;">
-    <hr style="flex:1; border:none; border-top:1px solid #ccc;">
-    <span style="padding:0 10px; color:#999; font-size:0.8em;">またはメールで</span>
-    <hr style="flex:1; border:none; border-top:1px solid #ccc;">
+  <div class="hero-section">
+    <h1 data-i18n="main_title">楽しく日本語を学ぼう！</h1>
   </div>
 
-  <input type="email" id="auth-email" placeholder="メールアドレス" data-i18n-placeholder="ph_email">
-  <input type="password" id="auth-pass" placeholder="パスワード" data-i18n-placeholder="ph_pass">
-  <input type="text" id="auth-display-name" placeholder="ゲーム名（ランキング用）" data-i18n-placeholder="ph_name" class="hidden">
-  
-  <button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login" style="width:100%; margin-top:10px;"></button> 
-  <button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel" style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
-</div>
-</div>
-
-<div id="settings-modal" class="modal-overlay">
-<div class="modal-box">
-  <h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
-
-  <div class="setting-row">
-  <div>
-  <div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
-  <div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
-  </div>
-  <button onclick="requestNotificationPermission()" class="btn-setting-action">
-  <i class="fa-solid fa-bell"></i> 許可
-  </button>
+  <div id="guest-welcome" class="auth-action-area">
+    <button id="login-btn" class="btn-auth btn-login" onclick="openAuthModal('login')">
+      <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="btn_login">ログイン</span>
+    </button>
+    <button id="signup-btn" class="btn-auth btn-signup" onclick="openAuthModal('signup')">
+      <i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span>
+    </button>
+    <button id="guest-btn" class="btn-auth btn-guest" onclick="loginAsGuest()">
+      <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span>
+    </button>
   </div>
 
-  <div class="setting-row">
-  <div>
-  <div style="font-weight:bold; font-size:0.95em;">公式LINE</div>
-  <div style="font-size:0.75em; color:#888;">最新情報・サポート</div>
+  <div id="user-dashboard" class="dashboard-card hidden">
+    <div class="avatar-circle"><i class="fa-solid fa-user-astronaut"></i></div>
+    <div class="user-meta">
+      <div style="display:flex; justify-content:space-between;">
+        <span id="user-name" style="font-weight:bold; font-size:1.1em;">Loading...</span>
+        <span style="font-size:0.9em; color:#666;">Lv.<span id="user-lvl">1</span></span>
+      </div>
+      <div class="level-bar-container">
+        <div id="level-fill" class="level-bar-fill"></div>
+      </div>
+      <div class="status-badges">
+        <span class="badge-streak"><i class="fa-solid fa-fire"></i> <span id="streak-val">0</span> Day</span>
+        <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
+      </div>
+    </div>
+    <button id="logout-btn" onclick="logout()" style="background:none; border:none; color:#999; cursor:pointer;"><i
+        class="fa-solid fa-right-from-bracket"></i></button>
   </div>
-  <a href="https://lin.ee/bMkrO5fX" target="_blank" class="line-btn" style="color:white;">
-  <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 追加
-  </a>
+
+  <div class="section-header">
+    <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> <span id="game-section-title"
+        data-i18n="group_learning">学習メニュー</span></h3>
+    <button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i>
+      もどる</button>
   </div>
 
-  <div style="margin-top:20px;">
-  <button onclick="closeSettingsModal()" style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
+  <div id="game-grid" class="grid-container fade-in"></div>
+
+  <div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
+    <h3 class="section-title"><i class="fa-solid fa-book-open"></i> <span data-i18n="group_kiso">基礎・単語</span></h3>
   </div>
-</div>
-</div>
+  <div class="grid-container">
+    <a href="kiso.html" class="game-card" style="border-color:#ff6f61;">
+      <i class="fa-solid fa-pen-nib card-icon" style="color:#ff6f61;"></i>
+      <span class="card-title" data-i18n="btn_kiso">ひらがな<br>カタカナ</span>
+    </a>
+    <a href="hiragana_video_list.html" class="game-card" style="border-color:#ffa726;">
+      <i class="fa-solid fa-video card-icon" style="color:#ffa726;"></i>
+      <span class="card-title" data-i18n="btn_hiragana_video">動画練習</span>
+    </a>
+    <a href="verb_list.html" class="game-card" style="border-color:#ab47bc;">
+      <i class="fa-solid fa-book card-icon" style="color:#ab47bc;"></i>
+      <span class="card-title" data-i18n="btn_verb_list">動詞リスト</span>
+    </a>
+    <a href="keiyoshi_list.html" class="game-card" style="border-color:#66bb6a;">
+      <i class="fa-solid fa-book card-icon" style="color:#66bb6a;"></i>
+      <span class="card-title" data-i18n="btn_keiyoshi_list">形容詞リスト</span>
+    </a>
+    <a href="kanji_list.html" class="game-card" style="border-color:#42a5f5;">
+      <i class="fa-solid fa-scroll card-icon" style="color:#42a5f5;"></i>
+      <span class="card-title" data-i18n="btn_kanji_list">漢字リスト</span>
+    </a>
+  </div>
 
-<script type="module" src="js/firebase-config.js"></script>
+  <div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
+    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
+  </div>
+  <div class="grid-container">
+    <a href="culture_map.html" id="static-sengoku-btn" class="game-card" style="border-color:#b71c1c;">
+      <div class="premium-badge"><i class="fa-solid fa-crown"></i> PRO</div>
+      <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
+      <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
+    </a>
+  </div>
 
-<script>
-window.currentLang = 'ja'; 
-window.isUserPremium = false; // デフォルトはfalse
+  <div id="fab-ranking" class="ranking-fab" onclick="toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
 
-// ★翻訳データに「btn_place_directions」を追加
-window.i18nData = {
-ja: {
-main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト",
-group_kiso: "基礎・単語", group_learning: "学習メニュー", group_fun_games: "ゲーム",
-btn_kiso: "ひらがなカタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト",btn_kanji_list: "漢字リスト",
-cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
-cat_clock: "とけい", cat_date_time: "日付・時間",
-cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう", cat_practice: "じっせん", cat_manga: "マンガ", cat_culture: "文化・行事", cat_prefecture: "都道府県",
-btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_hatsuon: "発音マスター", btn_h_match: "ひらがなマッチ",
-btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
-btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_hatsuon: "発音マスター", btn_k_match: "カタカナマッチ", btn_k_pair: "ひらカタあわせ",
-btn_shiri1: "しりとり1", btn_shiri2: "しりとり2", btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
-btn_imasu: "います<br>あります", btn_money: "お金の学習", btn_place_directions: "場所・道案内", btn_transport: "こうつう",
-btn_clock1: "とけい1", btn_clock2: "とけい2", btn_datetime_practice: "日付・練習",
-btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ", btn_kanji_sentence: "漢字・文章クイズ",
-btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？", btn_kei_neg: "ひていけい (～くない)",
-btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング", 
-btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか", 
-btn_teimasu: "V-ています", btn_temoii: "V-てもいいですか", btn_kata: "V-方",
-btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_counters: "助数詞マスター", btn_sentencepuzzle: "ぶんづくり",
-btn_shoptalk: "お買い物トーク", btn_discount: "割引計算バトル", btn_travel_survival: "日本旅行サバイバル", btn_airport: "空港サバイバル", btn_emergency: "緊急サバイバル", btn_sign: "看板サバイバル", btn_bustalk: "お仕事トーク", btn_sengoku: "戦国・日本語伝", btn_manga_sound: "オノマトペ", btn_festival: "日本の行事", btn_hokkaido_winter: "北海道・冬の旅",
-modal_login: "ログイン", modal_signup: "新規登録",
-ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
-btn_exec: "実行", btn_cancel: "キャンセル",
-err_input_req: "メールアドレスとパスワードを入力してください",
-err_pass_len: "パスワードは6文字以上にする必要があります。",
-err_name_req: "Please enter a game name (2+ chars).",
-err_name_taken: "That game name is already taken.",
-err_generic: "認証中にエラーが発生しました。",
-err_email_taken: "Email is already in use.",
-err_auth_fail: "Incorrect email or password."
-},
-en: {
-main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest",
-group_kiso: "Basics & Words", group_learning: "Learning Menu", group_fun_games: "Games",
-btn_kiso: "Hiragana/Katakana", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adjectives List", btn_verb_list: "Verbs List", btn_kanji_list: "Kanji List",
-cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
-cat_clock: "Clock", cat_date_time: "Date & Time",
-cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Grammar & Sentences", cat_practice: "Practice", cat_manga: "Manga", cat_culture: "Culture", cat_prefecture: "Prefectures",
-btn_h_write: "Writing Dojo", btn_h_sound: "Sound Quiz", btn_h_hatsuon: "Pronunciation", btn_h_match: "Matching",
-btn_h_vocab: "Vocabulary", btn_h_reorder: "Unscramble", btn_h_meteor: "Meteor Quiz",
-btn_k_write: "Writing Dojo", btn_k_sound: "Sound Quiz", btn_k_hatsuon: "Pronunciation", btn_k_match: "Matching", btn_k_pair: "Hira-Kata Pair",
-btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2", btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings",
-btn_imasu: "Imasu/Arimasu", btn_money: "Money Learning", btn_place_directions: "Places & Directions", btn_transport: "Transport",
-btn_clock1: "Clock 1", btn_clock2: "Clock 2", btn_datetime_practice: "Date Practice",
-btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz", btn_kanji_sentence: "Kanji Sentence",
-btn_kei1: "Adjectives 1", btn_kei_match: "Which one?", btn_kei_neg: "Negative Form",
-btn_verbgame: "Verb Game", btn_verbmasu: "Masu Form", btn_verbte: "Te Form", 
-btn_tekudasai: "V-tekudasai", btn_tekudasaimasenka: "V-tekudasaimasenka", btn_mashouka: "V-mashouka", 
-btn_teimasu: "V-teimasu", btn_temoii: "V-temoii", btn_kata: "V-kata",
-btn_partsort: "Particle Sort", btn_partquiz: "Particle Master", btn_counters: "Counters Master", btn_sentencepuzzle: "Sentence Puzzle",
-btn_shoptalk: "Shopping Talk", btn_discount: "Discount Battle", btn_travel_survival: "directions_game", btn_airport: "Airport Survival", btn_emergency: "Emergency Survival", btn_sign: "Sign Survival", btn_bustalk: "Business Talk", btn_sengoku: "Sengoku Legend", btn_manga_sound: "Onomatopoeia", btn_festival: "Festivals", btn_hokkaido_winter: "Hokkaido Winter Trip",
-modal_login: "Login", modal_signup: "Sign Up",
-ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
-btn_exec: "Submit", btn_cancel: "Cancel",
-err_input_req: "Please enter email and password.",
-err_pass_len: "Password must be at least 6 characters.",
-err_name_req: "Please enter a game name (2+ chars).",
-err_name_taken: "That game name is already taken.",
-err_generic: "An error occurred during authentication.",
-err_email_taken: "Email is already in use.",
-err_auth_fail: "Incorrect email or password."
-}
-};
+  <div id="ranking-modal" class="modal-overlay">
+    <div class="modal-box" style="text-align:left;">
+      <h2 style="text-align:center; color:#f0ad4e;"><i class="fa-solid fa-crown"></i> ランキング</h2>
+      <div id="ranking-loading" style="text-align:center;">読み込み中...</div>
+      <ul id="ranking-list" style="list-style:none; padding:0; max-height: 300px; overflow-y: auto;"></ul>
+      <button onclick="document.getElementById('ranking-modal').style.display='none'"
+        style="width:100%; padding:10px; margin-top:10px; border:none; background:#eee;">閉じる</button>
+    </div>
+  </div>
 
-const gameStructure = [
-{ id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
-{ url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
-{ url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
-{ url: "hiragana_pronunciation.html", titleKey: "btn_h_hatsuon", icon: "fa-solid fa-microphone" },
-{ url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
-{ url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
-{ url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
-{ url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
-]},
-{ id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
-{ url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
-{ url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" },
-{ url: "katakana_pronunciation.html", titleKey: "btn_k_hatsuon", icon: "fa-solid fa-microphone" },
-{ url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
-{ url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
-]},
-{ id: "shiritori", icon: "fa-solid fa-comments", color: "#fdd835", titleKey: "cat_shiritori", games: [
-{ url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
-{ url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
-]},
-// ★ word_other カテゴリの「お金の学習」の次に「場所・道案内サバイバル」を追加
-{ id: "word_other", icon: "fa-solid fa-microphone", color: "#26c6da", titleKey: "cat_word_other", games: [
-{ url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
-{ url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
-{ url: "imasu_arimasu.html", titleKey: "btn_imasu", icon: "fa-solid fa-cat" },
-{ url: "money.html", titleKey: "btn_money", icon: "fa-solid fa-coins" },
-{ url: "place_directions.html", titleKey: "btn_place_directions", icon: "fa-solid fa-map-location-dot" },
-{ url: "transport_game.html", titleKey: "btn_transport", icon: "fa-solid fa-car" },
-]},
-{ id: "clock", icon: "fa-solid fa-clock", color: "#5c6bc0", titleKey: "cat_clock", games: [
-{ url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
-{ url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
-]},
-{ id: "date_time", icon: "fa-solid fa-calendar-alt", color: "#3f51b5", titleKey: "cat_date_time", games: [
-{ url: "date_time_practice.html", titleKey: "btn_datetime_practice", icon: "fa-solid fa-book-open" }
-]},
-{ id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
-{ url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
-{ url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
-{ url: "kanji_sentence_quiz.html", titleKey: "btn_kanji_sentence", icon: "fa-solid fa-pen-to-square", isPremium: true }
-]},
-{ id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
-{ url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
-{ url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
-{ url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
-]},
-{ id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
-{ url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
-{ url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
-{ url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
-{ url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
-{ url: "verb_tekudasaimasenka_practice.html", titleKey: "btn_tekudasaimasenka", icon: "fa-solid fa-hands-praying" },
-{ url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" },
-{ url: "verb_teimasu_practice.html", titleKey: "btn_teimasu", icon: "fa-solid fa-spinner" },
-{ url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" },
-{ url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" }
-]},
-{ id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
-{ url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
-{ url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
-{ url: "counters_game.html", titleKey: "btn_counters", icon: "fa-solid fa-cubes" },
-{ url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
-]},
-{ id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [
-{ url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
-{ url: "discount_battle.html", titleKey: "btn_discount", icon: "fa-solid fa-tag" },
-{ url: "directions_game.html", titleKey: "btn_travel_survival", icon: "fa-solid fa-map-location-dot" },
-{ url: "airport_survival.html", titleKey: "btn_airport", icon: "fa-solid fa-passport" },
-{ url: "emergency_survival.html", titleKey: "btn_emergency", icon: "fa-solid fa-truck-medical" },
-{ url: "sign_survival.html", titleKey: "btn_sign", icon: "fa-solid fa-person-walking-luggage" },
-{ url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase", isPremium: true }
-]},
-{ id: "culture", icon: "fa-solid fa-torii-gate", color: "#9c27b0", titleKey: "cat_culture", games: [
-{ url: "culture_map.html", titleKey: "btn_sengoku", icon: "fa-solid fa-khanda", isPremium: true },
-{ url: "festival_game.html", titleKey: "btn_festival", icon: "fa-solid fa-calendar-days" }
-]},
-{ id: "manga", icon: "fa-solid fa-book-journal-whills", color: "#00897B", titleKey: "cat_manga", games: [
-{ url: "manga_sound.html", titleKey: "btn_manga_sound", icon: "fa-solid fa-comment-dots" }
-]},
-{ id: "prefecture", icon: "fa-solid fa-map-location-dot", color: "#0097a7", titleKey: "cat_prefecture", games: [
-{ url: "hokkaido_survival.html", titleKey: "btn_hokkaido_winter", icon: "fa-solid fa-snowflake" }
-]}
-];
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h2 id="modal-title"></h2>
+      <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
 
-const gameGrid = document.getElementById('game-grid');
-const backBtn = document.getElementById('game-back-btn');
+      <button class="btn-line-login" onclick="loginWithLine()">
+        <i class="fa-brands fa-line" style="font-size:1.5em;"></i> LINEでログイン
+      </button>
 
-window.renderGameCategories = () => {
-gameGrid.textContent = '';
-backBtn.style.display = 'none';
-document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang].group_learning;
-gameStructure.forEach(cat => {
-const div = document.createElement('div');
-div.className = 'game-card';
-div.style.borderColor = cat.color;
-div.onclick = () => renderGameList(cat);
-const title = window.i18nData[window.currentLang][cat.titleKey] || cat.titleKey;
-div.textContent = `<i class="${cat.icon} card-icon" style="color:${cat.color}"></i><span class="card-title">${title}</span><span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>`;
-gameGrid.appendChild(div);
-});
-gameGrid.classList.remove('fade-in');
-void gameGrid.offsetWidth;
-gameGrid.classList.add('fade-in');
-};
+      <div style="display:flex; align-items:center; margin:10px 0;">
+        <hr style="flex:1; border:none; border-top:1px solid #ccc;">
+        <span style="padding:0 10px; color:#999; font-size:0.8em;">またはメールで</span>
+        <hr style="flex:1; border:none; border-top:1px solid #ccc;">
+      </div>
 
-function renderGameList(category) {
-    gameGrid.textContent = '';
-    backBtn.style.display = 'block';
-    document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
-    
-    category.games.forEach(game => {
+      <input type="email" id="auth-email" placeholder="メールアドレス" data-i18n-placeholder="ph_email">
+      <input type="password" id="auth-pass" placeholder="パスワード" data-i18n-placeholder="ph_pass">
+      <input type="text" id="auth-display-name" placeholder="ゲーム名（ランキング用）" data-i18n-placeholder="ph_name"
+        class="hidden">
+
+      <button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login"
+        style="width:100%; margin-top:10px;"></button>
+      <button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel"
+        style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h2 style="margin-bottom:20px; color:#555;"><i class="fa-solid fa-gear"></i> 設定</h2>
+
+      <div class="setting-row">
+        <div>
+          <div style="font-weight:bold; font-size:0.95em;">サイト通知</div>
+          <div style="font-size:0.75em; color:#888;">最新情報を受け取る</div>
+        </div>
+        <button onclick="requestNotificationPermission()" class="btn-setting-action">
+          <i class="fa-solid fa-bell"></i> 許可
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div style="font-weight:bold; font-size:0.95em;">公式LINE</div>
+          <div style="font-size:0.75em; color:#888;">最新情報・サポート</div>
+        </div>
+        <a href="https://lin.ee/bMkrO5fX" target="_blank" class="line-btn" style="color:white;">
+          <i class="fa-brands fa-line" style="font-size:1.3em;"></i> 追加
+        </a>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button onclick="closeSettingsModal()"
+          style="padding:10px 30px; border:none; background:#eee; color:#555; border-radius:20px; cursor:pointer; font-weight:bold;">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/auth.js"></script>
+
+  <script>
+    window.currentLang = 'ja';
+    window.isUserPremium = false; // デフォルトはfalse
+
+    // ★翻訳データに「btn_place_directions」を追加
+    window.i18nData = {
+      ja: {
+        main_title: "Fun Learning Japanese", btn_login: "ログイン", btn_signup: "新規登録", btn_guest: "ゲスト",
+        group_kiso: "基礎・単語", group_learning: "学習メニュー", group_fun_games: "ゲーム",
+        btn_kiso: "ひらがなカタカナ", btn_hiragana_video: "動画練習", btn_keiyoshi_list: "形容詞リスト", btn_verb_list: "動詞リスト", btn_kanji_list: "漢字リスト",
+        cat_hiragana: "ひらがな", cat_katakana: "カタカナ", cat_shiritori: "しりとり", cat_word_other: "ことば",
+        cat_clock: "とけい", cat_date_time: "日付・時間",
+        cat_kanji_game: "かんじ", cat_keiyoshi_game: "けいようし", cat_verb_game: "どうし", cat_sentence: "ぶんしょう", cat_practice: "じっせん", cat_manga: "マンガ", cat_culture: "文化・行事", cat_prefecture: "都道府県",
+        btn_h_write: "かきかた道場", btn_h_sound: "おとクイズ", btn_h_hatsuon: "発音マスター", btn_h_match: "ひらがなマッチ",
+        btn_h_vocab: "ひらがな単語", btn_h_reorder: "並び替え", btn_h_meteor: "隕石クイズ",
+        btn_k_write: "カタカナ道場", btn_k_sound: "おとクイズ", btn_k_hatsuon: "発音マスター", btn_k_match: "カタカナマッチ", btn_k_pair: "ひらカタあわせ",
+        btn_shiri1: "しりとり1", btn_shiri2: "しりとり2", btn_treasure: "宝探し", btn_aisatsu: "あいさつ",
+        btn_imasu: "います<br>あります", btn_money: "お金の学習", btn_place_directions: "場所・道案内", btn_transport: "こうつう",
+        btn_clock1: "とけい1", btn_clock2: "とけい2", btn_datetime_practice: "日付・練習",
+        btn_kanjidojo: "かきかた道場", btn_kanjiquiz: "かんじクイズ", btn_kanji_sentence: "漢字・文章クイズ",
+        btn_kei1: "けいようし1", btn_kei_match: "どっちが〇〇？", btn_kei_neg: "ひていけい (～くない)",
+        btn_verbgame: "どうしゲーム", btn_verbmasu: "ます形タイピング", btn_verbte: "て形タイピング",
+        btn_tekudasai: "V-てください", btn_tekudasaimasenka: "V-てくださいませんか", btn_mashouka: "V-ましょうか",
+        btn_teimasu: "V-ています", btn_temoii: "V-てもいいですか", btn_kata: "V-方",
+        btn_partsort: "助詞・仕分け道場", btn_partquiz: "てにをはマスター", btn_counters: "助数詞マスター", btn_sentencepuzzle: "ぶんづくり",
+        btn_shoptalk: "お買い物トーク", btn_discount: "割引計算バトル", btn_travel_survival: "日本旅行サバイバル", btn_airport: "空港サバイバル", btn_emergency: "緊急サバイバル", btn_sign: "看板サバイバル", btn_bustalk: "お仕事トーク", btn_sengoku: "戦国・日本語伝", btn_manga_sound: "オノマトペ", btn_festival: "日本の行事", btn_hokkaido_winter: "北海道・冬の旅",
+        modal_login: "ログイン", modal_signup: "新規登録",
+        ph_email: "メールアドレス", ph_pass: "パスワード", ph_name: "ゲーム名 (ランキングに表示)",
+        btn_exec: "実行", btn_cancel: "キャンセル",
+        err_input_req: "メールアドレスとパスワードを入力してください",
+        err_pass_len: "パスワードは6文字以上にする必要があります。",
+        err_name_req: "Please enter a game name (2+ chars).",
+        err_name_taken: "That game name is already taken.",
+        err_generic: "認証中にエラーが発生しました。",
+        err_email_taken: "Email is already in use.",
+        err_auth_fail: "Incorrect email or password."
+      },
+      en: {
+        main_title: "Fun Learning Japanese", btn_login: "Login", btn_signup: "Sign Up", btn_guest: "Guest",
+        group_kiso: "Basics & Words", group_learning: "Learning Menu", group_fun_games: "Games",
+        btn_kiso: "Hiragana/Katakana", btn_hiragana_video: "Video Practice", btn_keiyoshi_list: "Adjectives List", btn_verb_list: "Verbs List", btn_kanji_list: "Kanji List",
+        cat_hiragana: "Hiragana", cat_katakana: "Katakana", cat_shiritori: "Shiritori", cat_word_other: "Words",
+        cat_clock: "Clock", cat_date_time: "Date & Time",
+        cat_kanji_game: "Kanji", cat_keiyoshi_game: "Adjectives", cat_verb_game: "Verbs", cat_sentence: "Grammar & Sentences", cat_practice: "Practice", cat_manga: "Manga", cat_culture: "Culture", cat_prefecture: "Prefectures",
+        btn_h_write: "Writing Dojo", btn_h_sound: "Sound Quiz", btn_h_hatsuon: "Pronunciation", btn_h_match: "Matching",
+        btn_h_vocab: "Vocabulary", btn_h_reorder: "Unscramble", btn_h_meteor: "Meteor Quiz",
+        btn_k_write: "Writing Dojo", btn_k_sound: "Sound Quiz", btn_k_hatsuon: "Pronunciation", btn_k_match: "Matching", btn_k_pair: "Hira-Kata Pair",
+        btn_shiri1: "Shiritori 1", btn_shiri2: "Shiritori 2", btn_treasure: "Treasure Hunt", btn_aisatsu: "Greetings",
+        btn_imasu: "Imasu/Arimasu", btn_money: "Money Learning", btn_place_directions: "Places & Directions", btn_transport: "Transport",
+        btn_clock1: "Clock 1", btn_clock2: "Clock 2", btn_datetime_practice: "Date Practice",
+        btn_kanjidojo: "Writing Dojo", btn_kanjiquiz: "Kanji Quiz", btn_kanji_sentence: "Kanji Sentence",
+        btn_kei1: "Adjectives 1", btn_kei_match: "Which one?", btn_kei_neg: "Negative Form",
+        btn_verbgame: "Verb Game", btn_verbmasu: "Masu Form", btn_verbte: "Te Form",
+        btn_tekudasai: "V-tekudasai", btn_tekudasaimasenka: "V-tekudasaimasenka", btn_mashouka: "V-mashouka",
+        btn_teimasu: "V-teimasu", btn_temoii: "V-temoii", btn_kata: "V-kata",
+        btn_partsort: "Particle Sort", btn_partquiz: "Particle Master", btn_counters: "Counters Master", btn_sentencepuzzle: "Sentence Puzzle",
+        btn_shoptalk: "Shopping Talk", btn_discount: "Discount Battle", btn_travel_survival: "directions_game", btn_airport: "Airport Survival", btn_emergency: "Emergency Survival", btn_sign: "Sign Survival", btn_bustalk: "Business Talk", btn_sengoku: "Sengoku Legend", btn_manga_sound: "Onomatopoeia", btn_festival: "Festivals", btn_hokkaido_winter: "Hokkaido Winter Trip",
+        modal_login: "Login", modal_signup: "Sign Up",
+        ph_email: "Email Address", ph_pass: "Password", ph_name: "Game Name (for Ranking)",
+        btn_exec: "Submit", btn_cancel: "Cancel",
+        err_input_req: "Please enter email and password.",
+        err_pass_len: "Password must be at least 6 characters.",
+        err_name_req: "Please enter a game name (2+ chars).",
+        err_name_taken: "That game name is already taken.",
+        err_generic: "An error occurred during authentication.",
+        err_email_taken: "Email is already in use.",
+        err_auth_fail: "Incorrect email or password."
+      }
+    };
+
+    const gameStructure = [
+      {
+        id: "hiragana", icon: "fa-solid fa-h", color: "#ff6f61", titleKey: "cat_hiragana", games: [
+          { url: "trace_write_hiragana.html", titleKey: "btn_h_write", icon: "fa-solid fa-paintbrush" },
+          { url: "hiragana_block.html", titleKey: "btn_h_sound", icon: "fa-solid fa-cube" },
+          { url: "hiragana_pronunciation.html", titleKey: "btn_h_hatsuon", icon: "fa-solid fa-microphone" },
+          { url: "hiragana_drag_match.html", titleKey: "btn_h_match", icon: "fa-solid fa-hand-pointer" },
+          { url: "hiragana.html", titleKey: "btn_h_vocab", icon: "fa-solid fa-shapes" },
+          { url: "hiragana2.html", titleKey: "btn_h_reorder", icon: "fa-solid fa-sort-alpha-down" },
+          { url: "meteor_quiz.html", titleKey: "btn_h_meteor", icon: "fa-solid fa-meteor" }
+        ]
+      },
+      {
+        id: "katakana", icon: "fa-solid fa-k", color: "#ffa726", titleKey: "cat_katakana", games: [
+          { url: "trace_write_katakana.html", titleKey: "btn_k_write", icon: "fa-solid fa-pen-nib" },
+          { url: "katakana_block.html", titleKey: "btn_k_sound", icon: "fa-solid fa-cube" },
+          { url: "katakana_pronunciation.html", titleKey: "btn_k_hatsuon", icon: "fa-solid fa-microphone" },
+          { url: "katakana_drag_match.html", titleKey: "btn_k_match", icon: "fa-solid fa-hand-pointer" },
+          { url: "hira_kata_pair.html", titleKey: "btn_k_pair", icon: "fa-solid fa-right-left" }
+        ]
+      },
+      {
+        id: "shiritori", icon: "fa-solid fa-comments", color: "#fdd835", titleKey: "cat_shiritori", games: [
+          { url: "shiritori.html", titleKey: "btn_shiri1", icon: "fa-solid fa-comment-dots" },
+          { url: "shiritori2.html", titleKey: "btn_shiri2", icon: "fa-regular fa-comments" }
+        ]
+      },
+      // ★ word_other カテゴリの「お金の学習」の次に「場所・道案内サバイバル」を追加
+      {
+        id: "word_other", icon: "fa-solid fa-microphone", color: "#26c6da", titleKey: "cat_word_other", games: [
+          { url: "treasure_Hunt.html", titleKey: "btn_treasure", icon: "fa-solid fa-gem" },
+          { url: "aisatsu_quiz.html", titleKey: "btn_aisatsu", icon: "fa-solid fa-hand-spock" },
+          { url: "imasu_arimasu.html", titleKey: "btn_imasu", icon: "fa-solid fa-cat" },
+          { url: "money.html", titleKey: "btn_money", icon: "fa-solid fa-coins" },
+          { url: "place_directions.html", titleKey: "btn_place_directions", icon: "fa-solid fa-map-location-dot" },
+          { url: "transport_game.html", titleKey: "btn_transport", icon: "fa-solid fa-car" },
+        ]
+      },
+      {
+        id: "clock", icon: "fa-solid fa-clock", color: "#5c6bc0", titleKey: "cat_clock", games: [
+          { url: "clock.html", titleKey: "btn_clock1", icon: "fa-regular fa-clock" },
+          { url: "clock2.html", titleKey: "btn_clock2", icon: "fa-solid fa-stopwatch" }
+        ]
+      },
+      {
+        id: "date_time", icon: "fa-solid fa-calendar-alt", color: "#3f51b5", titleKey: "cat_date_time", games: [
+          { url: "date_time_practice.html", titleKey: "btn_datetime_practice", icon: "fa-solid fa-book-open" }
+        ]
+      },
+      {
+        id: "kanji_game", icon: "fa-solid fa-pen-fancy", color: "#42a5f5", titleKey: "cat_kanji_game", games: [
+          { url: "kanji_dojo.html", titleKey: "btn_kanjidojo", icon: "fa-solid fa-paintbrush" },
+          { url: "kanji_quiz.html", titleKey: "btn_kanjiquiz", icon: "fa-solid fa-scroll" },
+          { url: "kanji_sentence_quiz.html", titleKey: "btn_kanji_sentence", icon: "fa-solid fa-pen-to-square", isPremium: true }
+        ]
+      },
+      {
+        id: "keiyoshi_game", icon: "fa-solid fa-star-half-stroke", color: "#66bb6a", titleKey: "cat_keiyoshi_game", games: [
+          { url: "keiyoshi_game.html", titleKey: "btn_kei_match", icon: "fa-solid fa-circle-question" },
+          { url: "keiyoshi.html", titleKey: "btn_kei1", icon: "fa-solid fa-star-half-stroke" },
+          { url: "keiyoshi_negative_practice.html", titleKey: "btn_kei_neg", icon: "fa-solid fa-circle-xmark" }
+        ]
+      },
+      {
+        id: "verbs", icon: "fa-solid fa-person-running", color: "#ab47bc", titleKey: "cat_verb_game", games: [
+          { url: "verb.html", titleKey: "btn_verbgame", icon: "fa-solid fa-person-running" },
+          { url: "verb_typing_masu.html", titleKey: "btn_verbmasu", icon: "fa-regular fa-keyboard" },
+          { url: "verb_typing_te.html", titleKey: "btn_verbte", icon: "fa-solid fa-keyboard" },
+          { url: "verb_tekudasai_practice.html", titleKey: "btn_tekudasai", icon: "fa-solid fa-list-check" },
+          { url: "verb_tekudasaimasenka_practice.html", titleKey: "btn_tekudasaimasenka", icon: "fa-solid fa-hands-praying" },
+          { url: "verb_mashouka_practice.html", titleKey: "btn_mashouka", icon: "fa-solid fa-hand-holding-heart" },
+          { url: "verb_teimasu_practice.html", titleKey: "btn_teimasu", icon: "fa-solid fa-spinner" },
+          { url: "verb_temoii_practice.html", titleKey: "btn_temoii", icon: "fa-solid fa-circle-check" },
+          { url: "verb_kata_practice.html", titleKey: "btn_kata", icon: "fa-solid fa-screwdriver-wrench" }
+        ]
+      },
+      {
+        id: "sentence", icon: "fa-solid fa-layer-group", color: "#ec407a", titleKey: "cat_sentence", games: [
+          { url: "particle_sorter.html", titleKey: "btn_partsort", icon: "fa-solid fa-filter" },
+          { url: "particle_quiz.html", titleKey: "btn_partquiz", icon: "fa-solid fa-filter" },
+          { url: "counters_game.html", titleKey: "btn_counters", icon: "fa-solid fa-cubes" },
+          { url: "sentence_puzzle.html", titleKey: "btn_sentencepuzzle", icon: "fa-solid fa-layer-group" }
+        ]
+      },
+      {
+        id: "practice", icon: "fa-solid fa-store", color: "#8d6e63", titleKey: "cat_practice", games: [
+          { url: "shopping_talk.html", titleKey: "btn_shoptalk", icon: "fa-solid fa-cart-shopping" },
+          { url: "discount_battle.html", titleKey: "btn_discount", icon: "fa-solid fa-tag" },
+          { url: "directions_game.html", titleKey: "btn_travel_survival", icon: "fa-solid fa-map-location-dot" },
+          { url: "airport_survival.html", titleKey: "btn_airport", icon: "fa-solid fa-passport" },
+          { url: "emergency_survival.html", titleKey: "btn_emergency", icon: "fa-solid fa-truck-medical" },
+          { url: "sign_survival.html", titleKey: "btn_sign", icon: "fa-solid fa-person-walking-luggage" },
+          { url: "business_game.html", titleKey: "btn_bustalk", icon: "fa-solid fa-briefcase", isPremium: true }
+        ]
+      },
+      {
+        id: "culture", icon: "fa-solid fa-torii-gate", color: "#9c27b0", titleKey: "cat_culture", games: [
+          { url: "culture_map.html", titleKey: "btn_sengoku", icon: "fa-solid fa-khanda", isPremium: true },
+          { url: "festival_game.html", titleKey: "btn_festival", icon: "fa-solid fa-calendar-days" }
+        ]
+      },
+      {
+        id: "manga", icon: "fa-solid fa-book-journal-whills", color: "#00897B", titleKey: "cat_manga", games: [
+          { url: "manga_sound.html", titleKey: "btn_manga_sound", icon: "fa-solid fa-comment-dots" }
+        ]
+      },
+      {
+        id: "prefecture", icon: "fa-solid fa-map-location-dot", color: "#0097a7", titleKey: "cat_prefecture", games: [
+          { url: "hokkaido_survival.html", titleKey: "btn_hokkaido_winter", icon: "fa-solid fa-snowflake" }
+        ]
+      }
+    ];
+
+    const gameGrid = document.getElementById('game-grid');
+    const backBtn = document.getElementById('game-back-btn');
+
+    window.renderGameCategories = () => {
+      gameGrid.textContent = '';
+      backBtn.style.display = 'none';
+      document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang].group_learning;
+      gameStructure.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'game-card';
+        div.style.borderColor = cat.color;
+        div.onclick = () => renderGameList(cat);
+        const title = window.i18nData[window.currentLang][cat.titleKey] || cat.titleKey;
+        div.textContent = `<i class="${cat.icon} card-icon" style="color:${cat.color}"></i><span class="card-title">${title}</span><span style="font-size:0.8em; color:#999; margin-top:5px; font-weight:bold;">${cat.games.length} Games</span>`;
+        gameGrid.appendChild(div);
+      });
+      gameGrid.classList.remove('fade-in');
+      void gameGrid.offsetWidth;
+      gameGrid.classList.add('fade-in');
+    };
+
+    function renderGameList(category) {
+      gameGrid.textContent = '';
+      backBtn.style.display = 'block';
+      document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
+
+      category.games.forEach(game => {
         // ★ロック機能：Divタグを使用してクリック無効化
         const isLocked = game.isPremium && !window.isUserPremium;
         const tagName = isLocked ? 'div' : 'a';
-        
+
         const card = document.createElement(tagName);
         card.className = 'game-card';
         card.style.borderColor = category.color;
 
         if (isLocked) {
-            card.classList.add('locked');
-            // onclickイベントでアラートを表示
-            card.onclick = () => window.openPremiumModal();
+          card.classList.add('locked');
+          // onclickイベントでアラートを表示
+          card.onclick = () => window.openPremiumModal();
         } else {
-            card.href = game.url;
+          card.href = game.url;
         }
 
         const gameTitle = window.i18nData[window.currentLang][game.titleKey] || game.title;
@@ -667,79 +969,80 @@ function renderGameList(category) {
         <i class="${game.icon} card-icon" style="color:${category.color}"></i>
         <span class="card-title">${gameTitle}</span>`;
         gameGrid.appendChild(card);
-    });
+      });
 
-    gameGrid.classList.remove('fade-in');
-    void gameGrid.offsetWidth;
-    gameGrid.classList.add('fade-in');
+      gameGrid.classList.remove('fade-in');
+      void gameGrid.offsetWidth;
+      gameGrid.classList.add('fade-in');
 
-    const sectionHeader = document.getElementById('game-section-title').closest('.section-header');
-    const y = sectionHeader.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({top: y, behavior: 'smooth'});
-}
+      const sectionHeader = document.getElementById('game-section-title').closest('.section-header');
+      const y = sectionHeader.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
 
-// ▼▼▼ Stripe決済ページへの誘導に変更しました ▼▼▼
-window.openPremiumModal = () => {
-    // ユーザーに確認してから飛ばす
-    if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+    // ▼▼▼ Stripe決済ページへの誘導に変更しました ▼▼▼
+    window.openPremiumModal = () => {
+      // ユーザーに確認してから飛ばす
+      if (confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
         // Stripeの支払いページを新しいタブで開く
         window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
-    }
-};
+      }
+    };
 
-window.setLanguage = (lang) => {
-window.currentLang = lang;
-document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if(window.i18nData[lang][key]) el.textContent = window.i18nData[lang][key]; });
-document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.dataset.i18nPlaceholder; if(window.i18nData[lang][key]) el.placeholder = window.i18nData[lang][key]; });
-document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
-document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-if(backBtn.style.display === 'none') renderGameCategories(); else renderGameCategories();
-if(document.getElementById('auth-modal').style.display === 'flex') {
-const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
-document.getElementById('modal-title').textContent = window.i18nData[lang][modeKey];
-document.getElementById('modal-submit').textContent = window.i18nData[lang]['btn_exec'];
-}
-};
+    window.setLanguage = (lang) => {
+      window.currentLang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.dataset.i18n; if (window.i18nData[lang][key]) el.textContent = window.i18nData[lang][key]; });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.dataset.i18nPlaceholder; if (window.i18nData[lang][key]) el.placeholder = window.i18nData[lang][key]; });
+      document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+      if (backBtn.style.display === 'none') renderGameCategories(); else renderGameCategories();
+      if (document.getElementById('auth-modal').style.display === 'flex') {
+        const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
+        document.getElementById('modal-title').textContent = window.i18nData[lang][modeKey];
+        document.getElementById('modal-submit').textContent = window.i18nData[lang]['btn_exec'];
+      }
+    };
 
-window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
-window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
+    window.openSettingsModal = () => document.getElementById('settings-modal').style.display = 'flex';
+    window.closeSettingsModal = () => document.getElementById('settings-modal').style.display = 'none';
 
-window.openAuthModal = (mode) => {
-  window.authMode = mode;
-  const modal = document.getElementById('auth-modal');
-  const displayNameInput = document.getElementById('auth-display-name');
-  modal.style.display = 'flex';
-  const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
-  document.getElementById('modal-title').textContent = window.i18nData[window.currentLang][titleKey];
-  document.getElementById('modal-submit').textContent = window.i18nData[window.currentLang]['btn_exec'];
-  displayNameInput.classList.toggle('hidden', mode === 'login');
-  document.getElementById('modal-msg').textContent = '';
-  document.getElementById('auth-email').value = '';
-  document.getElementById('auth-pass').value = '';
-  displayNameInput.value = '';
-};
-window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
+    window.openAuthModal = (mode) => {
+      window.authMode = mode;
+      const modal = document.getElementById('auth-modal');
+      const displayNameInput = document.getElementById('auth-display-name');
+      modal.style.display = 'flex';
+      const titleKey = mode === 'login' ? 'modal_login' : 'modal_signup';
+      document.getElementById('modal-title').textContent = window.i18nData[window.currentLang][titleKey];
+      document.getElementById('modal-submit').textContent = window.i18nData[window.currentLang]['btn_exec'];
+      displayNameInput.classList.toggle('hidden', mode === 'login');
+      document.getElementById('modal-msg').textContent = '';
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-pass').value = '';
+      displayNameInput.value = '';
+    };
+    window.closeAuthModal = () => document.getElementById('auth-modal').style.display = 'none';
 
-const handleEnter = (e) => {
-  if (e.key === 'Enter') window.submitAuth();
-};
-document.getElementById('auth-email').onkeydown = handleEnter;
-document.getElementById('auth-pass').onkeydown = handleEnter;
-document.getElementById('auth-display-name').onkeydown = handleEnter;
+    const handleEnter = (e) => {
+      if (e.key === 'Enter') window.submitAuth();
+    };
+    document.getElementById('auth-email').onkeydown = handleEnter;
+    document.getElementById('auth-pass').onkeydown = handleEnter;
+    document.getElementById('auth-display-name').onkeydown = handleEnter;
 
-window.renderGameCategories();
+    window.renderGameCategories();
 
-// ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
-window.setLanguage('ja');
-// ★初期ロード時にも静的カードをロックする
-window.updateStaticCards(false);
+    // ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
+    window.setLanguage('ja');
+    // ★初期ロード時にも静的カードをロックする
+    window.updateStaticCards(false);
 
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('mode') === 'ranking') {
-    setTimeout(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'ranking') {
+      setTimeout(() => {
         window.toggleRanking();
-    }, 800);
-}
-</script>
+      }, 800);
+    }
+  </script>
 </body>
+
 </html>
