@@ -169,22 +169,46 @@ function startStep(stepNum) {
 
 // --- 音声認識 ---
 function toggleSpeech() {
-    if (!recognition) return;
-    if (isListening) { recognition.stop(); return; }
+    if (!recognition) return alert("お使いのブラウザは音声認識に対応していません。");
+    
+    // すでに録音中の場合は停止する
+    if (isListening) { 
+        recognition.stop(); 
+        return; 
+    }
+
+    // 【高速化の秘訣1】iPadは直前の音声が残っているとマイクの起動が遅れるため、強制リセット
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+    if (typeof synth !== 'undefined' && synth.speaking) {
+        synth.cancel();
+    }
 
     isListening = true;
     const btn = document.getElementById('mic-btn');
     const resText = document.getElementById('feedback-text');
 
-    if (synth.speaking) synth.cancel();
-
     btn.classList.add('listening');
     resText.textContent = "聞いています...";
     resText.className = "feedback-text";
 
-    try { recognition.start(); } catch (e) { }
+    // 【高速化の秘訣2】連続認識をオフにし、サーバー通信を最軽量化
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    try { recognition.start(); } catch (e) { console.error("マイク起動エラー:", e); }
+
+    // 【高速化の秘訣3】iPad特有の「話し終わってからの長い沈黙(2〜3秒)」をカット！
+    recognition.onspeechend = () => {
+        recognition.stop();
+    };
 
     recognition.onresult = (event) => {
+        // 【高速化の秘訣4】結果が出たらすぐにマイクを完全にオフにする
+        recognition.stop();
+        
         const transcript = event.results[0][0].transcript;
         document.getElementById('user-transcript').textContent = `あなたの声: 「${transcript}」`;
         checkAnswer(transcript);
@@ -193,12 +217,21 @@ function toggleSpeech() {
     recognition.onend = () => {
         isListening = false;
         btn.classList.remove('listening');
+        
+        // 何も聞き取れずに終了した場合のフォロー
+        if (resText.textContent === "聞いています...") {
+            resText.textContent = "もう一度マイクを押してね";
+            resText.className = "feedback-text fb-fail";
+        }
     };
-    recognition.onerror = () => {
+    
+    recognition.onerror = (event) => {
         isListening = false;
         btn.classList.remove('listening');
-        resText.textContent = "うまく聞き取れませんでした";
-        resText.className = "feedback-text fb-fail";
+        if (event.error !== 'aborted') {
+            resText.textContent = "うまく聞き取れませんでした";
+            resText.className = "feedback-text fb-fail";
+        }
     };
 }
 
@@ -236,13 +269,23 @@ function checkAnswer(speech) {
     if (maxSim >= 80) {
         resText.textContent = "合格！ Excellent!";
         resText.className = "feedback-text fb-success";
-        SOUND_CORRECT.currentTime = 0; SOUND_CORRECT.play();
+        
+        // 正解音の連続再生対応
+        if (typeof SOUND_CORRECT !== 'undefined') {
+            SOUND_CORRECT.currentTime = 0; 
+            SOUND_CORRECT.play();
+        }
 
         setTimeout(() => { proceedToNextStep(); }, 1500);
     } else {
         resText.textContent = `もう一度！ (一致: ${Math.floor(maxSim)}%)`;
         resText.className = "feedback-text fb-fail";
-        SOUND_INCORRECT.currentTime = 0; SOUND_INCORRECT.play();
+        
+        // 不正解音の連続再生対応
+        if (typeof SOUND_INCORRECT !== 'undefined') {
+            SOUND_INCORRECT.currentTime = 0; 
+            SOUND_INCORRECT.play();
+        }
     }
 }
 
