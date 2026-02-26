@@ -1,5 +1,5 @@
 // Global back button injection logic
-document.addEventListener('DOMContentLoaded', () => {
+function injectGlobalBackButton() {
     // 1. Check if we should render the back button on this page
     const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('old_index.html');
 
@@ -46,4 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Give body a class so pages can adjust layout if they want.
     document.body.classList.add('has-global-back-btn');
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectGlobalBackButton);
+} else {
+    injectGlobalBackButton();
+}
