@@ -47,6 +47,7 @@ if (SpeechRecognition) {
     recognition.lang = 'ja-JP';
     recognition.interimResults = false;
     recognition.continuous = false;
+    recognition.maxAlternatives = 1;
 }
 
 // --- 初期化 ---
@@ -64,13 +65,21 @@ function renderVocabGrid() {
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
             `;
-        // 学習用の単語読み上げ機能はそのまま残します
+        // 学習用の単語読み上げ機能
         card.onclick = () => speakText(place.hira);
         grid.appendChild(card);
     });
 }
 
 function speakText(text) {
+    // 【フリーズ対策】読み上げ時にマイクが起動していたら強制停止する
+    if (isListening && recognition) {
+        try { recognition.stop(); } catch(e){}
+        isListening = false;
+        const btn = document.getElementById('mic-btn');
+        if (btn) btn.classList.remove('listening');
+    }
+
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP'; utter.rate = 0.9;
@@ -92,8 +101,16 @@ function goBack() {
     if (historyStack.length > 1) {
         historyStack.pop();
         const prev = historyStack[historyStack.length - 1];
+        
+        // 【フリーズ対策】戻るボタンを押した時、音声やマイクを完全にリセットする
         if (synth.speaking) synth.cancel();
-        if (isListening && recognition) recognition.stop();
+        if (isListening && recognition) {
+            try { recognition.stop(); } catch(e){}
+            isListening = false;
+            const btn = document.getElementById('mic-btn');
+            if (btn) btn.classList.remove('listening');
+        }
+
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(prev).classList.add('active');
         document.getElementById('start-btn').style.display = (prev === 'screen-learning') ? 'flex' : 'none';
@@ -134,12 +151,9 @@ function startStep(stepNum) {
 
     const imgEl = document.getElementById('game-image');
     const phraseEl = document.getElementById('game-phrase');
-    const micBtn = document.getElementById('mic-btn');
     const missionText = document.getElementById('mission-text');
 
     const rubyHtml = (place.kanji === place.hira) ? place.kanji : `<ruby>${place.kanji}<rt>${place.hira}</rt></ruby>`;
-
-    // ゲーム中は読み上げ（ヒント）を行わないため、setTimeoutでのspeakText呼び出しを削除しました
 
     if (currentStep === 1) {
         missionText.textContent = "この場所はどこ？（なまえを言ってね）";
@@ -154,15 +168,14 @@ function startStep(stepNum) {
         phraseEl.innerHTML = `すみません、${rubyHtml}は<br>どこですか？`;
 
     } else if (currentStep === 3) {
-        // STEP 3: マップ探索をスキップし、そのまま返答の練習へ進む
         missionText.textContent = "道を教えてあげて！";
-        imgEl.classList.remove('hidden'); // 対象の場所のイラストを表示し続ける
+        imgEl.classList.remove('hidden'); 
         targetDirectionPhrase = directionWords[Math.floor(Math.random() * directionWords.length)];
         phraseEl.textContent = targetDirectionPhrase;
 
     } else if (currentStep === 4) {
         missionText.textContent = "お礼を言おう！";
-        imgEl.classList.add('hidden'); // お礼のときはイラストを非表示に
+        imgEl.classList.add('hidden'); 
         phraseEl.textContent = "ありがとうございます";
     }
 }
@@ -177,7 +190,7 @@ function toggleSpeech() {
         return; 
     }
 
-    // 【高速化の秘訣1】iPadは直前の音声が残っているとマイクの起動が遅れるため、強制リセット
+    // 【高速化の秘訣】直前の音声残りを強制リセット
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
     }
@@ -193,20 +206,14 @@ function toggleSpeech() {
     resText.textContent = "聞いています...";
     resText.className = "feedback-text";
 
-    // 【高速化の秘訣2】連続認識をオフにし、サーバー通信を最軽量化
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
     try { recognition.start(); } catch (e) { console.error("マイク起動エラー:", e); }
 
-    // 【高速化の秘訣3】iPad特有の「話し終わってからの長い沈黙(2〜3秒)」をカット！
+    // 【爆速化】話し終わってからの沈黙をカット
     recognition.onspeechend = () => {
         recognition.stop();
     };
 
     recognition.onresult = (event) => {
-        // 【高速化の秘訣4】結果が出たらすぐにマイクを完全にオフにする
         recognition.stop();
         
         const transcript = event.results[0][0].transcript;
@@ -218,7 +225,6 @@ function toggleSpeech() {
         isListening = false;
         btn.classList.remove('listening');
         
-        // 何も聞き取れずに終了した場合のフォロー
         if (resText.textContent === "聞いています...") {
             resText.textContent = "もう一度マイクを押してね";
             resText.className = "feedback-text fb-fail";
@@ -270,7 +276,6 @@ function checkAnswer(speech) {
         resText.textContent = "合格！ Excellent!";
         resText.className = "feedback-text fb-success";
         
-        // 正解音の連続再生対応
         if (typeof SOUND_CORRECT !== 'undefined') {
             SOUND_CORRECT.currentTime = 0; 
             SOUND_CORRECT.play();
@@ -281,7 +286,6 @@ function checkAnswer(speech) {
         resText.textContent = `もう一度！ (一致: ${Math.floor(maxSim)}%)`;
         resText.className = "feedback-text fb-fail";
         
-        // 不正解音の連続再生対応
         if (typeof SOUND_INCORRECT !== 'undefined') {
             SOUND_INCORRECT.currentTime = 0; 
             SOUND_INCORRECT.play();
