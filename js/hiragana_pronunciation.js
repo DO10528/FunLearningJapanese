@@ -79,15 +79,9 @@
     let currentWordIdx = 0;
     let isListening = false;
 
+    // ※ここはインスタンスを作らず、APIが存在するかどうかのチェックだけにします
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
-
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
-        recognition.continuous = false;
-    }
 
     window.onload = () => {
         const grid = document.getElementById('level-buttons');
@@ -143,44 +137,43 @@
         }
     }
 
-    // --- iPadのフリーズ対策＆爆速化対応版 ---
+    // --- 【超強化版】iPadの「機械音が鳴らないバグ」を防ぐマイクシステム ---
     function startSpeechRecognition() {
-        if (!recognition) {
+        if (!SpeechRecognition) {
             alert("お使いのブラウザは音声認識に対応していません。");
             return;
         }
 
-        // すでに録音中の場合は停止する（マイクのトグル機能）
-        if (isListening) {
-            recognition.stop();
+        const btn = document.getElementById('mic-btn');
+        const resText = document.getElementById('result-text');
+
+        // すでに録音中の場合は「強制終了(abort)」で確実にリセットする
+        if (isListening && recognition) {
+            recognition.abort(); // stop()ではなく即座にキルする
+            isListening = false;
+            btn.classList.remove('listening');
+            resText.textContent = "もういちど マイクをおしてね";
             return;
         }
 
-        // 【フリーズ対策1】裏で動いているかもしれない音声合成などを完全に強制リセット
+        // 裏で動いているかもしれない音声合成などを完全にキャンセル
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
 
         isListening = true;
-        const btn = document.getElementById('mic-btn');
-        const resText = document.getElementById('result-text');
-        
         btn.classList.add('listening');
-        resText.textContent = "きいています...";
+        resText.textContent = "マイクをじゅんび中...";
         resText.className = "result-text";
 
-        // 【フリーズ対策2】連続認識をオフにし、最軽量化
-        recognition.continuous = false;
+        // 【最強対策1】毎回必ず「新しいマイク」を作り直す（使い回しによるフリーズを防ぐ）
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
         recognition.interimResults = false;
+        recognition.continuous = false;
         recognition.maxAlternatives = 1;
 
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error("マイク起動エラー:", e);
-        }
-
-        // 【フリーズ対策3】話し終わったと検知した瞬間に、待機時間をカットして強制終了（これが一番重要です）
+        // 話し終わったと検知した瞬間に、待機時間をカットして強制終了
         recognition.onspeechend = () => {
             recognition.stop();
         };
@@ -199,7 +192,7 @@
             btn.classList.remove('listening');
             
             // 何も聞き取れずに終了した場合のフォロー
-            if (resText.textContent === "きいています...") {
+            if (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...") {
                 resText.textContent = "もういちど マイクをおしてね";
                 resText.className = "result-text retry";
             }
@@ -214,6 +207,20 @@
                 resText.className = "result-text retry";
             }
         };
+
+        // 【最強対策2】OSのオーディオが落ち着くまで「0.1秒」だけ待ってからマイクを起動
+        // これにより、iPadがパニックを起こさず確実に「ピロッ」と鳴るようになります。
+        setTimeout(() => {
+            if (!isListening) return; // 待っている間にキャンセルされていたらやめる
+            try {
+                resText.textContent = "きいています...";
+                recognition.start();
+            } catch (e) {
+                console.error("マイク起動エラー:", e);
+                isListening = false;
+                btn.classList.remove('listening');
+            }
+        }, 100);
     }
 
     function checkPronunciation(speech) {
