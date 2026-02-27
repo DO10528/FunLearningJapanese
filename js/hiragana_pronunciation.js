@@ -143,6 +143,7 @@
         }
     }
 
+    // --- iPadのフリーズ対策＆爆速化対応版 ---
     function startSpeechRecognition() {
         if (!recognition) {
             alert("お使いのブラウザは音声認識に対応していません。");
@@ -155,7 +156,7 @@
             return;
         }
 
-        // 【高速化の秘訣1】iPadは直前の音声(TTSなど)が残っているとマイクの起動が遅れるため、強制リセット
+        // 【フリーズ対策1】裏で動いているかもしれない音声合成などを完全に強制リセット
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }
@@ -168,7 +169,7 @@
         resText.textContent = "きいています...";
         resText.className = "result-text";
 
-        // 【高速化の秘訣2】連続認識をオフにし、選択肢も1つに絞ってサーバー通信を最軽量化
+        // 【フリーズ対策2】連続認識をオフにし、最軽量化
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
@@ -179,14 +180,13 @@
             console.error("マイク起動エラー:", e);
         }
 
-        // 【高速化の秘訣3】iPad特有の「話し終わってからの長い沈黙(2〜3秒)」をカット！
-        // ユーザーが話し終わったと検知した瞬間に、強制的に音声認識を終了させて結果を急がせます。
+        // 【フリーズ対策3】話し終わったと検知した瞬間に、待機時間をカットして強制終了（これが一番重要です）
         recognition.onspeechend = () => {
             recognition.stop();
         };
 
         recognition.onresult = (event) => {
-            // 【高速化の秘訣4】結果が出たらすぐにマイクを完全にオフにする
+            // 結果が出たらすぐにマイクを完全にオフにする
             recognition.stop();
             
             const transcript = event.results[0][0].transcript;
@@ -198,7 +198,7 @@
             isListening = false;
             btn.classList.remove('listening');
             
-            // 何も聞き取れずに終了した場合のフォロー（iPadでよく起こる現象の対策）
+            // 何も聞き取れずに終了した場合のフォロー
             if (resText.textContent === "きいています...") {
                 resText.textContent = "もういちど マイクをおしてね";
                 resText.className = "result-text retry";
