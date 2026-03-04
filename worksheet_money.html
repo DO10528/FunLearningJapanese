@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本のお金 ワークシート (縦幅ゆったり版) - FunLearnJP</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --primary: #2e7d32;
+        --bg-color: #f1f8e9;
+        --text-color: #333;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Zen Maru Gothic', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0; padding: 20px;
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    .print-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 10px 25px; border-radius: 50px; font-weight: bold; font-size: 1em;
+        cursor: pointer; box-shadow: 0 4px 0 #1b5e20; margin-bottom: 20px;
+        transition: 0.1s; display: flex; align-items: center; gap: 8px;
+    }
+    .print-btn:active { transform: translateY(4px); box-shadow: none; }
+
+    .worksheet {
+        background: white;
+        width: 100%; max-width: 800px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    /* --- ページ設定 --- */
+    .page {
+        padding: 30px;
+        min-height: 1120px; 
+        background: white;
+        position: relative;
+    }
+
+    .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+    .header h1 { margin: 0; color: var(--primary); font-size: 1.8em; }
+    .header p { margin: 2px 0 0 0; color: #666; font-weight: bold; font-size: 0.9em; }
+
+    .name-block { display: flex; justify-content: flex-end; margin-bottom: 15px; font-size: 1em; font-weight: bold; }
+    .name-line { border-bottom: 1px solid #333; width: 180px; margin-left: 10px; }
+
+    .section-title {
+        background: #e8f5e9; color: var(--primary); padding: 8px 12px;
+        border-radius: 6px; font-weight: bold; font-size: 1.1em; margin-bottom: 20px;
+        display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--primary);
+    }
+
+    .jp-input {
+        border: none; border-bottom: 1px dashed #999;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        font-size: 1.1em; color: #333; padding: 2px; text-align: center;
+        background: transparent; outline: none;
+    }
+
+    /* 1枚目：お絵かき枠 */
+    .money-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .money-item {
+        border: 1px solid #eee; border-radius: 10px; padding: 10px;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .draw-box {
+        display: flex; justify-content: center; align-items: center;
+        border: 1.5px dashed #bdbdbd; background-color: #fafafa;
+        color: #e0e0e0; font-weight: 900; font-size: 2em;
+    }
+    .draw-box.circle { width: 85px; height: 85px; border-radius: 50%; }
+    .draw-box.rect { width: 160px; height: 75px; border-radius: 6px; }
+
+    /* 2〜4枚目：縦の隙間（gap）と内側の余白（padding）を大きくしました */
+    .q-list { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        grid-template-rows: repeat(5, auto); 
+        grid-auto-flow: column; 
+        gap: 35px 20px; /* 縦の隙間を15px→35pxへ拡大 */
+    }
+    .q-item {
+        display: flex; align-items: flex-start; gap: 8px;
+        padding: 18px 10px; /* ボックス自体の上下の余白を10px→18pxへ拡大 */
+        background: #fafafa; border-radius: 8px; border: 1px solid #eee;
+    }
+    .q-num {
+        background: var(--primary); color: white; width: 28px; height: 28px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        font-weight: bold; font-size: 0.9em; flex-shrink: 0; margin-top: 2px;
+    }
+    .q-content { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; } /* 行の間隔も6px→10pxへ拡大 */
+    .q-row { display: flex; align-items: center; gap: 5px; font-size: 0.95em; font-weight: bold; flex-wrap: wrap; }
+
+    /* =========================================
+       印刷時のA4完全1ページ1題名設定
+    ========================================= */
+    @media print {
+        @page { size: A4 portrait; margin: 0; }
+        body { background: white; padding: 0; margin: 0; }
+        .print-btn { display: none; }
+        .worksheet { box-shadow: none; max-width: none; width: 100%; border: none; }
+        
+        .page { 
+            width: 210mm; 
+            height: 297mm; 
+            padding: 15mm; 
+            margin: 0;
+            page-break-after: always;
+            page-break-inside: avoid;
+            display: block;
+        }
+        
+        .page:last-of-type { page-break-after: auto; }
+        .draw-box { background-color: transparent; border-color: #999; }
+        .q-item { border-color: #ddd; background: transparent; }
+        .jp-input { border-bottom: 1px solid #333; }
+    }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+    <i class="fa-solid fa-print"></i> ワークシートを印刷する (A4・4枚)
+</button>
+
+<div class="worksheet">
+
+    <div class="page">
+        <div class="header">
+            <h1>日本のお金 ワークシート (1)</h1>
+            <p>おかねの え と なまえ を かこう！</p>
+        </div>
+        <div class="name-block">名前 (Name): <div class="name-line"></div></div>
+
+        <div class="section-title"><i class="fa-solid fa-pen"></i> おかねの え を かきましょう</div>
+        <div class="money-grid">
+            <div class="money-item"><div class="draw-box circle">1</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box circle">5</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box circle">10</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box circle">50</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box circle">100</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box circle" style="font-size:1.5em;">500</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box rect">1000</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item"><div class="draw-box rect">5000</div><div class="q-row"><input type="text" class="jp-input" style="width:80px;"> えん</div></div>
+            <div class="money-item" style="grid-column: span 2;"><div class="draw-box rect">10000</div><div class="q-row"><input type="text" class="jp-input" style="width:100px;"> えん</div></div>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="header">
+            <h1>日本のお金 ワークシート (2)</h1>
+            <p>ゲームで出た お金を かこう！ (お金をはらおう)</p>
+        </div>
+        <div class="name-block">名前 (Name): <div class="name-line"></div></div>
+        <div class="section-title"><i class="fa-solid fa-hand-holding-dollar"></i> ねだん と はらうコイン</div>
+        <div class="q-list">
+            <script>
+                for(let i=1; i<=10; i++) {
+                    document.write(`
+                    <div class="q-item">
+                        <div class="q-num">${i}</div>
+                        <div class="q-content">
+                            <div class="q-row">ねだん: <input type="text" class="jp-input" style="width:60px;"> 円</div>
+                            <div class="q-row">はらう おかね: <input type="text" class="jp-input" style="width:100px;"></div>
+                        </div>
+                    </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="header">
+            <h1>日本のお金 ワークシート (3)</h1>
+            <p>きこえた 金額(きんがく)を かこう！ (いくらですか？)</p>
+        </div>
+        <div class="name-block">名前 (Name): <div class="name-line"></div></div>
+        <div class="section-title"><i class="fa-solid fa-volume-high"></i> きこえた ねだん を かきましょう</div>
+        <div class="q-list">
+            <script>
+                for(let i=1; i<=10; i++) {
+                    document.write(`
+                    <div class="q-item">
+                        <div class="q-num">${i}</div>
+                        <div class="q-content">
+                            <div class="q-row">ねだん: <input type="text" class="jp-input" style="width:80px;"> 円</div>
+                        </div>
+                    </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="header">
+            <h1>日本のお金 ワークシート (4)</h1>
+            <p>おつりを けいさんしよう！ (おつりはいくらですか？)</p>
+        </div>
+        <div class="name-block">名前 (Name): <div class="name-line"></div></div>
+        <div class="section-title"><i class="fa-solid fa-calculator"></i> おつり を かきましょう</div>
+        <div class="q-list">
+            <script>
+                for(let i=1; i<=10; i++) {
+                    document.write(`
+                    <div class="q-item">
+                        <div class="q-num">${i}</div>
+                        <div class="q-content">
+                            <div class="q-row" style="font-size:0.85em; color:#666;">
+                                ねだん:<input type="text" class="jp-input" style="width:45px;">円 / 
+                                はらった:<input type="text" class="jp-input" style="width:45px;">円
+                            </div>
+                            <div class="q-row" style="color:var(--primary);">
+                                ▶ おつり: <input type="text" class="jp-input" style="width:60px;"> 円
+                            </div>
+                        </div>
+                    </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
