@@ -1,26 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 音声認識の初期化 ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
-    let isRecording = false;
+    let SpeechRecognition = null;
+    let isRecording = false; // Keep this here as it's used globally
 
-    if (!SpeechRecognition) {
-        alert("このブラウザは音声認識に対応していません。\niPadの場合はSafariをご利用ください。");
-    } else {
-        try {
+    try {
+        SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.lang = 'ja-JP';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-            recognition.continuous = false;
-        } catch (e) {
-            console.error("Mic init error:", e);
+            recognition.continuous = false; // This was in the original, keep it.
+        } else {
+            console.warn("Speech Recognition API is not supported in this browser.");
+            alert("このブラウザは音声認識に対応していません。\niPadの場合はSafariをご利用ください。"); // Keep the alert from original
         }
+    } catch (e) {
+        console.warn("Error initializing Speech Recognition API:", e);
     }
 
+
     // --- 音声合成とルビの除去 ---
-    const synth = window.speechSynthesis;
+    let synth = null;
+    try {
+        synth = window.speechSynthesis;
+    } catch (e) {
+        console.warn("Error initializing Speech Synthesis API:", e);
+    }
     let voices = [];
 
     const loadVoices = () => { voices = synth.getVoices(); };
@@ -43,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMicUI('stop');
         }
 
+        if (!synth) return; // Added this check
         synth.cancel();
 
         const utterThis = new SpeechSynthesisUtterance(text);
@@ -52,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
         if (jpVoice) utterThis.voice = jpVoice;
 
+        if (!synth) return;
         synth.speak(utterThis);
     };
 
@@ -61,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!recognition) return;
 
-        if (synth.speaking || synth.pending) {
+        if (!synth) return; // Added this check
+        if (synth.speaking) {
             synth.cancel();
         }
 
