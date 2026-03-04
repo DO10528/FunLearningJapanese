@@ -1,6 +1,6 @@
-// Global back button injection logic
-function injectGlobalBackButton() {
-    // 1. Check if we should render the back button on this page
+// Global home button injection logic
+function injectGlobalHomeButton() {
+    // 1. Check if we should render the home button on this page
     const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('old_index.html');
 
     // Don't inject on home page
@@ -10,38 +10,14 @@ function injectGlobalBackButton() {
     if (document.getElementById('global-back-btn-element')) return;
 
     // 3. Create the button element
-    const btn = document.createElement('button');
+    const btn = document.createElement('a');
     btn.id = 'global-back-btn-element';
     btn.className = 'global-back-btn';
-    btn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
-    btn.setAttribute('aria-label', '戻る (Back)');
+    btn.href = 'index.html';
+    btn.innerHTML = '<i class="fa-solid fa-house"></i>';
+    btn.setAttribute('aria-label', 'ホームに戻る (Home)');
 
-    // 4. Attach routing logic
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Strategy: Attempt to call page-specific single-page-app routing functions first.
-        // If none exist, default to simply changing location to index.html.
-
-        if (typeof goBack === 'function') {
-            goBack();
-        } else if (typeof handleHeaderBack === 'function') {
-            handleHeaderBack();
-        } else if (typeof showMenu === 'function') {
-            showMenu();
-        } else if (typeof showLevelSelect === 'function') {
-            showLevelSelect();
-        } else if (typeof showLevelMenu === 'function') {
-            showLevelMenu();
-        } else if (typeof showTopicMap === 'function') {
-            showTopicMap();
-        } else {
-            // Default fallback routing for standalone pages
-            window.location.href = 'index.html';
-        }
-    });
-
-    // 5. Append to body
+    // 4. Append to body
     document.body.appendChild(btn);
 
     // Give body a class so pages can adjust layout if they want.
@@ -49,7 +25,7 @@ function injectGlobalBackButton() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectGlobalBackButton);
+    document.addEventListener('DOMContentLoaded', injectGlobalHomeButton);
 } else {
-    injectGlobalBackButton();
+    injectGlobalHomeButton();
 }

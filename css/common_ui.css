@@ -3,21 +3,22 @@
     position: fixed;
     top: 15px;
     left: 15px;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     color: var(--primary, #6200ea);
-    border: none;
+    border: 2px solid rgba(0,0,0,0.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     z-index: 99999;
     cursor: pointer;
+    text-decoration: none;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, box-shadow 0.2s;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -27,6 +28,7 @@
     transform: scale(1.1);
     background: #ffffff;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    color: var(--primary, #6200ea);
 }
 
 .global-back-btn:active {
@@ -43,11 +45,12 @@
 .btn-back,
 #header-back-btn,
 .sc-back-to-topic,
-.back-to-practice {
+.back-to-practice,
+.home-icon,
+.home-link {
     display: none !important;
 }
 
-/* Add padding to body or headers to prevent overlap if necessary */
 body.has-global-back-btn {
     /* If some pages need it, this can be dynamically added */
 }
