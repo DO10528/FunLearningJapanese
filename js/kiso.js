@@ -1,101 +1,101 @@
 // --- データ定義 ---
-        const charData = {
-            rows: ['A', 'I', 'U', 'E', 'O'],
-            
-            // 清音データ: 10列 x 5行の構造 (A, K, S, T, N, H, M, Y, R, W の順)
-            seion: [
-                ['あ', 'ア', 'a'], ['か', 'カ', 'ka'], ['さ', 'サ', 'sa'], ['た', 'タ', 'ta'], ['な', 'ナ', 'na'],
-                ['は', 'ハ', 'ha'], ['ま', 'マ', 'ma'], ['や', 'ヤ', 'ya'], ['ら', 'ラ', 'ra'], ['わ', 'ワ', 'wa'],
-                
-                ['い', 'イ', 'i'], ['き', 'キ', 'ki'], ['し', 'シ', 'shi'], ['ち', 'チ', 'chi'], ['に', 'ニ', 'ni'],
-                ['ひ', 'ヒ', 'hi'], ['み', 'ミ', 'mi'], ['', '', ''], ['り', 'リ', 'ri'], ['ゐ', 'ヰ', 'wi'],
-                
-                ['う', 'ウ', 'u'], ['く', 'ク', 'ku'], ['す', 'ス', 'su'], ['つ', 'ツ', 'tsu'], ['ぬ', 'ヌ', 'nu'],
-                ['ふ', 'フ', 'fu'], ['む', 'ム', 'mu'], ['ゆ', 'ユ', 'yu'], ['る', 'ル', 'ru'], ['', '', ''],
+const charData = {
+    rows: ['A', 'I', 'U', 'E', 'O'],
 
-                ['え', 'エ', 'e'], ['け', 'ケ', 'ke'], ['せ', 'セ', 'se'], ['て', 'テ', 'te'], ['ね', 'ネ', 'ne'],
-                ['へ', 'ヘ', 'he'], ['め', 'メ', 'me'], ['', '', ''], ['れ', 'レ', 're'], ['ゑ', 'ヱ', 'we'],
-                
-                ['お', 'オ', 'o'], ['こ', 'コ', 'ko'], ['そ', 'ソ', 'so'], ['と', 'ト', 'to'], ['の', 'ノ', 'no'],
-                ['ほ', 'ホ', 'ho'], ['も', 'モ', 'mo'], ['よ', 'ヨ', 'yo'], ['ろ', 'ロ', 'ro'], ['を', 'ヲ', 'wo'],
-                
-                ['ん', 'ン', 'n'] // 最後の'ん'/'ン'
-            ],
+    // 清音データ: 10列 x 5行の構造 (A, K, S, T, N, H, M, Y, R, W の順)
+    seion: [
+        ['あ', 'ア', 'a'], ['か', 'カ', 'ka'], ['さ', 'サ', 'sa'], ['た', 'タ', 'ta'], ['な', 'ナ', 'na'],
+        ['は', 'ハ', 'ha'], ['ま', 'マ', 'ma'], ['や', 'ヤ', 'ya'], ['ら', 'ラ', 'ra'], ['わ', 'ワ', 'wa'],
 
-            // 濁音・半濁音データ
-            dakuon_handakuon: [
-                {h: 'が', k: 'ガ', r: 'ga', type: 'dakuon'}, {h: 'ぎ', k: 'ギ', r: 'gi', type: 'dakuon'},
-                {h: 'ぐ', k: 'グ', r: 'gu', type: 'dakuon'}, {h: 'げ', k: 'ゲ', r: 'ge', type: 'dakuon'},
-                {h: 'ご', k: 'ゴ', r: 'go', type: 'dakuon'},
-                
-                {h: 'ざ', 'k': 'ザ', r: 'za', type: 'dakuon'}, {h: 'じ', k: 'ジ', r: 'ji', type: 'dakuon'},
-                {h: 'ず', k: 'ズ', r: 'zu', type: 'dakuon'}, {h: 'ぜ', k: 'ゼ', r: 'ze', type: 'dakuon'},
-                {h: 'ぞ', k: 'ゾ', r: 'zo', type: 'dakuon'},
+        ['い', 'イ', 'i'], ['き', 'キ', 'ki'], ['し', 'シ', 'shi'], ['ち', 'チ', 'chi'], ['に', 'ニ', 'ni'],
+        ['ひ', 'ヒ', 'hi'], ['み', 'ミ', 'mi'], ['', '', ''], ['り', 'リ', 'ri'], ['ゐ', 'ヰ', 'wi'],
 
-                {h: 'だ', 'k': 'ダ', r: 'da', type: 'dakuon'}, {h: 'ぢ', k: 'ヂ', r: 'ji', type: 'dakuon'},
-                {h: 'づ', k: 'ヅ', r: 'zu', type: 'dakuon'}, {h: 'で', k: 'デ', r: 'de', type: 'dakuon'},
-                {h: 'ど', k: 'ド', r: 'do', type: 'dakuon'},
+        ['う', 'ウ', 'u'], ['く', 'ク', 'ku'], ['す', 'ス', 'su'], ['つ', 'ツ', 'tsu'], ['ぬ', 'ヌ', 'nu'],
+        ['ふ', 'フ', 'fu'], ['む', 'ム', 'mu'], ['ゆ', 'ユ', 'yu'], ['る', 'ル', 'ru'], ['', '', ''],
 
-                {h: 'ば', 'k': 'バ', r: 'ba', type: 'dakuon'}, {h: 'び', k: 'ビ', r: 'bi', type: 'dakuon'},
-                {h: 'ぶ', k: 'ブ', r: 'bu', type: 'dakuon'}, {h: 'べ', k: 'ベ', r: 'be', type: 'dakuon'},
-                {h: 'ぼ', k: 'ボ', r: 'bo', type: 'dakuon'},
+        ['え', 'エ', 'e'], ['け', 'ケ', 'ke'], ['せ', 'セ', 'se'], ['て', 'テ', 'te'], ['ね', 'ネ', 'ne'],
+        ['へ', 'ヘ', 'he'], ['め', 'メ', 'me'], ['', '', ''], ['れ', 'レ', 're'], ['ゑ', 'ヱ', 'we'],
 
-                {h: 'ぱ', 'k': 'パ', r: 'pa', type: 'handakuon'}, {h: 'ぴ', k: 'ピ', r: 'pi', type: 'handakuon'},
-                {h: 'ぷ', k: 'プ', r: 'pu', type: 'handakuon'}, {h: 'ぺ', k: 'ペ', r: 'pe', type: 'handakuon'},
-                {h: 'ぽ', 'k': 'ポ', r: 'po', type: 'handakuon'}
-            ],
-            
-            // 拗音データ
-            yoon: [
-                {h: 'きゃ', k: 'キャ', r: 'kya'}, {h: 'きゅ', k: 'キュ', r: 'kyu'}, {h: 'きょ', k: 'キョ', r: 'kyo'},
-                {h: 'ぎゃ', k: 'ギャ', r: 'gya'}, {h: 'ぎゅ', k: 'ギュ', r: 'gyu'}, {h: 'ぎょ', k: 'ギョ', r: 'gyo'},
-                
-                {h: 'しゃ', k: 'シャ', r: 'sha'}, {h: 'しゅ', k: 'シュ', r: 'shu'}, {h: 'しょ', k: 'ショ', r: 'sho'},
-                {h: 'じゃ', k: 'ジャ', r: 'ja'}, {h: 'じゅ', k: 'ジュ', r: 'ju'}, {h: 'じょ', k: 'ジョ', r: 'jo'},
-                
-                {h: 'ちゃ', k: 'チャ', r: 'cha'}, {h: 'ちゅ', k: 'チュ', r: 'chu'}, {h: 'ちょ', k: 'チョ', r: 'cho'},
-                {h: 'ぢゃ', k: 'ヂャ', r: 'ja'}, {h: 'ぢゅ', k: 'ヂュ', r: 'ju'}, {h: 'ぢょ', k: 'ヂョ', r: 'jo'},
-                
-                {h: 'にゃ', k: 'ニャ', r: 'nya'}, {h: 'にゅ', k: 'ニュ', r: 'nyu'}, {h: 'にょ', k: 'ニョ', r: 'nyo'},
-                {h: 'ひゃ', k: 'ヒャ', r: 'hya'}, {h: 'ひゅ', k: 'ヒュ', r: 'hyu'}, {h: 'ひょ', k: 'ヒョ', r: 'hyo'},
-                
-                {h: 'びゃ', k: 'ビャ', r: 'bya'}, {h: 'びゅ', k: 'ビュ', r: 'byu'}, {h: 'びょ', k: 'ビョ', r: 'byo'},
-                {h: 'ぴゃ', k: 'ピャ', r: 'pya'}, {h: 'ぴゅ', k: 'ピュ', r: 'pyu'}, {h: 'ぴょ', k: 'ピョ', r: 'pyo'},
+        ['お', 'オ', 'o'], ['こ', 'コ', 'ko'], ['そ', 'ソ', 'so'], ['と', 'ト', 'to'], ['の', 'ノ', 'no'],
+        ['ほ', 'ホ', 'ho'], ['も', 'モ', 'mo'], ['よ', 'ヨ', 'yo'], ['ろ', 'ロ', 'ro'], ['を', 'ヲ', 'wo'],
 
-                {h: 'みゃ', k: 'ミャ', r: 'mya'}, {h: 'みゅ', k: 'ミュ', r: 'myu'}, {h: 'みょ', k: 'ミョ', r: 'myo'},
-                {h: 'りゃ', k: 'リャ', r: 'rya'}, {h: 'りゅ', k: 'リュ', r: 'ryu'}, {h: 'りょ', k: 'リョ', r: 'ryo'},
-            ]
-        };
+        ['ん', 'ン', 'n'] // 最後の'ん'/'ン'
+    ],
 
-        // --- 共通機能：音声合成 ---
-        const synth = window.speechSynthesis;
-        let voices = [];
-        setTimeout(() => { voices = synth.getVoices(); }, 500);
+    // 濁音・半濁音データ
+    dakuon_handakuon: [
+        { h: 'が', k: 'ガ', r: 'ga', type: 'dakuon' }, { h: 'ぎ', k: 'ギ', r: 'gi', type: 'dakuon' },
+        { h: 'ぐ', k: 'グ', r: 'gu', type: 'dakuon' }, { h: 'げ', k: 'ゲ', r: 'ge', type: 'dakuon' },
+        { h: 'ご', k: 'ゴ', r: 'go', type: 'dakuon' },
 
-        window.speakChar = (hira, kata) => {
-            if (synth.speaking) synth.cancel();
-            
-            const textToSpeak = hira || kata; 
-            if (!textToSpeak) return;
+        { h: 'ざ', 'k': 'ザ', r: 'za', type: 'dakuon' }, { h: 'じ', k: 'ジ', r: 'ji', type: 'dakuon' },
+        { h: 'ず', k: 'ズ', r: 'zu', type: 'dakuon' }, { h: 'ぜ', k: 'ゼ', r: 'ze', type: 'dakuon' },
+        { h: 'ぞ', k: 'ゾ', r: 'zo', type: 'dakuon' },
 
-            const ut = new SpeechSynthesisUtterance(textToSpeak);
-            ut.lang = 'ja-JP';
-            ut.rate = 0.9;
+        { h: 'だ', 'k': 'ダ', r: 'da', type: 'dakuon' }, { h: 'ぢ', k: 'ヂ', r: 'ji', type: 'dakuon' },
+        { h: 'づ', k: 'ヅ', r: 'zu', type: 'dakuon' }, { h: 'で', k: 'デ', r: 'de', type: 'dakuon' },
+        { h: 'ど', k: 'ド', r: 'do', type: 'dakuon' },
 
-            const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
-            const preferredKeywords = ['Google', 'Female', 'Kyoko', 'Haruka'];
-            let targetVoice = jpVoices.find(v => preferredKeywords.some(k => v.name.includes(k)));
-            
-            if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
-            if (targetVoice) ut.voice = targetVoice;
+        { h: 'ば', 'k': 'バ', r: 'ba', type: 'dakuon' }, { h: 'び', k: 'ビ', r: 'bi', type: 'dakuon' },
+        { h: 'ぶ', k: 'ブ', r: 'bu', type: 'dakuon' }, { h: 'べ', k: 'ベ', r: 'be', type: 'dakuon' },
+        { h: 'ぼ', k: 'ボ', r: 'bo', type: 'dakuon' },
 
-            synth.speak(ut);
-        };
-        
-        // --- HTML生成ヘルパー ---
-        function generateCardHTML(hira, kata, romaji, typeColor = '') {
-             const colorStyle = typeColor ? `style="border-color:${typeColor};"` : '';
-             return `
+        { h: 'ぱ', 'k': 'パ', r: 'pa', type: 'handakuon' }, { h: 'ぴ', k: 'ピ', r: 'pi', type: 'handakuon' },
+        { h: 'ぷ', k: 'プ', r: 'pu', type: 'handakuon' }, { h: 'ぺ', k: 'ペ', r: 'pe', type: 'handakuon' },
+        { h: 'ぽ', 'k': 'ポ', r: 'po', type: 'handakuon' }
+    ],
+
+    // 拗音データ
+    yoon: [
+        { h: 'きゃ', k: 'キャ', r: 'kya' }, { h: 'きゅ', k: 'キュ', r: 'kyu' }, { h: 'きょ', k: 'キョ', r: 'kyo' },
+        { h: 'ぎゃ', k: 'ギャ', r: 'gya' }, { h: 'ぎゅ', k: 'ギュ', r: 'gyu' }, { h: 'ぎょ', k: 'ギョ', r: 'gyo' },
+
+        { h: 'しゃ', k: 'シャ', r: 'sha' }, { h: 'しゅ', k: 'シュ', r: 'shu' }, { h: 'しょ', k: 'ショ', r: 'sho' },
+        { h: 'じゃ', k: 'ジャ', r: 'ja' }, { h: 'じゅ', k: 'ジュ', r: 'ju' }, { h: 'じょ', k: 'ジョ', r: 'jo' },
+
+        { h: 'ちゃ', k: 'チャ', r: 'cha' }, { h: 'ちゅ', k: 'チュ', r: 'chu' }, { h: 'ちょ', k: 'チョ', r: 'cho' },
+        { h: 'ぢゃ', k: 'ヂャ', r: 'ja' }, { h: 'ぢゅ', k: 'ヂュ', r: 'ju' }, { h: 'ぢょ', k: 'ヂョ', r: 'jo' },
+
+        { h: 'にゃ', k: 'ニャ', r: 'nya' }, { h: 'にゅ', k: 'ニュ', r: 'nyu' }, { h: 'にょ', k: 'ニョ', r: 'nyo' },
+        { h: 'ひゃ', k: 'ヒャ', r: 'hya' }, { h: 'ひゅ', k: 'ヒュ', r: 'hyu' }, { h: 'ひょ', k: 'ヒョ', r: 'hyo' },
+
+        { h: 'びゃ', k: 'ビャ', r: 'bya' }, { h: 'びゅ', k: 'ビュ', r: 'byu' }, { h: 'びょ', k: 'ビョ', r: 'byo' },
+        { h: 'ぴゃ', k: 'ピャ', r: 'pya' }, { h: 'ぴゅ', k: 'ピュ', r: 'pyu' }, { h: 'ぴょ', k: 'ピョ', r: 'pyo' },
+
+        { h: 'みゃ', k: 'ミャ', r: 'mya' }, { h: 'みゅ', k: 'ミュ', r: 'myu' }, { h: 'みょ', k: 'ミョ', r: 'myo' },
+        { h: 'りゃ', k: 'リャ', r: 'rya' }, { h: 'りゅ', k: 'リュ', r: 'ryu' }, { h: 'りょ', k: 'リョ', r: 'ryo' },
+    ]
+};
+
+// --- 共通機能：音声合成 ---
+const synth = window.speechSynthesis;
+let voices = [];
+setTimeout(() => { voices = synth.getVoices(); }, 500);
+
+window.speakChar = (hira, kata) => {
+    if (synth.speaking) synth.cancel();
+
+    const textToSpeak = hira || kata;
+    if (!textToSpeak) return;
+
+    const ut = new SpeechSynthesisUtterance(textToSpeak);
+    ut.lang = 'ja-JP';
+    ut.rate = 0.9;
+
+    const jpVoices = voices.filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
+    const preferredKeywords = ['Google', 'Female', 'Kyoko', 'Haruka'];
+    let targetVoice = jpVoices.find(v => preferredKeywords.some(k => v.name.includes(k)));
+
+    if (!targetVoice && jpVoices.length > 0) targetVoice = jpVoices[0];
+    if (targetVoice) ut.voice = targetVoice;
+
+    synth.speak(ut);
+};
+
+// --- HTML生成ヘルパー ---
+function generateCardHTML(hira, kata, romaji, typeColor = '') {
+    const colorStyle = typeColor ? `style="border-color:${typeColor};"` : '';
+    return `
                  <div class="kiso-card" onclick="speakChar('${hira}', '${kata}')" ${colorStyle}>
                      <div class="kiso-kana-box">
                          <span class="hira">${hira}</span>
@@ -105,44 +105,44 @@
                      <i class="fa-solid fa-volume-high" style="font-size:0.8em; color:#999; margin-top:3px;"></i>
                  </div>
              `;
-         }
+}
 
 
-        // 1. 清音 (50音) チャートの描画
-        function renderSeionChart() {
-            const container = document.getElementById('seion-chart');
-            let html = '';
-            
-            // ★修正点 1: 列の表示順序を反転 (W -> A)
-            const reversedColumns = ['わ', 'ら', 'や', 'ま', 'は', 'な', 'た', 'さ', 'か', 'あ']; 
-            
-            // 1行目: 列ヘッダー (わ行 -> あ行)
-            for (const col of reversedColumns) {
-                html += `<div class="kiso-header">${col}-column</div>`;
+// 1. 清音 (50音) チャートの描画
+function renderSeionChart() {
+    const container = document.getElementById('seion-chart');
+    let html = '';
+
+    // ★修正点 1: 列の表示順序を反転 (W -> A)
+    const reversedColumns = ['わ', 'ら', 'や', 'ま', 'は', 'な', 'た', 'さ', 'か', 'あ'];
+
+    // 1行目: 列ヘッダー (わ行 -> あ行)
+    for (const col of reversedColumns) {
+        html += `<div class="kiso-header">${col}-column</div>`;
+    }
+    html += '<div class="kiso-empty"></div>'; // 右上角の空セル
+
+    // 2行目以降: 行データ
+    for (let i = 0; i < 5; i++) { // i = 行インデックス (A, I, U, E, O)
+        for (let j = 9; j >= 0; j--) { // j = 元の列インデックス (9=W, 8=R, ... 0=A)
+            const index = i * 10 + j;
+            const charPair = charData.seion[index];
+            const hira = charPair[0];
+            const kata = charPair[1];
+            const romaji = charPair[2];
+
+            if (hira === '') {
+                html += '<div class="kiso-empty"></div>';
+            } else {
+                html += generateCardHTML(hira, kata, romaji);
             }
-            html += '<div class="kiso-empty"></div>'; // 右上角の空セル
-            
-            // 2行目以降: 行データ
-            for (let i = 0; i < 5; i++) { // i = 行インデックス (A, I, U, E, O)
-                for (let j = 9; j >= 0; j--) { // j = 元の列インデックス (9=W, 8=R, ... 0=A)
-                    const index = i * 10 + j; 
-                    const charPair = charData.seion[index];
-                    const hira = charPair[0];
-                    const kata = charPair[1];
-                    const romaji = charPair[2];
+        }
+        // ★修正点 2: 行見出しを右側に配置
+        html += `<div class="kiso-header">${charData.rows[i]}-row</div>`;
+    }
 
-                    if (hira === '') {
-                        html += '<div class="kiso-empty"></div>';
-                    } else {
-                        html += generateCardHTML(hira, kata, romaji);
-                    }
-                }
-                // ★修正点 2: 行見出しを右側に配置
-                html += `<div class="kiso-header">${charData.rows[i]}-row</div>`;
-            }
-            
-            // 最後の「ん/ン」を別途追加 (グリッドの外側)
-            html += `
+    // 最後の「ん/ン」を別途追加 (グリッドの外側)
+    html += `
                 <div style="grid-column: 1 / 12; text-align:right; margin-top:10px;">
                     <span style="color:#666; font-size:0.9em; margin-right:10px;">(最後の音: </span>
                     <div class="kiso-card" style="display:inline-flex; width:100px; min-height:60px; margin-right:10px;" onclick="speakChar('ん', 'ン')">
@@ -155,21 +155,21 @@
                 </div>
             `;
 
-            container.textContent = html;
-        }
+    container.innerHTML = html;
+}
 
-        // 2. 濁音・半濁音チャートの描画
+// 2. 濁音・半濁音チャートの描画
 function renderDakuonHandakuonChart() {
     const container = document.getElementById('dakuon-handakuon-chart');
     let html = '';
-    
+
     charData.dakuon_handakuon.forEach(item => {
         const isDakuon = item.type === 'dakuon';
-        
+
         // ★修正点 1: CSS変数を引用符で囲む
         // 濁音・半濁音の枠線色を設定 (濁音は青、半濁音はチャートのメイン色)
-        const typeColor = isDakuon ? '#42a5f5' : 'var(--primary-dark)'; 
-        
+        const typeColor = isDakuon ? '#42a5f5' : 'var(--primary-dark)';
+
         html += generateCardHTML(item.h, item.k, item.r, typeColor);
     });
     container.textContent = html;
@@ -179,13 +179,13 @@ function renderDakuonHandakuonChart() {
 function renderYoonChart() {
     const container = document.getElementById('yoon-chart');
     let html = '';
-    
+
     charData.yoon.forEach(item => {
         const isDakuonYoon = item.h.includes('ぎ') || item.h.includes('じ') || item.h.includes('ぢ') || item.h.includes('び') || item.h.includes('ぴ');
-        
+
         // ★修正点 2: CSS変数を引用符で囲む (hira文字の色設定)
         const typeColor = isDakuonYoon ? '#42a5f5' : 'var(--hira-color)';
-        
+
         // 枠線は濁音の拗音のみ青 (#42a5f5) にし、清音拗音はデフォルトの#ddd
         const borderColor = isDakuonYoon ? '#42a5f5' : '#ddd';
 
@@ -203,9 +203,9 @@ function renderYoonChart() {
     container.textContent = html;
 }
 
-        // ページロード時に全てを実行
-        document.addEventListener('DOMContentLoaded', () => {
-            renderSeionChart();
-            renderDakuonHandakuonChart();
-            renderYoonChart();
-        });
+// ページロード時に全てを実行
+document.addEventListener('DOMContentLoaded', () => {
+    renderSeionChart();
+    renderDakuonHandakuonChart();
+    renderYoonChart();
+});
