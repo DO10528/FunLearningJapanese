@@ -172,7 +172,7 @@ function renderDakuonHandakuonChart() {
 
         html += generateCardHTML(item.h, item.k, item.r, typeColor);
     });
-    container.textContent = html;
+    container.innerHTML = html;
 }
 
 // 3. 拗音チャートの描画
@@ -200,7 +200,7 @@ function renderYoonChart() {
             </div>
         `;
     });
-    container.textContent = html;
+    container.innerHTML = html;
 }
 
 // ページロード時に全てを実行
