@@ -545,7 +545,7 @@
     }
   </style>
 
-<link rel="stylesheet" href="css/common_ui.css">
+  <link rel="stylesheet" href="css/common_ui.css">
 </head>
 
 <body>
@@ -601,11 +601,14 @@
         class="fa-solid fa-right-from-bracket"></i></button>
   </div>
 
+  <button id="index-home-btn" class="global-back-btn" style="display: none;" onclick="renderGameCategories()"
+    aria-label="ホームに戻る">
+    <i class="fa-solid fa-house"></i>
+  </button>
+
   <div class="section-header">
     <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> <span id="game-section-title"
         data-i18n="group_learning">学習メニュー</span></h3>
-    <button id="game-back-btn" class="btn-back" onclick="renderGameCategories()"><i class="fa-solid fa-arrow-left"></i>
-      もどる</button>
   </div>
 
   <div id="game-grid" class="grid-container fade-in"></div>
@@ -636,16 +639,6 @@
     </a>
   </div>
 
-  <div class="section-header" style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e0e0e0;">
-    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> <span data-i18n="group_fun_games">ゲーム</span></h3>
-  </div>
-  <div class="grid-container">
-    <a href="culture_map.html" id="static-sengoku-btn" class="game-card" style="border-color:#b71c1c;">
-      <div class="premium-badge"><i class="fa-solid fa-crown"></i> PRO</div>
-      <i class="fa-solid fa-khanda card-icon" style="color:#b71c1c;"></i>
-      <span class="card-title" data-i18n="btn_sengoku">戦国・日本語伝</span>
-    </a>
-  </div>
 
   <div id="fab-ranking" class="ranking-fab" onclick="toggleRanking()"><i class="fa-solid fa-trophy"></i></div>
 
@@ -904,11 +897,11 @@
     ];
 
     const gameGrid = document.getElementById('game-grid');
-    const backBtn = document.getElementById('game-back-btn');
+    const indexHomeBtn = document.getElementById('index-home-btn');
 
     window.renderGameCategories = () => {
       gameGrid.textContent = '';
-      backBtn.style.display = 'none';
+      if (indexHomeBtn) indexHomeBtn.style.display = 'none';
       document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang].group_learning;
       gameStructure.forEach(cat => {
         const div = document.createElement('div');
@@ -927,7 +920,7 @@
 
     function renderGameList(category) {
       gameGrid.textContent = '';
-      backBtn.style.display = 'block';
+      if (indexHomeBtn) indexHomeBtn.style.display = 'flex';
       document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
 
       category.games.forEach(game => {
@@ -982,7 +975,10 @@
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.dataset.i18nPlaceholder; if (window.i18nData[lang][key]) el.placeholder = window.i18nData[lang][key]; });
       document.getElementById('lang-ja').classList.toggle('active', lang === 'ja');
       document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-      if (backBtn.style.display === 'none') renderGameCategories(); else renderGameCategories();
+
+      // Re-render categories or keep current view (lazy reload of categories logic)
+      if (indexHomeBtn && indexHomeBtn.style.display === 'none') renderGameCategories(); else renderGameCategories();
+
       if (document.getElementById('auth-modal').style.display === 'flex') {
         const modeKey = window.authMode === 'login' ? 'modal_login' : 'modal_signup';
         document.getElementById('modal-title').textContent = window.i18nData[lang][modeKey];
@@ -1033,7 +1029,7 @@
     });
   </script>
 
-<script src="js/common_ui.js"></script>
+  <script src="js/common_ui.js"></script>
 </body>
 
 </html>
