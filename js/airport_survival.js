@@ -169,15 +169,27 @@ let currentQuestionIndex = 0;
 let isListening = false;
 let currentTargetData = null; // 現在の正解データを保持
 
-const synth = window.speechSynthesis;
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
 
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = false;
-    recognition.continuous = false;
+let synth = null;
+try {
+    synth = window.speechSynthesis;
+} catch (e) {
+    console.warn("Error initializing Speech Synthesis API:", e);
+}
+
+let recognition = null;
+try {
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+    } else {
+        console.warn("Speech Recognition API is not supported in this browser.");
+    }
+} catch (e) {
+    console.warn("Error initializing Speech Recognition API:", e);
 }
 
 window.onload = () => {
@@ -200,7 +212,7 @@ window.goBack = () => {
     if (historyStack.length > 1) {
         historyStack.pop();
         const prev = historyStack[historyStack.length - 1];
-        if (synth.speaking) synth.cancel();
+        if (synth && synth.speaking) synth.cancel();
         if (isListening && recognition) recognition.stop();
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(prev).classList.add('active');
@@ -251,6 +263,7 @@ function renderLearning() {
 }
 
 window.speakText = (text) => {
+    if (!synth) return;
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP';
@@ -291,7 +304,7 @@ function loadQuestion() {
 window.toggleSpeechRecognition = () => {
     const micBtn = document.getElementById('mic-btn');
     const feedbackText = document.getElementById('feedback-text');
-    if (synth.speaking) synth.cancel();
+    if (synth && synth.speaking) synth.cancel();
 
     if (isListening) {
         recognition.stop();
@@ -374,8 +387,10 @@ function checkAnswer(transcript) {
     if (maxSimilarity >= 90) {
         fbText.textContent = "合格！ (Excellent)";
         fbText.className = "feedback-text fb-success";
-        const utter = new SpeechSynthesisUtterance("ピンポーン！");
-        utter.rate = 1.5; synth.speak(utter);
+        if (synth) {
+            const utter = new SpeechSynthesisUtterance("ピンポーン！");
+            utter.rate = 1.5; synth.speak(utter);
+        }
 
         setTimeout(() => {
             currentQuestionIndex++;
