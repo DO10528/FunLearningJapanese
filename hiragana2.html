@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ひらがな並び替え - FunLearnJP</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ひらがな並び替え - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap"
+        rel="stylesheet">
 
-<link rel="stylesheet" href="css/hiragana2.css">
+    <link rel="stylesheet" href="css/hiragana2.css">
 
-<link rel="stylesheet" href="css/common_ui.css">
+    <link rel="stylesheet" href="css/common_ui.css">
 </head>
+
 <body>
 
     <header>
@@ -19,19 +22,20 @@
     </header>
 
     <div class="main-container">
-        
+
         <div id="main-menu-2" class="pop-in">
             <div class="game-card">
                 <i class="fa-solid fa-sort-alpha-down menu-icon"></i>
                 <h1 class="menu-title">ならびかえ</h1>
                 <p class="menu-desc">もじ を ならびかえて<br>ただしい ことば をつくろう！</p>
-                
+
                 <div style="background:#e8f5e9; padding:10px; border-radius:10px; margin-bottom:20px; color:#2e7d32;">
                     ぜんぶで <strong>10もん</strong> あるよ！
-                    <div id="auth-status" style="margin-top:5px; font-size:0.9em; font-weight:normal; color:#1a6e1d;">認証中...</div>
+                    <div id="auth-status" style="margin-top:5px; font-size:0.9em; font-weight:normal; color:#1a6e1d;">
+                        認証中...</div>
                 </div>
 
-                <button id="startButtonGame2" class="start-btn" onclick="game.start()">
+                <button id="startButtonGame2" class="start-btn">
                     <i class="fa-solid fa-play"></i> スタート！
                 </button>
                 <a href="index.html" class="home-btn-text">ホームにもどる</a>
@@ -54,7 +58,8 @@
                 </div>
                 <p id="feedback" class="feedback-msg"></p>
                 <div style="margin-top: 10px;">
-                    <button onclick="location.reload()" style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
+                    <button onclick="location.reload()"
+                        style="background:none; border:none; color:#999; cursor:pointer; text-decoration:underline;">やめる</button>
                 </div>
             </div>
         </div>
@@ -65,8 +70,10 @@
     <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
     <audio id="snd-fanfare" src="assets/sounds/fanfare.mp3"></audio>
 
-<script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
 
-<script src="js/common_ui.js"></script>
+    <script src="js/common_ui.js"></script>
+    <script src="js/hiragana2.js"></script>
 </body>
+
 </html>
