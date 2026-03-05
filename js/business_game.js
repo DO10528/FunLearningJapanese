@@ -1,9 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const synth = window.speechSynthesis;
+    let synth = null;
     let voices = [];
-    synth.onvoiceschanged = () => { voices = synth.getVoices(); };
-    setTimeout(() => { voices = synth.getVoices(); }, 500);
+    try {
+        synth = window.speechSynthesis;
+        if (synth) {
+            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+            setTimeout(() => { voices = synth.getVoices(); }, 500);
+        }
+    } catch (e) {
+        console.warn("Error initializing Speech Synthesis API:", e);
+    }
 
     // --- データセット ---
     const scenarios = {
@@ -48,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     role: "上司",
                     icon: "fa-user-tie",
                     question: "（カバンを持って立ち上がりました）",
-                    voice: "", 
+                    voice: "",
                     options: [
                         { text: "行って参ります。", correct: true, fb: "正解！外へ仕事に行くときに使います。" },
                         { text: "行ってきます。", correct: false, fb: "少しカジュアルです。「参ります」の方が丁寧です。" },
@@ -161,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     role: "あなた",
                     icon: "fa-door-open",
                     question: "（中に入るときの言葉は？）",
-                    voice: "", 
+                    voice: "",
                     options: [
                         { text: "失礼します。", correct: true, fb: "正解！入るときも出るときも使えます。" },
                         { text: "お邪魔します。", correct: false, fb: "友達の家に行くときに使います。" },
@@ -191,14 +198,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 音声再生 (修正：一度だけ再生するように制御) ---
     window.speak = (text) => {
-        if (!text) return;
+        if (!text || !synth) return;
         if (synth.speaking) synth.cancel();
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.lang = 'ja-JP';
-        
+
         const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
-        if(jpVoice) utterThis.voice = jpVoice;
-        
+        if (jpVoice) utterThis.voice = jpVoice;
+
         synth.speak(utterThis);
     };
 
@@ -212,9 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.loadScenario = (key) => {
         currentMode = key;
         const data = scenarios[key];
-        
+
         document.getElementById('practice-title').textContent = data.title;
-        
+
         const listEl = document.getElementById('word-list');
         listEl.textContent = '';
         data.words.forEach(w => {
@@ -253,15 +260,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sim-situation').textContent = q.situation;
         document.getElementById('char-role').textContent = q.role;
         document.getElementById('question-text').textContent = q.question;
-        
+
         const iconEl = document.getElementById('char-icon');
         iconEl.innerHTML = `<i class="fa-solid ${q.icon}"></i>`;
 
         const container = document.getElementById('options-container');
         container.textContent = '';
-        
+
         const options = [...q.options].sort(() => Math.random() - 0.5);
-        
+
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
@@ -271,12 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // ★修正: 質問読み上げはここでのみ実行（一度きり）
-        if(q.voice) window.speak(q.voice);
+        if (q.voice) window.speak(q.voice);
     }
 
     window.replayVoice = () => {
         const q = currentQuizData[quizIndex];
-        if(q.voice) window.speak(q.voice);
+        if (q.voice) window.speak(q.voice);
     };
 
     function handleAnswer(opt, btn) {
@@ -287,21 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const icon = document.getElementById('fb-icon');
         const title = document.getElementById('fb-title');
         const text = document.getElementById('fb-text');
-        
-        if(opt.correct) {
+
+        if (opt.correct) {
             btn.classList.add('correct');
             icon.innerHTML = '<i class="fa-regular fa-circle-check" style="color:#4caf50;"></i>';
             title.textContent = "正解！";
             title.style.color = "#4caf50";
             score += 1;
-            if(window.addPoints) window.addPoints(1);
+            if (window.addPoints) window.addPoints(1);
         } else {
             btn.classList.add('incorrect');
             icon.innerHTML = '<i class="fa-regular fa-circle-xmark" style="color:#f44336;"></i>';
             title.textContent = "おしい！";
             title.style.color = "#f44336";
         }
-        
+
         text.textContent = opt.fb;
         modal.style.display = 'flex';
     }
@@ -309,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.nextQuestion = () => {
         document.getElementById('fb-modal').style.display = 'none';
         quizIndex++;
-        if(quizIndex < currentQuizData.length) {
+        if (quizIndex < currentQuizData.length) {
             loadQuestion();
         } else {
             showResult();
@@ -323,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ★追加: どこからでも課金画面を呼び出せるようにする
     window.openPremiumModal = () => {
-        if(confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
+        if (confirm("【プレミアム会員限定】\nこのゲームを遊ぶにはプレミアム登録が必要です。\n(月額99 THB)\n\nお支払いページへ移動しますか？")) {
             window.open("https://buy.stripe.com/test_aFa8wIcw2ezZdEe5ah3VC00", "_blank");
         }
     };
