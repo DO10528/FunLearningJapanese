@@ -1,81 +1,87 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ひらカタあわせ - FunLearnJP</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ひらカタあわせ - FunLearnJP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Klee+One:wght@600&display=swap"
+        rel="stylesheet">
 
-<link rel="stylesheet" href="css/hira_kata_pair.css">
+    <link rel="stylesheet" href="css/hira_kata_pair.css">
 
-<link rel="stylesheet" href="css/common_ui.css">
+    <link rel="stylesheet" href="css/common_ui.css">
 </head>
+
 <body>
 
-<header>
-    <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
-    <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
-</header>
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
 
-<div class="game-container">
-    
-    <div id="level-menu-area" class="menu-card">
-        <div class="menu-icon"><i class="fa-solid fa-right-left"></i></div>
-        <h1 class="menu-title">ひらカタあわせ</h1>
-        <p style="color:#666; margin-bottom:10px;">あそびたい レベルを えらんでね</p>
-        
-        <div id="auth-status" style="margin-bottom: 20px; font-weight: bold; color: var(--primary);">認証中...</div>
+    <div class="game-container">
 
-        <div id="level-grid" class="level-grid">
+        <div id="level-menu-area" class="menu-card">
+            <div class="menu-icon"><i class="fa-solid fa-right-left"></i></div>
+            <h1 class="menu-title">ひらカタあわせ</h1>
+            <p style="color:#666; margin-bottom:10px;">あそびたい レベルを えらんでね</p>
+
+            <div id="auth-status" style="margin-bottom: 20px; font-weight: bold; color: var(--primary);">認証中...</div>
+
+            <div id="level-grid" class="level-grid">
             </div>
-        
-        <button onclick="location.href='index.html'" class="home-btn-back">ホームにもどる</button>
-    </div>
 
-    <div id="game-play-area">
-        
-        <div class="game-header-info">
-            <span id="level-indicator" class="level-display">レベル 1</span>
-            <button class="back-to-menu" onclick="showLevelMenu()">メニューへ</button>
+            <button onclick="location.href='index.html'" class="home-btn-back">ホームにもどる</button>
         </div>
 
-        <div class="board">
-            <div class="pool-column">
-                <div class="pool-header">ひらがな</div>
-                <div id="hira-pool" class="pool-area"></div>
+        <div id="game-play-area">
+
+            <div class="game-header-info">
+                <span id="level-indicator" class="level-display">レベル 1</span>
+                <button class="back-to-menu" onclick="showLevelMenu()">メニューへ</button>
             </div>
 
-            <div class="center-area" id="pair-rows">
+            <div class="board">
+                <div class="pool-column">
+                    <div class="pool-header">ひらがな</div>
+                    <div id="hira-pool" class="pool-area"></div>
                 </div>
 
-            <div class="pool-column">
-                <div class="pool-header">カタカナ</div>
-                <div id="kata-pool" class="pool-area"></div>
+                <div class="center-area" id="pair-rows">
+                </div>
+
+                <div class="pool-column">
+                    <div class="pool-header">カタカナ</div>
+                    <div id="kata-pool" class="pool-area"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="check-btn" onclick="checkAnswer()">こたえあわせ！</button>
+    </div>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>だいせいかい！🎉</h2>
+            <p id="modal-point-feedback" class="point-feedback"></p>
+            <button class="next-btn" onclick="nextLevel()">つぎの レベルへ Go!</button>
         </div>
     </div>
 
-</div>
+    <audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
 
-<div id="success-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2>だいせいかい！🎉</h2>
-        <p id="modal-point-feedback" class="point-feedback"></p>
-        <button class="next-btn" onclick="nextLevel()">つぎの レベルへ Go!</button>
-    </div>
-</div>
-
-<audio id="snd-correct" src="assets/sounds/seikai.mp3"></audio>
-<audio id="snd-incorrect" src="assets/sounds/bubu.mp3"></audio>
-
-<script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
 
 
-<script src="js/common_ui.js"></script>
+    <script src="js/common_ui.js"></script>
+    <script src="js/hira_kata_pair.js"></script>
 </body>
+
 </html>
