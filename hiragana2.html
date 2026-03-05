@@ -49,6 +49,15 @@
             </div>
             <div class="game-card">
                 <div id="image-area" class="image-frame"></div>
+
+                <!-- 音声ヒントボタン (44px以上のタップ領域を確保) -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button id="hint-speak-btn"
+                        style="background-color: #ff9800; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 1.1em; font-weight: bold; cursor: pointer; min-height: 44px; min-width: 140px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <i class="fa-solid fa-volume-high"></i> 音声をきく
+                    </button>
+                </div>
+
                 <div class="instruction-text">ここに もじ をいれてね</div>
                 <div id="answer-container" class="drop-zone-container"></div>
                 <div class="instruction-text">つかう もじ</div>
