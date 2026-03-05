@@ -926,7 +926,16 @@
       category.games.forEach(game => {
         // ★ロック機能：Divタグを使用してクリック無効化
         const isLocked = game.isPremium && !window.isUserPremium;
-        const tagName = isLocked ? 'div' : 'a';
+
+        // ★ 未実装ゲームのリスト
+        const unimplementedUrls = [
+          'katakana_drag_match.html',
+          'hira_kata_pair.html',
+          'culture_map.html'
+        ];
+        const isUnimplemented = unimplementedUrls.includes(game.url);
+
+        const tagName = (isLocked || isUnimplemented) ? 'div' : 'a';
 
         const card = document.createElement(tagName);
         card.className = 'game-card';
@@ -936,6 +945,11 @@
           card.classList.add('locked');
           // onclickイベントでアラートを表示
           card.onclick = () => window.openPremiumModal();
+        } else if (isUnimplemented) {
+          // ★ 対応A: 未実装ゲームのアラート表示＆グレーアウト対応
+          card.style.opacity = '0.6';
+          card.style.cursor = 'not-allowed';
+          card.onclick = () => alert('現在開発中です！お楽しみに！');
         } else {
           card.href = game.url;
         }
