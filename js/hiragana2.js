@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAME_ID = 'hiragana_sort_game';
     const USER_STORAGE_KEY = 'user_accounts';
     const SESSION_STORAGE_KEY = 'current_user';
-    const GUEST_NAME = 'ゲスト'; 
-    
+    const GUEST_NAME = 'ゲスト';
+
     // ★修正点1: データパスを定義
     const DATA_PATH = 'data/words.json';
 
@@ -22,11 +22,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const FEEDBACK = document.getElementById('feedback');
     const TURN_MSG = document.getElementById('turn-msg');
     const SCORE_VAL = document.getElementById('score-val');
+    // ★ 音声ヒント
+    const HINT_BTN = document.getElementById('hint-speak-btn');
 
     // 音声
-    const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
-    const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
-    const SOUND_POP = new Audio('assets/sounds/pop.mp3'); 
+    const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3');
+    const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3');
+    const SOUND_POP = new Audio('assets/sounds/pop.mp3');
+
+    // ★ 音声合成 (TTS)
+    let synth = null;
+    let voices = [];
+    try {
+        synth = window.speechSynthesis;
+        if (synth) {
+            synth.onvoiceschanged = () => { voices = synth.getVoices(); };
+            setTimeout(() => { voices = synth.getVoices(); }, 500);
+        }
+    } catch (e) {
+        console.warn("Speech Synthesis API error:", e);
+    }
+
+    // ★ ヒント音声再生
+    window.playHintSound = () => {
+        if (!synth || !currentWord || !currentWord.reading) return;
+        try {
+            if (synth.speaking) synth.cancel(); // iOS/iPadOS freeze fix
+            const utterThis = new SpeechSynthesisUtterance(currentWord.reading);
+            utterThis.lang = 'ja-JP';
+            utterThis.rate = 0.85; // 学習者向けに少しゆっくりめ
+            const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            if (jpVoice) utterThis.voice = jpVoice;
+            synth.speak(utterThis);
+        } catch (e) {
+            console.error("Speech Synthesis Error:", e);
+        }
+    };
+
+    if (HINT_BTN) {
+        HINT_BTN.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.playHintSound();
+        });
+        // スマホ/iPadでのタップ反応を良くする
+        HINT_BTN.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // クリックの二重発火を防ぐ
+            window.playHintSound();
+        }, { passive: false });
+    }
 
     // ゲーム状態
     let gameData = []; // ★修正点2: 外部データ用配列
@@ -35,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let questionCount = 0;
     const MAX_QUESTIONS = 10;
     let askedWordIds = new Set();
-    
+
     // ドラッグ用
     let currentDragItem = null;
 
@@ -49,20 +92,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            
+
             // JSONの構造に合わせて、単語リストを抽出・整形
             // words.jsonが単に配列を返す構造だと仮定します。
             // 構造が異なる場合は data.words や data.list のようにアクセスしてください。
             gameData = data.filter(item => item.word && item.reading); // wordとreadingがあるものだけフィルタリング
-            
+
             console.log(`[Data] ${gameData.length} words loaded.`);
 
             if (gameData.length === 0) {
-                 throw new Error('words.jsonに有効な単語データが見つかりませんでした。');
+                throw new Error('words.jsonに有効な単語データが見つかりませんでした。');
             }
 
             // データ読み込み成功後、スタートボタンを有効にする
-            if(START_BTN) {
+            if (START_BTN) {
                 START_BTN.disabled = false;
                 START_BTN.textContent = 'ゲームスタート';
                 START_BTN.addEventListener('click', startGameLogic);
@@ -70,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('[Error] データの読み込みに失敗しました:', error);
-            if(START_BTN) {
-                 START_BTN.disabled = true;
-                 START_BTN.textContent = 'エラー: データ読み込み失敗';
+            if (START_BTN) {
+                START_BTN.disabled = true;
+                START_BTN.textContent = 'エラー: データ読み込み失敗';
             }
             alert('ゲームデータの読み込みに失敗しました。コンソールを確認してください。');
         }
@@ -82,25 +125,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // ポイント付与
     function getTodayDateString() {
         const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
     function checkAndAwardPoints(wordId) {
         const currentUser = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (!currentUser || currentUser === GUEST_NAME) return "guest"; 
+        if (!currentUser || currentUser === GUEST_NAME) return "guest";
         const usersJson = localStorage.getItem(USER_STORAGE_KEY);
         let users = usersJson ? JSON.parse(usersJson) : {};
         let user = users[currentUser];
-        if (!user) return "error"; 
+        if (!user) return "error";
         const today = getTodayDateString();
         const progressKey = `${GAME_ID}_word_${wordId}`;
         user.progress = user.progress || {};
         user.progress[progressKey] = user.progress[progressKey] || {};
-        if (user.progress[progressKey][today] === true) return "already_scored"; 
+        if (user.progress[progressKey][today] === true) return "already_scored";
         user.points = (user.points || 0) + 1;
         user.progress[progressKey][today] = true;
         users[currentUser] = user;
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-        return "scored"; 
+        return "scored";
     }
 
     // 1. ゲーム開始
@@ -111,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         MENU_AREA.style.display = 'none';
         GAME_AREA.style.display = 'block';
-        
+
         score = 0;
         questionCount = 0;
         askedWordIds.clear();
@@ -134,19 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
             askedWordIds.clear();
             available = gameData;
         }
-        
+
         const rIndex = Math.floor(Math.random() * available.length);
         currentWord = available[rIndex];
-        
+
         // ★修正: wordのidはユニークである必要がありますが、JSONにidが無い場合を考慮し、
         // JSONの単語そのものをキーとして利用できるように変更 (今回はシンプルにidがある前提)
         if (currentWord.id) {
-             askedWordIds.add(currentWord.id);
+            askedWordIds.add(currentWord.id);
         } else {
-             // idが無い場合は単語自体をIDとして使う (ただし推奨はしない)
-             askedWordIds.add(currentWord.reading); 
+            // idが無い場合は単語自体をIDとして使う (ただし推奨はしない)
+            askedWordIds.add(currentWord.reading);
         }
-        
+
         questionCount++;
         updateScoreBoard();
         renderQuestionUI(currentWord);
@@ -157,11 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 画像
         // ★修正: word.imageが存在することを前提とする
         if (word.image) {
-             IMAGE_AREA.innerHTML = `<img src="assets/images/${word.image}" alt="${word.word}" onerror="this.style.display='none'">`;
+            IMAGE_AREA.innerHTML = `<img src="assets/images/${word.image}" alt="${word.word}" onerror="this.style.display='none'">`;
         } else {
-             IMAGE_AREA.innerHTML = `<div style="padding: 20px; color: #999;">画像なし</div>`;
+            IMAGE_AREA.innerHTML = `<div style="padding: 20px; color: #999;">画像なし</div>`;
         }
-        
+
         // 文字のシャッフル
         const chars = Array.from(word.reading);
         const shuffled = shuffleArray([...chars]);
@@ -187,19 +230,24 @@ document.addEventListener('DOMContentLoaded', () => {
             piece.dataset.char = char;
             piece.draggable = true;
             piece.id = `piece-${i}`;
-            
+
             setupDragItem(piece);
             POOL_CONTAINER.appendChild(piece);
         });
 
         FEEDBACK.textContent = '';
         CHECK_BTN.disabled = false;
+
+        // ★ 新しい問題が出たタイミングで自動読み上げ (少し遅延させて安定化)
+        setTimeout(() => {
+            if (window.playHintSound) window.playHintSound();
+        }, 600);
     }
 
     // ----------------------------------------------------
     // ★★★ ドラッグ＆ドロップ & クリック移動ロジック ★★★
     // ----------------------------------------------------
-    
+
     function setupDragItem(item) {
         // --- クリックで移動 (簡易操作) ---
         item.addEventListener('click', (e) => {
@@ -229,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('touchstart', (e) => {
             currentDragItem = item;
             item.classList.add('dragging');
-        }, {passive: true});
+        }, { passive: true });
 
         item.addEventListener('touchend', (e) => {
             item.classList.remove('dragging');
@@ -239,10 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupDropZone(zone) {
         zone.addEventListener('dragover', (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
             zone.classList.add('hovered');
         });
-        
+
         zone.addEventListener('dragleave', () => {
             zone.classList.remove('hovered');
         });
@@ -250,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.addEventListener('drop', (e) => {
             e.preventDefault();
             zone.classList.remove('hovered');
-            
+
             if (currentDragItem) {
                 if (zone.classList.contains('drop-slot') && zone.hasChildNodes()) {
                     POOL_CONTAINER.appendChild(zone.firstChild);
@@ -286,19 +334,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // 正解
             SOUND_CORRECT.currentTime = 0;
             SOUND_CORRECT.play();
-            
+
             // ★修正: word.idが存在しない場合も考慮
             const wordIdentifier = currentWord.id || currentWord.reading;
             const res = checkAndAwardPoints(wordIdentifier);
             let msg = 'せいかい！✨';
-            if(res === 'scored') msg += ' (+1 pt)';
-            
+            if (res === 'scored') msg += ' (+1 pt)';
+
             FEEDBACK.textContent = msg;
             FEEDBACK.style.color = 'var(--correct-color)';
             CHECK_BTN.disabled = true;
             score += 1;
             updateScoreBoard();
-            
+
             setTimeout(() => {
                 showNextQuestion();
             }, 1500);
@@ -316,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         TURN_MSG.textContent = `問 ${questionCount} / ${MAX_QUESTIONS}`;
         SCORE_VAL.textContent = score;
     }
-    
+
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -326,10 +374,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playPopSound() {
-        try { 
-            SOUND_POP.currentTime = 0; 
-            SOUND_POP.play().catch(()=>{}); 
-        } catch(e){}
+        try {
+            SOUND_POP.currentTime = 0;
+            SOUND_POP.play().catch(() => { });
+        } catch (e) { }
     }
 
     // ★修正点3: DOMContentLoadedで初期化関数を呼び出す
