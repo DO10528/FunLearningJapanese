@@ -61,8 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         KATA_POOL.textContent = '';
         PAIR_ROWS.textContent = '';
 
-        const shuffHira = shuffleArray([...levelData.words]);
-        const shuffKata = shuffleArray([...levelData.words]);
+        const rawWords = [...levelData.words];
+        // 全単語リストをシャッフルしてから、最初の5個（5ペア）だけを抽出してゲームに使用する
+        const selectedWords = shuffleArray(rawWords).slice(0, 5);
+
+        // 選ばれた5ペアから表示用の配列を作成（それぞれの列で表示順を変えるためさらにシャッフル）
+        const shuffHira = shuffleArray([...selectedWords]);
+        const shuffKata = shuffleArray([...selectedWords]);
 
         // ひらがな＋イラスト カード生成
         shuffHira.forEach(w => {
@@ -173,7 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Validation ---
     window.checkAnswer = async function () {
         const rows = document.querySelectorAll('.pair-row');
-        const expectedCount = currentLevelData.words.length;
+        // 今回抽出されたペアの数（最大5）を基準にする
+        const expectedCount = Math.min(5, currentLevelData.words.length);
 
         if (rows.length < expectedCount) {
             alert('すべてのカードをペアにしてから「こたえあわせ」をおしてね！');
