@@ -19,15 +19,78 @@ document.addEventListener('DOMContentLoaded', () => {
     const IMG_PATH = 'assets/images/hiragana_words/';
     const POINTS_PER_LEVEL = 15;
 
+    // レベル1〜10まで、各レベル5個ずつの単語データに拡張
     const gameLevels = [
-        { level: 1, words: [{ hira: 'あめ', kata: 'アメ', file: 'あめ' }, { hira: 'いぬ', kata: 'イヌ', file: 'いぬ' }, { hira: 'うし', kata: 'ウシ', file: 'うし' }, { hira: 'えび', kata: 'エビ', file: 'えび' }] },
-        { level: 2, words: [{ hira: 'かに', kata: 'カニ', file: 'かに' }, { hira: 'き', kata: 'キ', file: 'き' }, { hira: 'くるま', kata: 'クルマ', file: 'くるま' }, { hira: 'こま', kata: 'コマ', file: 'こま' }] },
-        { level: 3, words: [{ hira: 'さる', kata: 'サル', file: 'さる' }, { hira: 'しか', kata: 'シカ', file: 'しか' }, { hira: 'すし', kata: 'スシ', file: 'すし' }, { hira: 'せみ', kata: 'セミ', file: 'せみ' }] },
-        { level: 4, words: [{ hira: 'たこ', kata: 'タコ', file: 'たこ' }, { hira: 'つき', kata: 'ツキ', file: 'つき' }, { hira: 'てれび', kata: 'テレビ', file: 'てれび' }, { hira: 'とり', kata: 'トリ', file: 'とり' }] },
-        { level: 5, words: [{ hira: 'なす', kata: 'ナス', file: 'なす' }, { hira: 'にほん', kata: 'ニホン', file: 'にほん' }, { hira: 'ねこ', kata: 'ネコ', file: 'ねこ' }, { hira: 'のり', kata: 'ノリ', file: 'のり' }] },
-        { level: 6, words: [{ hira: 'はし', kata: 'ハシ', file: 'はし' }, { hira: 'ひとで', kata: 'ヒトデ', file: 'ひとで' }, { hira: 'ふく', kata: 'フク', file: 'ふく' }, { hira: 'へび', kata: 'ヘビ', file: 'へび' }] },
-        { level: 7, words: [{ hira: 'まくら', kata: 'マクラ', file: 'まくら' }, { hira: 'みかん', kata: 'ミカン', file: 'みかん' }, { hira: 'めだか', kata: 'メダカ', file: 'めだか' }, { hira: 'もも', kata: 'モモ', file: 'もも' }] },
-        { level: 8, words: [{ hira: 'やぎ', kata: 'ヤギ', file: 'やぎ' }, { hira: 'りんご', kata: 'リンゴ', file: 'りんご' }, { hira: 'れもん', kata: 'レモン', file: 'れもん' }, { hira: 'わに', kata: 'ワニ', file: 'わに' }] }
+        { level: 1, words: [
+            { hira: 'あめ', kata: 'アメ', file: 'あめ' }, 
+            { hira: 'いぬ', kata: 'イヌ', file: 'いぬ' }, 
+            { hira: 'うし', kata: 'ウシ', file: 'うし' }, 
+            { hira: 'えび', kata: 'エビ', file: 'えび' }, 
+            { hira: 'おに', kata: 'オニ', file: 'おに' }
+        ] },
+        { level: 2, words: [
+            { hira: 'かに', kata: 'カニ', file: 'かに' }, 
+            { hira: 'き', kata: 'キ', file: 'き' }, 
+            { hira: 'くるま', kata: 'クルマ', file: 'くるま' }, 
+            { hira: 'けむし', kata: 'ケムシ', file: 'けむし' }, 
+            { hira: 'こま', kata: 'コマ', file: 'こま' }
+        ] },
+        { level: 3, words: [
+            { hira: 'さる', kata: 'サル', file: 'さる' }, 
+            { hira: 'しか', kata: 'シカ', file: 'しか' }, 
+            { hira: 'すし', kata: 'スシ', file: 'すし' }, 
+            { hira: 'せみ', kata: 'セミ', file: 'せみ' }, 
+            { hira: 'そば', kata: 'ソバ', file: 'そば' }
+        ] },
+        { level: 4, words: [
+            { hira: 'たこ', kata: 'タコ', file: 'たこ' }, 
+            { hira: 'はち', kata: 'ハチ', file: 'はち' }, 
+            { hira: 'つき', kata: 'ツキ', file: 'つき' }, 
+            { hira: 'てれび', kata: 'テレビ', file: 'てれび' }, 
+            { hira: 'とり', kata: 'トリ', file: 'とり' }
+        ] },
+        { level: 5, words: [
+            { hira: 'なす', kata: 'ナス', file: 'なす' }, 
+            { hira: 'にほん', kata: 'ニホン', file: 'にほん' }, 
+            { hira: 'ぬの', kata: 'ヌノ', file: 'ぬの' }, 
+            { hira: 'ねこ', kata: 'ネコ', file: 'ねこ' }, 
+            { hira: 'のり', kata: 'ノリ', file: 'のり' }
+        ] },
+        { level: 6, words: [
+            { hira: 'はし', kata: 'ハシ', file: 'はし' }, 
+            { hira: 'ひとで', kata: 'ヒトデ', file: 'ひとで' }, 
+            { hira: 'ふく', kata: 'フク', file: 'ふく' }, 
+            { hira: 'へび', kata: 'ヘビ', file: 'へび' }, 
+            { hira: 'ほし', kata: 'ホシ', file: 'ほし' }
+        ] },
+        { level: 7, words: [
+            { hira: 'まくら', kata: 'マクラ', file: 'まくら' }, 
+            { hira: 'みかん', kata: 'ミカン', file: 'みかん' }, 
+            { hira: 'むぎ', kata: 'ムギ', file: 'むぎ' }, 
+            { hira: 'めだか', kata: 'メダカ', file: 'めだか' }, 
+            { hira: 'もも', kata: 'モモ', file: 'もも' }
+        ] },
+        { level: 8, words: [
+            { hira: 'らくだ', kata: 'ラクダ', file: 'らくだ' }, 
+            { hira: 'りんご', kata: 'リンゴ', file: 'りんご' }, 
+            { hira: 'るんば', kata: 'ルンバ', file: 'るんば' }, 
+            { hira: 'れもん', kata: 'レモン', file: 'れもん' }, 
+            { hira: 'ろば', kata: 'ロバ', file: 'ろば' }
+        ] },
+        { level: 9, words: [
+            { hira: 'やぎ', kata: 'ヤギ', file: 'やぎ' }, 
+            { hira: 'ゆかた', kata: 'ユカタ', file: 'ゆかた' }, 
+            { hira: 'ようかい', kata: 'ヨウカイ', file: 'ようかい' },
+            { hira: 'すいか', kata: 'スイカ', file: 'すいか' }, // レベル9に追加
+            { hira: 'とまと', kata: 'トマト', file: 'とまと' } // レベル9に追加
+        ] },
+        { level: 10, words: [
+            { hira: 'わに', kata: 'ワニ', file: 'わに' }, 
+            { hira: 'かばん', kata: 'カバン', file: 'かばん' },
+            { hira: 'かめら', kata: 'カメラ', file: 'かめら' }, // レベル10に追加
+            { hira: 'ぴあの', kata: 'ピアノ', file: 'ぴあの' }, // レベル10に追加
+            { hira: 'ばす', kata: 'バス', file: 'ばす' } // レベル10に追加
+        ] }
     ];
 
     let currentLevelData = null;
@@ -78,6 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = document.createElement('img');
             img.src = `${IMG_PATH}${w.file}.png`;
             img.alt = w.hira;
+            // イラストが見つからなかった場合の代替テキスト処理
+            img.onerror = function() { this.style.display = 'none'; };
 
             const lbl = document.createElement('div');
             lbl.className = 'card-label';
@@ -158,6 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (row.classList.contains('locked-good')) return;
 
             // 元のプールに戻す
+            hiraCard.classList.remove('selected');
+            kataCard.classList.remove('selected');
             HIRA_POOL.appendChild(hiraCard);
             KATA_POOL.appendChild(kataCard);
             row.remove();
@@ -178,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Validation ---
     window.checkAnswer = async function () {
         const rows = document.querySelectorAll('.pair-row');
-        // 今回抽出されたペアの数（最大5）を基準にする
+        // 今回抽出されたペアの数（5）を基準にする
         const expectedCount = Math.min(5, currentLevelData.words.length);
 
         if (rows.length < expectedCount) {
@@ -201,8 +268,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (allCorrect) {
-            SOUND_CORRECT.currentTime = 0;
-            SOUND_CORRECT.play();
+            // 正解音の再生（フリーズ対策）
+            if (typeof SOUND_CORRECT !== 'undefined' && SOUND_CORRECT) {
+                SOUND_CORRECT.currentTime = 0;
+                SOUND_CORRECT.play().catch(e => console.log(e));
+            }
 
             // ポイント処理
             let ptsText = "";
@@ -214,8 +284,11 @@ document.addEventListener('DOMContentLoaded', () => {
             MODAL.style.display = 'flex';
 
         } else {
-            SOUND_INCORRECT.currentTime = 0;
-            SOUND_INCORRECT.play();
+            // 不正解音の再生（フリーズ対策）
+            if (typeof SOUND_INCORRECT !== 'undefined' && SOUND_INCORRECT) {
+                SOUND_INCORRECT.currentTime = 0;
+                SOUND_INCORRECT.play().catch(e => console.log(e));
+            }
             alert('ちがうペアがあるよ。なおしてみてね！ (ペアをタップするともどるよ)');
         }
     };
@@ -233,11 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Utils ---
     function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
         }
-        return array;
+        return newArray;
     }
 
     initGame();
