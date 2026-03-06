@@ -109,7 +109,7 @@ function startLevel(idx) {
     loadWord();
 }
 
-// 【新規追加】マイクの状態を完全にリセットしてクリアにする安全装置
+// マイクの状態を完全にリセットしてクリアにする安全装置
 window.forceResetMic = function() {
     if (recognition) {
         try { recognition.abort(); } catch(e) {}
@@ -151,9 +151,41 @@ function loadWord() {
         textEl.style.display = 'block';
         imgEl.style.display = 'none';
     }
+
+    // --- 動的「次へ」ボタンの生成と表示リセット ---
+    const micBtn = document.getElementById('mic-btn');
+    let nextBtn = document.getElementById('next-btn-dynamic');
+
+    if (micBtn) {
+        micBtn.style.display = 'inline-block'; // マイクボタンを復活させる
+        
+        // 次へボタンがまだ無ければ作成する
+        if (!nextBtn) {
+            nextBtn = document.createElement('button');
+            nextBtn.id = 'next-btn-dynamic';
+            nextBtn.innerHTML = 'つぎへすすむ <i class="fa-solid fa-arrow-right"></i>';
+            nextBtn.style.padding = '15px 40px';
+            nextBtn.style.fontSize = '1.3em';
+            nextBtn.style.fontWeight = 'bold';
+            nextBtn.style.backgroundColor = '#4caf50';
+            nextBtn.style.color = 'white';
+            nextBtn.style.border = 'none';
+            nextBtn.style.borderRadius = '50px';
+            nextBtn.style.cursor = 'pointer';
+            nextBtn.style.boxShadow = '0 5px 0 #2e7d32';
+            nextBtn.style.marginTop = '20px';
+            
+            nextBtn.onmousedown = () => { nextBtn.style.transform = 'translateY(5px)'; nextBtn.style.boxShadow = 'none'; };
+            nextBtn.onmouseup = () => { nextBtn.style.transform = 'translateY(0)'; nextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
+            
+            nextBtn.onclick = nextStep;
+            micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
+        }
+        nextBtn.style.display = 'none'; // 問題ロード時は必ず隠す
+    }
 }
 
-// --- 【修正版】iPadパニック回避マイクシステム ---
+// --- iPadパニック回避マイクシステム ---
 window.startSpeechRecognition = function() {
     if (!SpeechRecognition) {
         alert("お使いのブラウザは音声認識に対応していません。SafariかChromeの最新版をお使いください。");
@@ -163,7 +195,6 @@ window.startSpeechRecognition = function() {
     const btn = document.getElementById('mic-btn');
     const resText = document.getElementById('result-text');
 
-    // すでに録音中の場合はリセットして終了（これでトグルボタンとして正常に機能します）
     if (isListening) {
         forceResetMic();
         resText.textContent = "もういちど マイクをおしてね";
@@ -192,17 +223,13 @@ window.startSpeechRecognition = function() {
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
-    // ★修正点：onspeechend（強制終了）を削除し、iOSが自然にマイクを閉じるのを待つ
-
     recognition.onresult = (event) => {
-        // ★修正点：ここでの recognition.stop() を削除
         const transcript = event.results[0][0].transcript;
         document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
         checkPronunciation(transcript);
     };
 
     recognition.onend = () => {
-        // iOSが自然にマイク処理を終えたらリセット
         forceResetMic();
         if (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...") {
             resText.textContent = "もういちど マイクをおしてね";
@@ -258,9 +285,14 @@ function checkPronunciation(speech) {
             SOUND_CORRECT.play().catch(e => console.log(e));
         }
         
-        setTimeout(() => {
-            nextStep();
-        }, 1500);
+        // 正解したらマイクを隠して「つぎへすすむ」ボタンを表示する
+        const micBtn = document.getElementById('mic-btn');
+        const nextBtn = document.getElementById('next-btn-dynamic');
+        if (micBtn && nextBtn) {
+            micBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+        }
+        
     } else {
         resText.textContent = "おしい！もういちど。";
         resText.className = "result-text retry";
