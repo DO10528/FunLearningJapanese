@@ -1,9 +1,5 @@
-// --- 画像・音声パスの設定 ---
+// --- 画像パスの設定 ---
 const IMG_PATH = 'assets/images/hiragana_words/';
-
-// 音声
-const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3'); 
-const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3'); 
 
 // --- データ定義 ---
 const gameLevels = [
@@ -78,11 +74,9 @@ let selectedMode = 1;
 let currentLevelIdx = 0;
 let currentWordIdx = 0;
 
-// ★変更点：マイクの管理用変数
+// グローバルでインスタンスを保持し、再利用ではなく毎回作り直す方式
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-let isListening = false;
-let isMicReady = true; // マイクが完全に解放されているかを判定するフラグ
 
 window.onload = () => {
     const grid = document.getElementById('level-buttons');
@@ -96,9 +90,6 @@ window.onload = () => {
         btn.onclick = () => startLevel(idx);
         grid.appendChild(btn);
     });
-
-    // 最初に1回だけマイクを設定する（毎回作り直さない）
-    initSpeechRecognition();
 };
 
 function selectGameMode(mode) {
@@ -142,12 +133,13 @@ function loadWord() {
         imgEl.style.display = 'none';
     }
 
-    // --- 次へボタンの準備 ---
+    // 次へボタンの準備
     const micBtn = document.getElementById('mic-btn');
     let nextBtn = document.getElementById('next-btn-dynamic');
 
     if (micBtn) {
         micBtn.style.display = 'inline-block'; 
+        micBtn.classList.remove('listening');
         
         if (!nextBtn) {
             nextBtn = document.createElement('button');
@@ -174,40 +166,46 @@ function loadWord() {
     }
 }
 
-// ★変更点：マイクの設定を1つに固定し、システムに優しく終了を待つ
-function initSpeechRecognition() {
-    if (!SpeechRecognition) return;
-    if (recognition) return;
+window.startSpeechRecognition = function() {
+    if (!SpeechRecognition) {
+        alert("お使いのブラウザは音声認識に対応していません。");
+        return;
+    }
 
+    const btn = document.getElementById('mic-btn');
+    const resText = document.getElementById('result-text');
+
+    // 録音中の二重タップ防止
+    if (btn.classList.contains('listening')) return;
+
+    // 音声読み上げなどが裏で動いていたらキャンセルする
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+
+    // 毎回ピカピカの新しいマイクを作り直す（これが一番ピロッという音が即座に鳴りやすいです）
     recognition = new SpeechRecognition();
     recognition.lang = 'ja-JP';
     recognition.interimResults = false;
-    recognition.continuous = false; // 1回話し終わったら自動で止まる
+    recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
-        isListening = true;
-        isMicReady = false; // マイク使用中ロック
-        const btn = document.getElementById('mic-btn');
-        const resText = document.getElementById('result-text');
-        if (btn) btn.classList.add('listening');
-        if (resText) {
-            resText.textContent = "きいています...";
-            resText.className = "result-text";
-        }
+        btn.classList.add('listening');
+        resText.textContent = "きいています...";
+        resText.className = "result-text";
     };
 
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
         checkPronunciation(transcript);
-        // ここではストップも破壊もしない。iOSが自然に終わるのを待つ。
     };
 
     recognition.onerror = (event) => {
         console.warn("音声認識エラー:", event.error);
-        const resText = document.getElementById('result-text');
-        if (event.error !== 'aborted' && resText) {
+        btn.classList.remove('listening');
+        if (event.error !== 'aborted') {
             if (event.error === 'not-allowed') {
                 resText.textContent = "マイクのきょかがありません。";
             } else if (event.error === 'no-speech') {
@@ -219,55 +217,20 @@ function initSpeechRecognition() {
         }
     };
 
-    // ★一番重要：iOSが完全にマイクを片付けた時に呼ばれる
     recognition.onend = () => {
-        isListening = false;
-        isMicReady = true; // ロック解除！これで次の問題でもすぐ起動できる
-        const btn = document.getElementById('mic-btn');
-        if (btn) btn.classList.remove('listening');
-        
-        const resText = document.getElementById('result-text');
-        if (resText && (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...")) {
+        btn.classList.remove('listening');
+        if (resText.textContent === "きいています...") {
             resText.textContent = "もういちど マイクをおしてね";
             resText.className = "result-text retry";
         }
     };
-}
 
-window.startSpeechRecognition = function() {
-    if (!SpeechRecognition) {
-        alert("お使いのブラウザは音声認識に対応していません。SafariかChromeをお使いください。");
-        return;
-    }
-
-    if (!recognition) {
-        initSpeechRecognition();
-    }
-
-    const resText = document.getElementById('result-text');
-
-    // 録音中なら止める（ユーザーが手動で押した場合）
-    if (isListening) {
-        recognition.stop();
-        if (resText) resText.textContent = "マイクをとめました。";
-        return;
-    }
-
-    // ★追加：iOSがまだ裏で片付けをしている最中なら、起動をブロックしてフリーズを防ぐ
-    if (!isMicReady) {
-        console.log("マイクの準備中...");
-        return;
-    }
-
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-    }
-
+    // 同期的に即時スタート
     try {
         recognition.start();
     } catch (e) {
         console.error("マイク起動エラー:", e);
-        if (resText) resText.textContent = "エラーがおきました。もういちどおしてね。";
+        resText.textContent = "エラーがおきました。もういちどおしてね。";
     }
 }
 
@@ -285,13 +248,9 @@ function checkPronunciation(speech) {
     }
 
     if (maxSim >= 80) {
+        // ★正解の音を削除し、見た目のみに変更
         resText.textContent = "合格！ (Excellent!)";
         resText.className = "result-text success";
-        
-        if(typeof SOUND_CORRECT !== 'undefined') {
-            SOUND_CORRECT.currentTime = 0;
-            SOUND_CORRECT.play().catch(e => console.log(e));
-        }
         
         // 正解したらマイクを隠して「つぎへすすむ」ボタンを表示する
         const micBtn = document.getElementById('mic-btn');
@@ -302,13 +261,9 @@ function checkPronunciation(speech) {
         }
         
     } else {
+        // ★不正解の音を削除し、見た目のみに変更
         resText.textContent = "おしい！もういちど。";
         resText.className = "result-text retry";
-        
-        if(typeof SOUND_INCORRECT !== 'undefined') {
-            SOUND_INCORRECT.currentTime = 0;
-            SOUND_INCORRECT.play().catch(e => console.log(e));
-        }
     }
 }
 
