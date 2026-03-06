@@ -238,12 +238,14 @@ const cssVars = {
         selectedChoice = null;
         const currentQ = questionData[currentQuestionIndex];
         document.getElementById(`question-counter-${mode}`).textContent = `問 ${currentQuestionIndex + 1} / ${maxQuestions}`;
-        document.getElementById(`feedback-message-${mode}`).textContent = '';
-        document.getElementById(`mode${mode}-check-btn`).style.display = 'block';
+        document.getElementById(`feedback-message-${mode}`).innerHTML = '';
+        const checkBtn = document.getElementById(`mode${mode}-check-btn`);
+        checkBtn.style.display = 'block';
+        checkBtn.disabled = false;
         document.getElementById(`mode${mode}-next-btn`).style.display = 'none';
         
         if (mode === 1) {
-            document.getElementById(`mode1-check-btn`).disabled = true; 
+            checkBtn.disabled = true; 
             const kanji = currentQ.kanji;
             const correctKana = currentQ.kana;
             document.getElementById('mode1-question-box').textContent = kanji;
@@ -293,10 +295,8 @@ const cssVars = {
                 currentComponents.push({ id: key, type: type });
             });
             
-            setupDynamicDropdowns(3, currentComponents);
             
-            // ★ モード3のボタンを常に押せるように修正
-            document.getElementById(`mode3-check-btn`).disabled = false;
+            setupDynamicDropdowns(3, currentComponents);
         }
     }
     
@@ -448,15 +448,24 @@ const cssVars = {
         
         if (correct) {
             const GAME_ID = `${GAME_BASE_ID}_${mode}`; 
-            const pointAdded = await window.addPuzzlePoints(currentQuestionIndex + 1, GAME_ID); 
+            let pointAdded = false;
+            
+            try {
+                if (typeof window.addPuzzlePoints === 'function') {
+                    pointAdded = await window.addPuzzlePoints(currentQuestionIndex + 1, GAME_ID); 
+                }
+            } catch (error) {
+                console.warn("Failed to add puzzle points:", error);
+            }
+            
+            score++;
             
             if (pointAdded) {
-                score++;
                 document.getElementById('daily-point-limit').textContent = `🎉 ポイント獲得！ (+1pt)`;
                 feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 大正解！ (+1pt)</span>`;
             } else {
                 document.getElementById('daily-point-limit').textContent = `(今日はポイント獲得済み)`;
-                feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 正解です！ (今日はこの問題のポイント獲得済み)</span>`;
+                feedback = `<span style="color:${cssVars.correct};"><i class="fa-solid fa-circle-check"></i> 正解です！</span>`;
             }
 
             setTimeout(() => {
@@ -470,7 +479,7 @@ const cssVars = {
             checkBtn.disabled = false;
         }
         
-        document.getElementById(`feedback-message-${mode}`).textContent = feedback;
+        document.getElementById(`feedback-message-${mode}`).innerHTML = feedback;
     }
 
     function nextQuestion(mode) {
