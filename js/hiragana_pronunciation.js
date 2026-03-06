@@ -109,9 +109,13 @@ function startLevel(idx) {
     loadWord();
 }
 
-// マイクの状態を完全にリセットしてクリアにする安全装置
+// --- マイクの状態を完全にリセットしてクリアにする安全装置（超強化版） ---
 window.forceResetMic = function() {
     if (recognition) {
+        // ★イベントリスナーを完全に無効化し、過去のゴーストが発火するのを防ぐ
+        recognition.onresult = null;
+        recognition.onerror = null;
+        recognition.onend = null;
         try { recognition.abort(); } catch(e) {}
         recognition = null;
     }
@@ -121,7 +125,7 @@ window.forceResetMic = function() {
 };
 
 function loadWord() {
-    // 問題が切り替わるたびに、マイクのバグった状態を必ずリセットする
+    // 問題が切り替わるたびにマイクをリセット
     forceResetMic();
 
     const levelData = gameLevels[currentLevelIdx];
@@ -185,7 +189,7 @@ function loadWord() {
     }
 }
 
-// --- iPadパニック回避マイクシステム ---
+// --- iPadパニック回避＆ゴーストエラー防止マイクシステム ---
 window.startSpeechRecognition = function() {
     if (!SpeechRecognition) {
         alert("お使いのブラウザは音声認識に対応していません。SafariかChromeの最新版をお使いください。");
@@ -201,13 +205,12 @@ window.startSpeechRecognition = function() {
         return;
     }
 
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-    }
+    // 起動前に過去の亡霊を完全にリセット
+    forceResetMic();
 
     isListening = true;
     btn.classList.add('listening');
-    resText.textContent = "マイクをじゅんび中...";
+    resText.textContent = "きいています...";
     resText.className = "result-text";
 
     try {
@@ -225,6 +228,10 @@ window.startSpeechRecognition = function() {
 
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
+        
+        // ★超重要：結果が出たその瞬間にマイクを完全に破壊する
+        forceResetMic(); 
+        
         document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
         checkPronunciation(transcript);
     };
@@ -238,11 +245,15 @@ window.startSpeechRecognition = function() {
     };
 
     recognition.onerror = (event) => {
+        const errorType = event.error;
         forceResetMic();
-        if (event.error !== 'aborted') {
-            console.warn("音声認識エラー:", event.error);
-            if (event.error === 'not-allowed') {
+        
+        if (errorType !== 'aborted') {
+            console.warn("音声認識エラー:", errorType);
+            if (errorType === 'not-allowed') {
                 resText.textContent = "マイクのきょかがありません。設定(せってい)をかくにんしてね。";
+            } else if (errorType === 'no-speech') {
+                resText.textContent = "こえがきこえませんでした。もういちどおしてね。";
             } else {
                 resText.textContent = "うまくききとれませんでした。";
             }
@@ -250,17 +261,14 @@ window.startSpeechRecognition = function() {
         }
     };
 
-    setTimeout(() => {
-        if (!isListening) return;
-        try {
-            resText.textContent = "きいています...";
-            recognition.start();
-        } catch (e) {
-            console.error("マイク起動エラー:", e);
-            forceResetMic();
-            resText.textContent = "エラーがおきました。もういちどおしてね。";
-        }
-    }, 100);
+    // ★超重要：iOS Safari対策（即時起動に変更し、ブロックを回避）
+    try {
+        recognition.start();
+    } catch (e) {
+        console.error("マイク起動エラー:", e);
+        forceResetMic();
+        resText.textContent = "エラーがおきました。もういちどおしてね。";
+    }
 }
 
 function checkPronunciation(speech) {
