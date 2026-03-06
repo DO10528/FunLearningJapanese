@@ -79,13 +79,13 @@ let currentLevelIdx = 0;
 let currentWordIdx = 0;
 let isListening = false;
 
-// Web Speech APIの存在チェック（インスタンスはここでは作らない）
+// Web Speech APIの存在チェック
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 
 window.onload = () => {
     const grid = document.getElementById('level-buttons');
-    if (!grid) return; // gridが存在しない場合は処理をスキップ（エラー防止）
+    if (!grid) return; 
     
     gameLevels.forEach((lv, idx) => {
         const btn = document.createElement('button');
@@ -109,16 +109,30 @@ function startLevel(idx) {
     loadWord();
 }
 
+// 【新規追加】マイクの状態を完全にリセットしてクリアにする安全装置
+window.forceResetMic = function() {
+    if (recognition) {
+        try { recognition.abort(); } catch(e) {}
+        recognition = null;
+    }
+    isListening = false;
+    const btn = document.getElementById('mic-btn');
+    if (btn) btn.classList.remove('listening');
+};
+
 function loadWord() {
+    // 問題が切り替わるたびに、マイクのバグった状態を必ずリセットする
+    forceResetMic();
+
     const levelData = gameLevels[currentLevelIdx];
     const wordData = levelData.words[currentWordIdx];
     
-    // CSS変数を更新して、画面全体のテーマカラーを変更
     document.documentElement.style.setProperty('--current-theme', levelData.color);
 
     document.getElementById('current-level-display').textContent = levelData.level;
     document.getElementById('word-progress-text').textContent = `${currentWordIdx + 1} / ${levelData.words.length}`;
-    document.getElementById('result-text').textContent = "";
+    document.getElementById('result-text').textContent = "マイクをおして はなしてね";
+    document.getElementById('result-text').className = "result-text";
     document.getElementById('transcript-text').textContent = "";
     
     const totalInLevel = levelData.words.length;
@@ -139,7 +153,7 @@ function loadWord() {
     }
 }
 
-// --- 【超強化版】iPadの「機械音が鳴らないバグ」を防ぐマイクシステム ---
+// --- 【修正版】iPadパニック回避マイクシステム ---
 window.startSpeechRecognition = function() {
     if (!SpeechRecognition) {
         alert("お使いのブラウザは音声認識に対応していません。SafariかChromeの最新版をお使いください。");
@@ -149,18 +163,13 @@ window.startSpeechRecognition = function() {
     const btn = document.getElementById('mic-btn');
     const resText = document.getElementById('result-text');
 
-    // 【対策1】すでに録音中の場合は「強制終了(abort)」で確実にリセットする
-    if (isListening && recognition) {
-        try {
-            recognition.abort(); // stop()ではなく即座にキルする
-        } catch(e) { console.log(e); }
-        isListening = false;
-        btn.classList.remove('listening');
+    // すでに録音中の場合はリセットして終了（これでトグルボタンとして正常に機能します）
+    if (isListening) {
+        forceResetMic();
         resText.textContent = "もういちど マイクをおしてね";
         return;
     }
 
-    // 【対策2】裏で動いているかもしれない音声合成などを完全にキャンセル
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
     }
@@ -170,14 +179,11 @@ window.startSpeechRecognition = function() {
     resText.textContent = "マイクをじゅんび中...";
     resText.className = "result-text";
 
-    // 【対策3】毎回必ず「新しいマイク」を作り直す（使い回しによるフリーズを防ぐ）
     try {
         recognition = new SpeechRecognition();
     } catch(e) {
-        console.error("SpeechRecognitionの生成に失敗:", e);
-        isListening = false;
-        btn.classList.remove('listening');
-        resText.textContent = "マイクのじゅんびにしっぱいしました。";
+        forceResetMic();
+        resText.textContent = "エラーがおきました。もういちどおしてね。";
         return;
     }
     
@@ -186,25 +192,18 @@ window.startSpeechRecognition = function() {
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
-    // 話し終わったと検知した瞬間に、待機時間をカットして強制終了
-    recognition.onspeechend = () => {
-        try { recognition.stop(); } catch(e){}
-    };
+    // ★修正点：onspeechend（強制終了）を削除し、iOSが自然にマイクを閉じるのを待つ
 
     recognition.onresult = (event) => {
-        // 結果が出たらすぐにマイクを完全にオフにする
-        try { recognition.stop(); } catch(e){}
-        
+        // ★修正点：ここでの recognition.stop() を削除
         const transcript = event.results[0][0].transcript;
         document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
         checkPronunciation(transcript);
     };
 
     recognition.onend = () => {
-        isListening = false;
-        btn.classList.remove('listening');
-        
-        // 何も聞き取れずに終了した場合のフォロー
+        // iOSが自然にマイク処理を終えたらリセット
+        forceResetMic();
         if (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...") {
             resText.textContent = "もういちど マイクをおしてね";
             resText.className = "result-text retry";
@@ -212,12 +211,9 @@ window.startSpeechRecognition = function() {
     };
 
     recognition.onerror = (event) => {
-        isListening = false;
-        btn.classList.remove('listening');
-        // ユーザーが意図的に中断した時以外のエラーを表示
+        forceResetMic();
         if (event.error !== 'aborted') {
             console.warn("音声認識エラー:", event.error);
-            // マイク権限が拒否された場合の特別メッセージ
             if (event.error === 'not-allowed') {
                 resText.textContent = "マイクのきょかがありません。設定(せってい)をかくにんしてね。";
             } else {
@@ -227,17 +223,14 @@ window.startSpeechRecognition = function() {
         }
     };
 
-    // 【最強対策4】OSのオーディオが落ち着くまで「0.1秒」だけ待ってからマイクを起動
-    // これにより、iPadがパニックを起こさず確実に「ピロッ」と鳴るようになります。
     setTimeout(() => {
-        if (!isListening) return; // 待っている間にキャンセルされていたらやめる
+        if (!isListening) return;
         try {
             resText.textContent = "きいています...";
             recognition.start();
         } catch (e) {
             console.error("マイク起動エラー:", e);
-            isListening = false;
-            btn.classList.remove('listening');
+            forceResetMic();
             resText.textContent = "エラーがおきました。もういちどおしてね。";
         }
     }, 100);
@@ -247,10 +240,8 @@ function checkPronunciation(speech) {
     const wordData = gameLevels[currentLevelIdx].words[currentWordIdx];
     const resText = document.getElementById('result-text');
 
-    // ひらがなそのものとの一致率を計算
     let maxSim = calculateSimilarity(speech, wordData.hira);
     
-    // 追加した漢字・カタカナのバリエーションとの一致率も計算して、一番高いものを採用
     if (wordData.accepts) {
         wordData.accepts.forEach(acc => {
             const sim = calculateSimilarity(speech, acc);
@@ -258,19 +249,15 @@ function checkPronunciation(speech) {
         });
     }
 
-    console.log(`Speech: ${speech}, Max Similarity: ${maxSim}%`);
-
     if (maxSim >= 80) {
         resText.textContent = "合格！ (Excellent!)";
         resText.className = "result-text success";
         
-        // 正解の音を鳴らす (連続再生対策で currentTime を 0 にする)
         if(typeof SOUND_CORRECT !== 'undefined') {
             SOUND_CORRECT.currentTime = 0;
             SOUND_CORRECT.play().catch(e => console.log(e));
         }
         
-        // 次の問題へ進む前に少し待機
         setTimeout(() => {
             nextStep();
         }, 1500);
@@ -278,7 +265,6 @@ function checkPronunciation(speech) {
         resText.textContent = "おしい！もういちど。";
         resText.className = "result-text retry";
         
-        // 不正解の音を鳴らす
         if(typeof SOUND_INCORRECT !== 'undefined') {
             SOUND_INCORRECT.currentTime = 0;
             SOUND_INCORRECT.play().catch(e => console.log(e));
@@ -296,7 +282,6 @@ function nextStep() {
         currentLevelIdx++;
         if (currentLevelIdx < gameLevels.length) {
             currentWordIdx = 0;
-            // レベルアップの演出などがあればここに追加
             loadWord();
         } else {
             alert("ぜんぶクリア！おめでとう！");
