@@ -77,11 +77,12 @@ const gameLevels = [
 let selectedMode = 1; 
 let currentLevelIdx = 0;
 let currentWordIdx = 0;
-let isListening = false;
 
-// Web Speech APIの存在チェック
+// ★変更点：マイクの管理用変数
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
+let isListening = false;
+let isMicReady = true; // マイクが完全に解放されているかを判定するフラグ
 
 window.onload = () => {
     const grid = document.getElementById('level-buttons');
@@ -95,6 +96,9 @@ window.onload = () => {
         btn.onclick = () => startLevel(idx);
         grid.appendChild(btn);
     });
+
+    // 最初に1回だけマイクを設定する（毎回作り直さない）
+    initSpeechRecognition();
 };
 
 function selectGameMode(mode) {
@@ -109,25 +113,7 @@ function startLevel(idx) {
     loadWord();
 }
 
-// --- マイクの状態を完全にリセットしてクリアにする安全装置（超強化版） ---
-window.forceResetMic = function() {
-    if (recognition) {
-        // ★イベントリスナーを完全に無効化し、過去のゴーストが発火するのを防ぐ
-        recognition.onresult = null;
-        recognition.onerror = null;
-        recognition.onend = null;
-        try { recognition.abort(); } catch(e) {}
-        recognition = null;
-    }
-    isListening = false;
-    const btn = document.getElementById('mic-btn');
-    if (btn) btn.classList.remove('listening');
-};
-
 function loadWord() {
-    // 問題が切り替わるたびにマイクをリセット
-    forceResetMic();
-
     const levelData = gameLevels[currentLevelIdx];
     const wordData = levelData.words[currentWordIdx];
     
@@ -156,14 +142,13 @@ function loadWord() {
         imgEl.style.display = 'none';
     }
 
-    // --- 動的「次へ」ボタンの生成と表示リセット ---
+    // --- 次へボタンの準備 ---
     const micBtn = document.getElementById('mic-btn');
     let nextBtn = document.getElementById('next-btn-dynamic');
 
     if (micBtn) {
-        micBtn.style.display = 'inline-block'; // マイクボタンを復活させる
+        micBtn.style.display = 'inline-block'; 
         
-        // 次へボタンがまだ無ければ作成する
         if (!nextBtn) {
             nextBtn = document.createElement('button');
             nextBtn.id = 'next-btn-dynamic';
@@ -185,75 +170,48 @@ function loadWord() {
             nextBtn.onclick = nextStep;
             micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
         }
-        nextBtn.style.display = 'none'; // 問題ロード時は必ず隠す
+        nextBtn.style.display = 'none'; 
     }
 }
 
-// --- iPadパニック回避＆ゴーストエラー防止マイクシステム ---
-window.startSpeechRecognition = function() {
-    if (!SpeechRecognition) {
-        alert("お使いのブラウザは音声認識に対応していません。SafariかChromeの最新版をお使いください。");
-        return;
-    }
+// ★変更点：マイクの設定を1つに固定し、システムに優しく終了を待つ
+function initSpeechRecognition() {
+    if (!SpeechRecognition) return;
+    if (recognition) return;
 
-    const btn = document.getElementById('mic-btn');
-    const resText = document.getElementById('result-text');
-
-    if (isListening) {
-        forceResetMic();
-        resText.textContent = "もういちど マイクをおしてね";
-        return;
-    }
-
-    // 起動前に過去の亡霊を完全にリセット
-    forceResetMic();
-
-    isListening = true;
-    btn.classList.add('listening');
-    resText.textContent = "きいています...";
-    resText.className = "result-text";
-
-    try {
-        recognition = new SpeechRecognition();
-    } catch(e) {
-        forceResetMic();
-        resText.textContent = "エラーがおきました。もういちどおしてね。";
-        return;
-    }
-    
+    recognition = new SpeechRecognition();
     recognition.lang = 'ja-JP';
     recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.continuous = false; // 1回話し終わったら自動で止まる
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        
-        // ★超重要：結果が出たその瞬間にマイクを完全に破壊する
-        forceResetMic(); 
-        
-        document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
-        checkPronunciation(transcript);
-    };
-
-    recognition.onend = () => {
-        forceResetMic();
-        if (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...") {
-            resText.textContent = "もういちど マイクをおしてね";
-            resText.className = "result-text retry";
+    recognition.onstart = () => {
+        isListening = true;
+        isMicReady = false; // マイク使用中ロック
+        const btn = document.getElementById('mic-btn');
+        const resText = document.getElementById('result-text');
+        if (btn) btn.classList.add('listening');
+        if (resText) {
+            resText.textContent = "きいています...";
+            resText.className = "result-text";
         }
     };
 
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('transcript-text').textContent = `ききとった言葉: 「${transcript}」`;
+        checkPronunciation(transcript);
+        // ここではストップも破壊もしない。iOSが自然に終わるのを待つ。
+    };
+
     recognition.onerror = (event) => {
-        const errorType = event.error;
-        forceResetMic();
-        
-        if (errorType !== 'aborted') {
-            console.warn("音声認識エラー:", errorType);
-            if (errorType === 'not-allowed') {
-                resText.textContent = "マイクのきょかがありません。設定(せってい)をかくにんしてね。";
-            } else if (errorType === 'no-speech') {
-                resText.textContent = "こえがきこえませんでした。もういちどおしてね。";
+        console.warn("音声認識エラー:", event.error);
+        const resText = document.getElementById('result-text');
+        if (event.error !== 'aborted' && resText) {
+            if (event.error === 'not-allowed') {
+                resText.textContent = "マイクのきょかがありません。";
+            } else if (event.error === 'no-speech') {
+                resText.textContent = "こえがきこえませんでした。もういちど。";
             } else {
                 resText.textContent = "うまくききとれませんでした。";
             }
@@ -261,13 +219,55 @@ window.startSpeechRecognition = function() {
         }
     };
 
-    // ★超重要：iOS Safari対策（即時起動に変更し、ブロックを回避）
+    // ★一番重要：iOSが完全にマイクを片付けた時に呼ばれる
+    recognition.onend = () => {
+        isListening = false;
+        isMicReady = true; // ロック解除！これで次の問題でもすぐ起動できる
+        const btn = document.getElementById('mic-btn');
+        if (btn) btn.classList.remove('listening');
+        
+        const resText = document.getElementById('result-text');
+        if (resText && (resText.textContent === "きいています..." || resText.textContent === "マイクをじゅんび中...")) {
+            resText.textContent = "もういちど マイクをおしてね";
+            resText.className = "result-text retry";
+        }
+    };
+}
+
+window.startSpeechRecognition = function() {
+    if (!SpeechRecognition) {
+        alert("お使いのブラウザは音声認識に対応していません。SafariかChromeをお使いください。");
+        return;
+    }
+
+    if (!recognition) {
+        initSpeechRecognition();
+    }
+
+    const resText = document.getElementById('result-text');
+
+    // 録音中なら止める（ユーザーが手動で押した場合）
+    if (isListening) {
+        recognition.stop();
+        if (resText) resText.textContent = "マイクをとめました。";
+        return;
+    }
+
+    // ★追加：iOSがまだ裏で片付けをしている最中なら、起動をブロックしてフリーズを防ぐ
+    if (!isMicReady) {
+        console.log("マイクの準備中...");
+        return;
+    }
+
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+
     try {
         recognition.start();
     } catch (e) {
         console.error("マイク起動エラー:", e);
-        forceResetMic();
-        resText.textContent = "エラーがおきました。もういちどおしてね。";
+        if (resText) resText.textContent = "エラーがおきました。もういちどおしてね。";
     }
 }
 
