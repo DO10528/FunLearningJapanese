@@ -1,6 +1,8 @@
 // --- 画像パスの設定 ---
 const IMG_PATH = 'assets/images/hiragana_words/';
 
+// ※音声を鳴らさないため、SOUND_CORRECT などの Audio 設定は完全に削除しました。
+
 // --- データ定義 ---
 const gameLevels = [
     { level: 1, color: '#ff6b81', words: [ 
@@ -74,7 +76,6 @@ let selectedMode = 1;
 let currentLevelIdx = 0;
 let currentWordIdx = 0;
 
-// グローバルでインスタンスを保持し、再利用ではなく毎回作り直す方式
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 
@@ -112,8 +113,6 @@ function loadWord() {
 
     document.getElementById('current-level-display').textContent = levelData.level;
     document.getElementById('word-progress-text').textContent = `${currentWordIdx + 1} / ${levelData.words.length}`;
-    document.getElementById('result-text').textContent = "マイクをおして はなしてね";
-    document.getElementById('result-text').className = "result-text";
     document.getElementById('transcript-text').textContent = "";
     
     const totalInLevel = levelData.words.length;
@@ -133,36 +132,57 @@ function loadWord() {
         imgEl.style.display = 'none';
     }
 
-    // 次へボタンの準備
+    // --- マイクボタンと次へボタンの制御 ---
     const micBtn = document.getElementById('mic-btn');
     let nextBtn = document.getElementById('next-btn-dynamic');
+    const resText = document.getElementById('result-text');
 
+    // 「つぎへ」ボタンの生成と非表示
+    if (!nextBtn && micBtn) {
+        nextBtn = document.createElement('button');
+        nextBtn.id = 'next-btn-dynamic';
+        nextBtn.innerHTML = 'つぎへすすむ <i class="fa-solid fa-arrow-right"></i>';
+        nextBtn.style.padding = '15px 40px';
+        nextBtn.style.fontSize = '1.3em';
+        nextBtn.style.fontWeight = 'bold';
+        nextBtn.style.backgroundColor = '#4caf50';
+        nextBtn.style.color = 'white';
+        nextBtn.style.border = 'none';
+        nextBtn.style.borderRadius = '50px';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.style.boxShadow = '0 5px 0 #2e7d32';
+        nextBtn.style.marginTop = '20px';
+        
+        nextBtn.onmousedown = () => { nextBtn.style.transform = 'translateY(5px)'; nextBtn.style.boxShadow = 'none'; };
+        nextBtn.onmouseup = () => { nextBtn.style.transform = 'translateY(0)'; nextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
+        
+        nextBtn.onclick = nextStep;
+        micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
+    }
+    if (nextBtn) {
+        nextBtn.style.display = 'none'; 
+    }
+
+    // ★重要：マイクの準備期間（ロック機能）
     if (micBtn) {
         micBtn.style.display = 'inline-block'; 
         micBtn.classList.remove('listening');
         
-        if (!nextBtn) {
-            nextBtn = document.createElement('button');
-            nextBtn.id = 'next-btn-dynamic';
-            nextBtn.innerHTML = 'つぎへすすむ <i class="fa-solid fa-arrow-right"></i>';
-            nextBtn.style.padding = '15px 40px';
-            nextBtn.style.fontSize = '1.3em';
-            nextBtn.style.fontWeight = 'bold';
-            nextBtn.style.backgroundColor = '#4caf50';
-            nextBtn.style.color = 'white';
-            nextBtn.style.border = 'none';
-            nextBtn.style.borderRadius = '50px';
-            nextBtn.style.cursor = 'pointer';
-            nextBtn.style.boxShadow = '0 5px 0 #2e7d32';
-            nextBtn.style.marginTop = '20px';
-            
-            nextBtn.onmousedown = () => { nextBtn.style.transform = 'translateY(5px)'; nextBtn.style.boxShadow = 'none'; };
-            nextBtn.onmouseup = () => { nextBtn.style.transform = 'translateY(0)'; nextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
-            
-            nextBtn.onclick = nextStep;
-            micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
-        }
-        nextBtn.style.display = 'none'; 
+        // 0.8秒間、マイクボタンを半透明にしてクリックできないようにする
+        micBtn.disabled = true;
+        micBtn.style.opacity = '0.5';
+        micBtn.style.pointerEvents = 'none';
+        
+        resText.textContent = "マイクをじゅんびしています... (少しまってね)";
+        resText.className = "result-text";
+
+        // iPadのシステムが古いマイクを完全に手放すための「確実な待機時間」
+        setTimeout(() => {
+            micBtn.disabled = false;
+            micBtn.style.opacity = '1';
+            micBtn.style.pointerEvents = ''; // ロック解除
+            resText.textContent = "マイクをおして はなしてね";
+        }, 800);
     }
 }
 
@@ -175,15 +195,14 @@ window.startSpeechRecognition = function() {
     const btn = document.getElementById('mic-btn');
     const resText = document.getElementById('result-text');
 
-    // 録音中の二重タップ防止
-    if (btn.classList.contains('listening')) return;
+    // 録音中や準備中の二重タップ防止
+    if (btn.classList.contains('listening') || btn.disabled) return;
 
-    // 音声読み上げなどが裏で動いていたらキャンセルする
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
     }
 
-    // 毎回ピカピカの新しいマイクを作り直す（これが一番ピロッという音が即座に鳴りやすいです）
+    // 問題ごとに完全に新しいインスタンスを生成する
     recognition = new SpeechRecognition();
     recognition.lang = 'ja-JP';
     recognition.interimResults = false;
@@ -248,11 +267,11 @@ function checkPronunciation(speech) {
     }
 
     if (maxSim >= 80) {
-        // ★正解の音を削除し、見た目のみに変更
+        // 見た目と文だけで正解を表現
         resText.textContent = "合格！ (Excellent!)";
         resText.className = "result-text success";
         
-        // 正解したらマイクを隠して「つぎへすすむ」ボタンを表示する
+        // マイクを隠して「つぎへすすむ」ボタンを表示する
         const micBtn = document.getElementById('mic-btn');
         const nextBtn = document.getElementById('next-btn-dynamic');
         if (micBtn && nextBtn) {
@@ -261,13 +280,19 @@ function checkPronunciation(speech) {
         }
         
     } else {
-        // ★不正解の音を削除し、見た目のみに変更
+        // 見た目と文だけで不正解を表現
         resText.textContent = "おしい！もういちど。";
         resText.className = "result-text retry";
     }
 }
 
 function nextStep() {
+    // 古いマイクインスタンスが残っていたら安全に破棄する
+    if (recognition) {
+        try { recognition.abort(); } catch(e){}
+        recognition = null;
+    }
+
     currentWordIdx++;
     const levelWords = gameLevels[currentLevelIdx].words;
 
