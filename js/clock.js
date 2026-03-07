@@ -1,7 +1,6 @@
 // AI音声（SpeechSynthesis）の準備
 const synth = window.speechSynthesis;
 function speakText(text) {
-    // 【フリーズ対策】読み上げ時にマイクが起動していたら強制停止する
     if (isListening && recognition) {
         try { recognition.abort(); } catch(e){}
         isListening = false;
@@ -12,7 +11,7 @@ function speakText(text) {
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP';
-    utter.rate = 0.9; // 少しゆっくりめに
+    utter.rate = 0.9;
     synth.speak(utter);
 }
 
@@ -23,11 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const POINTS_PER_QUESTION = 1;
 
-    // --- データ定義 (音声認識の揺れに対応するため accepts を追加) ---
+    // --- データ定義 ---
     const IMG_PATH = 'assets/images/clocks/';
-    
-    // 【ルール1】正誤判定のオーディオ衝突を根本から排除するため、サウンド設定は完全に削除しました。
-    
     const timeData = [
         { hour: 1, text: 'いちじ', img: 'clock_1.png', accepts: ['いちじ', '1時', '一時'] },
         { hour: 2, text: 'にじ', img: 'clock_2.png', accepts: ['にじ', '2時', '二時'] },
@@ -58,55 +54,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCorrectAnswer = null;
     let currentMode = 1;
 
-    // --- 音声認識APIの準備 (インスタンスの使い回しを廃止) ---
+    // --- 音声認識APIの準備 ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
-    let quiz3Step = 1; // 1:質問する, 2:答える
+    let quiz3Step = 1;
     let quiz3CorrectData = null;
-
-    // --- モード選択画面の廃止と「戻るボタン」の動的配置 ---
-    function addBackButton(container) {
-        if (!container.querySelector('.dynamic-back-btn')) {
-            const backBtn = document.createElement('button');
-            backBtn.className = 'dynamic-back-btn';
-            backBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> もどる';
-            
-            // 小さく見やすい戻るボタンのスタイル
-            backBtn.style.position = 'absolute';
-            backBtn.style.top = '10px';
-            backBtn.style.left = '10px';
-            backBtn.style.padding = '8px 15px';
-            backBtn.style.fontSize = '1em';
-            backBtn.style.fontWeight = 'bold';
-            backBtn.style.backgroundColor = '#9e9e9e';
-            backBtn.style.color = 'white';
-            backBtn.style.border = 'none';
-            backBtn.style.borderRadius = '20px';
-            backBtn.style.cursor = 'pointer';
-            backBtn.style.boxShadow = '0 3px 0 #757575';
-            backBtn.style.zIndex = '1000';
-            
-            backBtn.onmousedown = () => { backBtn.style.transform = 'translateY(3px)'; backBtn.style.boxShadow = 'none'; };
-            backBtn.onmouseup = () => { backBtn.style.transform = 'translateY(0)'; backBtn.style.boxShadow = '0 3px 0 #757575'; };
-            
-            // メインメニュー（前のページ）へ確実に戻る
-            backBtn.onclick = () => {
-                if (recognition) { try { recognition.abort(); } catch(e){} }
-                if (synth.speaking) synth.cancel();
-                window.history.back();
-            };
-            
-            container.style.position = 'relative'; 
-            container.appendChild(backBtn);
-        }
-    }
 
     // --- 汎用関数 ---
     window.showScreen = function(screenElement) {
+        // 画面切り替え時にマイクと音声を確実に止める（バグ防止）
+        if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
+        if (synth.speaking) synth.cancel();
+        isListening = false;
+
         screens.forEach(s => s.classList.remove('active'));
         screenElement.classList.add('active');
-        addBackButton(screenElement); // 画面表示時に確実に戻るボタンを設置
     }
 
     function shuffleArray(array) {
@@ -134,16 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             item.appendChild(img);
             item.appendChild(p);
-            item.onclick = () => speakText(time.text); // AI音声読み上げ
+            item.onclick = () => speakText(time.text);
             studyGrid.appendChild(item);
         });
     }
-
-    // HTMLに古いモードボタンが残っていれば非表示にする
-    const modesScreen = document.getElementById('tc-screen-modes');
-    if (modesScreen) modesScreen.style.display = 'none';
-    const btnToModes = document.getElementById('tc-btn-to-modes');
-    if (btnToModes) btnToModes.style.display = 'none';
 
     // --- クイズのメインロジック ---
     window.startSpecificQuiz = function(mode) {
@@ -233,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ゲーム1 & 2 答え合わせ（ルール1＆ルール2適用） ---
+    // --- ゲーム1 & 2 答え合わせ ---
     async function handleQuizChoice(e) {
         const chosenOption = e.currentTarget;
         if (chosenOption.classList.contains('disabled')) return;
@@ -243,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chosenHour === currentCorrectAnswer) {
             const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
             
-            // 音を鳴らさず、見た目と文だけで正解を表現
+            // 音を鳴らさず視覚的に正解を表示
             feedback.textContent = success ? '合格！ Excellent! (+1 pt)' : '合格！ Excellent!';
             feedback.className = 'success show';
             feedback.style.color = '#4caf50';
@@ -252,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             quizOptions.querySelectorAll('.tc-option').forEach(opt => opt.classList.add('disabled'));
             chosenOption.classList.add('correct');
             
-            // 【ルール2】自動で進まず、次へボタンを表示する
+            // 次へ進むボタンを表示
             let globalNextBtn = document.getElementById('tc-global-next-btn');
             if (!globalNextBtn) {
                 globalNextBtn = document.createElement('button');
@@ -300,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupMicUI("「いま、なんじですか？」ときいてね！");
     }
 
-    // 【ルール4】マイクの0.8秒ロックと次へボタンの準備
     function setupMicUI(instructionText) {
         if (recognition) {
             try { recognition.abort(); } catch(e){}
@@ -340,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
             micBtn.style.display = 'flex'; 
             micBtn.classList.remove('listening');
             
+            // iPad対応: 0.8秒間マイクをロック
             micBtn.disabled = true;
             micBtn.style.opacity = '0.5';
             micBtn.style.pointerEvents = 'none';
@@ -363,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-        // 【ルール3】毎回新品のマイクを作り直す
+        // 毎回新品のマイクを作り直す
         recognition = new SpeechRecognition();
         recognition.lang = 'ja-JP';
         recognition.interimResults = false;
@@ -415,14 +372,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const transcriptEl = document.getElementById('quiz3-transcript');
 
         if (quiz3Step === 1) {
-            // 質問フェーズ
             if (cleanSpeech.includes('何時') || cleanSpeech.includes('なんじ') || cleanSpeech.includes('いまなんじ')) {
-                // 【ルール1】音を鳴らさず見た目で合格を表現
                 transcriptEl.textContent = "合格！ Excellent!";
                 transcriptEl.style.color = '#4caf50';
                 transcriptEl.style.fontWeight = 'bold';
                 
-                // 【ルール2】ボタンで次へ
                 showNextButton('とけいをみる', () => {
                     quiz3Step = 2;
                     const img = document.createElement('img');
@@ -439,7 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 transcriptEl.style.fontWeight = 'bold';
             }
         } else if (quiz3Step === 2) {
-            // 回答フェーズ
             let maxSim = 0;
             let targetAccepts = [];
             quiz3CorrectData.accepts.forEach(acc => {
@@ -462,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 transcriptEl.style.fontWeight = 'bold';
                 
                 showNextButton('つぎへすすむ', () => {
-                    startSpecificQuiz(3); // 次の問題へ
+                    startSpecificQuiz(3); 
                 });
             } else {
                 transcriptEl.textContent = "おしい！もういちど。";
