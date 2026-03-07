@@ -1,7 +1,7 @@
 // --- 画像・音声パス ---
 const IMG_PATH = 'assets/images/places/';
-const SOUND_CORRECT = new Audio('assets/sounds/seikai.mp3');
-const SOUND_INCORRECT = new Audio('assets/sounds/bubu.mp3');
+
+// ※正誤判定のオーディオ衝突を根本から排除するため、サウンド設定は完全に削除しました。
 
 // --- 20箇所の単語データ ---
 const placesList = [
@@ -39,16 +39,9 @@ let targetDirectionPhrase = '';
 // --- 音声関連 API ---
 const synth = window.speechSynthesis;
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// グローバルでの使い回しを廃止し、箱だけ用意
 let recognition = null;
 let isListening = false;
-
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = false;
-    recognition.continuous = false;
-    recognition.maxAlternatives = 1;
-}
 
 // --- 初期化 ---
 window.onload = () => {
@@ -65,14 +58,12 @@ function renderVocabGrid() {
                 <img src="${IMG_PATH}${place.file}.png" onerror="this.src='https://placehold.co/100x100?text=Image'" alt="${place.hira}">
                 <span>${place.kanji}</span>
             `;
-        // 学習用の単語読み上げ機能
         card.onclick = () => speakText(place.hira);
         grid.appendChild(card);
     });
 }
 
 function speakText(text) {
-    // 【フリーズ対策】読み上げ時にマイクが起動していたら強制停止する
     if (isListening && recognition) {
         try { recognition.stop(); } catch(e){}
         isListening = false;
@@ -102,7 +93,6 @@ function goBack() {
         historyStack.pop();
         const prev = historyStack[historyStack.length - 1];
         
-        // 【フリーズ対策】戻るボタンを押した時、音声やマイクを完全にリセットする
         if (synth.speaking) synth.cancel();
         if (isListening && recognition) {
             try { recognition.stop(); } catch(e){}
@@ -141,6 +131,13 @@ function startGame() {
 }
 
 function startStep(stepNum) {
+    // 【ルール3】問題の切り替えごとに、古いマイクを完全にリセット（破棄）
+    if (recognition) {
+        try { recognition.abort(); } catch(e){}
+        recognition = null;
+    }
+    isListening = false;
+
     currentStep = stepNum;
     const place = currentQuestions[currentQIndex];
 
@@ -178,67 +175,125 @@ function startStep(stepNum) {
         imgEl.classList.add('hidden'); 
         phraseEl.textContent = "ありがとうございます";
     }
+
+    // --- マイクボタンと「つぎへ」ボタンのUI制御 ---
+    const micBtn = document.getElementById('mic-btn');
+    let nextBtn = document.getElementById('next-btn-dynamic');
+    const resText = document.getElementById('feedback-text');
+
+    if (!nextBtn && micBtn) {
+        nextBtn = document.createElement('button');
+        nextBtn.id = 'next-btn-dynamic';
+        nextBtn.innerHTML = 'つぎへすすむ <i class="fa-solid fa-arrow-right"></i>';
+        nextBtn.style.padding = '15px 40px';
+        nextBtn.style.fontSize = '1.3em';
+        nextBtn.style.fontWeight = 'bold';
+        nextBtn.style.backgroundColor = '#4caf50';
+        nextBtn.style.color = 'white';
+        nextBtn.style.border = 'none';
+        nextBtn.style.borderRadius = '50px';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.style.boxShadow = '0 5px 0 #2e7d32';
+        nextBtn.style.marginTop = '20px';
+        
+        nextBtn.onmousedown = () => { nextBtn.style.transform = 'translateY(5px)'; nextBtn.style.boxShadow = 'none'; };
+        nextBtn.onmouseup = () => { nextBtn.style.transform = 'translateY(0)'; nextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
+        
+        nextBtn.onclick = proceedToNextStep; // クリックで進む
+        micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
+    }
+    if (nextBtn) {
+        nextBtn.style.display = 'none'; 
+    }
+
+    // 【ルール4】マイクの準備ができるまで0.8秒ロックする
+    if (micBtn) {
+        micBtn.style.display = 'inline-block'; 
+        micBtn.classList.remove('listening');
+        
+        // ボタンを無効化し、半透明にする
+        micBtn.disabled = true;
+        micBtn.style.opacity = '0.5';
+        micBtn.style.pointerEvents = 'none';
+        
+        resText.textContent = "マイクをじゅんびしています... (少しまってね)";
+        resText.className = "feedback-text";
+
+        // iOSがマイクを完全に手放すまで待ってから解放
+        setTimeout(() => {
+            micBtn.disabled = false;
+            micBtn.style.opacity = '1';
+            micBtn.style.pointerEvents = ''; 
+            resText.textContent = "マイクをおして はなしてね";
+        }, 800);
+    }
 }
 
 // --- 音声認識 ---
 function toggleSpeech() {
-    if (!recognition) return alert("お使いのブラウザは音声認識に対応していません。");
+    if (!SpeechRecognition) return alert("お使いのブラウザは音声認識に対応していません。");
     
-    // すでに録音中の場合は停止する
-    if (isListening) { 
-        recognition.stop(); 
-        return; 
-    }
-
-    // 【高速化の秘訣】直前の音声残りを強制リセット
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-    }
-    if (typeof synth !== 'undefined' && synth.speaking) {
-        synth.cancel();
-    }
-
-    isListening = true;
     const btn = document.getElementById('mic-btn');
     const resText = document.getElementById('feedback-text');
 
-    btn.classList.add('listening');
-    resText.textContent = "聞いています...";
-    resText.className = "feedback-text";
+    // 連打防止・準備中なら弾く
+    if (btn.classList.contains('listening') || btn.disabled) return;
 
-    try { recognition.start(); } catch (e) { console.error("マイク起動エラー:", e); }
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
 
-    // 【爆速化】話し終わってからの沈黙をカット
-    recognition.onspeechend = () => {
-        recognition.stop();
+    // 【ルール3】毎回新品のマイクを作り直す
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+        isListening = true;
+        btn.classList.add('listening');
+        resText.textContent = "聞いています...";
+        resText.className = "feedback-text";
     };
 
     recognition.onresult = (event) => {
-        recognition.stop();
-        
         const transcript = event.results[0][0].transcript;
         document.getElementById('user-transcript').textContent = `あなたの声: 「${transcript}」`;
         checkAnswer(transcript);
     };
 
-    recognition.onend = () => {
-        isListening = false;
+    recognition.onerror = (event) => {
+        console.warn("音声認識エラー:", event.error);
         btn.classList.remove('listening');
-        
+        isListening = false;
+        if (event.error !== 'aborted') {
+            if (event.error === 'not-allowed') {
+                resText.textContent = "マイクのきょかがありません。";
+            } else if (event.error === 'no-speech') {
+                resText.textContent = "こえがきこえませんでした。もういちど。";
+            } else {
+                resText.textContent = "うまく聞き取れませんでした";
+            }
+            resText.className = "feedback-text fb-fail";
+        }
+    };
+
+    recognition.onend = () => {
+        btn.classList.remove('listening');
+        isListening = false;
         if (resText.textContent === "聞いています...") {
             resText.textContent = "もう一度マイクを押してね";
             resText.className = "feedback-text fb-fail";
         }
     };
-    
-    recognition.onerror = (event) => {
-        isListening = false;
-        btn.classList.remove('listening');
-        if (event.error !== 'aborted') {
-            resText.textContent = "うまく聞き取れませんでした";
-            resText.className = "feedback-text fb-fail";
-        }
-    };
+
+    try { 
+        recognition.start(); 
+    } catch (e) { 
+        console.error("マイク起動エラー:", e); 
+        resText.textContent = "エラーがおきました。もう一度おしてね。";
+    }
 }
 
 function cleanText(text) {
@@ -273,27 +328,30 @@ function checkAnswer(speech) {
     });
 
     if (maxSim >= 80) {
+        // 【ルール1】音を鳴らさず、見た目だけで正解を表現
         resText.textContent = "合格！ Excellent!";
         resText.className = "feedback-text fb-success";
         
-        if (typeof SOUND_CORRECT !== 'undefined') {
-            SOUND_CORRECT.currentTime = 0; 
-            SOUND_CORRECT.play();
+        // 【ルール2】マイクを隠して「つぎへすすむ」ボタンを表示
+        const micBtn = document.getElementById('mic-btn');
+        const nextBtn = document.getElementById('next-btn-dynamic');
+        if (micBtn && nextBtn) {
+            micBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
         }
-
-        setTimeout(() => { proceedToNextStep(); }, 1500);
     } else {
         resText.textContent = `もう一度！ (一致: ${Math.floor(maxSim)}%)`;
         resText.className = "feedback-text fb-fail";
-        
-        if (typeof SOUND_INCORRECT !== 'undefined') {
-            SOUND_INCORRECT.currentTime = 0; 
-            SOUND_INCORRECT.play();
-        }
     }
 }
 
 function proceedToNextStep() {
+    // 進む前に念のため古いマイクをキル
+    if (recognition) {
+        try { recognition.abort(); } catch(e){}
+        recognition = null;
+    }
+
     if (currentStep < 4) {
         startStep(currentStep + 1);
     } else {
