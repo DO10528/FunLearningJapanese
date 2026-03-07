@@ -21,7 +21,7 @@ const gameLevels = [
     ] },
     { level: 3, color: '#feca57', words: [ 
         { hira: 'さる', file: 'さる', accepts: ['さる', '猿', 'サル'] }, 
-        { hira: 'しか', file: 'しか', accepts: ['しか', '鹿', 'シカ'] }, 
+        { hira: 'しか', file: 'しか', accepts: ['しか', '鹿', '歯科','シカ'] }, 
         { hira: 'すし', file: 'すし', accepts: ['すし', '寿司', '鮨', 'スシ', 'おすし', 'お寿司'] }, 
         { hira: 'せみ', file: 'せみ', accepts: ['せみ', '蝉', 'セミ'] }, 
         { hira: 'そば', file: 'そば', accepts: ['そば', '蕎麦', 'ソバ', 'おそば'] } 
