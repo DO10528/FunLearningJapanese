@@ -1,6 +1,14 @@
 // AI音声（SpeechSynthesis）の準備
 const synth = window.speechSynthesis;
 function speakText(text) {
+    // 【フリーズ対策】読み上げ時にマイクが起動していたら強制停止する
+    if (isListening && recognition) {
+        try { recognition.abort(); } catch(e){}
+        isListening = false;
+        const btn = document.getElementById('tc-mic-btn');
+        if (btn) btn.classList.remove('listening');
+    }
+
     if (synth.speaking) synth.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'ja-JP';
@@ -17,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- データ定義 (音声認識の揺れに対応するため accepts を追加) ---
     const IMG_PATH = 'assets/images/clocks/';
+    
+    // 【ルール1】正誤判定のオーディオ衝突を根本から排除するため、サウンド設定は完全に削除しました。
+    
     const timeData = [
         { hour: 1, text: 'いちじ', img: 'clock_1.png', accepts: ['いちじ', '1時', '一時'] },
         { hour: 2, text: 'にじ', img: 'clock_2.png', accepts: ['にじ', '2時', '二時'] },
@@ -32,17 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
         { hour: 12, text: 'じゅうにじ', img: 'clock_12.png', accepts: ['じゅうにじ', '12時', '十二時'] }
     ];
 
-    const soundCorrect = document.getElementById('tc-sound-correct');
-    const soundIncorrect = document.getElementById('tc-sound-incorrect');
-
     // --- DOM要素 ---
     const screens = document.querySelectorAll('.tc-screen');
     const studyScreen = document.getElementById('tc-screen-study');
-    const modesScreen = document.getElementById('tc-screen-modes');
     const quizScreen = document.getElementById('tc-screen-quiz');
-    
     const studyGrid = document.getElementById('tc-study-grid');
-    const btnToModes = document.getElementById('tc-btn-to-modes');
     
     const quizTitle = document.getElementById('tc-quiz-title');
     const quizPromptArea = document.getElementById('tc-quiz-prompt-area');
@@ -53,22 +58,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCorrectAnswer = null;
     let currentMode = 1;
 
-    // --- 音声認識APIの準備 (ゲーム3用) ---
+    // --- 音声認識APIの準備 (インスタンスの使い回しを廃止) ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
     let quiz3Step = 1; // 1:質問する, 2:答える
     let quiz3CorrectData = null;
 
-    if (SpeechRecognition) {
-        try {
-            recognition = new SpeechRecognition();
-            recognition.lang = 'ja-JP';
-            recognition.interimResults = false;
-            recognition.continuous = false;
-            recognition.maxAlternatives = 1;
-        } catch (e) {
-            console.error("音声認識の初期化エラー:", e);
+    // --- モード選択画面の廃止と「戻るボタン」の動的配置 ---
+    function addBackButton(container) {
+        if (!container.querySelector('.dynamic-back-btn')) {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'dynamic-back-btn';
+            backBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> もどる';
+            
+            // 小さく見やすい戻るボタンのスタイル
+            backBtn.style.position = 'absolute';
+            backBtn.style.top = '10px';
+            backBtn.style.left = '10px';
+            backBtn.style.padding = '8px 15px';
+            backBtn.style.fontSize = '1em';
+            backBtn.style.fontWeight = 'bold';
+            backBtn.style.backgroundColor = '#9e9e9e';
+            backBtn.style.color = 'white';
+            backBtn.style.border = 'none';
+            backBtn.style.borderRadius = '20px';
+            backBtn.style.cursor = 'pointer';
+            backBtn.style.boxShadow = '0 3px 0 #757575';
+            backBtn.style.zIndex = '1000';
+            
+            backBtn.onmousedown = () => { backBtn.style.transform = 'translateY(3px)'; backBtn.style.boxShadow = 'none'; };
+            backBtn.onmouseup = () => { backBtn.style.transform = 'translateY(0)'; backBtn.style.boxShadow = '0 3px 0 #757575'; };
+            
+            // メインメニュー（前のページ）へ確実に戻る
+            backBtn.onclick = () => {
+                if (recognition) { try { recognition.abort(); } catch(e){} }
+                if (synth.speaking) synth.cancel();
+                window.history.back();
+            };
+            
+            container.style.position = 'relative'; 
+            container.appendChild(backBtn);
         }
     }
 
@@ -76,13 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showScreen = function(screenElement) {
         screens.forEach(s => s.classList.remove('active'));
         screenElement.classList.add('active');
-    }
-
-    function playSound(audioElement) {
-        if (audioElement) {
-            audioElement.currentTime = 0;
-            audioElement.play().catch(e => console.error("音声再生エラー:", e));
-        }
+        addBackButton(screenElement); // 画面表示時に確実に戻るボタンを設置
     }
 
     function shuffleArray(array) {
@@ -115,7 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    btnToModes.onclick = () => showScreen(modesScreen);
+    // HTMLに古いモードボタンが残っていれば非表示にする
+    const modesScreen = document.getElementById('tc-screen-modes');
+    if (modesScreen) modesScreen.style.display = 'none';
+    const btnToModes = document.getElementById('tc-btn-to-modes');
+    if (btnToModes) btnToModes.style.display = 'none';
 
     // --- クイズのメインロジック ---
     window.startSpecificQuiz = function(mode) {
@@ -125,6 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
         quiz3Area.style.display = 'none';
         feedback.textContent = '';
         feedback.className = '';
+        
+        let globalNextBtn = document.getElementById('tc-global-next-btn');
+        if (globalNextBtn) globalNextBtn.style.display = 'none';
         
         showScreen(quizScreen);
 
@@ -150,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         soundButton.onclick = () => speakText(correctData.text);
         quizPromptArea.appendChild(soundButton);
         
-        // 自動で1回読み上げる
         setTimeout(() => speakText(correctData.text), 500);
 
         optionsData.forEach(time => {
@@ -203,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ゲーム1 & 2 答え合わせ ---
+    // --- ゲーム1 & 2 答え合わせ（ルール1＆ルール2適用） ---
     async function handleQuizChoice(e) {
         const chosenOption = e.currentTarget;
         if (chosenOption.classList.contains('disabled')) return;
@@ -211,20 +241,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const chosenHour = parseInt(chosenOption.dataset.hour);
         
         if (chosenHour === currentCorrectAnswer) {
-            playSound(soundCorrect);
             const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
             
-            feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
+            // 音を鳴らさず、見た目と文だけで正解を表現
+            feedback.textContent = success ? '合格！ Excellent! (+1 pt)' : '合格！ Excellent!';
             feedback.className = 'success show';
+            feedback.style.color = '#4caf50';
+            feedback.style.fontWeight = 'bold';
             
             quizOptions.querySelectorAll('.tc-option').forEach(opt => opt.classList.add('disabled'));
             chosenOption.classList.add('correct');
             
-            setTimeout(() => startSpecificQuiz(currentMode), 2000);
+            // 【ルール2】自動で進まず、次へボタンを表示する
+            let globalNextBtn = document.getElementById('tc-global-next-btn');
+            if (!globalNextBtn) {
+                globalNextBtn = document.createElement('button');
+                globalNextBtn.id = 'tc-global-next-btn';
+                globalNextBtn.style.padding = '15px 40px';
+                globalNextBtn.style.fontSize = '1.3em';
+                globalNextBtn.style.fontWeight = 'bold';
+                globalNextBtn.style.backgroundColor = '#4caf50';
+                globalNextBtn.style.color = 'white';
+                globalNextBtn.style.border = 'none';
+                globalNextBtn.style.borderRadius = '50px';
+                globalNextBtn.style.cursor = 'pointer';
+                globalNextBtn.style.boxShadow = '0 5px 0 #2e7d32';
+                globalNextBtn.style.marginTop = '20px';
+                
+                globalNextBtn.onmousedown = () => { globalNextBtn.style.transform = 'translateY(5px)'; globalNextBtn.style.boxShadow = 'none'; };
+                globalNextBtn.onmouseup = () => { globalNextBtn.style.transform = 'translateY(0)'; globalNextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
+                
+                quizPromptArea.parentNode.insertBefore(globalNextBtn, feedback.nextSibling);
+            }
+            globalNextBtn.innerHTML = 'つぎへすすむ <i class="fa-solid fa-arrow-right"></i>';
+            globalNextBtn.style.display = 'inline-block';
+            globalNextBtn.onclick = () => {
+                globalNextBtn.style.display = 'none';
+                startSpecificQuiz(currentMode);
+            };
+            
         } else {
-            playSound(soundIncorrect);
-            feedback.textContent = 'ちがうよ、もういちど！';
-            feedback.className = 'show';
+            feedback.textContent = 'おしい！もういちど。';
+            feedback.className = 'error show';
+            feedback.style.color = '#f44336';
+            feedback.style.fontWeight = 'bold';
             chosenOption.classList.add('incorrect', 'disabled');
         }
     }
@@ -237,100 +297,150 @@ document.addEventListener('DOMContentLoaded', () => {
         quiz3CorrectData = timeData[Math.floor(Math.random() * timeData.length)];
         currentCorrectAnswer = quiz3CorrectData.hour;
 
-        document.getElementById('quiz3-instruction').textContent = "「いま、なんじですか？」ときいてね！";
-        document.getElementById('quiz3-transcript').textContent = "";
-        document.getElementById('tc-mic-btn').style.display = 'flex';
+        setupMicUI("「いま、なんじですか？」ときいてね！");
+    }
+
+    // 【ルール4】マイクの0.8秒ロックと次へボタンの準備
+    function setupMicUI(instructionText) {
+        if (recognition) {
+            try { recognition.abort(); } catch(e){}
+            recognition = null;
+        }
+        isListening = false;
+
+        document.getElementById('quiz3-instruction').textContent = instructionText;
+        const transcriptEl = document.getElementById('quiz3-transcript');
+        
+        const micBtn = document.getElementById('tc-mic-btn');
+        let nextBtn = document.getElementById('tc-next-btn-dynamic');
+
+        if (!nextBtn && micBtn) {
+            nextBtn = document.createElement('button');
+            nextBtn.id = 'tc-next-btn-dynamic';
+            nextBtn.style.padding = '15px 40px';
+            nextBtn.style.fontSize = '1.3em';
+            nextBtn.style.fontWeight = 'bold';
+            nextBtn.style.backgroundColor = '#4caf50';
+            nextBtn.style.color = 'white';
+            nextBtn.style.border = 'none';
+            nextBtn.style.borderRadius = '50px';
+            nextBtn.style.cursor = 'pointer';
+            nextBtn.style.boxShadow = '0 5px 0 #2e7d32';
+            nextBtn.style.marginTop = '20px';
+            
+            nextBtn.onmousedown = () => { nextBtn.style.transform = 'translateY(5px)'; nextBtn.style.boxShadow = 'none'; };
+            nextBtn.onmouseup = () => { nextBtn.style.transform = 'translateY(0)'; nextBtn.style.boxShadow = '0 5px 0 #2e7d32'; };
+            
+            micBtn.parentNode.insertBefore(nextBtn, micBtn.nextSibling);
+        }
+
+        if (nextBtn) nextBtn.style.display = 'none';
+
+        if (micBtn) {
+            micBtn.style.display = 'flex'; 
+            micBtn.classList.remove('listening');
+            
+            micBtn.disabled = true;
+            micBtn.style.opacity = '0.5';
+            micBtn.style.pointerEvents = 'none';
+            
+            transcriptEl.textContent = "マイクをじゅんびしています... (少しまってね)";
+            transcriptEl.style.color = '#333';
+
+            setTimeout(() => {
+                micBtn.disabled = false;
+                micBtn.style.opacity = '1';
+                micBtn.style.pointerEvents = '';
+                transcriptEl.textContent = "マイクをおして はなしてね";
+            }, 800);
+        }
     }
 
     window.toggleMic = function() {
-        if (!recognition) {
-            alert("お使いのブラウザは音声認識に対応していません。");
-            return;
-        }
-        
-        if (isListening) { 
-            recognition.stop(); 
-            return; 
-        }
-
-        // 【高速化・フリーズ対策】iPad対応の強制リセット
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-
-        isListening = true;
+        if (!SpeechRecognition) return alert("お使いのブラウザは音声認識に対応していません。");
         const btn = document.getElementById('tc-mic-btn');
+        if (btn.classList.contains('listening') || btn.disabled) return;
+
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+        // 【ルール3】毎回新品のマイクを作り直す
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        recognition.maxAlternatives = 1;
+
         const transcriptEl = document.getElementById('quiz3-transcript');
-        
-        btn.classList.add('listening');
-        transcriptEl.textContent = "きいています...";
 
-        try { 
-            recognition.start(); 
-        } catch(e) { 
-            console.error("マイク起動エラー:", e); 
-        }
-
-        // 【爆速化】話し終わったと検知した瞬間に強制終了
-        recognition.onspeechend = () => {
-            recognition.stop();
+        recognition.onstart = () => {
+            isListening = true;
+            btn.classList.add('listening');
+            transcriptEl.textContent = "きいています...";
+            transcriptEl.style.color = '#333';
         };
 
         recognition.onresult = (event) => {
-            // 結果が出たらすぐにマイクを完全にオフにする
-            recognition.stop();
-
             const transcript = event.results[0][0].transcript;
-            transcriptEl.textContent = `「${transcript}」`;
+            transcriptEl.textContent = `あなたの声: 「${transcript}」`;
             handleSpeechResult(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            console.warn("音声認識エラー:", event.error);
+            isListening = false;
+            btn.classList.remove('listening');
+            if (event.error !== 'aborted') {
+                transcriptEl.textContent = "うまくききとれませんでした。もういちどおしてね。";
+                transcriptEl.style.color = '#f44336';
+            }
         };
 
         recognition.onend = () => {
             isListening = false;
             btn.classList.remove('listening');
-            
-            // 何も聞き取れずに終了した場合のフォロー
             if (transcriptEl.textContent === "きいています...") {
                 transcriptEl.textContent = "もういちど マイクをおしてね";
+                transcriptEl.style.color = '#f44336';
             }
         };
-        
-        recognition.onerror = (event) => {
-            isListening = false;
-            btn.classList.remove('listening');
-            if (event.error !== 'aborted') {
-                transcriptEl.textContent = "うまくききとれませんでした";
-            }
-        };
+
+        try { recognition.start(); } catch(e) { 
+            transcriptEl.textContent = "エラーがおきました。もういちどおしてね。";
+            transcriptEl.style.color = '#f44336';
+        }
     }
 
     async function handleSpeechResult(transcript) {
         const cleanSpeech = transcript.replace(/[\s、。！？!?,，]/g, '');
+        const transcriptEl = document.getElementById('quiz3-transcript');
 
         if (quiz3Step === 1) {
             // 質問フェーズ
             if (cleanSpeech.includes('何時') || cleanSpeech.includes('なんじ') || cleanSpeech.includes('いまなんじ')) {
-                playSound(soundCorrect);
-                quiz3Step = 2;
+                // 【ルール1】音を鳴らさず見た目で合格を表現
+                transcriptEl.textContent = "合格！ Excellent!";
+                transcriptEl.style.color = '#4caf50';
+                transcriptEl.style.fontWeight = 'bold';
                 
-                // 指示テキストの変更
-                document.getElementById('quiz3-instruction').textContent = "とけいを みて、「いま、〇〇じ です」と こたえてね！";
-                
-                // 時計の画像を表示
-                const img = document.createElement('img');
-                img.src = `${IMG_PATH}${quiz3CorrectData.img}`;
-                img.style.width = '150px';
-                quizPromptArea.textContent = '';
-                quizPromptArea.appendChild(img);
+                // 【ルール2】ボタンで次へ
+                showNextButton('とけいをみる', () => {
+                    quiz3Step = 2;
+                    const img = document.createElement('img');
+                    img.src = `${IMG_PATH}${quiz3CorrectData.img}`;
+                    img.style.width = '150px';
+                    quizPromptArea.textContent = '';
+                    quizPromptArea.appendChild(img);
+                    
+                    setupMicUI("とけいを みて、「いま、〇〇じ です」と こたえてね！");
+                });
             } else {
-                playSound(soundIncorrect);
-                document.getElementById('quiz3-transcript').textContent += " (もういちど！)";
+                transcriptEl.textContent = "おしい！もういちど。";
+                transcriptEl.style.color = '#f44336';
+                transcriptEl.style.fontWeight = 'bold';
             }
         } else if (quiz3Step === 2) {
             // 回答フェーズ
             let maxSim = 0;
-            
-            // 「今〇〇時です」のパターンを作成して判定
             let targetAccepts = [];
             quiz3CorrectData.accepts.forEach(acc => {
                 targetAccepts.push(`いま${acc}です`);
@@ -343,24 +453,39 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (maxSim >= 80) {
-                playSound(soundCorrect);
-                
-                // ポイント加算処理
-                let success = false;
                 if (window.addPointsToUser) {
-                    success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                    await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
                 }
                 
-                feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
-                feedback.className = 'success show';
-                document.getElementById('tc-mic-btn').style.display = 'none';
+                transcriptEl.textContent = "合格！ Excellent!";
+                transcriptEl.style.color = '#4caf50';
+                transcriptEl.style.fontWeight = 'bold';
                 
-                setTimeout(() => startSpecificQuiz(3), 2000);
+                showNextButton('つぎへすすむ', () => {
+                    startSpecificQuiz(3); // 次の問題へ
+                });
             } else {
-                playSound(soundIncorrect);
-                feedback.textContent = 'ちがうよ、もういちど！';
-                feedback.className = 'show';
+                transcriptEl.textContent = "おしい！もういちど。";
+                transcriptEl.style.color = '#f44336';
+                transcriptEl.style.fontWeight = 'bold';
             }
+        }
+    }
+
+    function showNextButton(text, callback) {
+        const micBtn = document.getElementById('tc-mic-btn');
+        let nextBtn = document.getElementById('tc-next-btn-dynamic');
+        if (micBtn && nextBtn) {
+            micBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+            nextBtn.innerHTML = `${text} <i class="fa-solid fa-arrow-right"></i>`;
+            nextBtn.onclick = () => {
+                if (recognition) {
+                    try { recognition.abort(); } catch(e){}
+                    recognition = null;
+                }
+                callback();
+            };
         }
     }
 
@@ -386,5 +511,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 初期起動 ---
     setupStudyScreen();
     showScreen(studyScreen);
-
 });
