@@ -1,12 +1,7 @@
-// firebase-messaging-sw.js (compat version)
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js');
+// firebase-messaging-sw.js
+importScripts('https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging-compat.js');
 
-// ファイル名: firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
-
-// あなたのFirebase設定
 const firebaseConfig = {
   apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls",
   authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
@@ -28,7 +23,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/icon.png' // アイコン画像がない場合は適宜変更してください
+    icon: '/assets/images/icon.png' // ※アイコンのパスを先生のアプリに合わせて修正しました
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
