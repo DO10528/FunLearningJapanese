@@ -577,7 +577,7 @@
     <button id="signup-btn" class="btn-auth btn-signup" onclick="openAuthModal('signup')">
       <i class="fa-solid fa-user-plus"></i> <span data-i18n="btn_signup">登録</span>
     </button>
-    <button id="guest-btn" class="btn-auth btn-guest" onclick="loginAsGuest()">
+    <button id="guest-btn" class="btn-auth btn-guest" onclick="window.loginAsGuest()">
       <i class="fa-solid fa-gamepad"></i> <span data-i18n="btn_guest">ゲスト</span>
     </button>
   </div>
@@ -597,7 +597,7 @@
         <span class="badge-points"><i class="fa-solid fa-star"></i> <span id="point-val">0</span> Pt</span>
       </div>
     </div>
-    <button id="logout-btn" onclick="logout()" style="background:none; border:none; color:#999; cursor:pointer;"><i
+    <button id="logout-btn" onclick="window.logout()" style="background:none; border:none; color:#999; cursor:pointer;"><i
         class="fa-solid fa-right-from-bracket"></i></button>
   </div>
 
@@ -657,7 +657,7 @@
       <h2 id="modal-title"></h2>
       <p id="modal-msg" style="color:red; font-size:0.9em;"></p>
 
-      <button class="btn-line-login" onclick="loginWithLine()">
+      <button class="btn-line-login" onclick="window.loginWithLine()">
         <i class="fa-brands fa-line" style="font-size:1.5em;"></i> LINEでログイン
       </button>
 
@@ -672,7 +672,7 @@
       <input type="text" id="auth-display-name" placeholder="ゲーム名（ランキング用）" data-i18n-placeholder="ph_name"
         class="hidden">
 
-      <button id="modal-submit" onclick="submitAuth()" class="btn-auth btn-login"
+      <button id="modal-submit" onclick="window.submitAuth()" class="btn-auth btn-login"
         style="width:100%; margin-top:10px;"></button>
       <button id="modal-close" onclick="closeAuthModal()" data-i18n="btn_cancel"
         style="width:100%; margin-top:10px; border:none; background:white; color:#666; cursor:pointer;">キャンセル</button>

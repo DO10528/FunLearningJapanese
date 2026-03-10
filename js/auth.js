@@ -16,53 +16,97 @@ window.loginWithLine = () => {
 window.submitAuth = async () => {
     const email = document.getElementById('auth-email').value.trim();
     const pass = document.getElementById('auth-pass').value.trim();
-    const displayName = document.getElementById('auth-display-name').value.trim();
+    const displayNameInput = document.getElementById('auth-display-name');
+    const displayName = displayNameInput ? displayNameInput.value.trim() : "";
     const msg = document.getElementById('modal-msg');
-    const errs = window.i18nData[window.currentLang];
+    const submitBtn = document.getElementById('modal-submit');
+    
+    // 翻訳データがない場合の安全装置
+    const errs = (window.i18nData && window.i18nData[window.currentLang]) 
+        ? window.i18nData[window.currentLang] 
+        : {
+            err_input_req: "メールアドレスとパスワードを入力してください",
+            err_pass_len: "パスワードは6文字以上にしてください",
+            err_name_req: "ゲーム名を入力してください",
+            err_name_taken: "その名前はすでに使われています",
+            err_generic: "エラーが発生しました",
+            err_email_taken: "このメールアドレスはすでに登録されています",
+            err_auth_fail: "ログインに失敗しました"
+        };
 
     if (!email || !pass) { msg.textContent = errs.err_input_req; return; }
     if (pass.length < 6) { msg.textContent = errs.err_pass_len; return; }
 
+    // ★連打防止：処理中はボタンを押せなくする
+    if (submitBtn) submitBtn.disabled = true;
+    msg.style.color = "#666";
+    msg.textContent = "処理中...";
+
     try {
         if (window.authMode === 'signup') {
-            if (!displayName || displayName.length < 2) { msg.textContent = errs.err_name_req; return; }
+            if (!displayName || displayName.length < 2) { 
+                throw new Error("name_req"); 
+            }
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("displayName", "==", displayName), limit(1));
             const snap = await getDocs(q);
-            if (!snap.empty) { msg.textContent = errs.err_name_taken; return; }
+            if (!snap.empty) { 
+                throw new Error("name_taken"); 
+            }
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
             const user = userCredential.user;
             await setDoc(doc(db, "users", user.uid), {
-                email: email, displayName: displayName, points: 0, streak: 1,
-                lastLogin: new Date().toISOString(), dailyTracker: {},
+                email: email, 
+                displayName: displayName, 
+                points: 0, 
+                streak: 1,
+                lastLogin: new Date().toISOString(), 
+                dailyTracker: {},
                 isPremium: false
             });
             sessionStorage.setItem(SESS_KEY, 'authenticated');
-            window.closeAuthModal();
+            if(window.closeAuthModal) window.closeAuthModal();
+
         } else {
+            // ログイン処理
             const userCredential = await signInWithEmailAndPassword(auth, email, pass);
             const user = userCredential.user;
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
+            
             if (!userSnap.exists()) {
                 await setDoc(userRef, {
-                    email: email, displayName: email.split('@')[0], points: 0, streak: 1,
-                    lastLogin: new Date().toISOString(), dailyTracker: {},
+                    email: email, 
+                    displayName: email.split('@')[0], 
+                    points: 0, 
+                    streak: 1,
+                    lastLogin: new Date().toISOString(), 
+                    dailyTracker: {},
                     isPremium: false
                 });
-            } else {
-                await updateDoc(userRef, { lastLogin: new Date().toISOString() });
             }
+            // ★重要修正：ここで lastLogin を更新してしまうと checkMonthlyReset が正常に機能しないため削除しました
+            // （更新は onAuthStateChanged 経由の checkMonthlyReset に任せます）
+
             sessionStorage.setItem(SESS_KEY, 'authenticated');
-            window.closeAuthModal();
+            if(window.closeAuthModal) window.closeAuthModal();
         }
     } catch (error) {
         console.error(error);
+        msg.style.color = "red";
         let errorMsg = errs.err_generic;
-        if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
-        else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') errorMsg = errs.err_auth_fail;
+        
+        // エラー内容に応じたメッセージの出し分け
+        if (error.message === "name_req") errorMsg = errs.err_name_req;
+        else if (error.message === "name_taken") errorMsg = errs.err_name_taken;
+        else if (error.code === 'auth/email-already-in-use') errorMsg = errs.err_email_taken;
+        else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') errorMsg = errs.err_auth_fail;
+        
         msg.textContent = errorMsg;
+    } finally {
+        // ★処理が終わったらボタンを再度押せるようにする
+        if (submitBtn) submitBtn.disabled = false;
     }
 };
 
@@ -70,13 +114,13 @@ window.logout = async () => {
     if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
     sessionStorage.removeItem(SESS_KEY);
     await signOut(auth);
-    updateUI(null);
+    window.updateUI(null);
 };
 
 window.loginAsGuest = () => {
     if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
     sessionStorage.setItem(SESS_KEY, 'guest');
-    updateUI('guest');
+    window.updateUI('guest');
 };
 
 const checkMonthlyReset = async (user) => {
@@ -86,9 +130,12 @@ const checkMonthlyReset = async (user) => {
         const data = snapshot.data();
         const now = new Date();
         const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+        
+        // 月が変わっていたらポイントをリセット
         if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
             await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
         } else {
+            // 月が同じなら最終ログイン日時だけ更新
             await updateDoc(userRef, { lastLogin: now.toISOString() });
         }
     }
@@ -102,7 +149,7 @@ window.updateStaticCards = (isPremium) => {
             staticSengoku.href = "javascript:void(0)";
             staticSengoku.onclick = (e) => {
                 e.preventDefault();
-                window.openPremiumModal();
+                if(window.openPremiumModal) window.openPremiumModal();
             };
         } else {
             staticSengoku.classList.remove('locked');
@@ -121,17 +168,19 @@ window.updateUI = function (userState) {
         window.isUserPremium = false;
         window.updateStaticCards(false);
 
-        welcome.classList.add('hidden');
-        dash.classList.remove('hidden');
+        if(welcome) welcome.classList.add('hidden');
+        if(dash) dash.classList.remove('hidden');
         document.getElementById('user-name').textContent = 'ゲスト';
         document.getElementById('user-lvl').textContent = 1;
         document.getElementById('level-fill').style.width = '0%';
         document.getElementById('streak-val').textContent = 0;
         document.getElementById('point-val').textContent = 0;
+        
     } else if (userState && userState.uid) {
-        welcome.classList.add('hidden');
-        dash.classList.remove('hidden');
+        if(welcome) welcome.classList.add('hidden');
+        if(dash) dash.classList.remove('hidden');
         const userId = userState.uid;
+        
         currentUserDocUnsubscribe = onSnapshot(doc(db, "users", userId), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -142,6 +191,7 @@ window.updateUI = function (userState) {
                 document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
                 document.getElementById('streak-val').textContent = data.streak || 0;
                 document.getElementById('point-val').textContent = data.points || 0;
+                
                 const pts = data.points || 0;
                 const level = Math.floor(pts / 100) + 1;
                 document.getElementById('user-lvl').textContent = level;
@@ -152,8 +202,8 @@ window.updateUI = function (userState) {
         window.isUserPremium = false;
         window.updateStaticCards(false);
 
-        welcome.classList.remove('hidden');
-        dash.classList.add('hidden');
+        if(welcome) welcome.classList.remove('hidden');
+        if(dash) dash.classList.add('hidden');
     }
 };
 
@@ -161,6 +211,8 @@ window.toggleRanking = async () => {
     const modal = document.getElementById('ranking-modal');
     const list = document.getElementById('ranking-list');
     const loading = document.getElementById('ranking-loading');
+
+    if(!modal || !list || !loading) return;
 
     modal.style.display = 'flex';
     list.innerHTML = '';
@@ -183,7 +235,6 @@ window.toggleRanking = async () => {
             const li = document.createElement('li');
             li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
 
-            // Text node is safer here instead of innerHTML if data.displayName has HTML tags (XSS protection)
             const span1 = document.createElement('span');
             span1.textContent = `${icon} ${name}`;
             const span2 = document.createElement('span');
@@ -209,11 +260,12 @@ window.toggleRanking = async () => {
 
 onAuthStateChanged(auth, async (user) => {
     if (sessionStorage.getItem(SESS_KEY) === 'guest') {
-        updateUI('guest');
+        window.updateUI('guest');
     } else if (user) {
+        // 月間リセットのチェックを行ってからUIを更新
         await checkMonthlyReset(user);
-        updateUI(user);
+        window.updateUI(user);
     } else {
-        updateUI(null);
+        window.updateUI(null);
     }
 });
