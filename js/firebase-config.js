@@ -2,16 +2,18 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+// だいすけ先生のFirebaseプロジェクト設定
 const firebaseConfig = {
-    apiKey: "AIzaSyDF18...", 
-    authDomain: "japanese-fun-learning.firebaseapp.com",
-    projectId: "japanese-fun-learning",
-    storageBucket: "japanese-fun-learning.firebasestorage.app",
-    messagingSenderId: "548074697960",
-    appId: "1:548074697960:web:4f207ed1f0f4ea583a6963",
-    measurementId: "G-4JXY1T51SV"
+    apiKey: "AIzaSyDpfbjezbYxrW3XMDegBSC5iFPEQEyD0Ls", // ← ここが間違っているか古いとエラーになります！
+    authDomain: "funlearningjapanese-b8e08.firebaseapp.com",
+    projectId: "funlearningjapanese-b8e08",
+    storageBucket: "funlearningjapanese-b8e08.appspot.com",
+    messagingSenderId: "1055688629268",
+    appId: "1:1055688629268:web:248183b62f15c34a2d5b01",
+    measurementId: "G-LCMXVLPS81"
 };
 
+// Firebaseの初期化（これをしないとログイン機能が動きません）
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
