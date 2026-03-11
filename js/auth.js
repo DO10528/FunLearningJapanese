@@ -59,7 +59,8 @@ window.submitAuth = async () => {
             await setDoc(doc(db, "users", user.uid), {
                 email: email, 
                 displayName: displayName, 
-                points: 0, 
+                monthlyPoints: 0, 
+                totalPoints: 0,
                 streak: 1,
                 lastLogin: new Date().toISOString(), 
                 dailyTracker: {},
@@ -79,7 +80,8 @@ window.submitAuth = async () => {
                 await setDoc(userRef, {
                     email: email, 
                     displayName: email.split('@')[0], 
-                    points: 0, 
+                    monthlyPoints: 0,
+                    totalPoints: 0, 
                     streak: 1,
                     lastLogin: new Date().toISOString(), 
                     dailyTracker: {},
@@ -133,7 +135,7 @@ const checkMonthlyReset = async (user) => {
         
         // 月が変わっていたらポイントをリセット
         if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-            await updateDoc(userRef, { points: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+            await updateDoc(userRef, { monthlyPoints: 0, lastLogin: now.toISOString(), dailyTracker: {} });
         } else {
             // 月が同じなら最終ログイン日時だけ更新
             await updateDoc(userRef, { lastLogin: now.toISOString() });
@@ -190,12 +192,16 @@ window.updateUI = function (userState) {
 
                 document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
                 document.getElementById('streak-val').textContent = data.streak || 0;
-                document.getElementById('point-val').textContent = data.points || 0;
                 
-                const pts = data.points || 0;
-                const level = Math.floor(pts / 100) + 1;
+                // 表示用は月間ポイント
+                const monthlyPts = data.monthlyPoints !== undefined ? data.monthlyPoints : (data.points || 0);
+                document.getElementById('point-val').textContent = monthlyPts;
+                
+                // レベル計算は累計ポイント
+                const totalPts = data.totalPoints !== undefined ? data.totalPoints : (data.points || 0);
+                const level = Math.floor(totalPts / 100) + 1;
                 document.getElementById('user-lvl').textContent = level;
-                document.getElementById('level-fill').style.width = `${(pts % 100)}%`;
+                document.getElementById('level-fill').style.width = `${(totalPts % 100)}%`;
             }
         });
     } else {
@@ -207,56 +213,53 @@ window.updateUI = function (userState) {
     }
 };
 
-window.toggleRanking = async () => {
-    const modal = document.getElementById('ranking-modal');
-    const list = document.getElementById('ranking-list');
-    const loading = document.getElementById('ranking-loading');
-
-    if(!modal || !list || !loading) return;
-
-    modal.style.display = 'flex';
-    list.innerHTML = '';
-    loading.style.display = 'block';
+window.addPointsToUser = async (pointsToAdd, questionId) => {
+    // ゲストや未ログインは弾く
+    if (!currentUserDocUnsubscribe || sessionStorage.getItem(SESS_KEY) === 'guest') {
+        return false;
+    }
+    
+    const user = auth.currentUser;
+    if (!user) return false;
 
     try {
-        const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
-        const querySnapshot = await getDocs(q);
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"形式
+            let tracker = data.dailyTracker || {};
+            
+            // すでに今日その問題をクリアしている場合はポイント加算せずスキップ
+            if (questionId && tracker[questionId] === todayStr) {
+                console.log(`Question ${questionId} already cleared today.`);
+                return false;
+            }
 
-        loading.style.display = 'none';
+            // ポイント加算とトラッカー更新
+            const currentMonthly = data.monthlyPoints !== undefined ? data.monthlyPoints : (data.points || 0);
+            const currentTotal = data.totalPoints !== undefined ? data.totalPoints : (data.points || 0);
+            
+            if (questionId) {
+                tracker[questionId] = todayStr;
+            }
 
-        let rank = 1;
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            const name = data.displayName || docSnap.id;
-            const pt = data.points || 0;
-
-            const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-
-            const li = document.createElement('li');
-            li.style.cssText = "padding:10px; border-bottom:1px dashed #ccc; font-weight:bold; display:flex; justify-content:space-between;";
-
-            const span1 = document.createElement('span');
-            span1.textContent = `${icon} ${name}`;
-            const span2 = document.createElement('span');
-            span2.style.color = '#f0ad4e';
-            span2.textContent = `${pt}pt`;
-
-            li.appendChild(span1);
-            li.appendChild(span2);
-
-            list.appendChild(li);
-            rank++;
-        });
-
-        if (rank === 1) {
-            list.innerHTML = '<li style="padding:10px; text-align:center; color:#999;">まだデータがありません</li>';
+            await updateDoc(userRef, {
+                monthlyPoints: currentMonthly + pointsToAdd,
+                totalPoints: currentTotal + pointsToAdd,
+                dailyTracker: tracker
+            });
+            return true;
         }
-
-    } catch (e) {
-        console.error(e);
-        loading.innerText = '読み込みエラー';
+    } catch (error) {
+        console.error("Error adding points:", error);
+        return false;
     }
+    return false;
 };
+
+
 
 onAuthStateChanged(auth, async (user) => {
     if (sessionStorage.getItem(SESS_KEY) === 'guest') {
