@@ -6,8 +6,9 @@ const assert = require('assert');
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
     
-    // 2. Navigate to local site
-    await page.goto('http://127.0.0.1:8080/index.html');
+    // We will use the file system directly since local http-server might be failing/blocked
+    const url = 'file://' + __dirname + '/index.html';
+    await page.goto(url);
     
     // 3. Verify ranking button is gone
     const rankingBtn = await page.$('.ranking-fab');
@@ -19,7 +20,7 @@ const assert = require('assert');
     }
 
     // 4. Create a test user
-    const testUsername = "TestPlayer" + Math.floor(Math.random()*1000);
+    const testUsername = "TestPlayer" + Date.now();
     
     // Wait until the dashboard/guest area is loaded
     await page.waitForSelector('#login-btn', { state: 'visible' });
