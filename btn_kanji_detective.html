@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>漢字間違い探し - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common_ui.css">
+<style>
+    body {
+        background-color: #f4f7fc;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 80px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .logo, .home-icon {
+        color: white;
+        text-decoration: none;
+        font-size: 1.4em;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .main-container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .game-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #555;
+    }
+    .timer-display {
+        font-size: 1.4em;
+        color: #e74c3c;
+    }
+    .level-display {
+        background: #fdf2e9;
+        color: #d35400;
+        padding: 5px 15px;
+        border-radius: 20px;
+    }
+    .grid-board {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 5px;
+        margin: 0 auto;
+        max-width: 400px;
+    }
+    @media (max-width: 480px) {
+        .grid-board {
+            grid-template-columns: repeat(5, 1fr);
+        }
+    }
+    .kanji-cell {
+        background: #fff;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 2em;
+        font-weight: bold;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        aspect-ratio: 1;
+        cursor: pointer;
+        transition: background 0.1s, transform 0.1s;
+        touch-action: manipulation;
+        user-select: none;
+    }
+    .kanji-cell:active {
+        transform: scale(0.95);
+        background: #eee;
+    }
+    .kanji-cell.correct-anim {
+        background: #2ecc71;
+        color: white;
+        border-color: #27ae60;
+        animation: pop 0.4s;
+        pointer-events: none;
+    }
+    .kanji-cell.wrong-anim {
+        background: #e74c3c;
+        color: white;
+        border-color: #c0392b;
+        animation: shake 0.4s;
+    }
+    @keyframes pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+    }
+    .game-over-panel {
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
+        <!-- Start screen -->
+        <div id="start-screen" class="game-card">
+            <h2 style="color: #8e44ad;"><i class="fa-solid fa-magnifying-glass"></i> 漢字間違い探し</h2>
+            <p style="font-size:1.1em; color:#555;">たくさん並んでいる漢字の中に<br><strong>１つだけ違う漢字</strong>がまぎれているよ！<br>60秒でいくつ見つけられるかな？</p>
+            <div style="font-size: 4em; margin: 20px 0;">🧐</div>
+            <button onclick="startGame()" style="background:#8e44ad; color:white; border:none; padding:15px 40px; border-radius:30px; font-size:1.4em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">スタート！</button>
+        </div>
+
+        <!-- Gameplay screen -->
+        <div id="game-card" class="game-card" style="display:none;">
+            <div class="top-bar">
+                <span class="level-display" id="level-display">レベル: 1</span>
+                <span class="timer-display" id="timer-display"><i class="fa-solid fa-clock"></i> 60</span>
+            </div>
+            
+            <p style="text-align:center; font-weight:bold; color:#777; margin-top:0;">違う漢字をタップしてね！</p>
+            <div id="grid-board" class="grid-board">
+                <!-- Kanji cells injected here -->
+            </div>
+        </div>
+
+        <!-- Result screen -->
+        <div id="result-screen" class="game-card" style="display:none;">
+            <h2 style="color: #8e44ad;"><i class="fa-solid fa-flag-checkered"></i> タイムアップ！</h2>
+            <h3>見つけた数: <span id="final-score" style="font-size:1.5em; color:#e74c3c;">0</span> 個</h3>
+            <p style="color:#666; font-weight:bold;">ポイントも記録されたよ！すごいね！</p>
+            <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <button onclick="resetGame()" style="background:#8e44ad; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">もういちど</button>
+                <button onclick="location.href='index.html'" style="background:#eee; color:#555; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; margin-top: 10px; box-shadow: 0 4px 0 #ccc;">ホームにもどる</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+
+    <script>
+        const kanjiPairs = [
+            { normal: "待", anomaly: "持" },
+            { normal: "持", anomaly: "待" },
+            { normal: "右", anomaly: "石" },
+            { normal: "石", anomaly: "右" },
+            { normal: "曰", anomaly: "日" },
+            { normal: "犬", anomaly: "大" },
+            { normal: "大", anomaly: "犬" },
+            { normal: "鳥", anomaly: "烏" },
+            { normal: "烏", anomaly: "鳥" },
+            { normal: "人", anomaly: "入" },
+            { normal: "土", anomaly: "士" },
+            { normal: "士", anomaly: "土" },
+            { normal: "微", anomaly: "徴" },
+            { normal: "徴", anomaly: "微" },
+            { normal: "木", anomaly: "本" },
+            { normal: "買", anomaly: "貝" },
+            { normal: "休", anomaly: "体" },
+            { normal: "力", anomaly: "刀" },
+            { normal: "刀", anomaly: "力" },
+            { normal: "牛", anomaly: "午" },
+            { normal: "未", anomaly: "末" },
+            { normal: "白", anomaly: "百" },
+            { normal: "王", anomaly: "玉" },
+            { normal: "千", anomaly: "干" },
+            { normal: "考", anomaly: "老" }
+        ];
+
+        let currentLevel = 1;
+        let score = 0;
+        let timeRemaining = 60;
+        let gameActive = false;
+        let timerInterval = null;
+        let timeouts = [];
+
+        function safeUpdate(id, func) {
+            const el = document.getElementById(id);
+            if (el) func(el);
+        }
+
+        function playSound(name) {
+            try {
+                const audio = new Audio('assets/sounds/' + name + '.mp3');
+                audio.play().catch(e => console.log('Audio disabled'));
+            } catch(e) {}
+        }
+
+        function startGame() {
+            safeUpdate('start-screen', el => el.style.display = 'none');
+            safeUpdate('game-card', el => el.style.display = 'block');
+            currentLevel = 1;
+            score = 0;
+            timeRemaining = 60;
+            gameActive = true;
+
+            safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+            
+            // Defensively clear existing timer
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (!gameActive) return;
+                timeRemaining--;
+                safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+                if (timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            renderBoard();
+        }
+
+        function renderBoard() {
+            if (!gameActive) return;
+
+            const pair = kanjiPairs[Math.floor(Math.random() * kanjiPairs.length)];
+            
+            // Grid size increases up to 30 cells
+            let totalCells = Math.min(12 + Math.floor(currentLevel * 1.5), 30);
+            
+            safeUpdate('level-display', el => el.textContent = \`レベル: \${currentLevel}\`);
+
+            const board = document.getElementById('grid-board');
+            if(!board) return;
+            
+            board.innerHTML = '';
+            
+            const anomalyIndex = Math.floor(Math.random() * totalCells);
+            
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'kanji-cell';
+                cell.textContent = i === anomalyIndex ? pair.anomaly : pair.normal;
+                
+                cell.onclick = () => handleCellClick(cell, i === anomalyIndex);
+                board.appendChild(cell);
+            }
+        }
+
+        function handleCellClick(cell, isAnomaly) {
+            if (!gameActive) return;
+            if (cell.classList.contains('correct-anim') || cell.classList.contains('wrong-anim')) return;
+
+            if (isAnomaly) {
+                gameActive = false;
+                cell.classList.add('correct-anim');
+                score++;
+                playSound('correct');
+
+                // Record point via Antigravity protocol
+                if (window.Antigravity && window.Antigravity.addPoint) {
+                    window.Antigravity.addPoint('kanji_lab', 'detective_' + currentLevel);
+                }
+
+                const t = setTimeout(() => {
+                    if (timeRemaining > 0) {
+                        currentLevel++;
+                        gameActive = true;
+                        renderBoard();
+                    }
+                }, 400);
+                timeouts.push(t);
+            } else {
+                cell.classList.add('wrong-anim');
+                playSound('wrong');
+                // Time penalty
+                timeRemaining = Math.max(0, timeRemaining - 3);
+                safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+                
+                const t = setTimeout(() => {
+                    if(document.body.contains(cell)) {
+                        cell.classList.remove('wrong-anim');
+                    }
+                }, 400);
+                timeouts.push(t);
+            }
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            safeUpdate('game-card', el => el.style.display = 'none');
+            safeUpdate('result-screen', el => el.style.display = 'block');
+            safeUpdate('final-score', el => el.textContent = score);
+        }
+
+        function resetGame() {
+            safeUpdate('result-screen', el => el.style.display = 'none');
+            startGame();
+        }
+
+        // Extremely robust teardown for SPA/navigational events
+        window.addEventListener('beforeunload', () => {
+            if (timerInterval) clearInterval(timerInterval);
+            timeouts.forEach(clearTimeout);
+        });
+
+    </script>
+    <script src="js/common_ui.js"></script>
+</body>
+</html>
