@@ -240,16 +240,16 @@
             selectedParts = [];
             const q = currentLevelQuestions[currentQuestionIndex];
             
-            safeUpdate('question-counter', el => el.textContent = \`問題: \${currentQuestionIndex + 1}/\${currentLevelQuestions.length}\`);
-            safeUpdate('score-display', el => el.textContent = \`正解: \${score}\`);
+            safeUpdate('question-counter', el => el.textContent = `問題: ${currentQuestionIndex + 1}/${currentLevelQuestions.length}`);
+            safeUpdate('score-display', el => el.textContent = `正解: ${score}`);
             safeUpdate('target-reading', el => el.textContent = q.reading);
             
             safeUpdate('combine-area', el => {
-                el.innerHTML = \`
+                el.innerHTML = `
                     <span id="slot-1" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block; font-size:0.8em; line-height:80px; text-align:center;"></span>
                     <span class="plus-sign"><i class="fa-solid fa-plus"></i></span>
                     <span id="slot-2" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block; font-size:0.8em; line-height:80px; text-align:center;"></span>
-                \`;
+                `;
             });
 
             // Prepare choices: correct and false parts
@@ -335,7 +335,7 @@
                 });
                 
                 safeUpdate('combine-area', el => {
-                    el.innerHTML = \`<span class="merged-kanji">\${q.kanji}</span>\`;
+                    el.innerHTML = `<span class="merged-kanji">${q.kanji}</span>`;
                 });
 
                 // Antigravity Protocol Tracking: Point is given per correct kanji, using its true character for uniqueness
@@ -381,16 +381,16 @@
 
         function endGame() {
             safeUpdate('game-card', el => {
-                el.innerHTML = \`
+                el.innerHTML = `
                     <h2 style="color: #8e44ad;"><i class="fa-solid fa-trophy"></i> ゲームクリア！</h2>
                     <div style="font-size: 5em; margin: 20px 0;">🎯</div>
-                    <h3>正解: \${score} / \${currentLevelQuestions.length}</h3>
+                    <h3>正解: ${score} / ${currentLevelQuestions.length}</h3>
                     <p style="color:#666; font-weight:bold;">よくできました！ポイントも記録されたよ！</p>
                     <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
                         <button onclick="location.reload()" style="background:#8e44ad; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">もういちど</button>
                         <button onclick="location.href='index.html'" style="background:#eee; color:#555; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; margin-top: 10px; box-shadow: 0 4px 0 #ccc;">ホームにもどる</button>
                     </div>
-                \`;
+                `;
             });
         }
 
