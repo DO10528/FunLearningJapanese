@@ -229,7 +229,7 @@
             timeRemaining = 60;
             gameActive = true;
 
-            safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+            safeUpdate('timer-display', el => el.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeRemaining}`);
             
             // Defensively clear existing timer
             if (timerInterval) clearInterval(timerInterval);
@@ -237,7 +237,7 @@
             timerInterval = setInterval(() => {
                 if (!gameActive) return;
                 timeRemaining--;
-                safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+                safeUpdate('timer-display', el => el.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeRemaining}`);
                 if (timeRemaining <= 0) {
                     endGame();
                 }
@@ -254,7 +254,7 @@
             // Grid size increases up to 30 cells
             let totalCells = Math.min(12 + Math.floor(currentLevel * 1.5), 30);
             
-            safeUpdate('level-display', el => el.textContent = \`レベル: \${currentLevel}\`);
+            safeUpdate('level-display', el => el.textContent = `レベル: ${currentLevel}`);
 
             const board = document.getElementById('grid-board');
             if(!board) return;
@@ -301,7 +301,7 @@
                 playSound('wrong');
                 // Time penalty
                 timeRemaining = Math.max(0, timeRemaining - 3);
-                safeUpdate('timer-display', el => el.innerHTML = \`<i class="fa-solid fa-clock"></i> \${timeRemaining}\`);
+                safeUpdate('timer-display', el => el.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeRemaining}`);
                 
                 const t = setTimeout(() => {
                     if(document.body.contains(cell)) {
