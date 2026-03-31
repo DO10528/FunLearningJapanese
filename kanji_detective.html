@@ -43,6 +43,34 @@
         margin: 0 auto;
         text-align: center;
     }
+    
+    /* Level Select UI */
+    .level-view { display: block; }
+    .level-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+    .level-card {
+        width: 140px; background: white; border-radius: 15px; padding: 20px 10px;
+        text-align: center; cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.2s; border-bottom: 5px solid #ddd;
+    }
+    .level-card:active { transform: translateY(3px); border-bottom-width: 2px; }
+    .level-badge {
+        display: inline-block; padding: 3px 8px; border-radius: 12px;
+        color: white; font-weight: bold; margin-bottom: 8px; font-size: 0.7em;
+    }
+    .level-title { font-size: 2em; font-weight: 900; line-height: 1; margin-bottom: 5px; color: #444; }
+    .level-desc { font-size: 0.75em; color: #888; font-weight: bold; }
+    .lv-n5 .level-badge { background-color: #e57373; } .lv-n5 { border-bottom-color: #e57373; }
+    .lv-n4 .level-badge { background-color: #d32f2f; } .lv-n4 { border-bottom-color: #d32f2f; }
+    .lv-n3 .level-badge { background-color: #f57c00; } .lv-n3 { border-bottom-color: #f57c00; }
+    
+    .btn-back {
+        background: #eee; color: #555; border: none; padding: 10px 20px; border-radius: 20px;
+        font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 #ccc;
+    }
+    .btn-back:active { transform: translateY(4px); box-shadow: none; }
+
+    /* Game UI */
     .game-card {
         background: white;
         border-radius: 20px;
@@ -124,9 +152,6 @@
         50% { transform: translateX(5px); }
         75% { transform: translateX(-5px); }
     }
-    .game-over-panel {
-        display: none;
-    }
 </style>
 </head>
 <body>
@@ -137,36 +162,32 @@
     </header>
 
     <div class="main-container">
-        <!-- Start screen -->
-        <div id="start-screen" class="game-card">
-            <h2 style="color: #8e44ad;"><i class="fa-solid fa-magnifying-glass"></i> 漢字間違い探し</h2>
-            <p style="font-size:1.1em; color:#555;">たくさん並んでいる漢字の中に<br><strong>１つだけ違う漢字</strong>がまぎれているよ！<br>60秒でいくつ見つけられるかな？</p>
-            <div style="font-size: 4em; margin: 20px 0;">🧐</div>
-            <button onclick="startGame()" style="background:#8e44ad; color:white; border:none; padding:15px 40px; border-radius:30px; font-size:1.4em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">スタート！</button>
+        <!-- Level UI -->
+        <div id="level-select-view" class="level-view">
+            <h2 style="color: #8e44ad; margin-top: 0;"><i class="fa-solid fa-magnifying-glass"></i> 漢字間違い探し</h2>
+            <p style="color:#555; font-weight:bold;">レベルをえらんでね</p>
+            <div class="level-grid">
+                <div class="level-card lv-n5" onclick="startLevel('n5')">
+                    <span class="level-badge">BASIC</span>
+                    <div class="level-title">N5</div>
+                    <div class="level-desc">はじめて</div>
+                </div>
+                <div class="level-card lv-n4" onclick="startLevel('n4')">
+                    <span class="level-badge">ELEMENTARY</span>
+                    <div class="level-title">N4</div>
+                    <div class="level-desc">すこし むずかしい</div>
+                </div>
+                <div class="level-card lv-n3" onclick="startLevel('n3')">
+                    <span class="level-badge">INTERMEDIATE</span>
+                    <div class="level-title">N3</div>
+                    <div class="level-desc">もっと むずかしい</div>
+                </div>
+            </div>
         </div>
 
         <!-- Gameplay screen -->
         <div id="game-card" class="game-card" style="display:none;">
-            <div class="top-bar">
-                <span class="level-display" id="level-display">レベル: 1</span>
-                <span class="timer-display" id="timer-display"><i class="fa-solid fa-clock"></i> 60</span>
-            </div>
-            
-            <p style="text-align:center; font-weight:bold; color:#777; margin-top:0;">違う漢字をタップしてね！</p>
-            <div id="grid-board" class="grid-board">
-                <!-- Kanji cells injected here -->
-            </div>
-        </div>
-
-        <!-- Result screen -->
-        <div id="result-screen" class="game-card" style="display:none;">
-            <h2 style="color: #8e44ad;"><i class="fa-solid fa-flag-checkered"></i> タイムアップ！</h2>
-            <h3>見つけた数: <span id="final-score" style="font-size:1.5em; color:#e74c3c;">0</span> 個</h3>
-            <p style="color:#666; font-weight:bold;">ポイントも記録されたよ！すごいね！</p>
-            <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <button onclick="resetGame()" style="background:#8e44ad; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">もういちど</button>
-                <button onclick="location.href='index.html'" style="background:#eee; color:#555; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; margin-top: 10px; box-shadow: 0 4px 0 #ccc;">ホームにもどる</button>
-            </div>
+            <!-- Game dynamic HTML injected here -->
         </div>
     </div>
 
@@ -174,35 +195,37 @@
     <script type="module" src="js/auth.js"></script>
 
     <script>
-        const kanjiPairs = [
-            { normal: "待", anomaly: "持" },
-            { normal: "持", anomaly: "待" },
-            { normal: "右", anomaly: "石" },
-            { normal: "石", anomaly: "右" },
-            { normal: "曰", anomaly: "日" },
-            { normal: "犬", anomaly: "大" },
-            { normal: "大", anomaly: "犬" },
-            { normal: "鳥", anomaly: "烏" },
-            { normal: "烏", anomaly: "鳥" },
-            { normal: "人", anomaly: "入" },
-            { normal: "土", anomaly: "士" },
-            { normal: "士", anomaly: "土" },
-            { normal: "微", anomaly: "徴" },
-            { normal: "徴", anomaly: "微" },
-            { normal: "木", anomaly: "本" },
-            { normal: "買", anomaly: "貝" },
-            { normal: "休", anomaly: "体" },
-            { normal: "力", anomaly: "刀" },
-            { normal: "刀", anomaly: "力" },
-            { normal: "牛", anomaly: "午" },
-            { normal: "未", anomaly: "末" },
-            { normal: "白", anomaly: "百" },
-            { normal: "王", anomaly: "玉" },
-            { normal: "千", anomaly: "干" },
-            { normal: "考", anomaly: "老" }
-        ];
+        const kanjiPairs = {
+            n5: [
+                { normal: "大", anomaly: "犬" }, { normal: "犬", anomaly: "大" },
+                { normal: "木", anomaly: "本" }, { normal: "本", anomaly: "木" },
+                { normal: "白", anomaly: "百" }, { normal: "百", anomaly: "白" },
+                { normal: "王", anomaly: "玉" }, { normal: "玉", anomaly: "王" },
+                { normal: "人", anomaly: "入" }, { normal: "入", anomaly: "人" },
+                { normal: "千", anomaly: "干" }, { normal: "干", anomaly: "千" },
+                { normal: "休", anomaly: "体" }, { normal: "体", anomaly: "休" },
+                { normal: "力", anomaly: "刀" }, { normal: "刀", anomaly: "力" }
+            ],
+            n4: [
+                { normal: "待", anomaly: "持" }, { normal: "持", anomaly: "待" },
+                { normal: "右", anomaly: "石" }, { normal: "石", anomaly: "右" },
+                { normal: "曰", anomaly: "日" },
+                { normal: "鳥", anomaly: "烏" }, { normal: "烏", anomaly: "鳥" },
+                { normal: "牛", anomaly: "午" }, { normal: "午", anomaly: "牛" },
+                { normal: "買", anomaly: "貝" }, { normal: "貝", anomaly: "買" }
+            ],
+            n3: [
+                { normal: "微", anomaly: "徴" }, { normal: "徴", anomaly: "微" },
+                { normal: "土", anomaly: "士" }, { normal: "士", anomaly: "土" },
+                { normal: "未", anomaly: "末" }, { normal: "末", anomaly: "未" },
+                { normal: "考", anomaly: "老" }, { normal: "老", anomaly: "考" },
+                { normal: "免", anomaly: "兎" }, { normal: "兎", anomaly: "免" },
+                { normal: "壁", anomaly: "璧" }, { normal: "璧", anomaly: "壁" }
+            ]
+        };
 
-        let currentLevel = 1;
+        let currentLevelId = 'n5';
+        let currentLevel = 1; // Used for grid size scaling
         let score = 0;
         let timeRemaining = 60;
         let gameActive = false;
@@ -221,9 +244,32 @@
             } catch(e) {}
         }
 
-        function startGame() {
-            safeUpdate('start-screen', el => el.style.display = 'none');
-            safeUpdate('game-card', el => el.style.display = 'block');
+        function renderGameTemplate() {
+            const gameCard = document.getElementById('game-card');
+            gameCard.innerHTML = `
+                <div class="top-bar">
+                    <span class="level-display" id="level-display">レベル: 1</span>
+                    <span class="timer-display" id="timer-display"><i class="fa-solid fa-clock"></i> 60</span>
+                </div>
+                
+                <p style="text-align:center; font-weight:bold; color:#777; margin-top:0;">違う漢字をタップしてね！</p>
+                <div id="grid-board" class="grid-board">
+                    <!-- Kanji cells injected here -->
+                </div>
+                
+                <div style="margin-top:20px;">
+                    <button onclick="backToMenu()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> やめる</button>
+                </div>
+            `;
+        }
+
+        function startLevel(level) {
+            currentLevelId = level;
+            document.getElementById('level-select-view').style.display = 'none';
+            document.getElementById('game-card').style.display = 'block';
+            
+            renderGameTemplate();
+            
             currentLevel = 1;
             score = 0;
             timeRemaining = 60;
@@ -231,7 +277,6 @@
 
             safeUpdate('timer-display', el => el.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeRemaining}`);
             
-            // Defensively clear existing timer
             if (timerInterval) clearInterval(timerInterval);
             
             timerInterval = setInterval(() => {
@@ -249,12 +294,12 @@
         function renderBoard() {
             if (!gameActive) return;
 
-            const pair = kanjiPairs[Math.floor(Math.random() * kanjiPairs.length)];
+            const categoryPairs = kanjiPairs[currentLevelId];
+            const pair = categoryPairs[Math.floor(Math.random() * categoryPairs.length)];
             
-            // Grid size increases up to 30 cells
             let totalCells = Math.min(12 + Math.floor(currentLevel * 1.5), 30);
             
-            safeUpdate('level-display', el => el.textContent = `レベル: ${currentLevel}`);
+            safeUpdate('level-display', el => el.innerHTML = `${currentLevelId.toUpperCase()} <span style="color:#aaa;">|</span> Lv: ${currentLevel}`);
 
             const board = document.getElementById('grid-board');
             if(!board) return;
@@ -283,9 +328,8 @@
                 score++;
                 playSound('correct');
 
-                // Record point via Antigravity protocol
                 if (window.Antigravity && window.Antigravity.addPoint) {
-                    window.Antigravity.addPoint('kanji_lab', 'detective_' + currentLevel);
+                    window.Antigravity.addPoint('kanji_lab', `detective_${currentLevelId}_${currentLevel}`);
                 }
 
                 const t = setTimeout(() => {
@@ -299,7 +343,6 @@
             } else {
                 cell.classList.add('wrong-anim');
                 playSound('wrong');
-                // Time penalty
                 timeRemaining = Math.max(0, timeRemaining - 3);
                 safeUpdate('timer-display', el => el.innerHTML = `<i class="fa-solid fa-clock"></i> ${timeRemaining}`);
                 
@@ -314,19 +357,31 @@
 
         function endGame() {
             gameActive = false;
-            clearInterval(timerInterval);
+            if (timerInterval) clearInterval(timerInterval);
             
-            safeUpdate('game-card', el => el.style.display = 'none');
-            safeUpdate('result-screen', el => el.style.display = 'block');
-            safeUpdate('final-score', el => el.textContent = score);
+            safeUpdate('game-card', el => {
+                el.innerHTML = `
+                    <h2 style="color: #8e44ad;"><i class="fa-solid fa-flag-checkered"></i> タイムアップ！</h2>
+                    <h3>見つけた数: <span style="font-size:1.5em; color:#e74c3c;">${score}</span> 個</h3>
+                    <p style="color:#666; font-weight:bold;">ポイントも記録されたよ！すごいね！</p>
+                    <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <button onclick="startLevel('${currentLevelId}')" style="background:#8e44ad; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">もういちど</button>
+                        <button onclick="backToMenu()" style="background:#eee; color:#555; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; margin-top: 10px; box-shadow: 0 4px 0 #ccc;">レベルをえらぶ</button>
+                    </div>
+                `;
+            });
         }
 
-        function resetGame() {
-            safeUpdate('result-screen', el => el.style.display = 'none');
-            startGame();
+        function backToMenu() {
+            gameActive = false;
+            if (timerInterval) clearInterval(timerInterval);
+            timeouts.forEach(clearTimeout);
+            timeouts = [];
+            
+            document.getElementById('game-card').style.display = 'none';
+            document.getElementById('level-select-view').style.display = 'block';
         }
 
-        // Extremely robust teardown for SPA/navigational events
         window.addEventListener('beforeunload', () => {
             if (timerInterval) clearInterval(timerInterval);
             timeouts.forEach(clearTimeout);
