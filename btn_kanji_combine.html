@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>部首がったいパズル - FunLearnJP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common_ui.css">
+<style>
+    body {
+        background-color: #f4f7fc;
+        font-family: 'Zen Maru Gothic', sans-serif;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 80px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .logo, .home-icon {
+        color: white;
+        text-decoration: none;
+        font-size: 1.4em;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .main-container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .game-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+    .status-bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 15px;
+    }
+    .reading-box {
+        background: #fdf2e9;
+        color: #d35400;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1.5em;
+        font-weight: 900;
+        margin-bottom: 20px;
+        border: 2px dashed #f39c12;
+    }
+    .parts-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+    .part-btn {
+        background: #fff;
+        border: 3px solid #ddd;
+        border-radius: 15px;
+        font-size: 2.2em;
+        font-weight: bold;
+        color: #333;
+        padding: 15px 0;
+        cursor: pointer;
+        transition: all 0.2s;
+        touch-action: manipulation;
+        box-shadow: 0 4px 0 #ddd;
+        user-select: none;
+    }
+    .part-btn:active {
+        transform: translateY(4px);
+        box-shadow: none;
+    }
+    .part-btn.selected {
+        border-color: #9b59b6;
+        background: #f4e8fb;
+        color: #8e44ad;
+        box-shadow: 0 4px 0 #9b59b6;
+    }
+    .part-btn.correct {
+        border-color: #2ecc71;
+        background: #eafaf1;
+        color: #27ae60;
+        box-shadow: 0 4px 0 #2ecc71;
+        pointer-events: none;
+    }
+    .part-btn.wrong {
+        border-color: #e74c3c;
+        background: #fdedec;
+        color: #c0392b;
+        box-shadow: 0 4px 0 #e74c3c;
+        animation: shake 0.4s;
+    }
+    .combine-area {
+        height: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 4em;
+        font-weight: 900;
+        color: #8e44ad;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .plus-sign {
+        font-size: 0.5em;
+        color: #ccc;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+    }
+    .merged-kanji {
+        animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        color: #2ecc71;
+    }
+    @keyframes pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> FunLearnJP</a>
+        <a href="index.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="game-card" class="game-card">
+            <h2 style="color: #8e44ad; margin-top: 0; outline: none;"><i class="fa-solid fa-layer-group"></i> 部首がったいパズル</h2>
+
+            <div class="status-bar">
+                <span id="question-counter">問題: 1/10</span>
+                <span id="score-display">正解: 0</span>
+            </div>
+
+            <div class="reading-box">
+                <div style="font-size:0.5em; color:#999; margin-bottom: 5px;">この漢字を作ろう！</div>
+                <strong id="target-reading">まつ</strong>
+            </div>
+
+            <div id="parts-grid" class="parts-grid">
+                <!-- Parts injected here -->
+            </div>
+
+            <div class="combine-area" id="combine-area">
+                <span id="slot-1" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block;"></span>
+                <span class="plus-sign"><i class="fa-solid fa-plus"></i></span>
+                <span id="slot-2" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block;"></span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Firebase and Auth -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+
+    <script>
+        const kanjiData = [
+            { kanji: "待", parts: ["彳", "寺"], reading: "まつ", falseParts: ["扌", "日", "寸"] }, 
+            { kanji: "持", parts: ["扌", "寺"], reading: "もつ", falseParts: ["氵", "木", "土"] },
+            { kanji: "時", parts: ["日", "寺"], reading: "とき", falseParts: ["氵", "扌", "月"] },
+            { kanji: "休", parts: ["亻", "木"], reading: "やすむ", falseParts: ["彳", "本", "水"] },
+            { kanji: "語", parts: ["言", "吾"], reading: "かたる", falseParts: ["氵", "口", "五"] },
+            { kanji: "飲", parts: ["飠", "欠"], reading: "のむ", falseParts: ["氵", "攵", "食"] },
+            { kanji: "読", parts: ["言", "売"], reading: "よむ", falseParts: ["氵", "買", "見"] },
+            { kanji: "聞", parts: ["門", "耳"], reading: "きく", falseParts: ["日", "目", "口"] },
+            { kanji: "明", parts: ["日", "月"], reading: "あかるい", falseParts: ["目", "木", "水"] },
+            { kanji: "林", parts: ["木", "木"], reading: "はやし", falseParts: ["氵", "十", "土"] },
+            { kanji: "話", parts: ["言", "舌"], reading: "はなす", falseParts: ["口", "古", "十"] },
+            { kanji: "池", parts: ["氵", "也"], reading: "いけ", falseParts: ["土", "日", "木"] }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedParts = [];
+        let currentLevelQuestions = [];
+        let gameActive = true;
+        let pendingTimeouts = [];
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Bug prevention wrapper
+        function safeUpdate(id, func) {
+            const el = document.getElementById(id);
+            if (el) func(el);
+        }
+
+        function initGame() {
+            currentLevelQuestions = shuffle([...kanjiData]).slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            gameActive = true;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex >= currentLevelQuestions.length) {
+                endGame();
+                return;
+            }
+
+            selectedParts = [];
+            const q = currentLevelQuestions[currentQuestionIndex];
+            
+            safeUpdate('question-counter', el => el.textContent = \`問題: \${currentQuestionIndex + 1}/\${currentLevelQuestions.length}\`);
+            safeUpdate('score-display', el => el.textContent = \`正解: \${score}\`);
+            safeUpdate('target-reading', el => el.textContent = q.reading);
+            
+            safeUpdate('combine-area', el => {
+                el.innerHTML = \`
+                    <span id="slot-1" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block; font-size:0.8em; line-height:80px; text-align:center;"></span>
+                    <span class="plus-sign"><i class="fa-solid fa-plus"></i></span>
+                    <span id="slot-2" style="border-bottom: 3px dashed #ccc; width:60px; height:80px; display:inline-block; font-size:0.8em; line-height:80px; text-align:center;"></span>
+                \`;
+            });
+
+            // Prepare choices: correct and false parts
+            let choices = [...q.parts, ...q.falseParts.slice(0, 4 - q.parts.length)];
+            // Make exactly 6 choices by appending random from other items if needed
+            while(choices.length < 6) {
+                 const randomKanji = kanjiData[Math.floor(Math.random() * kanjiData.length)];
+                 const randomPart = randomKanji.parts[Math.floor(Math.random() * randomKanji.parts.length)];
+                 if(!choices.includes(randomPart)) choices.push(randomPart);
+            }
+            choices = choices.slice(0, 6);
+            choices = shuffle(choices);
+
+            safeUpdate('parts-grid', el => {
+                el.innerHTML = '';
+                choices.forEach(part => {
+                    const btn = document.createElement('button');
+                    btn.className = 'part-btn';
+                    btn.textContent = part;
+                    btn.onclick = () => handlePartClick(btn, part, q);
+                    el.appendChild(btn);
+                });
+            });
+            gameActive = true;
+        }
+
+        function handlePartClick(btn, part, q) {
+            if (!gameActive) return;
+            
+            // Toggle selection logic
+            const alreadySelected = selectedParts.find(p => p.btn === btn);
+            if (alreadySelected) {
+                btn.classList.remove('selected');
+                selectedParts = selectedParts.filter(p => p.btn !== btn);
+                updateSlots();
+                return;
+            }
+
+            if (selectedParts.length >= 2) return;
+
+            btn.classList.add('selected');
+            selectedParts.push({ btn, part });
+            updateSlots();
+
+            if (selectedParts.length === 2) {
+                gameActive = false;
+                checkAnswer(q);
+            }
+        }
+
+        function updateSlots() {
+            safeUpdate('slot-1', el => {
+                el.textContent = selectedParts[0] ? selectedParts[0].part : '';
+                el.style.borderBottom = selectedParts[0] ? 'none' : '3px dashed #ccc';
+            });
+            safeUpdate('slot-2', el => {
+                el.textContent = selectedParts[1] ? selectedParts[1].part : '';
+                el.style.borderBottom = selectedParts[1] ? 'none' : '3px dashed #ccc';
+            });
+        }
+
+        function checkAnswer(q) {
+            const selectedChars = selectedParts.map(p => p.part);
+            let isCorrect = true;
+            
+            // Allow reverse order like [寺, 氵] just in case it's same parts
+            const temp = [...q.parts];
+            for (let c of selectedChars) {
+                const idx = temp.indexOf(c);
+                if (idx !== -1) {
+                    temp.splice(idx, 1);
+                } else {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect && temp.length === 0) {
+                score++;
+                selectedParts.forEach(p => {
+                    p.btn.classList.add('correct');
+                    p.btn.classList.remove('selected');
+                });
+                
+                safeUpdate('combine-area', el => {
+                    el.innerHTML = \`<span class="merged-kanji">\${q.kanji}</span>\`;
+                });
+
+                // Antigravity Protocol Tracking: Point is given per correct kanji, using its true character for uniqueness
+                if(window.Antigravity && window.Antigravity.addPoint) {
+                    window.Antigravity.addPoint('kanji_lab', 'combine_' + q.kanji);
+                }
+
+                // Create Audio correctly or silently fail
+                try {
+                    const audio = new Audio('assets/sounds/correct.mp3');
+                    audio.play().catch(e => console.log('Audio error:', e));
+                } catch(e) {}
+
+                const tid = setTimeout(() => {
+                    if (!document.getElementById('combine-area')) return;
+                    currentQuestionIndex++;
+                    nextQuestion();
+                }, 1500);
+                pendingTimeouts.push(tid);
+            } else {
+                selectedParts.forEach(p => {
+                    p.btn.classList.add('wrong');
+                });
+                
+                try {
+                    const audio = new Audio('assets/sounds/wrong.mp3');
+                    audio.play().catch(e => console.log('Audio error:', e));
+                } catch(e) {}
+
+                const tid = setTimeout(() => {
+                    if (!document.getElementById('parts-grid')) return;
+                    selectedParts.forEach(p => {
+                        p.btn.classList.remove('wrong');
+                        p.btn.classList.remove('selected');
+                    });
+                    selectedParts = [];
+                    updateSlots();
+                    gameActive = true;
+                }, 600);
+                pendingTimeouts.push(tid);
+            }
+        }
+
+        function endGame() {
+            safeUpdate('game-card', el => {
+                el.innerHTML = \`
+                    <h2 style="color: #8e44ad;"><i class="fa-solid fa-trophy"></i> ゲームクリア！</h2>
+                    <div style="font-size: 5em; margin: 20px 0;">🎯</div>
+                    <h3>正解: \${score} / \${currentLevelQuestions.length}</h3>
+                    <p style="color:#666; font-weight:bold;">よくできました！ポイントも記録されたよ！</p>
+                    <div style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                        <button onclick="location.reload()" style="background:#8e44ad; color:white; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; box-shadow: 0 4px 0 #732d91;">もういちど</button>
+                        <button onclick="location.href='index.html'" style="background:#eee; color:#555; border:none; padding:15px 30px; border-radius:30px; font-size:1.2em; font-weight:bold; cursor:pointer; width:100%; max-width:250px; margin-top: 10px; box-shadow: 0 4px 0 #ccc;">ホームにもどる</button>
+                    </div>
+                \`;
+            });
+        }
+
+        // Cleanup on unload to prevent errors
+        window.addEventListener('beforeunload', () => {
+            pendingTimeouts.forEach(clearTimeout);
+        });
+
+        // Start
+        window.onload = () => {
+             // Make sure parts grid exist before trying to modify
+            if (document.getElementById('parts-grid')) {
+                initGame();
+            }
+        };
+
+    </script>
+    <script src="js/common_ui.js"></script>
+</body>
+</html>
