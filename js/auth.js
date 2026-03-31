@@ -259,7 +259,13 @@ window.addPointsToUser = async (pointsToAdd, questionId) => {
     return false;
 };
 
-
+// Antigravity Protocol Enforcement
+window.Antigravity = {
+    addPoint: async (categoryStr, questionId) => {
+        // Enforce the 1-point and once-a-day rule via addPointsToUser.
+        return await window.addPointsToUser(1, questionId);
+    }
+};
 
 onAuthStateChanged(auth, async (user) => {
     if (sessionStorage.getItem(SESS_KEY) === 'guest') {
