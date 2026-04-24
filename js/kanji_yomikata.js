@@ -29,75 +29,92 @@ if (!window.Antigravity) {
 
 // === Quiz Logic ===
 window.startQuiz = async (level) => {
-    currentLevel = level;
-    score = 0;
-    currentIndex = 0;
+    try {
+        currentLevel = level;
+        score = 0;
+        currentIndex = 0;
 
-    // Fetch user data for dailyTracker
-    let tracker = {};
-    if (auth.currentUser && sessionStorage.getItem('fun_japanese_user_v2') !== 'guest') {
-        try {
-            const userRef = doc(db, "users", auth.currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                tracker = userSnap.data().dailyTracker || {};
+        // Check if DB is loaded
+        if (!window.kanjiDatabase) {
+            console.error("kanjiDatabase is not loaded.");
+            alert("データの読み込みに失敗しました。");
+            return;
+        }
+
+        // Fetch user data for dailyTracker
+        let tracker = {};
+        if (auth.currentUser && sessionStorage.getItem('fun_japanese_user_v2') !== 'guest') {
+            try {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    tracker = userSnap.data().dailyTracker || {};
+                }
+            } catch (error) {
+                console.error("Error fetching user tracker:", error);
             }
-        } catch (error) {
-            console.error("Error fetching user tracker:", error);
         }
-    }
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    const rawData = kanjiDatabase[level];
+        const todayStr = new Date().toISOString().split('T')[0];
+        const rawData = window.kanjiDatabase[level];
 
-    // Filter valid kanjis that have at least one reading
-    const validData = rawData.filter(item => {
-        const hasKun = (item.kun && item.kun !== "" && item.kun !== "-" && item.kun !== "なし");
-        const hasOn = (item.on && item.on !== "" && item.on !== "-" && item.on !== "なし");
-        return hasKun || hasOn;
-    });
-
-    // Prioritize un-acquired ones
-    const unacquired = [];
-    const acquired = [];
-    validData.forEach(item => {
-        const questionId = 'kanji_yomi_' + item.kanji;
-        if (tracker[questionId] === todayStr) {
-            acquired.push(item);
-        } else {
-            unacquired.push(item);
+        if (!rawData) {
+            alert(`レベル ${level} のデータがありません。`);
+            return;
         }
-    });
 
-    // Shuffle both arrays
-    unacquired.sort(() => 0.5 - Math.random());
-    acquired.sort(() => 0.5 - Math.random());
+        // Filter valid kanjis that have at least one reading
+        const validData = rawData.filter(item => {
+            const hasKun = (item.kun && item.kun !== "" && item.kun !== "-" && item.kun !== "なし");
+            const hasOn = (item.on && item.on !== "" && item.on !== "-" && item.on !== "なし");
+            return hasKun || hasOn;
+        });
 
-    // Combine them, taking unacquired first
-    let selectedData = [...unacquired, ...acquired];
-    
-    // Pick exactly 10 or max available
-    const count = Math.min(selectedData.length, totalQuestions);
-    questions = selectedData.slice(0, count);
+        // Prioritize un-acquired ones
+        const unacquired = [];
+        const acquired = [];
+        validData.forEach(item => {
+            const questionId = 'kanji_yomi_' + item.kanji;
+            if (tracker[questionId] === todayStr) {
+                acquired.push(item);
+            } else {
+                unacquired.push(item);
+            }
+        });
 
-    // Switch View
-    const scoreArea = document.getElementById('score-area');
-    const ingameNav = document.getElementById('ingame-nav');
-    const quizArea = document.getElementById('quiz-area');
-    const levelLabel = document.getElementById('level-label');
+        // Shuffle both arrays
+        unacquired.sort(() => 0.5 - Math.random());
+        acquired.sort(() => 0.5 - Math.random());
 
-    if (scoreArea) scoreArea.style.display = 'none';
-    if (ingameNav) ingameNav.style.display = 'block';
-    if (quizArea) quizArea.style.display = 'block';
-    if (levelLabel) levelLabel.textContent = level.toUpperCase();
-    
-    if (views.level) views.level.style.display = 'none';
-    if (views.quiz) {
-        views.quiz.style.display = 'block';
-        views.quiz.classList.add('active');
+        // Combine them, taking unacquired first
+        let selectedData = [...unacquired, ...acquired];
+        
+        // Pick exactly 10 or max available
+        const count = Math.min(selectedData.length, totalQuestions);
+        questions = selectedData.slice(0, count);
+
+        // Switch View
+        const scoreArea = document.getElementById('score-area');
+        const ingameNav = document.getElementById('ingame-nav');
+        const quizArea = document.getElementById('quiz-area');
+        const levelLabel = document.getElementById('level-label');
+
+        if (scoreArea) scoreArea.style.display = 'none';
+        if (ingameNav) ingameNav.style.display = 'block';
+        if (quizArea) quizArea.style.display = 'block';
+        if (levelLabel) levelLabel.textContent = level.toUpperCase();
+        
+        if (views.level) views.level.style.display = 'none';
+        if (views.quiz) {
+            views.quiz.style.display = 'block';
+            views.quiz.classList.add('active');
+        }
+        
+        showQuestion();
+    } catch (err) {
+        console.error("Error in startQuiz:", err);
+        alert("エラーが発生しました: " + err.message);
     }
-    
-    showQuestion();
 };
 
 function showQuestion() {
@@ -130,7 +147,7 @@ function showQuestion() {
     // Generate choices: 1 correct kanji, 1 incorrect kanji from same level
     const correctKanji = qData.kanji;
     
-    const allCandidates = kanjiDatabase[currentLevel].filter(item => item.kanji !== correctKanji);
+    const allCandidates = window.kanjiDatabase[currentLevel].filter(item => item.kanji !== correctKanji);
     let distractorKanji = "?";
     if (allCandidates.length >= 1) {
         const shuffled = allCandidates.sort(() => 0.5 - Math.random());
