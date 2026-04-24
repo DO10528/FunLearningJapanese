@@ -430,6 +430,7 @@
   { "kanji": "決", "kun": "き(める)", "on": "けつ", "meaning": "decide" }
 ]
         };
+        window.kanjiDatabase = kanjiDatabase;
 
         // DOM要素
         const views = {
