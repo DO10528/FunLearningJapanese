@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>よみかたクイズ - FunLearnJP</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/kanji_quiz.css">
+    <link rel="stylesheet" href="css/common_ui.css">
+    
+    <style>
+        .yomi-display {
+            font-size: 5rem;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            padding: 10px;
+        }
+        
+        .choice-btn {
+            font-family: 'Klee One', serif;
+            font-size: 4rem;
+            padding: 10px;
+        }
+
+        .choices-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>よみかたクイズ</h1>
+            <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="level-select-view">
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:15px; font-size:1.2em;">レベルをえらんでね</h2>
+            
+            <div class="level-grid">
+                <div class="level-card lv-n5" onclick="startQuiz('n5')">
+                    <span class="level-badge">BASIC</span>
+                    <div class="level-title">N5 Level</div>
+                    <div class="level-desc">はじめて</div>
+                </div>
+                <div class="level-card lv-n4" onclick="startQuiz('n4')">
+                    <span class="level-badge">ELEMENTARY</span>
+                    <div class="level-title">N4 Level</div>
+                    <div class="level-desc">すこし むずかしい</div>
+                </div>
+                <div class="level-card lv-n3" onclick="startQuiz('n3')">
+                    <span class="level-badge">INTERMEDIATE</span>
+                    <div class="level-title">N3 Level</div>
+                    <div class="level-desc">もっと むずかしい</div>
+                </div>
+                <div class="level-card lv-locked">
+                    <span class="level-badge"><i class="fa-solid fa-lock"></i></span>
+                    <div class="level-title">N2 Level</div>
+                </div>
+                <div class="level-card lv-locked">
+                    <span class="level-badge"><i class="fa-solid fa-lock"></i></span>
+                    <div class="level-title">N1 Level</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-view" class="quiz-card" style="display: none;">
+            
+            <div id="auth-status-kanji" style="text-align:center; font-size:0.9em; color:#666; margin-bottom:10px;"></div>
+
+            <div id="quiz-area">
+                
+                <div id="question-info" style="color:#666; font-weight:bold; margin-top:5px; font-size:0.9em;">
+                    <span id="level-label" style="background:#ddd; padding:2px 8px; border-radius:10px; font-size:0.8em; margin-right:5px;">N5</span>
+                    だい <span id="q-num" style="font-size:1.3em; color:var(--primary);">1</span> もん
+                </div>
+
+                <div id="yomi-display" class="yomi-display">?</div>
+
+                <div id="choices-container" class="choices-grid-2"></div>
+
+                <div id="result-message" style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-top: 15px; min-height: 40px;"></div>
+            </div>
+
+            <div id="score-area" style="display: none;">
+                <h2 style="font-size:1.5em; color:var(--primary);">おつかれさま！</h2>
+                <div style="font-size: 4rem; font-weight:900; color:var(--correct-color); margin: 15px 0;">
+                    <span id="score-text">0</span><span style="font-size:0.4em; color:#333;">てん</span>
+                </div>
+                <div class="nav-buttons">
+                    <button onclick="backToLevelSelect()" class="nav-btn btn-restart">レベルせんたく</button>
+                    <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
+                </div>
+            </div>
+            
+            <div class="nav-buttons" id="ingame-nav" style="margin-top:15px;">
+                 <button onclick="backToLevelSelect()" class="nav-btn btn-back">やめる</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    
+    <!-- kanji_list.js for kanjiDatabase -->
+    <script src="js/kanji_list.js"></script>
+
+    <script src="js/kanji_yomikata.js"></script>
+    <script src="js/common_ui.js"></script>
+</body>
+</html>

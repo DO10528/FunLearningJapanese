@@ -439,7 +439,7 @@
         const kanjiContainer = document.getElementById('kanji-container');
         const listTitle = document.getElementById('list-title');
         const searchInput = document.getElementById('search-input');
-        
+
         let currentLevelData = []; // 現在表示中の漢字データ
         let synth = window.speechSynthesis;
         let voices = [];
@@ -451,9 +451,13 @@
 
         // 初期化：各レベルの漢字数を表示
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('count-n5').textContent = kanjiDatabase['n5'].length + " Kanji";
-            document.getElementById('count-n4').textContent = kanjiDatabase['n4'].length + " Kanji";
-            document.getElementById('count-n3').textContent = kanjiDatabase['n3'].length + " Kanji";
+            const countN5 = document.getElementById('count-n5');
+            const countN4 = document.getElementById('count-n4');
+            const countN3 = document.getElementById('count-n3');
+            
+            if (countN5) countN5.textContent = kanjiDatabase['n5'].length + " Kanji";
+            if (countN4) countN4.textContent = kanjiDatabase['n4'].length + " Kanji";
+            if (countN3) countN3.textContent = kanjiDatabase['n3'].length + " Kanji";
             
             // 初回ロード時にもVoice取得を試みる
             setTimeout(() => { if(synth) voices = synth.getVoices(); }, 500);
@@ -464,20 +468,25 @@
             currentLevelData = kanjiDatabase[level];
             
             // タイトルと色の設定
-            listTitle.textContent = `${level.toUpperCase()} 漢字リスト (${currentLevelData.length}字)`;
-            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${level}`);
-            listTitle.style.borderLeftColor = colorVar;
-            listTitle.style.color = colorVar;
+            if (listTitle) {
+                listTitle.textContent = `${level.toUpperCase()} 漢字リスト (${currentLevelData.length}字)`;
+                const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${level}`);
+                listTitle.style.borderLeftColor = colorVar;
+                listTitle.style.color = colorVar;
+            }
             
             // 画面切り替え
-            views.select.classList.add('hidden');
-            views.list.classList.remove('hidden');
-            views.list.classList.add('fade-in');
+            if (views.select) views.select.classList.add('hidden');
+            if (views.list) {
+                views.list.classList.remove('hidden');
+                views.list.classList.add('fade-in');
+            }
             
             // 検索ボックスをリセット
-            searchInput.value = '';
+            if (searchInput) searchInput.value = '';
             
             // リスト描画
+            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${level}`);
             renderList(currentLevelData, colorVar);
             
             // ページ上部へ
@@ -485,13 +494,16 @@
         };
 
         window.showLevelSelect = () => {
-            views.list.classList.add('hidden');
-            views.select.classList.remove('hidden');
-            views.select.classList.add('fade-in');
+            if (views.list) views.list.classList.add('hidden');
+            if (views.select) {
+                views.select.classList.remove('hidden');
+                views.select.classList.add('fade-in');
+            }
         };
 
         // ▼ リスト描画関数 ▼
         function renderList(list, borderColor = '#ccc') {
+            if (!kanjiContainer) return;
             kanjiContainer.textContent = '';
             
             if (list.length === 0) {
@@ -553,15 +565,20 @@
         };
 
         // ▼ 検索機能 ▼
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            const filtered = currentLevelData.filter(item => {
-                return item.kanji.includes(val) || 
-                       item.meaning.toLowerCase().includes(val) ||
-                       item.kun.includes(val) ||
-                       item.on.includes(val);
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const filtered = currentLevelData.filter(item => {
+                    return item.kanji.includes(val) || 
+                           item.meaning.toLowerCase().includes(val) ||
+                           item.kun.includes(val) ||
+                           item.on.includes(val);
+                });
+                let currentLevel = 'n5';
+                if (listTitle) {
+                    currentLevel = listTitle.textContent.split(' ')[0].toLowerCase();
+                }
+                const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${currentLevel}`);
+                renderList(filtered, colorVar);
             });
-            const currentLevel = listTitle.textContent.split(' ')[0].toLowerCase();
-            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--c-${currentLevel}`);
-            renderList(filtered, colorVar);
-        });
+        }
