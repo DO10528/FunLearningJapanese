@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (percentage >= 60) {
             resultEl.innerHTML = `<span class="score-badge score-high">Great! ${percentage}%</span>`;
             document.getElementById('mic-btn').disabled = true;
-            if (window.addPointsToUser) window.addPointsToUser(1, currentScenarioId);
+            if (window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('shopping_talk', currentScenarioId);
             nextBtn.style.display = 'block';
             nextBtn.textContent = '次へ';
             nextBtn.onclick = nextStep;

@@ -255,7 +255,7 @@ function checkAllFilled() {
         if(SOUND_SEIKAI) { SOUND_SEIKAI.currentTime = 0; SOUND_SEIKAI.play().catch(e=>{}); }
         document.getElementById('judge-msg').textContent = "せいかい！つぎのレベルへ！";
         
-        if(window.addPointsToUser) window.addPointsToUser(currentLevel.id, `level_${currentLevel.id}`);
+        if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('hiragana_block', `level_${currentLevel.id}`);
 
         setTimeout(() => {
             const nextId = currentLevel.id + 1;

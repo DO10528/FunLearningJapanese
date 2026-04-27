@@ -265,27 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const success = await window.Antigravity.addPoint('hira_match', t.dataset.word);
                     if (success) earnedThisLevel++;
                 }
-            } else if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
-                if(success) earnedThisLevel = POINTS_PER_LEVEL;
-            }
-            
-            agEarnedPoints += earnedThisLevel;
-            agMatchedItems += total;
-            
-            FEEDBACK.textContent = `せいかい！ おめでとう！ (+${earnedThisLevel}pt)`;
-            FEEDBACK.className = 'feedback-msg success';
-            
-            // ロックする
-            targets.forEach(t => t.classList.add('correct'));
-            
-            // 10ステップ（10アイテム=2レベル）クリアでリザルト画面
-            if (agMatchedItems >= AG_MAX_ITEMS) {
-                setTimeout(() => {
-                    if(window.Antigravity && window.Antigravity.showResultScreen) {
-                        window.Antigravity.showResultScreen(agEarnedPoints);
-                    }
-                }, 1500);
+            } else if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('hiragana_drag_match', 1500);
                 return;
             }
             

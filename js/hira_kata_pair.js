@@ -276,40 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ポイント処理
             let ptsText = "";
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
-                if (success) ptsText = `+${POINTS_PER_LEVEL}pt ゲット！`;
-            }
-            MODAL_POINT_FEEDBACK.textContent = ptsText;
-            MODAL.style.display = 'flex';
-
-        } else {
-            // 不正解音の再生（フリーズ対策）
-            if (typeof SOUND_INCORRECT !== 'undefined' && SOUND_INCORRECT) {
-                SOUND_INCORRECT.currentTime = 0;
-                SOUND_INCORRECT.play().catch(e => console.log(e));
-            }
-            alert('ちがうペアがあるよ。なおしてみてね！ (ペアをタップするともどるよ)');
-        }
-    };
-
-    window.nextLevel = function () {
-        MODAL.style.display = 'none';
-        const nextIndex = gameLevels.findIndex(l => l.level === currentLevelData.level) + 1;
-        if (nextIndex < gameLevels.length) {
-            loadLevel(gameLevels[nextIndex]);
-        } else {
-            alert('全レベルクリアおめでとう！');
-            showLevelMenu();
-        }
-    };
-
-    // --- Utils ---
-    function shuffleArray(array) {
-        const newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('hira_kata_pair', newArray[j]] = [newArray[j], newArray[i]];
         }
         return newArray;
     }

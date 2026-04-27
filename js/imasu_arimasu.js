@@ -77,9 +77,7 @@
         const storageKey = `imasu_arimasu_points_${window.currentUserId}_${today}`;
         let answered = JSON.parse(localStorage.getItem(storageKey)) || [];
         if (!answered.includes(questId)) {
-            if(window.addPointsToUser) window.addPointsToUser(1);
-            answered.push(questId);
-            localStorage.setItem(storageKey, JSON.stringify(answered));
+            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('imasu_arimasu', JSON.stringify(answered));
         }
     }
 

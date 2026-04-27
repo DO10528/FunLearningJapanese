@@ -1,0 +1,112 @@
+[
+    {
+        "file": "hiragana_block.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "clock.js",
+        "replacements_with_id": 2,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "kanji_yomikata.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "shiritori.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "money.js",
+        "replacements_with_id": 3,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "shopping_talk.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "sentence_puzzle.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "treasure_Hunt.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "particle_quiz.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "katakana_block.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "imasu_arimasu.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "verb_typing_masu.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "transport_game.js",
+        "replacements_with_id": 6,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "particle_sorter.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "hira_kata_pair.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "verb_typing_te.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "katakana_drag_match.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "shiritori2.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "kanji_quiz.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "clock2.js",
+        "replacements_with_id": 2,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "hiragana_drag_match.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    },
+    {
+        "file": "aisatsu_quiz.js",
+        "replacements_with_id": 1,
+        "replacements_without_id": 0
+    }
+]

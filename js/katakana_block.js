@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
             SOUND_SEIKAI.play();
             document.getElementById('judge-msg').textContent = "せいかい！つぎのレベルへ！";
             
-            if(window.addPointsToUser) window.addPointsToUser(currentLevel.id, `katakana_level_${currentLevel.id}`);
+            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('katakana_block', `katakana_level_${currentLevel.id}`);
 
             setTimeout(() => {
                 const nextId = currentLevel.id + 1;

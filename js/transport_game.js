@@ -138,8 +138,7 @@
             fb.innerText = "⭕️ せいかい！";
             fb.style.color = "var(--correct-color)";
             playSeikai();
-            if(window.addPointsToUser) window.addPointsToUser(g1CurrentId);
-            setTimeout(() => initGame1(), 2000);
+            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
         } else {
             fb.innerText = "❌ ちがいます...";
             fb.style.color = "var(--incorrect-color)";
@@ -180,8 +179,7 @@
                 fb.innerText = `⭕️ はい、${g2Target.name} に いきます。`;
                 fb.style.color = "var(--correct-color)";
                 playSeikai();
-                if(window.addPointsToUser) window.addPointsToUser(g2CurrentId);
-                setTimeout(() => initGame2(), 2000);
+                if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
             } else {
                 playSeikai();
                 setTimeout(() => showFixQuestion2(), 1000);
@@ -212,9 +210,7 @@
                 if(c.id === g2Target.id) {
                     document.getElementById('feedback-game2').innerText = `⭕️ せいかい！ ${g2Target.name} に いきます。`;
                     playSeikai();
-                    if(window.addPointsToUser) window.addPointsToUser(g2CurrentId);
-                    optsDiv.querySelectorAll('button').forEach(b => b.disabled = true);
-                    setTimeout(() => initGame2(), 2000);
+                    if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
                 } else {
                     playBubu();
                 }
@@ -259,8 +255,7 @@
                 fb.innerText = `⭕️ はい、${targetWord} いきます。`;
                 fb.style.color = "var(--correct-color)";
                 playSeikai();
-                if(window.addPointsToUser) window.addPointsToUser(g3CurrentId);
-                setTimeout(() => initGame3(), 2000);
+                if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
             } else {
                 playSeikai();
                 setTimeout(() => showFixQuestion3(), 1000);
@@ -291,9 +286,7 @@
                     let text = c.name + (c.particle || '');
                     document.getElementById('feedback-game3').innerText = `⭕️ せいかい！ ${text} いきます。`;
                     playSeikai();
-                    if(window.addPointsToUser) window.addPointsToUser(g3CurrentId);
-                    optsDiv.querySelectorAll('button').forEach(b => b.disabled = true);
-                    setTimeout(() => initGame3(), 2000);
+                    if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
                 } else {
                     playBubu();
                 }
@@ -353,8 +346,7 @@
             fb.innerText = "⭕️ かんぺきです！";
             fb.style.color = "var(--correct-color)";
             playSeikai();
-            if(window.addPointsToUser) window.addPointsToUser(g4CurrentId);
-            setTimeout(() => initGame4(), 2000);
+            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('transport_game', 2000);
         } else {
             fb.innerText = "❌ おしい！";
             fb.style.color = "var(--incorrect-color)";

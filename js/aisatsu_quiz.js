@@ -210,8 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     chosenButton.classList.add('correct-answer');
                     
                     // Firebaseポイント加算
-                    if (typeof window.addPointsToUser === 'function') {
-                        await window.addPointsToUser(POINTS_PER_QUESTION, correctAnswer);
+                    if (window.Antigravity && window.Antigravity.addPoint) {
+                        await window.Antigravity.addPoint('aisatsu_quiz', correctAnswer);
                     }
                     showResult(true, correctAnswer, "scored");
                 } else {

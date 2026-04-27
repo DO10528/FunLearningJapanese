@@ -18,7 +18,7 @@ function speakText(text) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    if (typeof window.addPointsToUser !== 'function') {
+    if (!(window.Antigravity && window.Antigravity.addPoint)) {
         window.addPointsToUser = async () => { return false; };
     }
     const POINTS_PER_QUESTION = 1;
@@ -222,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let success = false;
             if (window.Antigravity && window.Antigravity.addPoint) {
                 success = await window.Antigravity.addPoint('clock_' + currentMode, currentCorrectAnswer);
-            } else if (window.addPointsToUser) {
-                success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+            } else if (window.Antigravity && window.Antigravity.addPoint) {
+                success = await window.Antigravity.addPoint('clock', currentCorrectAnswer);
             }
             if (success) agEarnedPoints++;
             
@@ -436,8 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let success = false;
                 if (window.Antigravity && window.Antigravity.addPoint) {
                     success = await window.Antigravity.addPoint('clock_' + currentMode, currentCorrectAnswer);
-                } else if (window.addPointsToUser) {
-                    success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                } else if (window.Antigravity && window.Antigravity.addPoint) {
+                    success = await window.Antigravity.addPoint('clock', currentCorrectAnswer);
                 }
                 if (success) agEarnedPoints++;
                 

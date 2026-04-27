@@ -266,20 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targets.forEach(t => t.classList.add('correct'));
 
             // ポイント加算
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
-                if (success) {
-                    FEEDBACK.textContent += ` (+${POINTS_PER_LEVEL}pt 記録)`;
-                }
-            }
-
-            setTimeout(() => {
-                if (currentLevelData.level < gameLevels.length) {
-                    FEEDBACK.textContent += ' -> つぎのレベルへ！';
-                    setTimeout(() => {
-                        const nextLvl = gameLevels.find(l => l.level === currentLevelData.level + 1);
-                        if (nextLvl) loadLevel(nextLvl);
-                    }, 2000);
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('katakana_drag_match', 2000);
                 } else {
                     FEEDBACK.textContent = 'すごい！ぜんぶのレベルをクリアしたよ！';
                 }

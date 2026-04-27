@@ -480,33 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(SOUND_CORRECT_PATH);
             
             // ★★★ Firebaseポイント付与 ★★★
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_ON_CLEAR); // 1ポイント加算
-                if (success) {
-                    pointMsg = `🎉 全問クリア！ (+${POINTS_ON_CLEAR}pt 記録)`;
-                } else if (window.currentUserId) {
-                    pointMsg = 'ポイント登録中にエラーが発生しました。';
-                }
-            }
-            // ★★★ Firebaseポイント付与 終了 ★★★
-
-            finalMessage = `🎉 全${MAX_WORDS}問クリア！すごい！おめでとう！`;
-            FEEDBACK_MESSAGE.style.color = 'green';
-            FINAL_SCORE_TEXT.textContent = finalMessage; // 隠しDOMに結果をセット
-            POINT_RECORD_FEEDBACK.textContent = pointMsg; // 隠しDOMにポイントメッセージをセット
-
-        } else {
-            playSound(SOUND_INCORRECT_PATH);
-            const lastWord = document.getElementById(`cell-${currentCellIndex - 1}`).dataset.word;
-            finalMessage = `😭 ゲームオーバー！「${lastWord}」は「ん」で終わるから負けだよ。`;
-            FEEDBACK_MESSAGE.style.color = '#ff6f61';
-            FINAL_SCORE_TEXT.textContent = finalMessage;
-            POINT_RECORD_FEEDBACK.textContent = 'ポイントは獲得できませんでした。';
-        }
-
-        FEEDBACK_MESSAGE.textContent = finalMessage;
-        GAME_STATUS_MESSAGE.textContent = 'ゲーム終了';
-        SHIRITORI_GRID.removeEventListener('drop', handleDrop);
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('shiritori2', handleDrop);
         RETURN_CARD_BUTTON.style.display = 'none'; 
         RESET_BUTTON.style.backgroundColor = '#4CAF50';
     }

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // ★★★ Firebase連携設定 ★★★
     // ----------------------------------------------------
-    if (typeof window.addPointsToUser !== 'function') {
+    if (!(window.Antigravity && window.Antigravity.addPoint)) {
         window.addPointsToUser = async () => { return false; };
     }
     const POINTS_PER_CORRECT = 1; 
@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
             speakText("せいかい！やったね！");
 
             const wordKey = currentWord.name; // nameをキーとして使用
-            const success = await window.addPointsToUser(POINTS_PER_CORRECT, wordKey);
+            const success = await window.Antigravity.addPoint('treasure_Hunt', wordKey);
             
             let message = `⭕️ せいかい！おめでとう！`;
             if (success) {
