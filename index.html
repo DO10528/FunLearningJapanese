@@ -499,6 +499,41 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       z-index: 3;
     }
+
+    /* --- スマートナビゲーション --- */
+    .smart-nav-bar {
+      position: fixed;
+      top: 75px; /* ヘッダーのすぐ下 */
+      left: 0;
+      width: 100%;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 900;
+      pointer-events: none;
+    }
+
+    .smart-nav-btn {
+      pointer-events: auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .smart-nav-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 
   <link rel="stylesheet" href="css/common_ui.css">
@@ -557,10 +592,14 @@
         class="fa-solid fa-right-from-bracket"></i></button>
   </div>
 
-  <button id="index-home-btn" class="global-back-btn" style="display: none;" onclick="renderGameCategories()"
-    aria-label="ホームに戻る">
-    <i class="fa-solid fa-house"></i>
-  </button>
+  <div id="smart-nav-bar" class="smart-nav-bar hidden">
+    <button class="smart-nav-btn" onclick="renderGameCategories()" aria-label="ホームに戻る">
+      <i class="fa-solid fa-house"></i>
+    </button>
+    <button class="smart-nav-btn" onclick="renderGameCategories()" aria-label="前に戻る">
+      <i class="fa-solid fa-arrow-rotate-left"></i>
+    </button>
+  </div>
 
   <div class="section-header">
     <h3 class="section-title"><i class="fa-solid fa-graduation-cap"></i> <span id="game-section-title"
@@ -850,6 +889,9 @@
 
     window.renderGameCategories = () => {
       gameGrid.textContent = '';
+      const smartNav = document.getElementById('smart-nav-bar');
+      if (smartNav) smartNav.classList.add('hidden');
+      const indexHomeBtn = document.getElementById('index-home-btn'); // 念のため残す
       if (indexHomeBtn) indexHomeBtn.style.display = 'none';
       document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang].group_learning;
       gameStructure.forEach(cat => {
@@ -869,6 +911,9 @@
 
     function renderGameList(category) {
       gameGrid.textContent = '';
+      const smartNav = document.getElementById('smart-nav-bar');
+      if (smartNav) smartNav.classList.remove('hidden');
+      const indexHomeBtn = document.getElementById('index-home-btn');
       if (indexHomeBtn) indexHomeBtn.style.display = 'flex';
       document.getElementById('game-section-title').textContent = window.i18nData[window.currentLang][category.titleKey];
 
@@ -973,7 +1018,19 @@
     document.getElementById('auth-pass').onkeydown = handleEnter;
     document.getElementById('auth-display-name').onkeydown = handleEnter;
 
-    window.renderGameCategories();
+    // URLパラメータによるディープリンク処理（カテゴリー一覧へ戻る等の対応）
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetCat = urlParams.get('cat');
+    if (targetCat) {
+      const catObj = gameStructure.find(c => c.id === targetCat);
+      if (catObj) {
+        window.renderGameList(catObj);
+      } else {
+        window.renderGameCategories();
+      }
+    } else {
+      window.renderGameCategories();
+    }
 
     // ★ここが重要：ページ読み込み時に即座に日本語設定を適用し、プレースホルダーなどを反映させる
     window.setLanguage('ja');
