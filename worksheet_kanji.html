@@ -12,6 +12,17 @@
 </head>
 <body id="body">
 
+<!-- スマートナビゲーションバー -->
+<div class="smart-nav-bar">
+    <button class="smart-nav-btn" onclick="exitGameToHome()" aria-label="ホームに戻る">
+        <i class="fa-solid fa-house"></i>
+    </button>
+    <button class="smart-nav-btn" onclick="exitGameToCategory()" aria-label="前に戻る">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+    </button>
+</div>
+
+
 <div class="fab-group no-print">
     <button class="fab btn-ans" onclick="toggleAnswer()" title="答えを表示"><i class="fa-solid fa-eye"></i></button>
     <button class="fab btn-print" onclick="window.print()" title="印刷"><i class="fa-solid fa-print"></i></button>

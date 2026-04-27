@@ -47,8 +47,49 @@
 .sc-back-to-topic,
 .back-to-practice,
 .home-icon,
-.home-link {
+.home-link,
+.global-back-btn {
     display: none !important;
 }
 
 /* If some pages need it, body.has-global-back-btn can be dynamically added */
+
+/* --- スマートナビゲーション --- */
+.smart-nav-bar {
+  position: fixed;
+  top: 15px; /* Games mostly don't have headers */
+  left: 0;
+  width: 100%;
+  padding: 0 15px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.smart-nav-btn {
+  pointer-events: auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: var(--primary, #5c7aff);
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s, box-shadow 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.smart-nav-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
