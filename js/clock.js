@@ -63,12 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let quiz3Step = 1;
     let quiz3CorrectData = null;
 
+    // --- Antigravity Session Tracking ---
+    let agQuestionCount = 0;
+    let agEarnedPoints = 0;
+    const AG_MAX_QUESTIONS = 10;
+
     // --- 汎用関数 ---
     window.showScreen = function(screenElement) {
         // 画面を切り替える（戻る）際に、裏で動いているマイクや音声を安全に消去する
         if (recognition) { try { recognition.abort(); } catch(e){} recognition = null; }
         if (synth.speaking) synth.cancel();
         isListening = false;
+
+        if (screenElement.id === 'tc-screen-modes' || screenElement.id === 'tc-screen-study') {
+            agQuestionCount = 0;
+            agEarnedPoints = 0;
+        }
 
         screens.forEach(s => s.classList.remove('active'));
         screenElement.classList.add('active');
@@ -106,6 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- クイズのメインロジック ---
     window.startSpecificQuiz = function(mode) {
+        if (agQuestionCount >= AG_MAX_QUESTIONS) {
+            if (window.Antigravity && window.Antigravity.showResultScreen) {
+                window.Antigravity.showResultScreen(agEarnedPoints);
+            }
+            return;
+        }
+        agQuestionCount++;
+
         currentMode = mode;
         quizPromptArea.textContent = '';
         quizOptions.textContent = '';
@@ -201,7 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const chosenHour = parseInt(chosenOption.dataset.hour);
         
         if (chosenHour === currentCorrectAnswer) {
-            const success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+            let success = false;
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                success = await window.Antigravity.addPoint('clock_' + currentMode, currentCorrectAnswer);
+            } else if (window.addPointsToUser) {
+                success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+            }
+            if (success) agEarnedPoints++;
             
             // 音を鳴らさず視覚的に正解を表示
             feedback.textContent = success ? '合格！ Excellent! (+1 pt)' : '合格！ Excellent!';
@@ -409,9 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (maxSim >= 80) {
-                if (window.addPointsToUser) {
-                    await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
+                let success = false;
+                if (window.Antigravity && window.Antigravity.addPoint) {
+                    success = await window.Antigravity.addPoint('clock_' + currentMode, currentCorrectAnswer);
+                } else if (window.addPointsToUser) {
+                    success = await window.addPointsToUser(POINTS_PER_QUESTION, currentCorrectAnswer);
                 }
+                if (success) agEarnedPoints++;
                 
                 transcriptEl.textContent = "合格！ Excellent!";
                 transcriptEl.style.color = '#4caf50';
