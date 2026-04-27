@@ -305,7 +305,54 @@ window.addPointsToUser = async (pointsToAdd, questionId) => {
 };
 
 window.Antigravity.addPoint = async (categoryStr, questionId) => {
-    return await window.addPointsToUser(1, `${categoryStr}_${questionId}`);
+    if (!categoryStr) {
+        categoryStr = window.location.pathname.split('/').pop().replace('.html','') || 'unknown_game';
+    }
+    if (!questionId) {
+        questionId = 'general_progress';
+    }
+    
+    const success = await window.addPointsToUser(1, `${categoryStr}_${questionId}`);
+    
+    if (success) {
+        // UI Animation for +1 Point
+        const pointValEl = document.getElementById('point-val');
+        if (pointValEl) {
+            const floater = document.createElement('div');
+            floater.textContent = '+1';
+            floater.style.position = 'absolute';
+            floater.style.color = '#ff9800';
+            floater.style.fontWeight = 'bold';
+            floater.style.fontSize = '1.5rem';
+            floater.style.pointerEvents = 'none';
+            floater.style.zIndex = '9999';
+            floater.style.animation = 'floatUpFade 1s ease-out forwards';
+            floater.style.textShadow = '1px 1px 2px rgba(0,0,0,0.3)';
+            
+            const rect = pointValEl.getBoundingClientRect();
+            floater.style.left = (rect.left + window.scrollX) + 'px';
+            floater.style.top = (rect.top + window.scrollY - 20) + 'px';
+            
+            document.body.appendChild(floater);
+            
+            if (!document.getElementById('ag-float-style')) {
+                const style = document.createElement('style');
+                style.id = 'ag-float-style';
+                style.textContent = `
+                    @keyframes floatUpFade {
+                        0% { opacity: 1; transform: translateY(0) scale(1); }
+                        100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            setTimeout(() => {
+                if (floater.parentNode) floater.parentNode.removeChild(floater);
+            }, 1000);
+        }
+    }
+    return success;
 };
 
 onAuthStateChanged(auth, async (user) => {
