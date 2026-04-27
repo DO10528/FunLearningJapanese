@@ -146,5 +146,25 @@ window.exitGameToCategory = function() {
 };
 </script>
 
+
+<script>
+// Antigravity Session Cleanup
+window.addEventListener('antigravity-session-end', function() {
+    if (typeof window.performNavCleanup === 'function') {
+        window.performNavCleanup();
+    }
+});
+</script>
+
+<script>
+// Antigravity Session Cleanup
+window.addEventListener('antigravity-session-end', function() {
+    if (typeof window.performNavCleanup === 'function') {
+        window.performNavCleanup();
+    }
+});
+</script>
 </body>
+
+
 </html>
