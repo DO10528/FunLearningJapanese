@@ -130,15 +130,22 @@ const checkMonthlyReset = async (user) => {
     const snapshot = await getDoc(userRef);
     if (snapshot.exists()) {
         const data = snapshot.data();
-        const now = new Date();
+        
+        // JSTでの現在時刻を取得
+        const nowStrJst = new Date().toLocaleString("en-US", {timeZone: "Asia/Tokyo"});
+        const jstNow = new Date(nowStrJst);
+        
+        // 前回ログイン日時をJSTで取得
         const lastDate = data.lastLogin ? new Date(data.lastLogin) : new Date(0);
+        const lastStrJst = lastDate.toLocaleString("en-US", {timeZone: "Asia/Tokyo"});
+        const jstLast = new Date(lastStrJst);
         
         // 月が変わっていたらポイントをリセット
-        if (now.getFullYear() !== lastDate.getFullYear() || now.getMonth() !== lastDate.getMonth()) {
-            await updateDoc(userRef, { monthlyPoints: 0, lastLogin: now.toISOString(), dailyTracker: {} });
+        if (jstNow.getFullYear() !== jstLast.getFullYear() || jstNow.getMonth() !== jstLast.getMonth()) {
+            await updateDoc(userRef, { monthlyPoints: 0, lastLogin: new Date().toISOString(), dailyTracker: {} });
         } else {
             // 月が同じなら最終ログイン日時だけ更新
-            await updateDoc(userRef, { lastLogin: now.toISOString() });
+            await updateDoc(userRef, { lastLogin: new Date().toISOString() });
         }
     }
 };
@@ -166,17 +173,22 @@ window.updateUI = function (userState) {
     const welcome = document.getElementById('guest-welcome');
     if (currentUserDocUnsubscribe) currentUserDocUnsubscribe();
 
+    // 防弾仕様：要素が存在する場合のみ操作するユーティリティ
+    const setSafeText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    const setSafeStyleWidth = (id, width) => { const el = document.getElementById(id); if (el) el.style.width = width; };
+
     if (userState === 'guest') {
         window.isUserPremium = false;
         window.updateStaticCards(false);
 
         if(welcome) welcome.classList.add('hidden');
         if(dash) dash.classList.remove('hidden');
-        document.getElementById('user-name').textContent = 'ゲスト';
-        document.getElementById('user-lvl').textContent = 1;
-        document.getElementById('level-fill').style.width = '0%';
-        document.getElementById('streak-val').textContent = 0;
-        document.getElementById('point-val').textContent = 0;
+        
+        setSafeText('user-name', 'ゲスト');
+        setSafeText('user-lvl', 1);
+        setSafeStyleWidth('level-fill', '0%');
+        setSafeText('streak-val', 0);
+        setSafeText('point-val', 0);
         
     } else if (userState && userState.uid) {
         if(welcome) welcome.classList.add('hidden');
@@ -190,18 +202,18 @@ window.updateUI = function (userState) {
 
                 window.updateStaticCards(window.isUserPremium);
 
-                document.getElementById('user-name').textContent = data.displayName || 'ユーザー';
-                document.getElementById('streak-val').textContent = data.streak || 0;
+                setSafeText('user-name', data.displayName || 'ユーザー');
+                setSafeText('streak-val', data.streak || 0);
                 
                 // 表示用は月間ポイント
                 const monthlyPts = data.monthlyPoints !== undefined ? data.monthlyPoints : (data.points || 0);
-                document.getElementById('point-val').textContent = monthlyPts;
+                setSafeText('point-val', monthlyPts);
                 
                 // レベル計算は累計ポイント
                 const totalPts = data.totalPoints !== undefined ? data.totalPoints : (data.points || 0);
                 const level = Math.floor(totalPts / 100) + 1;
-                document.getElementById('user-lvl').textContent = level;
-                document.getElementById('level-fill').style.width = `${(totalPts % 100)}%`;
+                setSafeText('user-lvl', level);
+                setSafeStyleWidth('level-fill', `${(totalPts % 100)}%`);
             }
         });
     } else {
@@ -228,7 +240,11 @@ window.addPointsToUser = async (pointsToAdd, questionId) => {
         
         if (userSnap.exists()) {
             const data = userSnap.data();
-            const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"形式
+            
+            // JSTでの今日の日付文字列を取得 ("YYYY-MM-DD"形式)
+            const jstDate = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+            const todayStr = `${jstDate.getFullYear()}-${String(jstDate.getMonth()+1).padStart(2,'0')}-${String(jstDate.getDate()).padStart(2,'0')}`;
+            
             let tracker = data.dailyTracker || {};
             
             // すでに今日その問題をクリアしている場合はポイント加算せずスキップ
