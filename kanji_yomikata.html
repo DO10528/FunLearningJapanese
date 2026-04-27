@@ -156,6 +156,44 @@ window.exitGameToHome = function() {
 
 window.exitGameToCategory = function() {
     if(window.performNavCleanup) window.performNavCleanup();
+
+    // Heuristic Router: Find local "Back/Quit" buttons to go up ONE tier
+    const btnKeywords = ['やめる', 'もどる', 'メニューにもどる', 'リストにもどる', 'レベルせんたくに もどる'];
+    const buttons = document.querySelectorAll('button, a, .btn-back, .tc-button, .sc-button, .dv-button-secondary, .level-back-btn, .home-btn-large, .home-btn-text, .nav-btn');
+    
+    for (let btn of buttons) {
+        if (btn.classList.contains('smart-nav-btn')) continue;
+        
+        // Exclude buttons that explicitly link to home or contain "ホーム"
+        const text = btn.textContent.trim();
+        const href = btn.getAttribute('href');
+        if (text.includes('ホーム') || href === 'index.html') continue;
+        
+        // Check if visible
+        const style = window.getComputedStyle(btn);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
+        
+        // Check if it's inside a hidden container
+        let parent = btn.parentElement;
+        let isHidden = false;
+        while (parent && parent !== document.body) {
+            const pStyle = window.getComputedStyle(parent);
+            if (pStyle.display === 'none' || pStyle.visibility === 'hidden') {
+                isHidden = true;
+                break;
+            }
+            parent = parent.parentElement;
+        }
+        if (isHidden) continue;
+
+        // Check if it matches keywords or is an obvious back button
+        if (btnKeywords.some(kw => text.includes(kw)) || btn.classList.contains('btn-back') || btn.classList.contains('level-back-btn')) {
+            btn.click();
+            return;
+        }
+    }
+
+    // Fallback: Return to Category List (Tier 2)
     window.location.href = "index.html?cat=kanji_game";
 };
 </script>
