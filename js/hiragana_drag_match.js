@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDragItem = null;
     let isLevelClear = false; // 二重ポイント加算防止
 
+    // --- Antigravity Session Tracking ---
+    let agEarnedPoints = 0;
+    let agMatchedItems = 0;
+    const AG_MAX_ITEMS = 10;
+
     // --- 初期化 ---
     function initGame() {
         LEVEL_GRID.textContent = '';
@@ -53,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- レベルロード ---
     function loadLevel(levelData) {
         currentLevelData = levelData;
         isLevelClear = false; // レベル開始時にリセット
@@ -110,6 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.showLevelMenu = function() {
+        // メニューに戻る際、セッションをリセット
+        agEarnedPoints = 0;
+        agMatchedItems = 0;
         GAME_AREA.style.display = 'none';
         MENU_AREA.style.display = 'block';
     };
@@ -250,26 +257,37 @@ document.addEventListener('DOMContentLoaded', () => {
             isLevelClear = true; // クリアフラグを立てる
             SOUND_CORRECT.currentTime = 0;
             SOUND_CORRECT.play();
-            FEEDBACK.textContent = 'せいかい！ おめでとう！';
+            
+            let earnedThisLevel = 0;
+            // Antigravity Protocol: 1 point per correct item
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                for (let t of targets) {
+                    const success = await window.Antigravity.addPoint('hira_match', t.dataset.word);
+                    if (success) earnedThisLevel++;
+                }
+            } else if (typeof window.addPointsToUser === 'function') {
+                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
+                if(success) earnedThisLevel = POINTS_PER_LEVEL;
+            }
+            
+            agEarnedPoints += earnedThisLevel;
+            agMatchedItems += total;
+            
+            FEEDBACK.textContent = `せいかい！ おめでとう！ (+${earnedThisLevel}pt)`;
             FEEDBACK.className = 'feedback-msg success';
             
             // ロックする
             targets.forEach(t => t.classList.add('correct'));
-
-            // ★★★ Firebaseポイント加算ロジック (HTML側で定義されたグローバル関数を使用) ★★★
-            if (typeof window.addPointsToUser === 'function') {
-                 const success = await window.addPointsToUser(POINTS_PER_LEVEL);
-                 if (success) {
-                     FEEDBACK.textContent += ` (+${POINTS_PER_LEVEL}pt 記録)`;
-                 } else if (window.currentUserId) {
-                     FEEDBACK.textContent += ' (ポイント記録エラー)';
-                 } else {
-                     FEEDBACK.textContent += ' (ゲストモードのためポイント記録なし)';
-                 }
-            } else {
-                 FEEDBACK.textContent += ' (ポイントシステム未初期化)';
+            
+            // 10ステップ（10アイテム=2レベル）クリアでリザルト画面
+            if (agMatchedItems >= AG_MAX_ITEMS) {
+                setTimeout(() => {
+                    if(window.Antigravity && window.Antigravity.showResultScreen) {
+                        window.Antigravity.showResultScreen(agEarnedPoints);
+                    }
+                }, 1500);
+                return;
             }
-            // ★★★ Firebaseポイント加算ロジック 終了 ★★★
             
             // 次のレベルへ自動遷移の準備など
             setTimeout(() => {

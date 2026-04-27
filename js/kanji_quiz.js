@@ -228,6 +228,7 @@
         let questions = []; // 全問（10問）の漢字データを格納（選択肢は都度生成）
         let currentIndex = 0;
         let score = 0;
+        let agEarnedPoints = 0;
         const totalQuestions = 10;
         let isAnswering = false;
 
@@ -242,6 +243,7 @@
             currentLevel = level;
             // リセット
             score = 0;
+            agEarnedPoints = 0;
             currentIndex = 0;
             // デフォルトは訓読み
             currentMode = 'kun';
@@ -357,7 +359,15 @@
                 document.getElementById('seikai-sound').play();
                 score += 10;
                 
-                if(window.addPointsToUser) window.addPointsToUser(1);
+                let success = false;
+                if (window.Antigravity && window.Antigravity.addPoint) {
+                    // Use kanji character as question ID
+                    success = await window.Antigravity.addPoint('kanji_quiz_' + currentLevel, qData.kanji);
+                } else if(window.addPointsToUser) {
+                    success = await window.addPointsToUser(1);
+                }
+                if (success) agEarnedPoints++;
+                
             } else {
                 btn.classList.add('incorrect');
                 document.getElementById('result-message').textContent = `ざんねん... せいかいは「${correct}」`;
@@ -385,8 +395,13 @@
         function showResult() {
             document.getElementById('quiz-area').style.display = 'none';
             document.getElementById('ingame-nav').style.display = 'none';
-            document.getElementById('score-area').style.display = 'block';
-            document.getElementById('score-text').textContent = score;
+            
+            if (window.Antigravity && window.Antigravity.showResultScreen) {
+                window.Antigravity.showResultScreen(agEarnedPoints);
+            } else {
+                document.getElementById('score-area').style.display = 'block';
+                document.getElementById('score-text').textContent = score;
+            }
         }
 
         window.backToLevelSelect = () => {
