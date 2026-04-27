@@ -225,7 +225,7 @@ window.updateUI = function (userState) {
     }
 };
 
-window.addPointsToUser = async (pointsToAdd, questionId) => {
+window._originalAddPointsToUser = async (pointsToAdd, questionId) => {
     // ゲストや未ログインは弾く
     if (!currentUserDocUnsubscribe || sessionStorage.getItem(SESS_KEY) === 'guest') {
         return false;
@@ -275,12 +275,37 @@ window.addPointsToUser = async (pointsToAdd, questionId) => {
     return false;
 };
 
-// Antigravity Protocol Enforcement
-window.Antigravity = {
-    addPoint: async (categoryStr, questionId) => {
-        // Enforce the 1-point and once-a-day rule via addPointsToUser.
-        return await window.addPointsToUser(1, questionId);
+// Antigravity Protocol Enforcement & Global Interceptor
+window.Antigravity = window.Antigravity || {};
+window.Antigravity.sessionCount = 0;
+window.Antigravity.sessionPoints = 0;
+
+window.addPointsToUser = async (pointsToAdd, questionId) => {
+    const success = await window._originalAddPointsToUser(pointsToAdd, questionId);
+    
+    // Intercept and track session progress
+    window.Antigravity.sessionCount += 1;
+    if (success) window.Antigravity.sessionPoints += pointsToAdd;
+
+    if (window.Antigravity.sessionCount >= 10) {
+        // Broadcast event so games can halt their internal loops/timers
+        window.dispatchEvent(new Event('antigravity-session-end'));
+        
+        // Show result screen
+        if (window.Antigravity.showResultScreen) {
+            window.Antigravity.showResultScreen(window.Antigravity.sessionPoints);
+        }
+        
+        // Reset session for replay
+        window.Antigravity.sessionCount = 0;
+        window.Antigravity.sessionPoints = 0;
     }
+    
+    return success;
+};
+
+window.Antigravity.addPoint = async (categoryStr, questionId) => {
+    return await window.addPointsToUser(1, `${categoryStr}_${questionId}`);
 };
 
 onAuthStateChanged(auth, async (user) => {
