@@ -108,5 +108,27 @@
     <script type="module" src="js/firebase-config.js"></script>
 
 <script src="js/common_ui.js"></script>
+
+<script>
+// 【重要】画面遷移前にタイマーや音声を破棄する共通関数
+window.performNavCleanup = function() {
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (typeof recognition !== 'undefined' && recognition !== null) {
+        try { recognition.stop(); } catch(e) {}
+    }
+};
+
+window.exitGameToHome = function() {
+    if(window.performNavCleanup) window.performNavCleanup();
+    window.location.href = "index.html";
+};
+
+window.exitGameToCategory = function() {
+    if(window.performNavCleanup) window.performNavCleanup();
+    window.location.href = "index.html?cat=word_other";
+};
+</script>
+
 </body>
 </html>
