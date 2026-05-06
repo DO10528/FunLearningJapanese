@@ -201,7 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 droppedCards.forEach((card, index) => {
                     const correctWord = currentCorrectParts[index];
                     
-                    if (card.textContent === correctWord) {
+                    // 文字列の空白を除去して厳密に比較する（見えないスペースによるバグ解消）
+                    const cleanCardText = card.textContent.trim().replace(/\s+/g, '');
+                    const cleanCorrectWord = correctWord.trim().replace(/\s+/g, '');
+                    
+                    if (cleanCardText === cleanCorrectWord) {
                         card.classList.add('correct-slot');
                         card.classList.remove('wrong-slot');
                     } else {
@@ -224,21 +228,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                     
-                    let msg = `🎉 素晴らしい！正解です。(+1 ポイント！)`;
+                    let msg = `🎉 Excellent! 素晴らしい！ (+1 ポイント！)`;
                     // ★★★★★★★★★★★★★★★★★★★★★★★
 
                     score++;
                     currentQuestionIndex++;
                     displayFeedback(true, msg);
+                    feedbackMessage.style.display = "block"; // 確実に表示
                     
-                    setTimeout(startNewQuestion, 2000);
-                    
-                } else {
-                    playSound(SOUND_INCORRECT_PATH); 
-                    displayFeedback(false, `🤔 残念、並び順が違います。カードをクリックして戻すか、リセットして再挑戦！`);
-                    checkButton.disabled = false;
-                    resetButton.disabled = false;
+                    setTimeout(() => {
+                        startNewQuestion();
+                    }, 2000);
+                    return; // 処理をここで完全に遮断
                 }
+                
+                // --- 不正解時の処理 ---
+                playSound(SOUND_INCORRECT_PATH); 
+                // 不正解時は「残念」メッセージを非表示にする
+                displayFeedback(false, "");
+                feedbackMessage.style.display = "none";
+                
+                checkButton.disabled = false;
+                resetButton.disabled = false;
             }
 
             function resetPuzzle() {
@@ -274,22 +285,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function endGame() {
                 playSound(SOUND_CORRECT_PATH); 
-                questionText.textContent = `🎉 ゲームクリア！`;
-                englishTranslation.textContent = `おめでとうございます！`;
-                dropZone.textContent = '';
-                cardContainer.textContent = '';
-                checkButton.disabled = true;
-                resetButton.disabled = true;
-                displayFeedback(true, `全問終了！最終スコアは ${score} 点です。`);
+                if (questionText) questionText.textContent = `🎉 ゲームクリア！`;
+                if (englishTranslation) englishTranslation.textContent = `おめでとうございます！`;
+                
+                if (dropZone) {
+                    dropZone.innerHTML = `
+                        <div style="text-align:center; width:100%; padding: 20px;">
+                            <h2 style="color: #4CAF50; font-size: 1.8em; margin-bottom: 10px;">最終スコア: ${score} / ${totalQuestions} 点</h2>
+                            <p style="margin-bottom: 25px; color: #555;">よくがんばりました！</p>
+                            <div style="display:flex; justify-content:center; gap:20px; flex-wrap: wrap;">
+                                <button class="sp-action-button sp-tertiary" onclick="exitGameToHome()">ホームへ戻る</button>
+                                <button class="sp-action-button sp-primary" onclick="exitGameToCategory()">一覧へ戻る</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (cardContainer) cardContainer.textContent = '';
+                if (checkButton) checkButton.style.display = 'none';
+                if (resetButton) resetButton.style.display = 'none';
+                if (feedbackMessage) feedbackMessage.style.display = 'none';
             }
 
             // ----------------------------------------------------
             // ユーティリティ
             // ----------------------------------------------------
             
+            let currentAudio = null;
             function playSound(path) {
-                const audio = new Audio(path);
-                audio.play().catch(e => console.error("音声再生エラー:", e));
+                // 前の音をリセットして重なりを防ぐ
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = new Audio(path);
+                currentAudio.play().catch(e => console.error("音声再生エラー:", e));
             }
 
             function shuffleArray(array) {
