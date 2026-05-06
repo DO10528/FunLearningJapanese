@@ -1762,16 +1762,24 @@ function renderList(containerId, data) {
         const card = document.createElement('div');
         card.className = `verb-card ${item.learned ? 'learned' : ''}`;
         
-        // 表示用のテキスト
-        const displayText = item[window.currentDisplayMode][currentForm];
+        // 表示用のテキスト（改行を除去して1行にする）
+        const displayText = item[window.currentDisplayMode][currentForm].replace(/\n/g, '');
         // 発音用のテキスト（常にひらがな）
-        const speechText = item.hiragana[currentForm];
+        const speechText = item.hiragana[currentForm].replace(/\n/g, '');
+
+        // 動的なフォントサイズ調整（文字数が多い場合は小さくする）
+        let dynamicFontSize = '1.15em';
+        if (displayText.length >= 7) {
+            dynamicFontSize = '0.85em';
+        } else if (displayText.length >= 5) {
+            dynamicFontSize = '0.95em';
+        }
 
         card.innerHTML = `
             <div class="verb-info">
                 <div class="verb-icon"><i class="${item.icon}"></i></div>
                 <div class="verb-text-box">
-                    <div class="verb-jp">${displayText.replace(/\n/g, '<br>')}</div>
+                    <div class="verb-jp" style="font-size: ${dynamicFontSize};">${displayText}</div>
                     <div class="verb-en">${item.en}</div>
                 </div>
             </div>
