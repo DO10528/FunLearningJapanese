@@ -94,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 勉強スクリーン ---
+    let currentStudyAudio = null;
+
     function setupStudyScreen() {
         studyGrid.textContent = '';
         timeData.forEach(time => {
@@ -109,7 +111,43 @@ document.addEventListener('DOMContentLoaded', () => {
             
             item.appendChild(img);
             item.appendChild(p);
-            item.onclick = () => speakText(time.text);
+            
+            // クリック時のアニメーション設定（防弾仕様）
+            item.style.transition = "transform 0.1s ease";
+            item.style.cursor = "pointer";
+            
+            item.onclick = async () => {
+                // アニメーション (スケールダウン)
+                item.style.transform = "scale(0.9)";
+                setTimeout(() => {
+                    item.style.transform = "scale(1)";
+                }, 100);
+                
+                // 音声インスタンスの管理 (重複再生防止)
+                if (currentStudyAudio) {
+                    try {
+                        currentStudyAudio.pause();
+                        currentStudyAudio.currentTime = 0;
+                    } catch(e) {}
+                }
+                
+                try {
+                    // 正しい音声パス (assets/sounds/hours/Xji.mp3)
+                    currentStudyAudio = new Audio(`assets/sounds/hours/${time.hour}ji.mp3`);
+                    await currentStudyAudio.play();
+                } catch (e) {
+                    console.log("Audio play failed, fallback to TTS:", e);
+                    // エラー時は読み上げにフォールバックしてクラッシュを防ぐ
+                    speakText(time.text);
+                }
+                
+                // Antigravity Protocol 遵守 (将来的な拡張用・防弾仕様)
+                if (window.Antigravity && typeof window.Antigravity.addPoint === 'function') {
+                    // 練習モードでもタップした記録を残す (エラーを投げない)
+                    window.Antigravity.addPoint('clock_study', time.hour).catch(e => console.log('Antigravity error:', e));
+                }
+            };
+            
             studyGrid.appendChild(item);
         });
     }
