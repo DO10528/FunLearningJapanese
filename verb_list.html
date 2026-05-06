@@ -37,24 +37,30 @@
     </div>
 
     <div class="tab-scroll-container">
-        <button class="tab-btn active" onclick="setForm('masu')">
-            <i class="fa-solid fa-square-check"></i> ます
-        </button>
-        <button class="tab-btn" onclick="setForm('mashita')">
-            <i class="fa-solid fa-clock-rotate-left"></i> ました
-        </button>
-        <button class="tab-btn" onclick="setForm('te')">
-            <i class="fa-solid fa-share-nodes"></i> て形
-        </button>
-        <button class="tab-btn" onclick="setForm('jisho')">
-            <i class="fa-solid fa-book"></i> 辞書形
-        </button>
-        <button class="tab-btn" onclick="setForm('nai')">
-            <i class="fa-solid fa-xmark"></i> ない形
-        </button>
-        <button class="tab-btn" onclick="setForm('ta')">
-            <i class="fa-solid fa-flag"></i> た形
-        </button>
+        <div class="tab-wrapper">
+            <button class="tab-btn active" onclick="setForm('masu')"><i class="fa-solid fa-square-check"></i> ます</button>
+            <span class="helper-icon" onclick="openLogicHelper('masu', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
+        <div class="tab-wrapper">
+            <button class="tab-btn" onclick="setForm('mashita')"><i class="fa-solid fa-clock-rotate-left"></i> ました</button>
+            <span class="helper-icon" onclick="openLogicHelper('mashita', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
+        <div class="tab-wrapper">
+            <button class="tab-btn" onclick="setForm('te')"><i class="fa-solid fa-share-nodes"></i> て形</button>
+            <span class="helper-icon" onclick="openLogicHelper('te', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
+        <div class="tab-wrapper">
+            <button class="tab-btn" onclick="setForm('jisho')"><i class="fa-solid fa-book"></i> 辞書形</button>
+            <span class="helper-icon" onclick="openLogicHelper('jisho', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
+        <div class="tab-wrapper">
+            <button class="tab-btn" onclick="setForm('nai')"><i class="fa-solid fa-xmark"></i> ない形</button>
+            <span class="helper-icon" onclick="openLogicHelper('nai', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
+        <div class="tab-wrapper">
+            <button class="tab-btn" onclick="setForm('ta')"><i class="fa-solid fa-flag"></i> た形</button>
+            <span class="helper-icon" onclick="openLogicHelper('ta', event)"><i class="fa-solid fa-lightbulb"></i></span>
+        </div>
         <!-- 表示切替ボタン -->
         <button id="display-mode-btn" class="tab-btn" onclick="toggleDisplayMode()" style="background-color: var(--primary); color: white; border: 2px solid white; margin-left: 10px;">
             <i class="fa-solid fa-language"></i> ひらがなに切替
@@ -84,6 +90,19 @@
         <a href="index.html" class="home-btn-large">ホームにもどる</a>
     </div>
 
+</div>
+
+<!-- ロジック・ヘルパー モーダル -->
+<div id="logic-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this) closeLogicHelper()">
+    <div class="logic-modal-content">
+        <div class="logic-modal-header">
+            <h2 id="logic-modal-title"><i class="fa-solid fa-lightbulb"></i> ルール (Rule)</h2>
+            <button class="logic-close-btn" onclick="closeLogicHelper()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="logic-modal-body" id="logic-modal-body">
+            <!-- JSで動的に構築される -->
+        </div>
+    </div>
 </div>
 
 <script src="js/verb_list.js?v=3"></script>
