@@ -46,21 +46,40 @@
             padding: 15px;
         }
 
-        /* --- 2. カード選択エリア (クリック元) --- */
+        /* --- 2. 英文エリア (明確な視覚分離) --- */
+        #sp-english-translation-container {
+            background-color: #e8f5e9; /* 薄い緑 */
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #4CAF50;
+            margin: 15px 0;
+        }
+
+        #sp-english-translation {
+            font-size: 1.4em;
+            color: #2e7d32;
+            font-weight: 900;
+            text-align: center;
+            margin: 0;
+            word-break: keep-all;
+        }
+
+        /* --- 3. カード選択エリア (クリック元) --- */
         #sp-card-selection-area {
             background-color: #fffde7; /* 薄い黄色 */
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ffcc5c;
+            border: 2px dashed #ffcc5c;
         }
 
         #sp-card-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
-            min-height: 50px;
+            gap: 12px;
+            min-height: 60px;
             padding-top: 10px;
         }
 
@@ -77,6 +96,8 @@
             font-weight: bold;
             cursor: pointer; /* 押せるように */
             user-select: none;
+            word-break: keep-all; /* 単語の途中で改行させない */
+            white-space: nowrap; /* はみ出さずにカード幅を維持 */
             
             /* 立体的なボタンデザイン */
             box-shadow: 0 4px 0 #f0a000; 
