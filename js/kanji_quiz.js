@@ -363,8 +363,35 @@
                 if (window.Antigravity && window.Antigravity.addPoint) {
                     // Use kanji character as question ID
                     success = await window.Antigravity.addPoint('kanji_quiz_' + currentLevel, qData.kanji);
-                } else if(window.Antigravity && window.Antigravity.addPoint) {
-                    success = await window.Antigravity.addPoint('kanji_quiz', 1500);
+                }
+                if (success) agEarnedPoints++;
+                
+            } else {
+                btn.classList.add('incorrect');
+                const resultMsg = document.getElementById('result-message');
+                if (resultMsg) {
+                    resultMsg.textContent = `ざんねん... せいかいは「${correct}」`;
+                    resultMsg.style.color = "var(--incorrect-color)";
+                }
+                const bubu = document.getElementById('bubu-sound');
+                if (bubu) {
+                    bubu.currentTime = 0;
+                    bubu.play();
+                }
+            }
+
+            // 正解をハイライト
+            buttons.forEach(b => {
+                if(b.textContent === correct) {
+                    b.classList.add('correct');
+                }
+                b.disabled = true; // 他のボタンも押せないようにする
+            });
+
+            setTimeout(() => {
+                currentIndex++;
+                showQuestion();
+            }, 1500);
         }
 
         function showResult() {
