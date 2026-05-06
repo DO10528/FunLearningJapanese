@@ -1,210 +1,45 @@
 {
   "templates": [
-    { "id": "A1", "type": "NはAです", "hint": "（動物）の状態を表す文です。", "pattern": ["N_ANIMAL_P", "は", "A_I_GOOD", "です"], "english": "The (N_ANIMAL_P) is (A_I_GOOD)." },
-    { "id": "A2", "type": "NはAです", "hint": "（食べ物）の味を表す文です。", "pattern": ["N_FOOD_T", "は", "A_I_TASTE", "です"], "english": "The (N_FOOD_T) is (A_I_TASTE)." },
-    { "id": "A3", "type": "NはAです", "hint": "（場所）の広さを表す文です。", "pattern": ["N_PLACE_S", "は", "A_I_SIZE_P", "です"], "english": "The (N_PLACE_S) is (A_I_SIZE_P)." },
-    { "id": "A4", "type": "NはAです", "hint": "（自然現象）の状態を表す文です。", "pattern": ["N_NATURE_T", "は", "A_I_TEMP", "です"], "english": "The (N_NATURE_T) is (A_I_TEMP)." },
-    { "id": "A5", "type": "NはAです", "hint": "（道具）の状態を表す文です。", "pattern": ["N_OBJECT_C", "は", "A_I_GOOD", "です"], "english": "The (N_OBJECT_C) is (A_I_GOOD)." },
-
-    { "id": "B1", "type": "NをVます", "hint": "（人物）が（食べ物）を食べる動作を表します。", "pattern": ["P_CHILD", "は", "N_FOOD_E", "を", "V_EAT"], "english": "(P_CHILD) eats (N_FOOD_E)." },
-    { "id": "B2", "type": "NをVます", "hint": "（動物）が（食べ物）を食べる動作を表します。", "pattern": ["N_ANIMAL_H", "は", "N_FOOD_ANIMAL", "を", "V_EAT"], "english": "The (N_ANIMAL_H) eats (N_FOOD_ANIMAL)." },
-    { "id": "B3", "type": "NをVます", "hint": "（人物）が（飲み物）を飲む動作を表します。", "pattern": ["P_CHILD", "は", "N_DRINK_OK", "を", "V_DRINK"], "english": "(P_CHILD) drinks (N_DRINK_OK)." },
-    { "id": "B4", "type": "NをVます", "hint": "（人物）が（道具）を捜す動作を表します。", "pattern": ["P_CHILD", "は", "N_OBJECT_U", "を", "V_USE_LOOK"], "english": "(P_CHILD) looks for (N_OBJECT_U)." },
-    { "id": "B5", "type": "NをVます", "hint": "（人物）が（乗り物）に乗る動作を表します。", "pattern": ["P_CHILD", "は", "N_VEHICLE_R", "に", "V_RIDE"], "english": "(P_CHILD) rides (N_VEHICLE_R)." },
-
-    { "id": "C1", "type": "NへVます", "hint": "（人物）が（場所）へ行く文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_GO"], "english": "(P_CHILD) goes to (N_PLACE_G)." },
-    { "id": "C2", "type": "NへVます", "hint": "（人物）が（場所）へ帰る文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_RETURN"], "english": "(P_CHILD) returns to (N_PLACE_G)." },
-    { "id": "C3", "type": "NへVます", "hint": "（人物）が（場所）へ行く文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_GO"], "english": "(P_CHILD) goes to (N_PLACE_G)." },
-    { "id": "C4", "type": "NへVます", "hint": "（人物）が（場所）へ帰る文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_RETURN"], "english": "(P_CHILD) returns to (N_PLACE_G)." },
-    { "id": "C5", "type": "NへVます", "hint": "（人物）が（場所）へ行く文です。", "pattern": ["P_CHILD", "は", "N_PLACE_G", "へ", "V_GO"], "english": "(P_CHILD) goes to (N_PLACE_G)." },
-
-    { "id": "D1", "type": "NがVます", "hint": "（動物）が（動作動詞）をする文です。", "pattern": ["N_ANIMAL_A", "が", "V_ANIMAL_A"], "english": "The (N_ANIMAL_A) (V_ANIMAL_A)." },
-    { "id": "D2", "type": "NがVます", "hint": "（乗り物）が（移動動詞）をする文です。", "pattern": ["N_VEHICLE_M", "が", "V_MOVE_M"], "english": "The (N_VEHICLE_M) (V_MOVE_M)." },
-    { "id": "D3", "type": "NがVます", "hint": "（動物）が（動作動詞）をする文です。", "pattern": ["N_ANIMAL_A", "が", "V_ANIMAL_A"], "english": "The (N_ANIMAL_A) (V_ANIMAL_A)." },
-    { "id": "D4", "type": "NがVます", "hint": "（乗り物）が（移動動詞）をする文です。", "pattern": ["N_VEHICLE_M", "が", "V_MOVE_M"], "english": "The (N_VEHICLE_M) (V_MOVE_M)." },
-    { "id": "D5", "type": "NがVます", "hint": "（動物）が（動作動詞）をする文です。", "pattern": ["N_ANIMAL_A", "が", "V_ANIMAL_A"], "english": "The (N_ANIMAL_A) (V_ANIMAL_A)." },
-
-    { "id": "E1", "type": "NはNがAです", "hint": "（動物）は（体の部位）が（形容詞）です。", "pattern": ["N_ANIMAL_H", "は", "N_BODY", "が", "A_I_SIZE"], "english": "The (N_ANIMAL_H)'s (N_BODY) is (A_I_SIZE)." },
-    { "id": "E2", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_SIZE"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_SIZE)." },
-    { "id": "E3", "type": "NはNがAです", "hint": "（人物）は（体の部位）が（形容詞）です。", "pattern": ["P_CHILD", "は", "N_BODY", "が", "A_I_SIZE"], "english": "(P_CHILD)'s (N_BODY) is (A_I_SIZE)." },
-    { "id": "E4", "type": "NはNがAです", "hint": "（動物）は（体の部位）が（形容詞）です。", "pattern": ["N_ANIMAL_H", "は", "N_BODY", "が", "A_I_GOOD"], "english": "The (N_ANIMAL_H)'s (N_BODY) is (A_I_GOOD)." },
-    { "id": "E5", "type": "NはNがAです", "hint": "（場所）は（自然）が（形容詞）です。", "pattern": ["N_PLACE_S", "は", "N_NATURE_S", "が", "A_I_GOOD"], "english": "(N_PLACE_S) has (N_NATURE_S) that is (A_I_GOOD)." },
-
-    { "id": "F1", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
-    { "id": "F2", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
-    { "id": "F3", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
-    { "id": "F4", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." },
-    { "id": "F5", "type": "NはNでVます", "hint": "（人物）が（場所）で（動作）をする文です。", "pattern": ["P_CHILD", "は", "N_PLACE_T", "で", "V_ACTION_T"], "english": "(P_CHILD) (V_ACTION_T) at (N_PLACE_T)." }
+    { "id": "LOGIC1", "type": "NはNでVます", "hint": "学生が勉強する場所", "pattern": ["P_STUDENT", "は", "N_LIBRARY", "で", "V_STUDY"], "english": "The (P_STUDENT) (V_STUDY) in the (N_LIBRARY)." },
+    { "id": "LOGIC2", "type": "NはNでVます", "hint": "お母さんが料理する場所", "pattern": ["P_MOTHER", "は", "N_KITCHEN", "で", "V_COOK"], "english": "(P_MOTHER) (V_COOK) in the (N_KITCHEN)." },
+    { "id": "LOGIC3", "type": "NはNでVます", "hint": "のび太が遊ぶ場所", "pattern": ["P_NOBITA", "は", "N_PARK", "で", "V_PLAY"], "english": "(P_NOBITA) (V_PLAY) in the (N_PARK)." },
+    { "id": "LOGIC4", "type": "NはNでVます", "hint": "お父さんが仕事する場所", "pattern": ["P_FATHER", "は", "N_OFFICE", "で", "V_WORK"], "english": "(P_FATHER) (V_WORK) at the (N_OFFICE)." },
+    { "id": "LOGIC5", "type": "NはNでVます", "hint": "私が買い物する場所", "pattern": ["P_ME", "は", "N_MALL", "で", "V_SHOP"], "english": "(P_ME) (V_SHOP) at the (N_MALL)." },
+    { "id": "LOGIC6", "type": "NはNでVます", "hint": "先生が教える場所", "pattern": ["P_TEACHER", "は", "N_SCHOOL", "で", "V_TEACH"], "english": "The (P_TEACHER) (V_TEACH) at (N_SCHOOL)." },
+    { "id": "LOGIC7", "type": "NはNでVます", "hint": "犬が走る場所", "pattern": ["N_DOG", "は", "N_PARK", "で", "V_RUN"], "english": "The (N_DOG) (V_RUN) in the (N_PARK)." },
+    { "id": "LOGIC8", "type": "NはNをVます", "hint": "鳥が飛ぶ場所", "pattern": ["N_BIRD", "は", "N_SKY", "を", "V_FLY"], "english": "The (N_BIRD) (V_FLY) in the (N_SKY)." },
+    { "id": "LOGIC9", "type": "NはNをVます", "hint": "私が水を飲む", "pattern": ["P_ME", "は", "N_WATER", "を", "V_DRINK"], "english": "(P_ME) (V_DRINK) (N_WATER)." },
+    { "id": "LOGIC10", "type": "NはNをVます", "hint": "私がリンゴを食べる", "pattern": ["P_ME", "は", "N_APPLE", "を", "V_EAT"], "english": "(P_ME) (V_EAT) an (N_APPLE)." }
   ],
-
   "word_pool": {
-    "P_CHILD": [
-      { "japanese": "わたし", "english": "I/Me" },
-      { "japanese": "がくせい", "english": "student" },
-      { "japanese": "おとこのこ", "english": "boy" },
-      { "japanese": "おんなのこ", "english": "girl" },
-      { "japanese": "のびた", "english": "Nobita" }
-    ],
-    "P_ADULT": [
-      { "japanese": "せんせい", "english": "teacher" },
-      { "japanese": "まりお", "english": "Mario" },
-      { "japanese": "ごくう", "english": "Goku" }
-    ],
-    "N_ANIMAL_P": [
-      { "japanese": "いぬ", "english": "dog" },
-      { "japanese": "ねこ", "english": "cat" },
-      { "japanese": "うさぎ", "english": "rabbit" },
-      { "japanese": "ひよこ", "english": "chick" }
-    ],
-    "N_ANIMAL_H": [
-      { "japanese": "いぬ", "english": "dog" },
-      { "japanese": "ねこ", "english": "cat" },
-      { "japanese": "うさぎ", "english": "rabbit" },
-      { "japanese": "うし", "english": "cow" },
-      { "japanese": "くま", "english": "bear" }
-    ],
-    "N_ANIMAL_A": [
-      { "japanese": "いるか", "english": "dolphin" },
-      { "japanese": "くじら", "english": "whale" },
-      { "japanese": "とり", "english": "bird" },
-      { "japanese": "すずめ", "english": "sparrow" },
-      { "japanese": "へび", "english": "snake" }
-    ],
-    "N_FOOD_T": [
-      { "japanese": "りんご", "english": "apple" },
-      { "japanese": "すし", "english": "sushi" },
-      { "japanese": "みかん", "english": "mandarin orange" },
-      { "japanese": "ぎょうざ", "english": "gyoza" },
-      { "japanese": "とうふ", "english": "tofu" },
-      { "japanese": "あんこ", "english": "anko" }
-    ],
-    "N_FOOD_E": [
-      { "japanese": "ごはん", "english": "rice" },
-      { "japanese": "たまご", "english": "egg" },
-      { "japanese": "にく", "english": "meat" },
-      { "japanese": "とうふ", "english": "tofu" },
-      { "japanese": "ぎょうざ", "english": "gyoza" }
-    ],
-    "N_FOOD_ANIMAL": [
-      { "japanese": "ごはん", "english": "rice" },
-      { "japanese": "にく", "english": "meat" }
-    ],
-    "N_DRINK_OK": [
-      { "japanese": "みず", "english": "water" },
-      { "japanese": "こうちゃ", "english": "black tea" },
-      { "japanese": "こーら", "english": "cola" },
-      { "japanese": "コーヒー", "english": "coffee" }
-    ],
-    "N_PLACE_S": [
-      { "japanese": "がっこう", "english": "school" },
-      { "japanese": "うみ", "english": "sea" },
-      { "japanese": "こうえん", "english": "park" },
-      { "japanese": "みずうみ", "english": "lake" },
-      { "japanese": "やま", "english": "mountain" }
-    ],
-    "N_PLACE_G": [
-      { "japanese": "がっこう", "english": "school" },
-      { "japanese": "うみ", "english": "sea" },
-      { "japanese": "こうえん", "english": "park" },
-      { "japanese": "えき", "english": "station" },
-      { "japanese": "こんびに", "english": "convenience store" },
-      { "japanese": "おてら", "english": "temple" }
-    ],
-    "N_PLACE_T": [
-      { "japanese": "がっこう", "english": "school" },
-      { "japanese": "こうえん", "english": "park" },
-      { "japanese": "うみ", "english": "sea" },
-      { "japanese": "やま", "english": "mountain" },
-      { "japanese": "ぎんこう", "english": "bank" }
-    ],
-    "N_OBJECT_C": [
-      { "japanese": "いす", "english": "chair" },
-      { "japanese": "えほん", "english": "picture book" },
-      { "japanese": "とけい", "english": "clock" },
-      { "japanese": "ぬいぐるみ", "english": "stuffed toy" },
-      { "japanese": "ろけっと", "english": "rocket" }
-    ],
-    "N_OBJECT_U": [
-      { "japanese": "めがね", "english": "glasses" },
-      { "japanese": "さいふ", "english": "wallet" },
-      { "japanese": "はさみ", "english": "scissors" },
-      { "japanese": "てぶくろ", "english": "gloves" },
-      { "japanese": "マイク", "english": "microphone" }
-    ],
-    "N_VEHICLE_R": [
-      { "japanese": "くるま", "english": "car" },
-      { "japanese": "でんしゃ", "english": "train" },
-      { "japanese": "じてんしゃ", "english": "bicycle" }
-    ],
-    "N_VEHICLE_M": [
-      { "japanese": "くるま", "english": "car" },
-      { "japanese": "でんしゃ", "english": "train" },
-      { "japanese": "トラック", "english": "truck" },
-      { "japanese": "ひこうき", "english": "airplane" }
-    ],
+    "P_STUDENT": [ { "japanese": "がくせい", "english": "student" } ],
+    "P_MOTHER": [ { "japanese": "おかあさん", "english": "Mother" } ],
+    "P_NOBITA": [ { "japanese": "のびた", "english": "Nobita" } ],
+    "P_FATHER": [ { "japanese": "おとうさん", "english": "Father" } ],
+    "P_ME": [ { "japanese": "わたし", "english": "I" } ],
+    "P_TEACHER": [ { "japanese": "せんせい", "english": "teacher" } ],
+    "N_DOG": [ { "japanese": "いぬ", "english": "dog" } ],
+    "N_BIRD": [ { "japanese": "とり", "english": "bird" } ],
 
-    "N_NATURE_T": [
-      { "japanese": "てんき", "english": "weather" }
-    ],
-    "N_BODY": [
-      { "japanese": "あし", "english": "leg" },
-      { "japanese": "て", "english": "hand" }
-    ],
-    "N_NATURE_S": [
-      { "japanese": "き", "english": "tree" },
-      { "japanese": "はな", "english": "flower" }
-    ],
+    "N_LIBRARY": [ { "japanese": "としょかん", "english": "library" } ],
+    "N_KITCHEN": [ { "japanese": "キッチン", "english": "kitchen" } ],
+    "N_PARK": [ { "japanese": "こうえん", "english": "park" } ],
+    "N_OFFICE": [ { "japanese": "かいしゃ", "english": "office" } ],
+    "N_MALL": [ { "japanese": "デパート", "english": "department store" } ],
+    "N_SCHOOL": [ { "japanese": "がっこう", "english": "school" } ],
+    "N_SKY": [ { "japanese": "そら", "english": "sky" } ],
+    "N_WATER": [ { "japanese": "みず", "english": "water" } ],
+    "N_APPLE": [ { "japanese": "りんご", "english": "apple" } ],
 
-    "A_I_GOOD": [
-      { "japanese": "いい", "english": "good" },
-      { "japanese": "かわいい", "english": "cute" }
-    ],
-    "A_I_TASTE": [
-      { "japanese": "おいしい", "english": "delicious" },
-      { "japanese": "あまい", "english": "sweet" }
-    ],
-    "A_I_SIZE_P": [
-      { "japanese": "おおきい", "english": "big" },
-      { "japanese": "ちいさい", "english": "small" }
-    ],
-    "A_I_TEMP": [
-      { "japanese": "あつい", "english": "hot" },
-      { "japanese": "さむい", "english": "cold" }
-    ],
-    "A_I_SIZE": [
-      { "japanese": "おおきい", "english": "big" },
-      { "japanese": "ちいさい", "english": "small" }
-    ],
-
-    "V_EAT": [
-      { "japanese": "たべます", "english": "eat" }
-    ],
-    "V_DRINK": [
-      { "japanese": "のみます", "english": "drink" }
-    ],
-    "V_USE_LOOK": [
-      { "japanese": "さがします", "english": "look for" }
-    ],
-    "V_RIDE": [
-      { "japanese": "のります", "english": "ride" }
-    ],
-    "V_GO": [
-      { "japanese": "いきます", "english": "go" }
-    ],
-    "V_RETURN": [
-      { "japanese": "かえります", "english": "return" }
-    ],
-    "V_ANIMAL_A": [
-      { "japanese": "とびます", "english": "fly" },
-      { "japanese": "およぎます", "english": "swim" }
-    ],
-    "V_MOVE_M": [
-      { "japanese": "はしります", "english": "run" },
-      { "japanese": "とびます", "english": "fly" }
-    ],
-    "V_ACTION_T": [
-      { "japanese": "べんきょうします", "english": "study" },
-      { "japanese": "あそびます", "english": "play" }
-    ]
+    "V_STUDY": [ { "japanese": "べんきょうします", "english": "studies" } ],
+    "V_COOK": [ { "japanese": "りょうりをします", "english": "cooks" } ],
+    "V_PLAY": [ { "japanese": "あそびます", "english": "plays" } ],
+    "V_WORK": [ { "japanese": "しごとをします", "english": "works" } ],
+    "V_SHOP": [ { "japanese": "かいものをします", "english": "shop" } ],
+    "V_TEACH": [ { "japanese": "おしえます", "english": "teaches" } ],
+    "V_RUN": [ { "japanese": "はしります", "english": "runs" } ],
+    "V_FLY": [ { "japanese": "とびます", "english": "flies" } ],
+    "V_DRINK": [ { "japanese": "のみます", "english": "drink" } ],
+    "V_EAT": [ { "japanese": "たべます", "english": "eat" } ]
   }
 }
