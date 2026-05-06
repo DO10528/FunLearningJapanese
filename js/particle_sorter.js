@@ -55,7 +55,7 @@
     let score = 0;
     
     // Firebase関数ダミー
-    if (!(window.Antigravity && window.Antigravity.addPoint)) {
+    if (typeof window.addPointsToUser !== 'function') {
         window.addPointsToUser = async () => false;
     }
     const POINTS_PER_QUESTION = 1;
@@ -223,7 +223,7 @@
             
             // ★★★ Firebaseポイント加算 ★★★
             // テキストをID代わりに
-            await window.Antigravity.addPoint('particle_sorter', currentQ.text);
+            await window.addPointsToUser(POINTS_PER_QUESTION, currentQ.text);
             // ★★★★★★★★★★★★★★★★★
 
             score++;

@@ -10,7 +10,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            if (!(window.Antigravity && window.Antigravity.addPoint)) {
+            if (typeof window.addPointsToUser !== 'function') {
                 window.addPointsToUser = async () => { return false; };
             }
             const POINTS_PER_QUESTION = 1;
@@ -286,7 +286,7 @@
                 
                 if (isCorrect) {
                     playSound(soundCorrect);
-                    const success = await window.Antigravity.addPoint('clock2', pointKey);
+                    const success = await window.addPointsToUser(POINTS_PER_QUESTION, pointKey);
                     
                     feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
                     feedback.className = 'success show';
@@ -397,7 +397,7 @@
                     if (maxSim >= 80) {
                         playSound(soundCorrect);
                         const pointKey = `${currentHourValue}_${currentMinuteValue}`;
-                        const success = await window.Antigravity.addPoint('clock2', pointKey);
+                        const success = await window.addPointsToUser(POINTS_PER_QUESTION, pointKey);
                         
                         feedback.textContent = success ? 'せいかい！ (+1 pt)' : 'せいかい！';
                         feedback.className = 'success show';

@@ -27,7 +27,7 @@
     let totalQ = 0;
     
     // Firebase関数ダミー
-    if (!(window.Antigravity && window.Antigravity.addPoint)) {
+    if (typeof window.addPointsToUser !== 'function') {
         window.addPointsToUser = async () => false;
     }
     const POINTS_PER_QUESTION = 1;
@@ -88,7 +88,7 @@
             feedback.textContent = "せいかい！";
 
             // ★Firebaseポイント加算
-            await window.Antigravity.addPoint('verb_typing_te', currentQ.masu); // ます形をID代わりに
+            await window.addPointsToUser(POINTS_PER_QUESTION, currentQ.masu); // ます形をID代わりに
 
             setTimeout(nextQuestion, 800);
         } else {

@@ -169,7 +169,9 @@
     window.checkLv1 = () => {
         if (trayTotal === currentLv1Target) {
             showModal(true, "せいかい！");
-            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('money', `いま ${trayTotal}円 です。<br>${currentLv1Target}円 にしてね。`);
+            if(window.addPointsToUser) window.addPointsToUser(1);
+        } else {
+            showModal(false, `いま ${trayTotal}円 です。<br>${currentLv1Target}円 にしてね。`);
         }
     };
 
@@ -205,7 +207,9 @@
     window.checkLv2 = () => {
         if (parseInt(inputNum) === currentLv2Target) {
             showModal(true, "せいかい！");
-            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('money', `こたえは ${currentLv2Target}円 でした。`);
+            if(window.addPointsToUser) window.addPointsToUser(1);
+        } else {
+            showModal(false, `こたえは ${currentLv2Target}円 でした。`);
         }
     };
 
@@ -232,7 +236,9 @@
         const correct = lv3Paid - lv3Price;
         if (parseInt(inputNum) === correct) {
             showModal(true, "せいかい！");
-            if(window.Antigravity && window.Antigravity.addPoint) window.Antigravity.addPoint('money', `こたえは ${correct}円 です。`);
+            if(window.addPointsToUser) window.addPointsToUser(2);
+        } else {
+            showModal(false, `こたえは ${correct}円 です。`);
         }
     };
 

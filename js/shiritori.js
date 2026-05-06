@@ -249,8 +249,25 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // ★★★ Firebaseポイント加算 ★★★
             let ptMsg = '';
-            if (window.Antigravity && window.Antigravity.addPoint) {
-                const success = await window.Antigravity.addPoint('shiritori', score), 1500);
+            if (typeof window.addPointsToUser === 'function') {
+                const success = await window.addPointsToUser(POINTS_PER_CORRECT_ANSWER);
+                ptMsg = success ? ` (+${POINTS_PER_CORRECT_ANSWER}pt 記録)` : ' (ポイント記録エラー)';
+            } else {
+                 ptMsg = ' (ポイント未記録)';
+            }
+            // ★★★ Firebaseポイント加算 終了 ★★★
+
+            FEEDBACK.textContent = `せいかい！✨${ptMsg}`;
+            FEEDBACK.style.color = 'var(--correct-color)';
+
+            turnCount++;
+            currentWord = selectedWord;
+            gameHistoryIds.add(currentWord.id);
+            updateTurnMessage();
+
+            const newLastChar = getCleanLastChar(currentWord.reading);
+            if (newLastChar === 'ん') {
+                setTimeout(() => endGame(false, score), 1500);
             } else {
                 setTimeout(() => {
                     renderCurrentWord();
@@ -309,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ★★★ Firebaseポイント加算 (最終スコアのフィードバックのみ) ★★★
         let pointMsg = 'ゲストモードのためポイントは記録されません。';
         
-        if (finalScore > 0 && window.Antigravity && window.Antigravity.addPoint) {
+        if (finalScore > 0 && typeof window.addPointsToUser === 'function') {
             // ポイントは正解時に既に加算済み
             pointMsg = `スコア ${finalScore} ポイントをランキングに記録しました！`;
         }

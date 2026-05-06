@@ -130,7 +130,7 @@
     let filledCount = 0; // 埋まった数
     
     // Firebase関数ダミー
-    if (!(window.Antigravity && window.Antigravity.addPoint)) {
+    if (typeof window.addPointsToUser !== 'function') {
         window.addPointsToUser = async () => false;
     }
     const POINTS_PER_QUESTION = 1;
@@ -344,7 +344,7 @@
         if (filledCount >= currentQuestion.answers.length) {
             // ★★★ Firebaseポイント加算 ★★★
             // 全ての穴埋めが完了したらポイント付与
-            const result = await window.Antigravity.addPoint('particle_quiz', currentQIndex);
+            const result = await window.addPointsToUser(POINTS_PER_QUESTION, currentQIndex);
             let msg = "よくできました！";
             if (result) {
                 msg += " (+1pt)";
