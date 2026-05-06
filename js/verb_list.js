@@ -1673,7 +1673,7 @@ masterVerbs.forEach((v, idx) => {
 });
 
 let currentForm = 'masu';
-let displayMode = 'kanji'; // デフォルトは漢字
+window.currentDisplayMode = 'hiragana'; // デフォルトはひらがな
 const synth = window.speechSynthesis;
 
 
@@ -1714,13 +1714,31 @@ window.setForm = (form) => {
 };
 
 window.toggleDisplayMode = () => {
-    const cb = document.getElementById('mode-toggle');
-    if(cb) {
-        // Toggle UI logic handles the switch. If checked, it's kanji? Wait, the label order was Kanji -> Hiragana.
-        // Usually, checked = right side (Hiragana). Let's define checked=hiragana.
-        displayMode = cb.checked ? 'hiragana' : 'kanji';
-        renderAllGroups();
+    // 1. 防弾仕様: 要素が存在するか確認
+    const listContainer = document.getElementById('list-container');
+    const btn = document.getElementById('display-mode-btn');
+    
+    if (!listContainer || !btn) {
+        console.warn('Antigravity Protocol: display elements not found.');
+        return;
     }
+
+    // 2. モードの切り替え
+    window.currentDisplayMode = window.currentDisplayMode === 'hiragana' ? 'kanji' : 'hiragana';
+    
+    // 3. UI（ボタン）の更新
+    if (window.currentDisplayMode === 'kanji') {
+        btn.innerHTML = '<i class="fa-solid fa-language"></i> ひらがなに切替';
+        btn.style.backgroundColor = 'var(--primary)';
+        btn.style.color = 'white';
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-language"></i> 漢字に切替';
+        btn.style.backgroundColor = 'var(--accent)';
+        btn.style.color = 'black';
+    }
+
+    // 4. リストの再描画（innerHTMLのみ書き換え）
+    renderAllGroups();
 };
 
 function renderAllGroups() {
