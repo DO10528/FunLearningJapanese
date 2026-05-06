@@ -1763,7 +1763,7 @@ function renderList(containerId, data) {
         card.className = `verb-card ${item.learned ? 'learned' : ''}`;
         
         // 表示用のテキスト
-        const displayText = item[displayMode][currentForm];
+        const displayText = item[window.currentDisplayMode][currentForm];
         // 発音用のテキスト（常にひらがな）
         const speechText = item.hiragana[currentForm];
 
@@ -1802,10 +1802,18 @@ function toggleLearned(id) {
 }
 
 window.onload = () => {
-    // スイッチの初期状態と同期
-    const cb = document.getElementById('mode-toggle');
-    if(cb) {
-        displayMode = cb.checked ? 'hiragana' : 'kanji';
+    // ボタンの初期状態と同期
+    const btn = document.getElementById('display-mode-btn');
+    if(btn) {
+        if (window.currentDisplayMode === 'kanji') {
+            btn.innerHTML = '<i class="fa-solid fa-language"></i> ひらがなに切替';
+            btn.style.backgroundColor = 'var(--primary)';
+            btn.style.color = 'white';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-language"></i> 漢字に切替';
+            btn.style.backgroundColor = 'var(--accent)';
+            btn.style.color = 'black';
+        }
     }
     setForm('masu'); 
     if (speechSynthesis.onvoiceschanged !== undefined) {
