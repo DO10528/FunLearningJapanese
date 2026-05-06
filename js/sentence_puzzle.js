@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const scoreDisplay = document.getElementById('sp-score-display');
             const englishTranslation = document.getElementById('sp-english-translation');
 
-            const SOUND_CORRECT_PATH = 'assets/sounds/seikai.mp3'; 
-            const SOUND_INCORRECT_PATH = 'assets/sounds/bubu.mp3'; 
+            const SOUND_CORRECT_PATH = 'assets/sounds/correct.mp3'; 
+            const SOUND_INCORRECT_PATH = 'assets/sounds/wrong.mp3'; 
             
             let allTemplates = [];         
             let wordPool = {};             
@@ -40,6 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             async function initializeGame() {
                 try {
+                    // 防弾仕様: 必須要素が存在するか確認
+                    if (!dropZone || !cardContainer || !checkButton || !resetButton || !questionText || !scoreDisplay) {
+                        console.warn('Antigravity Protocol: Game elements are missing. Halting execution.');
+                        return;
+                    }
+
                     const response = await fetch(DATA_PATH);
                     const data = await response.json();
                     
@@ -58,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     startNewQuestion();
                 } catch (error) {
                     console.error("データの読み込みまたはゲーム初期化に失敗しました:", error);
-                    questionText.textContent = "エラー: ゲームを開始できませんでした。ファイルパスを確認してください。";
+                    if (questionText) questionText.textContent = "エラー: ゲームを開始できませんでした。ファイルパスを確認してください。";
                 }
             }
 
@@ -209,14 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     playSound(SOUND_CORRECT_PATH); 
                     
                     // ★★★ Firebaseポイント加算 ★★★
-                    // IDがない場合のフォールバックとして英文を使用
-                    const pointKey = currentTemplate.id || currentTemplate.english;
-                    const result = await window.Antigravity.addPoint('sentence_puzzle', pointKey);
-                    
-                    let msg = `🎉 素晴らしい！正解です。`;
-                    if (result) {
-                        msg += ' (+1 ポイント！)';
+                    if (window.Antigravity && window.Antigravity.addPoint) {
+                        try {
+                            const pointKey = currentTemplate.id || currentQuestionIndex.toString();
+                            await window.Antigravity.addPoint('sentence_puzzle', pointKey);
+                        } catch(e) {
+                            console.error('Antigravity point error:', e);
+                        }
                     }
+                    
+                    let msg = `🎉 素晴らしい！正解です。(+1 ポイント！)`;
                     // ★★★★★★★★★★★★★★★★★★★★★★★
 
                     score++;
