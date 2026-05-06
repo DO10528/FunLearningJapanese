@@ -184,13 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // ----------------------------------------------------
 
             async function checkAnswer() {
+                if (!checkButton || !resetButton || !feedbackMessage) return;
+                
                 checkButton.disabled = true;
                 resetButton.disabled = true;
                 
                 const droppedCards = [...dropZone.querySelectorAll('.puzzle-card')];
                 
                 if (droppedCards.length !== currentCorrectParts.length) {
-                    displayFeedback(false, `❌ カードの数が違います。（${currentCorrectParts.length}枚必要です）`);
+                    if (feedbackMessage) {
+                        displayFeedback(false, `❌ カードの数が違います。（${currentCorrectParts.length}枚必要です）`);
+                        feedbackMessage.style.display = "block";
+                    }
                     checkButton.disabled = false;
                     resetButton.disabled = false;
                     return;
@@ -201,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 droppedCards.forEach((card, index) => {
                     const correctWord = currentCorrectParts[index];
                     
-                    // 文字列の空白を除去して厳密に比較する（見えないスペースによるバグ解消）
                     const cleanCardText = card.textContent.trim().replace(/\s+/g, '');
                     const cleanCorrectWord = correctWord.trim().replace(/\s+/g, '');
                     
@@ -218,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isCorrect) {
                     playSound(SOUND_CORRECT_PATH); 
                     
-                    // ★★★ Firebaseポイント加算 ★★★
                     if (window.Antigravity && window.Antigravity.addPoint) {
                         try {
                             const pointKey = currentTemplate.id || currentQuestionIndex.toString();
@@ -228,25 +231,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                     
-                    let msg = `🎉 Excellent! 素晴らしい！ (+1 ポイント！)`;
-                    // ★★★★★★★★★★★★★★★★★★★★★★★
+                    const msg = `🎉 Excellent! 素晴らしい！`;
 
                     score++;
                     currentQuestionIndex++;
-                    displayFeedback(true, msg);
-                    feedbackMessage.style.display = "block"; // 確実に表示
+                    if (feedbackMessage) {
+                        displayFeedback(true, msg);
+                        feedbackMessage.style.display = "block";
+                    }
                     
                     setTimeout(() => {
                         startNewQuestion();
                     }, 2000);
-                    return; // 処理をここで完全に遮断
+                    return; 
                 }
                 
-                // --- 不正解時の処理 ---
                 playSound(SOUND_INCORRECT_PATH); 
-                // 不正解時は「残念」メッセージを非表示にする
-                displayFeedback(false, "");
-                feedbackMessage.style.display = "none";
+                if (feedbackMessage) {
+                    feedbackMessage.textContent = "";
+                    feedbackMessage.style.display = "none";
+                }
                 
                 checkButton.disabled = false;
                 resetButton.disabled = false;

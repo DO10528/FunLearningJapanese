@@ -89,20 +89,21 @@
 
         .puzzle-card {
             background-color: #ffcc5c; 
-            color: #333;
+            color: #000 !important;
             padding: 12px 18px; 
             border-radius: 8px;
             font-size: 1.3em; 
-            font-weight: bold;
-            cursor: pointer; /* 押せるように */
+            font-weight: bold !important;
+            cursor: pointer;
             user-select: none;
-            word-break: keep-all; /* 単語の途中で改行させない */
-            white-space: nowrap; /* はみ出さずにカード幅を維持 */
+            word-break: keep-all;
+            white-space: nowrap;
+            opacity: 1 !important;
+            filter: none !important;
             
-            /* 立体的なボタンデザイン */
             box-shadow: 0 4px 0 #f0a000; 
             border: 1px solid #f0a000;
-            transition: transform 0.1s, opacity 0.1s, background-color 0.3s, box-shadow 0.1s;
+            transition: transform 0.1s, background-color 0.3s, box-shadow 0.1s;
         }
 
         /* カードをクリックしたときのアニメーション */
@@ -115,6 +116,9 @@
         #sp-drop-zone .puzzle-card {
             background-color: #fff8e1; 
             border-color: #ff6f61;
+            color: #000 !important;
+            opacity: 1 !important;
+            filter: none !important;
         }
 
         /* 正解時のカード (JSの .correct-slot に対応) */
