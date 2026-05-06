@@ -52,7 +52,8 @@
         width: 100%;
         overflow-x: auto;
         white-space: nowrap;
-        padding-bottom: 10px; /* スクロールバーの干渉を防ぐ */
+        padding-top: 15px; /* 上部の影とヘルパーアイコンの切れを防ぐ */
+        padding-bottom: 15px; /* スクロールバーと影の干渉を防ぐ */
         margin-bottom: 20px;
         -webkit-overflow-scrolling: touch;
         display: flex;
