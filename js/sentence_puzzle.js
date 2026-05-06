@@ -272,6 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function displayFeedback(isCorrect, message) {
+                if (!feedbackMessage) return;
+                
                 feedbackMessage.textContent = message;
                 feedbackMessage.classList.remove('hidden'); 
                 feedbackMessage.classList.remove('feedback-correct', 'feedback-incorrect');
@@ -284,26 +286,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function updateScoreDisplay() {
+                if (!scoreDisplay) return;
                 scoreDisplay.textContent = `正解数: ${score} / ${totalQuestions} 問`;
             }
 
             function endGame() {
-                playSound(SOUND_CORRECT_PATH); 
-                if (questionText) questionText.textContent = `🎉 ゲームクリア！`;
-                if (englishTranslation) englishTranslation.textContent = `おめでとうございます！`;
+                if (!questionText || !englishTranslation || !dropZone) return;
                 
-                if (dropZone) {
-                    dropZone.innerHTML = `
-                        <div style="text-align:center; width:100%; padding: 20px;">
-                            <h2 style="color: #4CAF50; font-size: 1.8em; margin-bottom: 10px;">最終スコア: ${score} / ${totalQuestions} 点</h2>
-                            <p style="margin-bottom: 25px; color: #555;">よくがんばりました！</p>
-                            <div style="display:flex; justify-content:center; gap:20px; flex-wrap: wrap;">
-                                <button class="sp-action-button sp-tertiary" onclick="exitGameToHome()">ホームへ戻る</button>
-                                <button class="sp-action-button sp-primary" onclick="exitGameToCategory()">一覧へ戻る</button>
-                            </div>
+                playSound(SOUND_CORRECT_PATH); 
+                questionText.textContent = `🎉 ゲームクリア！`;
+                englishTranslation.textContent = `おめでとうございます！`;
+                
+                dropZone.innerHTML = `
+                    <div style="text-align:center; width:100%; padding: 20px;">
+                        <h2 style="color: #4CAF50; font-size: 1.8em; margin-bottom: 10px;">最終スコア: ${score} / ${totalQuestions} 点</h2>
+                        <p style="margin-bottom: 25px; color: #555;">よくがんばりました！</p>
+                        <div style="display:flex; justify-content:center; gap:20px; flex-wrap: wrap;">
+                            <button class="sp-action-button sp-tertiary" onclick="exitGameToHome()">ホームへ戻る</button>
+                            <button class="sp-action-button sp-primary" onclick="exitGameToCategory()">一覧へ戻る</button>
                         </div>
-                    `;
-                }
+                    </div>
+                `;
                 
                 if (cardContainer) cardContainer.textContent = '';
                 if (checkButton) checkButton.style.display = 'none';
