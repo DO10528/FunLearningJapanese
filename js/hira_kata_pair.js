@@ -276,8 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // ポイント処理
             let ptsText = "";
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('hira_kata_pair', Date.now().toString());
                 if (success) ptsText = `+${POINTS_PER_LEVEL}pt ゲット！`;
             }
             MODAL_POINT_FEEDBACK.textContent = ptsText;

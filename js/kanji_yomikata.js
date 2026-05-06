@@ -190,8 +190,8 @@ async function checkAnswer(btn, selected, correct, kanjiId) {
         // Antigravity protocol: add point
         if (window.Antigravity && window.Antigravity.addPoint) {
             window.Antigravity.addPoint('kanji_yomi', 'kanji_yomi_' + kanjiId);
-        } else if (window.addPointsToUser) {
-            window.addPointsToUser(1, 'kanji_yomi_' + kanjiId);
+        } else if (window.Antigravity && window.Antigravity.addPoint) {
+            window.Antigravity.addPoint('kanji_yomikata', 'kanji_yomi_' + kanjiId);
         }
     } else {
         btn.classList.add('incorrect');

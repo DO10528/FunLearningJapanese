@@ -266,8 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targets.forEach(t => t.classList.add('correct'));
 
             // ポイント加算
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('katakana_drag_match', Date.now().toString());
                 if (success) {
                     FEEDBACK.textContent += ` (+${POINTS_PER_LEVEL}pt 記録)`;
                 }

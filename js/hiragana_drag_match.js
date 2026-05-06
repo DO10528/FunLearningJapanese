@@ -265,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const success = await window.Antigravity.addPoint('hira_match', t.dataset.word);
                     if (success) earnedThisLevel++;
                 }
-            } else if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_LEVEL);
+            } else if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('hiragana_drag_match', Date.now().toString());
                 if(success) earnedThisLevel = POINTS_PER_LEVEL;
             }
             

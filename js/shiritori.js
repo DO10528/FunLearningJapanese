@@ -249,8 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // ★★★ Firebaseポイント加算 ★★★
             let ptMsg = '';
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_PER_CORRECT_ANSWER);
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('shiritori', Date.now().toString());
                 ptMsg = success ? ` (+${POINTS_PER_CORRECT_ANSWER}pt 記録)` : ' (ポイント記録エラー)';
             } else {
                  ptMsg = ' (ポイント未記録)';
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ★★★ Firebaseポイント加算 (最終スコアのフィードバックのみ) ★★★
         let pointMsg = 'ゲストモードのためポイントは記録されません。';
         
-        if (finalScore > 0 && typeof window.addPointsToUser === 'function') {
+        if (finalScore > 0 && window.Antigravity && window.Antigravity.addPoint) {
             // ポイントは正解時に既に加算済み
             pointMsg = `スコア ${finalScore} ポイントをランキングに記録しました！`;
         }

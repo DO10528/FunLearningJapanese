@@ -1,0 +1,82 @@
+[
+    {
+        "file": "hiragana_block.js",
+        "replacements": 1
+    },
+    {
+        "file": "kanji_yomikata.js",
+        "replacements": 1
+    },
+    {
+        "file": "shiritori.js",
+        "replacements": 1
+    },
+    {
+        "file": "money.js",
+        "replacements": 3
+    },
+    {
+        "file": "shopping_talk.js",
+        "replacements": 1
+    },
+    {
+        "file": "sentence_puzzle.js",
+        "replacements": 1
+    },
+    {
+        "file": "treasure_Hunt.js",
+        "replacements": 1
+    },
+    {
+        "file": "particle_quiz.js",
+        "replacements": 1
+    },
+    {
+        "file": "katakana_block.js",
+        "replacements": 1
+    },
+    {
+        "file": "imasu_arimasu.js",
+        "replacements": 1
+    },
+    {
+        "file": "verb_typing_masu.js",
+        "replacements": 1
+    },
+    {
+        "file": "transport_game.js",
+        "replacements": 6
+    },
+    {
+        "file": "particle_sorter.js",
+        "replacements": 1
+    },
+    {
+        "file": "hira_kata_pair.js",
+        "replacements": 1
+    },
+    {
+        "file": "verb_typing_te.js",
+        "replacements": 1
+    },
+    {
+        "file": "katakana_drag_match.js",
+        "replacements": 1
+    },
+    {
+        "file": "shiritori2.js",
+        "replacements": 1
+    },
+    {
+        "file": "clock2.js",
+        "replacements": 2
+    },
+    {
+        "file": "hiragana_drag_match.js",
+        "replacements": 1
+    },
+    {
+        "file": "aisatsu_quiz.js",
+        "replacements": 1
+    }
+]

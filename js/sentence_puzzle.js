@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // ★★★ Firebase連携ポイント設定 ★★★
             // ----------------------------------------------------
             // モジュールで定義した関数のフォールバック
-            if (typeof window.addPointsToUser !== 'function') {
-                window.addPointsToUser = async () => { return false; };
+            if (!(window.Antigravity && window.Antigravity.addPoint)) {
+                
             }
             const POINTS_PER_QUESTION = 1;
 
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // ★★★ Firebaseポイント加算 ★★★
                     // IDがない場合のフォールバックとして英文を使用
                     const pointKey = currentTemplate.id || currentTemplate.english;
-                    const result = await window.addPointsToUser(POINTS_PER_QUESTION, pointKey);
+                    const result = await window.Antigravity.addPoint('sentence_puzzle', pointKey);
                     
                     let msg = `🎉 素晴らしい！正解です。`;
                     if (result) {

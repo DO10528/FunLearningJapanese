@@ -480,8 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(SOUND_CORRECT_PATH);
             
             // ★★★ Firebaseポイント付与 ★★★
-            if (typeof window.addPointsToUser === 'function') {
-                const success = await window.addPointsToUser(POINTS_ON_CLEAR); // 1ポイント加算
+            if (window.Antigravity && window.Antigravity.addPoint) {
+                const success = await window.Antigravity.addPoint('shiritori2', Date.now().toString()); // 1ポイント加算
                 if (success) {
                     pointMsg = `🎉 全問クリア！ (+${POINTS_ON_CLEAR}pt 記録)`;
                 } else if (window.currentUserId) {
