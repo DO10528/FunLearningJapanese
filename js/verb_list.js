@@ -1676,11 +1676,6 @@ let currentForm = 'masu';
 let displayMode = 'kanji'; // デフォルトは漢字
 const synth = window.speechSynthesis;
 
-function toggleDisplayMode() {
-    const isKanji = document.getElementById('mode-toggle').checked;
-    displayMode = isKanji ? 'kanji' : 'hiragana';
-    renderAllGroups();
-}
 
 function speak(text) {
     if (synth.speaking) synth.cancel();
