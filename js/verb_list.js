@@ -1801,6 +1801,134 @@ function toggleLearned(id) {
     }
 }
 
+// --- ロジック・ヘルパー ---
+const logicRules = {
+    'masu': {
+        title: 'ます形 (Masu form)',
+        g1: { desc: 'う段 (u-row) → い段 (i-row) + ます', stem: 'か', drop: 'く', add: 'きます' },
+        g2: { desc: '「る」をとる + ます (Drop "ru" + masu)', stem: 'たべ', drop: 'る', add: 'ます' },
+        g3: [
+            { stem: 'する', result: 'します' },
+            { stem: 'くる', result: 'きます' }
+        ]
+    },
+    'mashita': {
+        title: 'ました (Mashita form)',
+        g1: { desc: 'う段 (u-row) → い段 (i-row) + ました', stem: 'か', drop: 'く', add: 'きました' },
+        g2: { desc: '「る」をとる + ました (Drop "ru" + mashita)', stem: 'たべ', drop: 'る', add: 'ました' },
+        g3: [
+            { stem: 'する', result: 'しました' },
+            { stem: 'くる', result: 'きました' }
+        ]
+    },
+    'te': {
+        title: 'て形 (Te form)',
+        g1: { desc: 'う/つ/る → って<br>む/ぶ/ぬ → んで<br>く → いて / ぐ → いで<br>す → して', stem: 'の', drop: 'む', add: 'んで' },
+        g2: { desc: '「る」をとる + て (Drop "ru" + te)', stem: 'たべ', drop: 'る', add: 'て' },
+        g3: [
+            { stem: 'する', result: 'して' },
+            { stem: 'くる', result: 'きて' }
+        ]
+    },
+    'jisho': {
+        title: '辞書形 (Dictionary form)',
+        g1: { desc: 'そのまま (Base form)', stem: 'か', drop: '', add: 'く' },
+        g2: { desc: 'そのまま (Base form)', stem: 'たべ', drop: '', add: 'る' },
+        g3: [
+            { stem: 'する', result: 'する' },
+            { stem: 'くる', result: 'くる' }
+        ]
+    },
+    'nai': {
+        title: 'ない形 (Nai form)',
+        g1: { desc: 'う段 (u-row) → あ段 (a-row) + ない<br><span style="color:#ff4081;font-size:0.8em">※「う」→「わ」になります</span>', stem: 'か', drop: 'く', add: 'かない' },
+        g2: { desc: '「る」をとる + ない (Drop "ru" + nai)', stem: 'たべ', drop: 'る', add: 'ない' },
+        g3: [
+            { stem: 'する', result: 'しない' },
+            { stem: 'くる', result: 'こない' }
+        ]
+    },
+    'ta': {
+        title: 'た形 (Ta form)',
+        g1: { desc: 'て形と同じルールで「て」が「た/だ」になる', stem: 'の', drop: 'む', add: 'んだ' },
+        g2: { desc: '「る」をとる + た (Drop "ru" + ta)', stem: 'たべ', drop: 'る', add: 'た' },
+        g3: [
+            { stem: 'する', result: 'した' },
+            { stem: 'くる', result: 'きた' }
+        ]
+    }
+};
+
+window.openLogicHelper = (form, event) => {
+    // タブ切り替えのクリックをキャンセルせず、モーダルを開く
+    if(event) event.stopPropagation();
+
+    const modal = document.getElementById('logic-modal');
+    const body = document.getElementById('logic-modal-body');
+    const title = document.getElementById('logic-modal-title');
+    
+    // 防弾仕様: 要素が存在しない場合はエラーを回避
+    if (!modal || !body || !title) {
+        console.warn('Antigravity Protocol: logic modal elements missing.');
+        return;
+    }
+
+    const rules = logicRules[form];
+    if (!rules) return;
+
+    title.innerHTML = `<i class="fa-solid fa-lightbulb"></i> ${rules.title}`;
+    
+    const buildAnimHTML = (rule) => {
+        if (!rule.drop && !rule.add) {
+            return `<div class="anim-container"><span class="stem">${rule.stem}</span></div>`;
+        }
+        return `
+            <div class="anim-container">
+                <span class="stem">${rule.stem}</span>
+                <span class="suffix-container">
+                    <span class="drop-suffix">${rule.drop}</span>
+                    <span class="add-suffix">${rule.add}</span>
+                </span>
+            </div>
+        `;
+    };
+
+    const g3HTML = rules.g3.map(item => `
+        <div class="g3-row">
+            <span class="stem">${item.stem}</span>
+            <i class="fa-solid fa-arrow-right arrow"></i>
+            <span class="g3-result">${item.result}</span>
+        </div>
+    `).join('');
+
+    body.innerHTML = `
+        <div class="rule-box g1">
+            <div class="rule-title g1">Group I</div>
+            <div class="rule-desc">${rules.g1.desc}</div>
+            ${buildAnimHTML(rules.g1)}
+        </div>
+        <div class="rule-box g2">
+            <div class="rule-title g2">Group II</div>
+            <div class="rule-desc">${rules.g2.desc}</div>
+            ${buildAnimHTML(rules.g2)}
+        </div>
+        <div class="rule-box g3">
+            <div class="rule-title g3">Group III</div>
+            <div class="rule-desc">不規則 (Irregular)</div>
+            <div class="anim-container g3-grid">
+                ${g3HTML}
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+};
+
+window.closeLogicHelper = () => {
+    const modal = document.getElementById('logic-modal');
+    if (modal) modal.style.display = 'none';
+};
+
 window.onload = () => {
     // ボタンの初期状態と同期
     const btn = document.getElementById('display-mode-btn');
