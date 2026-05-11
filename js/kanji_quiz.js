@@ -411,6 +411,7 @@
             const ingameNavEl = document.getElementById('ingame-nav');
             const scoreAreaEl = document.getElementById('score-area');
             const scoreTextEl = document.getElementById('score-text');
+            const pointsTextEl = document.getElementById('points-text');
             
             if (quizAreaEl) quizAreaEl.style.display = 'none';
             if (ingameNavEl) ingameNavEl.style.display = 'none';
@@ -420,6 +421,7 @@
             } else {
                 if (scoreAreaEl) scoreAreaEl.style.display = 'block';
                 if (scoreTextEl) scoreTextEl.textContent = score;
+                if (pointsTextEl) pointsTextEl.textContent = agEarnedPoints;
             }
         }
 
