@@ -91,12 +91,13 @@
             </div>
 
             <div id="score-area" style="display: none;">
-                <h2 style="font-size:1.5em; color:var(--primary);">おつかれさま！</h2>
+                <h2 style="font-size:1.5em; color:var(--primary);">🎉 おつかれさま！</h2>
                 <div style="font-size: 4rem; font-weight:900; color:var(--correct-color); margin: 15px 0;">
                     <span id="score-text">0</span><span style="font-size:0.4em; color:#333;">てん</span>
                 </div>
                 <div class="nav-buttons">
-                    <button onclick="backToLevelSelect()" class="nav-btn btn-restart">レベルせんたく</button>
+                    <button onclick="startQuiz(currentLevel)" class="nav-btn btn-restart">もう一度遊ぶ</button>
+                    <button onclick="backToLevelSelect()" class="nav-btn btn-back">レベルせんたく</button>
                     <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
                 </div>
             </div>

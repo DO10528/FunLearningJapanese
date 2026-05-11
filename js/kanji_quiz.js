@@ -292,56 +292,55 @@
 
         // --- 問題表示 ---
         function showQuestion() {
-            // ゲーム終了後や配列外アクセス防止
-            if (currentIndex >= questions.length) return;
+            if (currentIndex >= questions.length) {
+                showResult();
+                return;
+            }
 
             isAnswering = true;
             const qData = questions[currentIndex];
             const correctReading = qData[currentMode];
             
-            document.getElementById('q-num').textContent = currentIndex + 1;
-            document.getElementById('kanji-display').textContent = qData.kanji;
-            document.getElementById('result-message').textContent = "";
+            const qNumEl = document.getElementById('q-num');
+            const kanjiDisplayEl = document.getElementById('kanji-display');
+            const resultMsgEl = document.getElementById('result-message');
+            const choicesContainerEl = document.getElementById('choices-container');
+            
+            if (qNumEl) qNumEl.textContent = currentIndex + 1;
+            if (kanjiDisplayEl) kanjiDisplayEl.textContent = qData.kanji;
+            if (resultMsgEl) resultMsgEl.textContent = "";
 
-            // 選択肢生成（正解1 + 不正解2）
-            // 不正解の候補は「同じレベル」かつ「現在のモード」の読みから選ぶ
             const allCandidates = kanjiDatabase[currentLevel].filter(item => {
                 const r = item[currentMode];
                 return r && r !== "" && r !== "-" && r !== "なし" && r !== correctReading;
             });
 
-            // 不正解を2つ選ぶ
             let distractors = [];
             if (allCandidates.length >= 2) {
                 const shuffledCandidates = allCandidates.sort(() => 0.5 - Math.random());
                 distractors = shuffledCandidates.slice(0, 2).map(item => item[currentMode]);
             } else {
-                // 万が一候補が足りない場合のダミー
                 distractors = ["?", "??"];
             }
 
             const choices = [correctReading, ...distractors];
-            // シャッフル
             for (let i = choices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [choices[i], choices[j]] = [choices[j], choices[i]];
             }
 
-            // ボタン配置
-            const container = document.getElementById('choices-container');
-            container.textContent = "";
-            container.className = "choices-grid"; // 1列グリッド
-
-            // 3択にするため、スタイル調整が必要ならここで行うが、
-            // CSSの grid-template-columns: 1fr なので縦に3つ並ぶ
-            
-            choices.forEach(choice => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.textContent = choice;
-                btn.onclick = () => checkAnswer(btn, choice, correctReading);
-                container.appendChild(btn);
-            });
+            if (choicesContainerEl) {
+                choicesContainerEl.textContent = "";
+                choicesContainerEl.className = "choices-grid";
+                
+                choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.textContent = choice;
+                    btn.onclick = () => checkAnswer(btn, choice, correctReading);
+                    choicesContainerEl.appendChild(btn);
+                });
+            }
         }
 
         async function checkAnswer(btn, selected, correct) {
