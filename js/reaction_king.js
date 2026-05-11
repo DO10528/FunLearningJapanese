@@ -1,90 +1,55 @@
-const aizuchiData = {
-    happy: [
-        { text: '最高！', icon: 'fa-solid fa-face-laugh-beam' },
-        { text: 'いいですね！', icon: 'fa-solid fa-thumbs-up' },
-        { text: 'よかった！', icon: 'fa-solid fa-face-smile' },
-        { text: 'すごい！', icon: 'fa-solid fa-star' },
-        { text: 'おめでとう！', icon: 'fa-solid fa-gift' },
-        { text: 'さすが！', icon: 'fa-solid fa-fire' },
-        { text: 'うれしい！', icon: 'fa-solid fa-heart' },
-        { text: 'すばらしい！', icon: 'fa-solid fa-trophy' },
-        { text: 'よくやった！', icon: 'fa-solid fa-hand-sparkles' },
-        { text: 'たのしい！', icon: 'fa-solid fa-party-horn' },
-        { text: 'ほんとうに！', icon: 'fa-solid fa-circle-check' },
-        { text: 'ナイス！', icon: 'fa-solid fa-hand-peace' },
-        { text: '大成功！', icon: 'fa-solid fa-check-double' }
-    ],
-    sad: [
-        { text: '大変ですね', icon: 'fa-solid fa-face-frown' },
-        { text: 'ショックですね', icon: 'fa-solid fa-face-surprise' },
-        { text: '残念です', icon: 'fa-solid fa-face-sad-tear' },
-        { text: 'かわいそうに', icon: 'fa-solid fa-heart-circle-minus' },
-        { text: 'つらいですね', icon: 'fa-solid fa-hand-holding-heart' },
-        { text: 'きびしいですね', icon: 'fa-solid fa-cloud' },
-        { text: 'こまったな', icon: 'fa-solid fa-face-dizzy' },
-        { text: 'むずかしいですね', icon: 'fa-solid fa-puzzle-piece' }
-    ],
-    surprise: [
-        { text: '本当ですか！？', icon: 'fa-solid fa-face-open-mouth' },
-        { text: 'ええっ！', icon: 'fa-solid fa-bolt' },
-        { text: '信じられません！', icon: 'fa-solid fa-face-surprise' },
-        { text: 'まさか！', icon: 'fa-solid fa-face-flushed' },
-        { text: 'すごい！', icon: 'fa-solid fa-star' },
-        { text: 'びっくりしました！', icon: 'fa-solid fa-bomb' },
-        { text: 'マジで！？', icon: 'fa-solid fa-circle-exclamation' }
-    ],
-    neutral: [
-        { text: 'なるほど', icon: 'fa-solid fa-lightbulb' },
-        { text: 'そうですね', icon: 'fa-solid fa-check' },
-        { text: 'たしかに', icon: 'fa-solid fa-thumbs-up' },
-        { text: 'わかりました', icon: 'fa-solid fa-hand-holding' },
-        { text: 'そうなんですね', icon: 'fa-solid fa-circle-info' },
-        { text: 'なるほどね', icon: 'fa-solid fa-face-thinking' },
-        { text: 'そうですか', icon: 'fa-solid fa-question' }
-    ]
-};
-
-const dialogues = [
-    { text: '宝くじに当たりました！', category: 'happy' },
-    { text: '今日はとてもいい天気です！', category: 'happy' },
-    { text: '試験に合格しました！', category: 'happy' },
-    { text: '新しい友達ができました！', category: 'happy' },
-    { text: '好きな人に告白したらOKでした！', category: 'happy' },
-    { text: 'ペットが生まれました！', category: 'happy' },
-    { text: '仕事が早く終わりました！', category: 'happy' },
-    { text: '家族に会いに行きます！', category: 'happy' },
-    { text: '大好きなレストランに行けます！', category: 'happy' },
-    { text: 'プレゼントをもらいました！', category: 'happy' },
-    { text: '犬にかまれました...', category: 'sad' },
-    { text: '財布を落としました...', category: 'sad' },
-    { text: '電車に遅れました...', category: 'sad' },
-    { text: '雨でピクニックが中止になりました...', category: 'sad' },
-    { text: '好きな人にふられました...', category: 'sad' },
-    { text: '風邪をひきました...', category: 'sad' },
-    { text: '大切なものを壊しました...', category: 'sad' },
-    { text: '試験に落ちました...', category: 'sad' },
-    { text: 'ペットが逃げました...', category: 'sad' },
-    { text: '仕事で大失敗しました...', category: 'sad' },
-    { text: '宇宙人に会いました！', category: 'surprise' },
-    { text: '100万円拾いました！', category: 'surprise' },
-    { text: '有名人に会いました！', category: 'surprise' },
-    { text: '空を飛べるようになりました！', category: 'surprise' },
-    { text: 'タイムマシンが発明されました！', category: 'surprise' },
-    { text: '明日から夏休みです！', category: 'surprise' },
-    { text: 'ずっと会いたかった人に突然会えました！', category: 'surprise' },
-    { text: '家にサンタさんが来ました！', category: 'surprise' },
-    { text: 'ラーメンが無料で食べられます！', category: 'surprise' },
-    { text: '突然空が紫色になりました！', category: 'surprise' },
-    { text: '昨日は図書館に行きました', category: 'neutral' },
-    { text: '今日はパンを食べました', category: 'neutral' },
-    { text: '散歩に行きたいです', category: 'neutral' },
-    { text: '来月旅行に行きます', category: 'neutral' },
-    { text: 'この本はとても面白いです', category: 'neutral' },
-    { text: '毎日朝7時に起きます', category: 'neutral' },
-    { text: 'この辺りは静かです', category: 'neutral' },
-    { text: '好きな色は青です', category: 'neutral' },
-    { text: '趣味は写真です', category: 'neutral' },
-    { text: 'このレストランの料理は美味しいです', category: 'neutral' }
+const reactionData = [
+    { dialogue: 'テストで100点を取りました！', correct: ['おめでとう！', 'すごいですね！'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '財布を落としてしまいました…', correct: ['大変ですね！', 'それはショックですね'], wrong: ['よかったですね', 'おめでとう'] },
+    { dialogue: '明日から日本へ旅行に行きます', correct: ['いいですね！', '楽しみですね'], wrong: ['信じられません', '残念です'] },
+    { dialogue: '今日は雨が降っていますね', correct: ['そうですね', 'たしかに'], wrong: ['最高！', 'ショックですね'] },
+    { dialogue: '好きな人に告白しました！', correct: ['どうだった？', 'すごい勇気ですね！'], wrong: ['ざんねん', '知りません'] },
+    { dialogue: 'ペットの犬が生まれました！', correct: ['かわいい！', 'よかったですね！'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '電車に遅れてしまいました…', correct: ['大丈夫ですか？', '大変ですね'], wrong: ['おめでとう', 'すごい！'] },
+    { dialogue: '新しいスマホを買いました！', correct: ['いいですね！', 'どんなの？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '今日の料理は美味しかったです', correct: ['よかったです！', 'また作りますね'], wrong: ['まずかったです', '知りません'] },
+    { dialogue: '風邪をひいてしまいました…', correct: ['大丈夫ですか？', 'ゆっくり休んでください'], wrong: ['おめでとう', 'すごい！'] },
+    { dialogue: '富士山に登りました！', correct: ['すごい！', '景色はどうでした？'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '明日は早く起きなければなりません', correct: ['頑張ってください！', '寝坊しないようにね'], wrong: ['最高！', 'ショックですね'] },
+    { dialogue: '学校で友達ができました！', correct: ['よかったですね！', 'どんな人？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '昨日のゲームは面白かったです', correct: ['そうですね！', '私も好きです'], wrong: ['つまらなかったです', '知りません'] },
+    { dialogue: '財布が見つかりました！', correct: ['よかったです！', '安心しました'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '今日は忙しい一日でした', correct: ['お疲れ様でした！', 'ゆっくり休んでください'], wrong: ['最高！', 'ショックですね'] },
+    { dialogue: '誕生日プレゼントをもらいました！', correct: ['おめでとう！', '何をもらいました？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: 'ラーメンを食べに行きましょう', correct: ['いいですね！', '行きましょう！'], wrong: ['食べたくないです', '知りません'] },
+    { dialogue: '今日の空はきれいですね', correct: ['そうですね！', '青くて気持ちいいです'], wrong: ['汚いです', '知りません'] },
+    { dialogue: '試験に合格しました！', correct: ['おめでとう！', 'すごいですね！'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: 'スマホを落として壊しました…', correct: ['大変ですね！', '大丈夫ですか？'], wrong: ['よかったですね', 'おめでとう'] },
+    { dialogue: '来年の夏休みは海外に行きます', correct: ['楽しみですね！', 'どこに行きますか？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: 'この本はとても面白いです', correct: ['そうですか？', '読んでみます！'], wrong: ['つまらないです', '知りません'] },
+    { dialogue: '今日は寒いですね', correct: ['そうですね！', '暖かくしてください'], wrong: ['暑いです', '知りません'] },
+    { dialogue: 'お祭りに行きました！', correct: ['楽しかったですね！', '何をしました？'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '仕事で大失敗しました…', correct: ['大丈夫ですか？', '次は頑張りましょう！'], wrong: ['おめでとう', 'すごい！'] },
+    { dialogue: '新しい靴を買いました！', correct: ['いいですね！', 'どんなの？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '今日はお弁当を作りました', correct: ['すごいですね！', '美味しそうです'], wrong: ['まずそうです', '知りません'] },
+    { dialogue: '猫を拾いました！', correct: ['かわいい！', 'よかったですね！'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '電車の中で寝てしまいました…', correct: ['大丈夫ですか？', '疲れていますね'], wrong: ['おめでとう', 'すごい！'] },
+    { dialogue: 'ハロウィンの仮装をしました！', correct: ['すごい！', '何になりました？'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: 'クリスマスパーティーに行きます', correct: ['楽しみですね！', 'いいですね！'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '昨日は徹夜で勉強しました', correct: ['お疲れ様でした！', '大丈夫ですか？'], wrong: ['最高！', 'ショックですね'] },
+    { dialogue: '花火大会に行きました！', correct: ['きれいでしたね！', '楽しかったですか？'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '自転車を盗まれました…', correct: ['大変ですね！', '警察に届けましたか？'], wrong: ['よかったですね', 'おめでとう'] },
+    { dialogue: '日本語の勉強を始めました', correct: ['いいですね！', '頑張ってください！'], wrong: ['難しいです', '知りません'] },
+    { dialogue: '今日はランチを一緒に食べませんか？', correct: ['いいですね！', '行きましょう！'], wrong: ['食べたくないです', '知りません'] },
+    { dialogue: 'この映画は感動しました', correct: ['そうですか？', '私も見たいです！'], wrong: ['つまらなかったです', '知りません'] },
+    { dialogue: '引っ越しをすることになりました', correct: ['大変ですね！', 'どこに引っ越しますか？'], wrong: ['残念です', 'ごめんなさい'] },
+    { dialogue: '桜が咲きました！', correct: ['きれいですね！', '花見に行きましょう！'], wrong: ['汚いです', '知りません'] },
+    { dialogue: '期末試験が近づいています', correct: ['頑張ってください！', '大丈夫ですか？'], wrong: ['最高！', 'ショックですね'] },
+    { dialogue: '新しいアルバイトを始めました', correct: ['頑張ってください！', 'どんな仕事ですか？'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '買い物に行きませんか？', correct: ['いいですね！', '行きましょう！'], wrong: ['行きたくないです', '知りません'] },
+    { dialogue: 'この曲は大好きです', correct: ['私も好きです！', 'いい曲ですね！'], wrong: ['嫌いです', '知りません'] },
+    { dialogue: '今日は20キロ歩きました', correct: ['すごいですね！', '疲れましたね'], wrong: ['大変ですね', 'ざんねん'] },
+    { dialogue: '犬に吠えられました…', correct: ['大丈夫ですか？', '怖かったですね'], wrong: ['おめでとう', 'すごい！'] },
+    { dialogue: '夏休みの計画はもう立てましたか？', correct: ['まだです', 'どこかに行きたいです！'], wrong: ['知りません', 'どうでもいいです'] },
+    { dialogue: '今日は天気がいいですね', correct: ['そうですね！', '散歩に行きましょう！'], wrong: ['悪いです', '知りません'] },
+    { dialogue: '数学の問題が解けません…', correct: ['一緒に考えましょう！', '先生に聞きましょう'], wrong: ['できなくて当然', '知りません'] },
+    { dialogue: '誕生日パーティーに来てください', correct: ['いいですね！', '行きます！'], wrong: ['行けません', '知りません'] },
+    { dialogue: 'このカメラは高性能です', correct: ['すごいですね！', '写真を撮ってみましょう！'], wrong: ['使いにくいです', '知りません'] }
 ];
 
 let currentLevel = 'beginner';
@@ -107,7 +72,7 @@ window.startQuiz = (level) => {
     currentIndex = 0;
 
     const selectedDialogues = [];
-    const availableDialogues = dialogues.slice();
+    const availableDialogues = reactionData.slice();
     for (let i = 0; i < totalQuestions && availableDialogues.length > 0; i++) {
         const idx = Math.floor(Math.random() * availableDialogues.length);
         selectedDialogues.push(availableDialogues.splice(idx, 1)[0]);
@@ -142,40 +107,44 @@ function showQuestion() {
     const choicesContainerEl = document.getElementById('choices-container');
 
     if (qNumEl) qNumEl.textContent = currentIndex + 1;
-    if (dialogueDisplayEl) dialogueDisplayEl.textContent = qData.text;
+    if (dialogueDisplayEl) dialogueDisplayEl.textContent = qData.dialogue;
     if (resultMsgEl) resultMsgEl.textContent = '';
 
-    const categories = [
-        { id: 'happy', name: 'うれしい', icon: 'fa-solid fa-face-laugh', color: '#4caf50' },
-        { id: 'sad', name: 'かなしい', icon: 'fa-solid fa-face-frown', color: '#f44336' },
-        { id: 'surprise', name: 'びっくり', icon: 'fa-solid fa-face-surprise', color: '#ff9800' },
-        { id: 'neutral', name: 'ふつう', icon: 'fa-solid fa-face-smile', color: '#2196f3' }
+    const correctChoice = qData.correct[Math.floor(Math.random() * qData.correct.length)];
+    const wrongChoice1 = qData.wrong[Math.floor(Math.random() * qData.wrong.length)];
+    let wrongChoice2;
+    do {
+        wrongChoice2 = qData.wrong[Math.floor(Math.random() * qData.wrong.length)];
+    } while (wrongChoice2 === wrongChoice1 && qData.wrong.length > 1);
+
+    const choices = [
+        { text: correctChoice, isCorrect: true },
+        { text: wrongChoice1, isCorrect: false },
+        { text: wrongChoice2, isCorrect: false }
     ];
 
-    for (let i = categories.length - 1; i > 0; i--) {
+    for (let i = choices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [categories[i], categories[j]] = [categories[j], categories[i]];
+        [choices[i], choices[j]] = [choices[j], choices[i]];
     }
 
     if (choicesContainerEl) {
         choicesContainerEl.textContent = '';
         choicesContainerEl.className = 'choices-grid';
-        categories.forEach(cat => {
+        choices.forEach(choice => {
             const btn = document.createElement('button');
             btn.className = 'choice-btn';
-            btn.innerHTML = `<i class="${cat.icon}"></i><br>${cat.name}`;
-            btn.style.color = cat.color;
-            btn.onclick = () => checkAnswer(btn, cat.id, qData.category);
+            btn.textContent = choice.text;
+            btn.onclick = () => checkAnswer(btn, choice.isCorrect);
             choicesContainerEl.appendChild(btn);
         });
     }
 }
 
-async function checkAnswer(btn, selected, correct) {
+async function checkAnswer(btn, isCorrect) {
     if (!isAnswering) return;
     isAnswering = false;
 
-    const isCorrect = (selected === correct);
     const buttons = document.querySelectorAll('.choice-btn');
     const resultMessageEl = document.getElementById('result-message');
     const seikaiSoundEl = document.getElementById('seikai-sound');
@@ -195,7 +164,7 @@ async function checkAnswer(btn, selected, correct) {
 
         if (window.Antigravity && window.Antigravity.addPoint) {
             try {
-                const pointKey = questions[currentIndex].text;
+                const pointKey = questions[currentIndex].dialogue;
                 await window.Antigravity.addPoint('reaction_king', pointKey);
                 agEarnedPoints++;
             } catch(e) {
