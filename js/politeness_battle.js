@@ -8,15 +8,34 @@ const honorifics = {
     '飲む': '召し上がる',
     '食べる': '召し上がる',
     'する': 'なさる',
+    'くる': 'いらっしゃる',
     '来る': 'いらっしゃる',
+    'いく': 'いらっしゃる',
     '行く': 'いらっしゃる',
+    'みる': 'ご覧になる',
     '見る': 'ご覧になる',
+    'いう': 'おっしゃる',
     '言う': 'おっしゃる',
+    'しる': 'ご存知',
     '知る': 'ご存知',
+    'いる': 'いらっしゃる',
     '居る': 'いらっしゃる',
+    'ねる': 'お休みになる',
     '寝る': 'お休みになる',
-    '死ぬ': 'お亡くなりになる',
-    '着る': 'お召しになる'
+    'きる': 'お召しになる',
+    '着る': 'お召しになる',
+    'あるく': 'お歩きになる',
+    '歩く': 'お歩きになる',
+    'はなす': 'お話しになる',
+    '話す': 'お話しになる',
+    'かく': 'お書きになる',
+    '書く': 'お書きになる',
+    'よむ': 'お読みになる',
+    '読む': 'お読みになる',
+    'たべる': '召し上がる',
+    '食べる': '召し上がる',
+    'のむ': '召し上がる',
+    '飲む': '召し上がる'
 };
 
 let currentLevel = 'beginner';
@@ -80,9 +99,40 @@ function getMasuForm(jishoForm) {
     }
 }
 
+function getStem(jishoForm) {
+    if (!jishoForm) return '';
+    if (jishoForm.endsWith('する')) {
+        return jishoForm.replace('する', '');
+    } else if (jishoForm.endsWith('くる')) {
+        return jishoForm.replace('くる', '');
+    } else if (jishoForm.endsWith('る')) {
+        return jishoForm.slice(0, -1);
+    } else {
+        const lastChar = jishoForm.slice(-1);
+        const map = {
+            'く': 'き', 'ぐ': 'ぎ', 'す': 'し',
+            'つ': 'ち', 'ぬ': 'に', 'ぶ': 'び',
+            'む': 'み', 'る': 'り', 'う': 'い'
+        };
+        return jishoForm.slice(0, -1) + (map[lastChar] || '');
+    }
+}
+
 function getHonorificForm(jishoForm) {
     if (honorifics[jishoForm]) {
-        return getMasuForm(honorifics[jishoForm]) + 'か？';
+        const honJisho = honorifics[jishoForm];
+        if (honJisho === 'ご存知') {
+            return 'ご存知ですか？';
+        }
+        return getMasuForm(honJisho) + 'か？';
+    }
+    const stem = getStem(jishoForm);
+    if (stem) {
+        if (jishoForm.match(/[\u4e00-\u9faf]/) && !jishoForm.match(/^[ぁ-ん]+$/)) {
+            return 'ご' + stem + 'になりますか？';
+        } else {
+            return 'お' + stem + 'になりますか？';
+        }
     }
     return getMasuForm(jishoForm) + 'か？';
 }
