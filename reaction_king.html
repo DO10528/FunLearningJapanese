@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>あいづちマスター - FunLearnJP</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/kanji_quiz.css">
+    <link rel="stylesheet" href="css/common_ui.css">
+</head>
+<body>
+
+<!-- スマートナビゲーションバー -->
+<div class="smart-nav-bar">
+    <button class="smart-nav-btn" onclick="exitGameToHome()" aria-label="ホームに戻る">
+        <i class="fa-solid fa-house"></i>
+    </button>
+    <button class="smart-nav-btn" onclick="exitGameToCategory()" aria-label="前に戻る">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+    </button>
+</div>
+
+    <header>
+        <div class="header-container">
+            <h1>あいづちマスター</h1>
+            <a href="index.html" class="home-link"><i class="fa-solid fa-house"></i> ホーム</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="level-select-view">
+            <h2 style="text-align:center; color:var(--primary); margin-bottom:15px; font-size:1.2em;">レベルをえらんでね</h2>
+            
+            <div class="level-grid">
+                <div class="level-card lv-n5" onclick="startQuiz('beginner')">
+                    <span class="level-badge">BASIC</span>
+                    <div class="level-title">初級</div>
+                    <div class="level-desc">はじめて</div>
+                </div>
+                <div class="level-card lv-n4" onclick="startQuiz('intermediate')">
+                    <span class="level-badge">ELEMENTARY</span>
+                    <div class="level-title">中級</div>
+                    <div class="level-desc">すこし むずかしい</div>
+                </div>
+                <div class="level-card lv-n3" onclick="startQuiz('advanced')">
+                    <span class="level-badge">INTERMEDIATE</span>
+                    <div class="level-title">上級</div>
+                    <div class="level-desc">もっと むずかしい</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-view" class="quiz-card">
+            
+            <div id="auth-status-reaction">認証中...</div>
+
+            <div id="quiz-area">
+                
+                <div id="question-info" style="color:#666; font-weight:bold; margin-top:5px; font-size:0.9em;">
+                    だい <span id="q-num" style="font-size:1.3em; color:var(--primary);">1</span> もん
+                </div>
+
+                <div id="dialogue-display" class="kanji-display" style="font-size:2rem;">?</div>
+
+                <div id="choices-container" class="choices-grid"></div>
+
+                <div id="result-message"></div>
+            </div>
+
+            <div id="score-area" style="display: none;">
+                <h2 style="font-size:1.5em; color:var(--primary);">🎉 おつかれさま！</h2>
+                <div style="font-size: 4rem; font-weight:900; color:var(--correct-color); margin: 15px 0;">
+                    <span id="score-text">0</span><span style="font-size:0.4em; color:#333;">てん</span>
+                </div>
+                <div id="points-display" style="font-size: 2rem; font-weight:bold; color:#FFD700; margin: 20px 0;">
+                    ⭐️ 今回のポイント：<span id="points-text">0</span> Pt
+                </div>
+                <div class="nav-buttons">
+                    <button onclick="startQuiz(currentLevel)" class="nav-btn btn-restart">もう一度遊ぶ</button>
+                    <button onclick="backToLevelSelect()" class="nav-btn btn-back">レベルせんたく</button>
+                    <a href="index.html" class="nav-btn btn-home">ホームにもどる</a>
+                </div>
+            </div>
+            
+            <div class="nav-buttons" id="ingame-nav" style="margin-top:15px;">
+                 <button onclick="backToLevelSelect()" class="nav-btn btn-back">やめる</button>
+            </div>
+
+        </div>
+    </div>
+
+    <audio id="seikai-sound" src="assets/sounds/seikai.mp3"></audio>
+    <audio id="bubu-sound" src="assets/sounds/bubu.mp3"></audio>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/reaction_king.js"></script>
+    <script src="js/common_ui.js"></script>
+
+<script>
+window.performNavCleanup = function() {
+    if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (typeof recognition !== 'undefined' && recognition !== null) {
+        try { recognition.stop(); } catch(e) {}
+    }
+};
+
+window.exitGameToHome = function() {
+    if(window.performNavCleanup) window.performNavCleanup();
+    window.location.href = "index.html";
+};
+
+window.exitGameToCategory = function() {
+    if(window.performNavCleanup) window.performNavCleanup();
+    const btnKeywords = ['やめる', 'もどる', 'メニューにもどる', 'リストにもどる', 'レベルせんたくに もどる'];
+    const buttons = document.querySelectorAll('button, a, .btn-back, .tc-button, .sc-button, .dv-button-secondary, .level-back-btn, .home-btn-large, .home-btn-text, .nav-btn');
+    
+    for (let btn of buttons) {
+        if (btn.classList.contains('smart-nav-btn')) continue;
+        const text = btn.textContent.trim();
+        const href = btn.getAttribute('href');
+        if (text.includes('ホーム') || href === 'index.html') continue;
+        const style = window.getComputedStyle(btn);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
+        let parent = btn.parentElement;
+        let isHidden = false;
+        while (parent && parent !== document.body) {
+            const pStyle = window.getComputedStyle(parent);
+            if (pStyle.display === 'none' || pStyle.visibility === 'hidden') {
+                isHidden = true;
+                break;
+            }
+            parent = parent.parentElement;
+        }
+        if (isHidden) continue;
+        if (btnKeywords.some(kw => text.includes(kw)) || btn.classList.contains('btn-back') || btn.classList.contains('level-back-btn')) {
+            btn.click();
+            return;
+        }
+    }
+    window.location.href = "index.html?cat=tpo_switch";
+};
+</script>
+
+<script>
+window.addEventListener('antigravity-session-end', function() {
+    if (typeof window.performNavCleanup === 'function') {
+        window.performNavCleanup();
+    }
+});
+</script>
+
+</body>
+</html>
