@@ -348,65 +348,83 @@
             if (!isAnswering) return;
             isAnswering = false;
 
+            const qData = questions[currentIndex];
+            
             const isCorrect = (selected === correct);
             const buttons = document.querySelectorAll('.choice-btn');
+            const resultMessageEl = document.getElementById('result-message');
+            const seikaiSoundEl = document.getElementById('seikai-sound');
+            const bubuSoundEl = document.getElementById('bubu-sound');
 
             if (isCorrect) {
                 btn.classList.add('correct');
-                document.getElementById('result-message').textContent = "せいかい！";
-                document.getElementById('result-message').style.color = "var(--correct-color)";
-                document.getElementById('seikai-sound').currentTime = 0;
-                document.getElementById('seikai-sound').play();
+                if (resultMessageEl) {
+                    resultMessageEl.textContent = "🎉 Excellent! せいかい！";
+                    resultMessageEl.style.color = "var(--correct-color)";
+                }
+                if (seikaiSoundEl) {
+                    seikaiSoundEl.currentTime = 0;
+                    seikaiSoundEl.play().catch(e => console.error("Sound error:", e));
+                }
                 score += 10;
                 
-                let success = false;
                 if (window.Antigravity && window.Antigravity.addPoint) {
-                    // Use kanji character as question ID
-                    success = await window.Antigravity.addPoint('kanji_quiz_' + currentLevel, qData.kanji);
+                    try {
+                        const pointKey = qData.kanji;
+                        await window.Antigravity.addPoint('kanji_quiz', pointKey);
+                        agEarnedPoints++;
+                    } catch(e) {
+                        console.error('Antigravity point error:', e);
+                    }
                 }
-                if (success) agEarnedPoints++;
                 
             } else {
                 btn.classList.add('incorrect');
-                const resultMsg = document.getElementById('result-message');
-                if (resultMsg) {
-                    resultMsg.textContent = `ざんねん... せいかいは「${correct}」`;
-                    resultMsg.style.color = "var(--incorrect-color)";
+                if (resultMessageEl) {
+                    resultMessageEl.textContent = `Oops! ざんねん... せいかいは「${correct}」`;
+                    resultMessageEl.style.color = "var(--incorrect-color)";
                 }
-                const bubu = document.getElementById('bubu-sound');
-                if (bubu) {
-                    bubu.currentTime = 0;
-                    bubu.play();
+                if (bubuSoundEl) {
+                    bubuSoundEl.currentTime = 0;
+                    bubuSoundEl.play().catch(e => console.error("Sound error:", e));
                 }
             }
 
-            // 正解をハイライト
             buttons.forEach(b => {
                 if(b.textContent === correct) {
                     b.classList.add('correct');
                 }
-                b.disabled = true; // 他のボタンも押せないようにする
+                b.disabled = true;
             });
 
             setTimeout(() => {
                 currentIndex++;
-                showQuestion();
-            }, 1500);
+                if (currentIndex >= questions.length) {
+                    showResult();
+                } else {
+                    showQuestion();
+                }
+            }, 1800);
         }
 
         function showResult() {
-            document.getElementById('quiz-area').style.display = 'none';
-            document.getElementById('ingame-nav').style.display = 'none';
+            const quizAreaEl = document.getElementById('quiz-area');
+            const ingameNavEl = document.getElementById('ingame-nav');
+            const scoreAreaEl = document.getElementById('score-area');
+            const scoreTextEl = document.getElementById('score-text');
+            
+            if (quizAreaEl) quizAreaEl.style.display = 'none';
+            if (ingameNavEl) ingameNavEl.style.display = 'none';
             
             if (window.Antigravity && window.Antigravity.showResultScreen) {
                 window.Antigravity.showResultScreen(agEarnedPoints);
             } else {
-                document.getElementById('score-area').style.display = 'block';
-                document.getElementById('score-text').textContent = score;
+                if (scoreAreaEl) scoreAreaEl.style.display = 'block';
+                if (scoreTextEl) scoreTextEl.textContent = score;
             }
         }
 
         window.backToLevelSelect = () => {
-            views.quiz.classList.remove('active');
-            views.level.style.display = 'block';
+            if (views.quiz) views.quiz.classList.remove('active');
+            if (views.level) views.level.style.display = 'block';
         };
