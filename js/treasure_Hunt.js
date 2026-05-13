@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'denki', name: 'でんき', img: 'light.png' },
             { id: 'sofa', name: 'ソファ', img: 'sofa.png' }
         ]},
-        kitchen: { title: 'キッチン・しょっき', color: '#ffcc80', words: [
+        kitchen: { title: 'キッチン\nしょっき', color: '#ffcc80', words: [
             { id: 'spoon', name: 'スプーン', img: 'spoon.png' },
             { id: 'fork', name: 'フォーク', img: 'fork.png' },
             { id: 'cup', name: 'コップ', img: 'cup.png' },
