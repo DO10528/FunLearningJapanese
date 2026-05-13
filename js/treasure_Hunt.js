@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'renji', name: 'レンジ', img: 'microwave.png' },
             { id: 'apron', name: 'エプロン', img: 'apron.png' }
         ]},
-        bathroom: { title: 'おふろ・せんめんじょ', color: '#80deea', words: [
+        bathroom: { title: 'おふろ\nせんめんじょ', color: '#80deea', words: [
             { id: 'haburashi', name: 'はブラシ', img: 'toothbrush.png' },
             { id: 'towel', name: 'タオル', img: 'towel.png' },
             { id: 'sekken', name: 'せっけん', img: 'soap.png' },
