@@ -15,11 +15,11 @@
 <body>
 
 <!-- スマートナビゲーションバー -->
-<div class="smart-nav-bar" style="display: none !important;">
-    <button type="button" class="smart-nav-btn" onclick="exitGameToHome()" aria-label="ホームに戻る">
+<div class="smart-nav-bar">
+    <button type="button" class="smart-nav-btn" onclick="event.preventDefault(); event.stopPropagation(); exitGameToHome();" aria-label="ホームに戻る">
         <i class="fa-solid fa-house"></i>
     </button>
-    <button type="button" class="smart-nav-btn" onclick="exitGameToCategory()" aria-label="前に戻る">
+    <button type="button" class="smart-nav-btn" onclick="event.preventDefault(); event.stopPropagation(); exitGameToCategory();" aria-label="前に戻る">
         <i class="fa-solid fa-arrow-rotate-left"></i>
     </button>
 </div>
