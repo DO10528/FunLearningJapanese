@@ -1,17 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ----------------------------------------------------
-    // ★★★ Firebase連携設定 ★★★
-    // ----------------------------------------------------
-    if (!(window.Antigravity && window.Antigravity.addPoint)) {
-        
-    }
     const POINTS_PER_CORRECT = 1; 
-
-    // ----------------------------------------------------
-    // ★ 1. データ定義
-    // (soundプロパティは使用しませんが、データ構造はそのままでも問題ありません)
-    // ----------------------------------------------------
     const ASSETS_BASE = 'assets/';
 
     const GAME_DATA = {
@@ -97,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         kitchen: {
             title: 'キッチン・\nしょっき',
-            color: '#ffcc80', // オレンジ系
+            color: '#ffcc80',
             words: [
                 { id: 'spoon', name: 'スプーン', img: 'spoon.png' },
                 { id: 'fork', name: 'フォーク', img: 'fork.png' },
@@ -113,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         bathroom: {
             title: 'おふろ・\nせんめんじょ',
-            color: '#80deea', // 水色系
+            color: '#80deea',
             words: [
                 { id: 'haburashi', name: 'はブラシ', img: 'toothbrush.png' },
                 { id: 'towel', name: 'タオル', img: 'towel.png' },
@@ -129,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         electronics: {
             title: 'かでん',
-            color: '#b0bec5', // メタリック/グレー系
+            color: '#b0bec5',
             words: [
                 { id: 'rimokon', name: 'リモコン', img: 'remote.png' },
                 { id: 'soujiki', name: 'そうじき', img: 'vacuum.png' },
@@ -145,9 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         colors: {
             title: 'いろ',
-            color: '#f48fb1', // ピンク系
+            color: '#f48fb1',
             words: [
-                { id: 'aka', name: 'あか', img: 'red.png' }, // 赤い色紙などの画像を用意
+                { id: 'aka', name: 'あか', img: 'red.png' },
                 { id: 'ao', name: 'あお', img: 'blue.png' },
                 { id: 'kiiro', name: 'きいろ', img: 'yellow.png' },
                 { id: 'midori', name: 'みどり', img: 'green.png' },
@@ -161,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: {
             title: 'からだ',
-            color: '#ffccbc', // 肌色系
+            color: '#ffccbc',
             words: [
                 { id: 'te', name: 'て', img: 'hand.png' },
                 { id: 'ashi', name: 'あし', img: 'foot.png' },
@@ -177,92 +166,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ----------------------------------------------------
-    // ★ 2. 状態管理
-    // ----------------------------------------------------
     let currentTopicId = null;
     let currentWordList = [];
     let currentWord = null;
     let videoStream = null;
-    // audioCache は削除しました
 
-    // ----------------------------------------------------
-    // ★ 3. DOM要素の取得
-    // ----------------------------------------------------
-    const screens = document.querySelectorAll('.sc-screen');
-    
-    // 画面ごとの要素
-    const screenTopic = document.getElementById('sc-screen-topic');
-    const topicGrid = document.getElementById('sc-topic-grid');
-
-    const screenStudy = document.getElementById('sc-screen-study');
-    const studyTitle = document.getElementById('sc-study-title');
-    const studyGrid = document.getElementById('sc-study-grid');
-    const startGameBtn = document.getElementById('sc-start-game-button');
-
-    const screenGame = document.getElementById('sc-screen-game');
-    const gamePrompt = document.getElementById('sc-game-prompt');
-    const playSoundBtn = document.getElementById('sc-play-sound-button');
-    const openCameraBtn = document.getElementById('sc-open-camera-button');
-
-    const screenCamera = document.getElementById('sc-screen-camera');
-    const videoEl = document.getElementById('sc-video-element');
-    const canvasEl = document.getElementById('sc-canvas-element');
-    const takePicBtn = document.getElementById('sc-take-picture-button');
-    const cancelCameraBtn = document.getElementById('sc-cancel-camera-button');
-
-    const screenResult = document.getElementById('sc-screen-result');
-    const resProbImg = document.getElementById('sc-problem-image');
-    const resProbName = document.getElementById('sc-problem-name');
-    const resUserImg = document.getElementById('sc-result-image');
-    const btnCorrect = document.getElementById('sc-correct-button');
-    const btnIncorrect = document.getElementById('sc-incorrect-button');
-    const pointFeedback = document.getElementById('sc-point-feedback'); 
-
-    const backToTopicBtns = document.querySelectorAll('.sc-back-to-topic');
-
-    // ----------------------------------------------------
-    // ★ 4. 関数定義 (音声読み上げに変更)
-    // ----------------------------------------------------
-
-    // 画面切り替え
     function showScreen(screenEl) {
-        screens.forEach(s => s.classList.remove('active'));
-        screenEl.classList.add('active');
+        const screens = document.querySelectorAll('.sc-screen');
+        if (screens) {
+            screens.forEach(s => s.classList.remove('active'));
+        }
+        if (screenEl) {
+            screenEl.classList.add('active');
+        }
     }
 
-    // ★★★ 音声読み上げ関数 (Text-to-Speech) ★★★
     function speakText(text) {
         if (!window.speechSynthesis) {
             console.error("このブラウザは音声読み上げに対応していません");
             return;
         }
-        
-        // 読み上げ中のものがあればキャンセル
         window.speechSynthesis.cancel();
-
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP'; // 日本語
-        utterance.rate = 0.9;     // 速さ (1.0が標準、0.9は少しゆっくり)
-        utterance.pitch = 1.0;    // 高さ
-        utterance.volume = 1.0;   // 音量
-
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
         window.speechSynthesis.speak(utterance);
     }
 
-    function shuffleArray(array) {
-        let newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-        }
-        return newArray;
-    }
-
-    // ----------------------------------------------------
-    // ★ 5. トピック選択ロジック
-    // ----------------------------------------------------
     function initTopicScreen() {
+        const topicGrid = document.getElementById('sc-topic-grid');
+        const screenTopic = document.getElementById('sc-screen-topic');
+        
+        if (!topicGrid) return;
+        
         topicGrid.textContent = '';
         Object.keys(GAME_DATA).forEach(key => {
             const data = GAME_DATA[key];
@@ -277,167 +215,224 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectTopic(key) {
+        const studyTitle = document.getElementById('sc-study-title');
+        const studyGrid = document.getElementById('sc-study-grid');
+        const screenStudy = document.getElementById('sc-screen-study');
+        
+        if (!GAME_DATA[key]) return;
+        
         currentTopicId = key;
         currentWordList = GAME_DATA[key].words;
         
-        // 勉強画面のセットアップ
-        studyTitle.textContent = `「${GAME_DATA[key].title}」の ことば`;
-        studyGrid.textContent = '';
-
-        currentWordList.forEach(word => {
-            const item = document.createElement('div');
-            item.className = 'sc-study-item';
-            
-            const imgPath = `${ASSETS_BASE}images/${currentTopicId}/${word.img}`;
-
-            const img = document.createElement('img');
-            img.src = imgPath;
-            img.alt = word.name;
-            img.onerror = () => { img.src = 'assets/images/placeholder.png'; };
-
-            const p = document.createElement('p');
-            p.textContent = word.name;
-
-            // ★変更: クリック時にテキストを読み上げ
-            item.onclick = () => speakText(word.name);
-            
-            item.appendChild(img);
-            item.appendChild(p);
-            studyGrid.appendChild(item);
-        });
-
+        if (studyTitle) {
+            studyTitle.textContent = `「${GAME_DATA[key].title}」の ことば`;
+        }
+        if (studyGrid) {
+            studyGrid.textContent = '';
+            currentWordList.forEach(word => {
+                const item = document.createElement('div');
+                item.className = 'sc-study-item';
+                
+                const imgPath = `${ASSETS_BASE}images/${currentTopicId}/${word.img}`;
+                const img = document.createElement('img');
+                img.src = imgPath;
+                img.alt = word.name;
+                img.onerror = () => { img.src = 'assets/images/placeholder.png'; };
+                
+                const p = document.createElement('p');
+                p.textContent = word.name;
+                item.onclick = () => speakText(word.name);
+                
+                item.appendChild(img);
+                item.appendChild(p);
+                studyGrid.appendChild(item);
+            });
+        }
         showScreen(screenStudy);
     }
 
-    // ----------------------------------------------------
-    // ★ 6. ゲームロジック
-    // ----------------------------------------------------
     function setupNewProblem() {
-        // 現在のリストからランダムに選択
+        const gamePrompt = document.getElementById('sc-game-prompt');
+        const playSoundBtn = document.getElementById('sc-play-sound-button');
+        const openCameraBtn = document.getElementById('sc-open-camera-button');
+        const screenGame = document.getElementById('sc-screen-game');
+        
+        if (!currentWordList || currentWordList.length === 0) return;
+        
         const randIndex = Math.floor(Math.random() * currentWordList.length);
         currentWord = currentWordList[randIndex];
 
-        gamePrompt.textContent = 'したのボタンをおして、きこえたものを さがしてね！';
-        playSoundBtn.style.display = 'block';
-        openCameraBtn.style.display = 'none';
+        if (gamePrompt) gamePrompt.textContent = 'したのボタンをおして、きこえたものを さがしてね！';
+        if (playSoundBtn) playSoundBtn.style.display = 'block';
+        if (openCameraBtn) openCameraBtn.style.display = 'none';
         
         showScreen(screenGame);
     }
 
-    playSoundBtn.onclick = () => {
-        // ★変更: テキストを読み上げ
-        speakText(currentWord.name);
+    function setupEventListeners() {
+        const playSoundBtn = document.getElementById('sc-play-sound-button');
+        const startGameBtn = document.getElementById('sc-start-game-button');
+        const backToTopicBtns = document.querySelectorAll('.sc-back-to-topic');
+        const openCameraBtn = document.getElementById('sc-open-camera-button');
+        const takePicBtn = document.getElementById('sc-take-picture-button');
+        const cancelCameraBtn = document.getElementById('sc-cancel-camera-button');
+        const btnCorrect = document.getElementById('sc-correct-button');
+        const btnIncorrect = document.getElementById('sc-incorrect-button');
 
-        gamePrompt.textContent = `「${currentWord.name}」をさがしてね！`;
-        openCameraBtn.style.display = 'block';
-    };
-
-    startGameBtn.onclick = () => setupNewProblem();
-
-    backToTopicBtns.forEach(btn => {
-        btn.onclick = () => {
-            stopCamera();
-            initTopicScreen();
-        };
-    });
-
-    // ----------------------------------------------------
-    // ★ 7. カメラロジック
-    // ----------------------------------------------------
-    openCameraBtn.onclick = async () => {
-        if (videoStream) return;
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' }, 
-                audio: false 
-            });
-            videoStream = stream;
-            videoEl.srcObject = stream;
-            videoEl.onloadedmetadata = () => {
-                canvasEl.width = videoEl.videoWidth;
-                canvasEl.height = videoEl.videoHeight;
+        if (playSoundBtn) {
+            playSoundBtn.onclick = () => {
+                if (currentWord) {
+                    speakText(currentWord.name);
+                    const gamePrompt = document.getElementById('sc-game-prompt');
+                    if (gamePrompt) gamePrompt.textContent = `「${currentWord.name}」をさがしてね！`;
+                    if (openCameraBtn) openCameraBtn.style.display = 'block';
+                }
             };
-            await videoEl.play();
-            showScreen(screenCamera);
-        } catch (err) {
-            console.error(err);
-            alert("カメラが つかえませんでした");
         }
-    };
+
+        if (startGameBtn) {
+            startGameBtn.onclick = () => setupNewProblem();
+        }
+
+        backToTopicBtns.forEach(btn => {
+            btn.onclick = () => {
+                stopCamera();
+                initTopicScreen();
+            };
+        });
+
+        if (openCameraBtn) {
+            openCameraBtn.onclick = async () => {
+                if (videoStream) return;
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' }, 
+                        audio: false 
+                    });
+                    videoStream = stream;
+                    const videoEl = document.getElementById('sc-video-element');
+                    const canvasEl = document.getElementById('sc-canvas-element');
+                    const screenCamera = document.getElementById('sc-screen-camera');
+                    
+                    if (videoEl) {
+                        videoEl.srcObject = stream;
+                        videoEl.onloadedmetadata = () => {
+                            if (canvasEl) {
+                                canvasEl.width = videoEl.videoWidth;
+                                canvasEl.height = videoEl.videoHeight;
+                            }
+                        };
+                        await videoEl.play();
+                    }
+                    showScreen(screenCamera);
+                } catch (err) {
+                    console.error(err);
+                    alert("カメラが つかえませんでした");
+                }
+            };
+        }
+
+        if (takePicBtn) {
+            takePicBtn.onclick = () => {
+                const videoEl = document.getElementById('sc-video-element');
+                const canvasEl = document.getElementById('sc-canvas-element');
+                const resUserImg = document.getElementById('sc-result-image');
+                const resProbImg = document.getElementById('sc-problem-image');
+                const resProbName = document.getElementById('sc-problem-name');
+                const screenResult = document.getElementById('sc-screen-result');
+                
+                if (canvasEl && videoEl && currentWord && currentTopicId) {
+                    const ctx = canvasEl.getContext('2d');
+                    ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+                    const imgData = canvasEl.toDataURL('image/png');
+                    
+                    if (resUserImg) resUserImg.src = imgData;
+                    if (resProbImg) resProbImg.src = `${ASSETS_BASE}images/${currentTopicId}/${currentWord.img}`;
+                    if (resProbName) resProbName.textContent = currentWord.name;
+                    
+                    stopCamera();
+                    showScreen(screenResult);
+                }
+            };
+        }
+
+        if (cancelCameraBtn) {
+            cancelCameraBtn.onclick = () => {
+                stopCamera();
+                const screenGame = document.getElementById('sc-screen-game');
+                showScreen(screenGame);
+            };
+        }
+
+        if (btnCorrect) {
+            btnCorrect.onclick = () => handleSelfAssessment(true);
+        }
+        if (btnIncorrect) {
+            btnIncorrect.onclick = () => handleSelfAssessment(false);
+        }
+    }
 
     function stopCamera() {
         if (videoStream) {
             videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
-            videoEl.srcObject = null;
+            const videoEl = document.getElementById('sc-video-element');
+            if (videoEl) videoEl.srcObject = null;
         }
     }
 
-    takePicBtn.onclick = () => {
-        const ctx = canvasEl.getContext('2d');
-        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-        const imgData = canvasEl.toDataURL('image/png');
-
-        resUserImg.src = imgData;
-        resProbImg.src = `${ASSETS_BASE}images/${currentTopicId}/${currentWord.img}`;
-        resProbName.textContent = currentWord.name;
-
-        stopCamera();
-        showScreen(screenResult);
-    };
-
-    cancelCameraBtn.onclick = () => {
-        stopCamera();
-        showScreen(screenGame);
-    };
-
-    // ----------------------------------------------------
-    // ★ 8. 結果ロジック
-    // ----------------------------------------------------
-    
     async function handleSelfAssessment(isCorrect) {
+        const btnCorrect = document.getElementById('sc-correct-button');
+        const btnIncorrect = document.getElementById('sc-incorrect-button');
+        const pointFeedback = document.getElementById('sc-point-feedback');
         
-        btnCorrect.disabled = true;
-        btnIncorrect.disabled = true;
+        if (btnCorrect) btnCorrect.disabled = true;
+        if (btnIncorrect) btnIncorrect.disabled = true;
 
         if (isCorrect) {
-            // ★変更: 正解時の音声もTTSで言わせる
             speakText("せいかい！やったね！");
-
-            const wordKey = currentWord.name; // nameをキーとして使用
-            const success = await window.Antigravity.addPoint('treasure_Hunt', wordKey);
+            
+            let success = false;
+            if (currentWord && window.Antigravity && typeof window.Antigravity.addPoint === 'function') {
+                const wordKey = currentTopicId + '_' + currentWord.id;
+                try {
+                    success = await window.Antigravity.addPoint('treasure_hunt', wordKey);
+                } catch (e) {
+                    console.error('Antigravity error:', e);
+                }
+            }
             
             let message = `⭕️ せいかい！おめでとう！`;
             if (success) {
                 message += ` (+${POINTS_PER_CORRECT} ポイント)`;
-                pointFeedback.style.color = 'var(--correct-color)';
+                if (pointFeedback) pointFeedback.style.color = 'var(--correct-color)';
             } else {
-                message += ' (ポイント記録エラー)';
-                pointFeedback.style.color = 'var(--accent)';
+                message += ' (ポイント記録済み)';
+                if (pointFeedback) pointFeedback.style.color = 'var(--accent)';
             }
-            pointFeedback.textContent = message;
+            if (pointFeedback) pointFeedback.textContent = message;
 
         } else {
-            // ★変更: 不正解時の音声もTTSで言わせる
             speakText("ざんねん。つぎ、がんばろう！");
-
-            pointFeedback.textContent = '❌ ざんねん！ちがったみたい。がんばろうね。';
-            pointFeedback.style.color = 'var(--incorrect-color)';
+            if (pointFeedback) {
+                pointFeedback.textContent = '❌ ざんねん！ちがったみたい。がんばろうね。';
+                pointFeedback.style.color = 'var(--incorrect-color)';
+            }
         }
         
         setTimeout(() => {
-            resUserImg.src = '';
-            resProbImg.src = '';
-            btnCorrect.disabled = false;
-            btnIncorrect.disabled = false;
+            const resUserImg = document.getElementById('sc-result-image');
+            const resProbImg = document.getElementById('sc-problem-image');
+            
+            if (resUserImg) resUserImg.src = '';
+            if (resProbImg) resProbImg.src = '';
+            if (btnCorrect) btnCorrect.disabled = false;
+            if (btnIncorrect) btnIncorrect.disabled = false;
+            
             setupNewProblem();
-        }, 2000); // 読み上げ時間を考慮して少し長めに待機
+        }, 2000);
     }
-    
-    btnCorrect.onclick = () => handleSelfAssessment(true);
-    btnIncorrect.onclick = () => handleSelfAssessment(false);
 
-
-    // 初期化実行
+    setupEventListeners();
     initTopicScreen();
 });
