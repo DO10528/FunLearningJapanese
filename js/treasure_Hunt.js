@@ -152,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initTopicScreen() {
+        console.log('=== initTopicScreen CALLED ===');
+        console.trace();
         const topicGrid = document.getElementById('sc-topic-grid');
         if (!topicGrid) return;
         
