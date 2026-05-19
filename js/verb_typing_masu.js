@@ -108,8 +108,15 @@
             // 正解
             input.disabled = true; // 遷移完了まで入力をロック
             
-            sndCorrect.currentTime = 0;
-            sndCorrect.play().catch(e => console.log('Audio play error:', e));
+            try {
+                sndCorrect.currentTime = 0;
+                let playPromise = sndCorrect.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log('Audio play error:', e));
+                }
+            } catch(e) {
+                console.log('Audio sync error:', e);
+            }
             
             // 視覚的な「丸（✔）」のフィードバックを表示
             feedback.style.color = "green";
@@ -143,8 +150,15 @@
             
         } else {
             // 不正解
-            sndIncorrect.currentTime = 0;
-            sndIncorrect.play().catch(e => console.log('Audio play error:', e));
+            try {
+                sndIncorrect.currentTime = 0;
+                let playPromise = sndIncorrect.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log('Audio play error:', e));
+                }
+            } catch(e) {
+                console.log('Audio sync error:', e);
+            }
             input.classList.add('shake');
             feedback.style.color = "red";
             feedback.textContent = `こたえ: ${currentQ.jp}`;
