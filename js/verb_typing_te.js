@@ -25,6 +25,9 @@
     let currentQueue = [];
     let currentQ = null;
     let totalQ = 0;
+    let answeredCount = 0;
+    let earnedPoints = 0;
+    const MAX_QUESTIONS = 10;
     
     // Firebase関数ダミー
     if (!(window.Antigravity && window.Antigravity.addPoint)) {
@@ -52,7 +55,15 @@
 
         currentQueue = [...verbData[group]];
         currentQueue.sort(() => Math.random() - 0.5);
+        
+        // 最大10問に制限する
+        if (currentQueue.length > MAX_QUESTIONS) {
+            currentQueue = currentQueue.slice(0, MAX_QUESTIONS);
+        }
+        
         totalQ = currentQueue.length;
+        answeredCount = 0;
+        earnedPoints = 0;
         
         menuScreen.style.display = 'none';
         gameScreen.style.display = 'block';
@@ -62,14 +73,20 @@
 
     function nextQuestion() {
         if (currentQueue.length === 0) {
-            alert("クリア！おめでとう！");
-            location.reload();
+            // 安全のためのフォールバック
+            if (window.Antigravity && window.Antigravity.showResultScreen) {
+                window.Antigravity.showResultScreen(earnedPoints);
+            } else {
+                alert(`クリア！おめでとう！\nかくとくポイント: ${earnedPoints}`);
+                location.reload();
+            }
             return;
         }
 
         currentQ = currentQueue.pop();
         qText.textContent = currentQ.masu;
         input.value = "";
+        input.disabled = false;
         input.focus();
         feedback.textContent = "";
         
@@ -77,23 +94,55 @@
         progressBar.style.width = percent + '%';
     }
 
-    // ★ async に変更
-    async function checkAnswer() {
-        const userVal = input.value.trim();
+    // 正解判定後の自動遷移ロジックの追加・防弾仕様の表記ゆれ対策
+    function checkAnswer() {
+        if (input.disabled) return; // 二重送信防止
         
-        if (userVal === currentQ.te) {
+        // 入力値と正解データを正規化
+        const userVal = input.value.trim().replace(/　/g, "").replace(/\s+/g, "").toLowerCase();
+        const correctVal = currentQ.te.replace(/　/g, "").replace(/\s+/g, "").toLowerCase();
+        
+        if (userVal === correctVal) {
+            // 正解
+            input.disabled = true; // 遷移完了まで入力をロック
+            
             sndCorrect.currentTime = 0;
-            sndCorrect.play();
+            sndCorrect.play().catch(e => console.log('Audio play error:', e));
+            
+            // 視覚的な「丸（✔）」のフィードバックを表示
             feedback.style.color = "green";
-            feedback.textContent = "せいかい！";
+            feedback.innerHTML = '<i class="fa-solid fa-check-circle" style="font-size: 1.5rem; margin-right: 8px; vertical-align: middle;"></i>せいかい！';
 
-            // ★Firebaseポイント加算
-            await window.Antigravity.addPoint('verb_typing_te', currentQ.masu); // ます形をID代わりに
+            answeredCount++;
+            earnedPoints += POINTS_PER_QUESTION;
 
-            setTimeout(nextQuestion, 800);
+            // ポイント加算（エラーでブロックされないように非同期実行）
+            try {
+                if (window.Antigravity && window.Antigravity.addPoint) {
+                    window.Antigravity.addPoint('verb_typing_te', currentQ.masu).catch(e => console.warn('Point track warning:', e));
+                }
+            } catch(e) {
+                console.warn('Point track error:', e);
+            }
+
+            // 1.5秒後に次の問題またはリザルト画面へ遷移
+            setTimeout(() => {
+                if (answeredCount >= MAX_QUESTIONS || currentQueue.length === 0) {
+                    if (window.Antigravity && window.Antigravity.showResultScreen) {
+                        window.Antigravity.showResultScreen(earnedPoints);
+                    } else {
+                        alert(`クリア！おめでとう！\nかくとくポイント: ${earnedPoints}`);
+                        location.reload();
+                    }
+                } else {
+                    nextQuestion();
+                }
+            }, 1500);
+            
         } else {
+            // 不正解
             sndIncorrect.currentTime = 0;
-            sndIncorrect.play();
+            sndIncorrect.play().catch(e => console.log('Audio play error:', e));
             input.classList.add('shake');
             feedback.style.color = "red";
             feedback.textContent = `こたえ: ${currentQ.te}`;
